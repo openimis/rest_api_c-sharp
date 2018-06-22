@@ -1,0 +1,16 @@
+﻿Tools > NuGet Package Manager > Package Manager Console
+	Install-Package Microsoft.EntityFrameworkCore.SqlServer
+	Install-Package Microsoft.EntityFrameworkCore.Tools
+	Install-Package Microsoft.VisualStudio.Web.CodeGeneration.Design
+
+	Scaffold-DbContext "Server=TPH-L18042\SQLEXPRESS;Database=IMIS;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+
+
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Server=TPH-L18042\\SQLEXPRESS;Database=IMIS;Trusted_Connection=True;");
+            }
+        }
