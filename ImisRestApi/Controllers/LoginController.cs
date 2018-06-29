@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Web.Http;
 using ImisRestApi.Security;
 
-using ImisRestApi.Models.RequestModels;
+using ImisRestApi.Models.HTTPModels;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,6 +24,7 @@ using ImisRestApi.Models.Interfaces;
 
 namespace ImisRestApi.Controllers
 {
+    [ApiVersion("1")]
     [Route("api/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
@@ -32,7 +33,12 @@ namespace ImisRestApi.Controllers
         private readonly IMISContext _imisContext;
         private readonly IIMISRepository _imisRepository;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="imisContext"></param>
+        /// <param name="imisRepository"></param>
         public LoginController(IConfiguration configuration, IMISContext imisContext, IIMISRepository imisRepository)
         {
             _configuration = configuration;
@@ -41,26 +47,33 @@ namespace ImisRestApi.Controllers
         }
 
         /// <summary>
-        /// This function creates JWT token for the user identified with the user's credentials 
+        /// Creates the JWT token 
         /// </summary>
-        /// <param name="request">
-        ///     The username and password as JSON
-        /// </param>
-        /// <returns>
-        ///     200 {"token": "[JWT_ACCESS_TOKEN]", "expires": "[Token_expiration_DateTime]" } 
-        ///     400 {"error": "The request body is invalid"} 
-        ///     401 No body
-        /// </returns>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// ### REMARKS ###
+        /// The following codes are returned
+        /// - 400 - No sub domain is found that matches the SubDomainName property
+        /// - 200 - Updated an existing API object
+        /// - 201 - Created a new API object</remarks>
         [AllowAnonymous]
         [HttpPost]
+        [ProducesResponseType(typeof(LoginResponseModel), 200)]
+        [ProducesResponseType(typeof(LoginBadRequestModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult Login([FromBody] LoginRequestModel request)
         {
 
-            if (request.Username==null || request.Password==null)
-            {
-                return BadRequest(new { error = "The request body is invalid"});
-            }
+            List<string> errors = LoginBadRequestModel.GetBadRequestErrors(request);
 
+            if (errors.Count() > 0)
+            {
+                return BadRequest(new LoginBadRequestModel {
+                    Errors = errors.ToArray()
+                });
+            }
+            
             IUserRepository userRepository = _imisRepository.getUserRepository();
 
             TblUsers user = userRepository.GetByUsernameAndPassword(request.Username, request.Password);
@@ -75,7 +88,7 @@ namespace ImisRestApi.Controllers
                 };
 
                 // save user roles
-                var roles = user.getRolesStringArray();
+                var roles = user.GetRolesStringArray();
 
                 foreach (var role in roles)
                 {
@@ -92,10 +105,10 @@ namespace ImisRestApi.Controllers
                     expires: expirationDate,
                     signingCredentials: creds);
 
-                return Ok(new
+                return Ok(new LoginResponseModel 
                 {
-                    token = new JwtSecurityTokenHandler().WriteToken(token), 
-                    expires = expirationDate
+                    Token = new JwtSecurityTokenHandler().WriteToken(token), 
+                    Expires = expirationDate
                 });
             }
 
