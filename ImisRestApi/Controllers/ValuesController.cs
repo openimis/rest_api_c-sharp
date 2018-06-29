@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ImisRestApi.Controllers
 {
+    [ApiVersion("1")]
     [Authorize(Roles = "IMISAdmin")]
     [Route("api/[controller]")]
     public class ValuesController : Controller

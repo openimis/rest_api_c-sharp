@@ -16,6 +16,9 @@ using ImisRestApi.Security;
 using ImisRestApi.Models.Interfaces;
 using ImisRestApi.Models.Repository;
 
+using Swashbuckle.AspNetCore.SwaggerGen;
+using ImisRestApi.Docs;
+
 namespace ImisRestApi
 {
     public class Startup
@@ -54,6 +57,8 @@ namespace ImisRestApi
 
             services.AddSingleton<IIMISRepository, IMISRepository>();
 
+            services.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
+
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMISContext imisContext)
@@ -66,7 +71,10 @@ namespace ImisRestApi
             app.UseAuthentication();
             app.UseMvc();
             app.UseStaticFiles();
-        
+
+            app.UseSwagger(SwaggerHelper.ConfigureSwagger);
+            app.UseSwaggerUI(SwaggerHelper.ConfigureSwaggerUI);
+
             // ===== Create tables ======
             //imisContext.Database.EnsureCreated();
         }

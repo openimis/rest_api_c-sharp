@@ -260,3 +260,7 @@ paket-files/
 __pycache__/
 *.pyc
 /ImisRestApi/Controllers/AccountController.cs
+/ImisRestApi.Specs
+/ImisRestApi.Specs-old
+/ImisRestApi.Tests
+/Specs
