@@ -19,8 +19,7 @@ namespace OpenImis.RestApi.IntegrationTests
         {
             _testFixture = new TestFixture();
         }
-
-
+		
 		/// <summary>
 		/// Given  that the following users exists
 		/// | Username | Password |
@@ -34,17 +33,11 @@ namespace OpenImis.RestApi.IntegrationTests
 		[InlineData(@"{'username': 'Admin', 'password': 'Admin'}")]
 		public async Task LoginWithGoodCredentials(string credentials) 
         {
-
-            //using (var context = new IMISContext())
-            //{
-            //    context.TblUsers.Add(new TblUsers
-            //    { LoginName = "Admin",
-            //      Password = "Admin".ToCharArray()
-            //    });
-            //}
+			// SETUP
+			ByteArrayContent content = HttpBody.GetBodyFromJSONString(credentials);
 
 			// ACT
-			var response = await _testFixture.Client.PostAsync("/api/login", HttpBody.GetBodyFromJSONString(credentials));
+			var response = await _testFixture.Client.PostAsync("/api/login", content);
             
 			// ASSERT
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -58,7 +51,6 @@ namespace OpenImis.RestApi.IntegrationTests
 
 			loginResponse.Token.Should().NotBeEmpty();
 			loginResponse.Expires.Should().BeAfter(DateTime.Now);
-
 		}
 
 		[Theory]
