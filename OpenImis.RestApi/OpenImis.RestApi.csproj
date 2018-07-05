@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <UserSecretsId>aspnet-ImisRestApi-0F650C61-A020-4549-AC0C-C49F0334E2D7</UserSecretsId>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <ProjectGuid>{0F650C61-A020-4549-AC0C-C49F0334E2D7}</ProjectGuid>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
