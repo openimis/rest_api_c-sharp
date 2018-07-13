@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImisRestApi", "ImisRestApi\ImisRestApi.csproj", "{4ECA9D05-7CB6-468A-AF5A-1AB6954594ED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4ECA9D05-7CB6-468A-AF5A-1AB6954594ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ECA9D05-7CB6-468A-AF5A-1AB6954594ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ECA9D05-7CB6-468A-AF5A-1AB6954594ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ECA9D05-7CB6-468A-AF5A-1AB6954594ED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D77A0F1E-B2D7-4938-9BEE-C0AAFA52D112}
+	EndGlobalSection
+EndGlobal

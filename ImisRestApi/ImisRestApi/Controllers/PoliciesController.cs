@@ -1,0 +1,49 @@
+﻿using ImisRestApi.Data;
+using ImisRestApi.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+
+namespace ImisRestApi.Controllers
+{
+    [Authorize]
+    public class PoliciesController : Controller
+    {
+        private ImisPolicy policies;
+
+        public PoliciesController(IConfiguration configuration)
+        {
+            policies = new ImisPolicy(configuration);
+        }
+
+        [HttpPost]
+        [Route("api/Policies/Enter_Policy")]
+        public IActionResult Enter_Policy([FromBody]Policy model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var response = policies.Enter(model);
+            return Json(response);
+
+        }
+
+        [HttpPost]
+        [Route("api/Policies/Renew_Policy")]
+        public IActionResult Renew_Policy([FromBody]Policy model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var response = policies.Renew(model);
+
+            return Json(response);
+
+        }
+    }
+}
