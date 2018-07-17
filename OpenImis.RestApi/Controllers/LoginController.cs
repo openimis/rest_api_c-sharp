@@ -5,11 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using OpenImis.RestApi.Security;
-
 using OpenImis.RestApi.Models.HTTPModels;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,12 +20,12 @@ using System.ComponentModel.DataAnnotations;
 namespace OpenImis.RestApi.Controllers
 {
     [ApiVersion("1")]
-    [Route("api/[controller]")]
+    [Route("api/{version:apiVersion}/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IIMISRepository _imisRepository;
+        private readonly ICoreRepository _imisRepository;
 
         /// <summary>
         /// 
@@ -38,25 +33,28 @@ namespace OpenImis.RestApi.Controllers
         /// <param name="configuration"></param>
         /// <param name="imisContext"></param>
         /// <param name="imisRepository"></param>
-        public LoginController(IConfiguration configuration, IIMISRepository imisRepository)
+        public LoginController(IConfiguration configuration, ICoreRepository imisRepository)
         {
             _configuration = configuration;
             _imisRepository = imisRepository;
         }
 
-        /// <summary>
-        /// Creates the JWT token 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// ### REMARKS ###
-        /// The following codes are returned
-        /// - 400 - No sub domain is found that matches the SubDomainName property
-        /// - 200 - Updated an existing API object
-        /// - 201 - Created a new API object
-        /// </remarks>
-        [AllowAnonymous]
+		/// <summary>
+		/// Creates the JWT token 
+		/// </summary>
+		/// <remarks>
+		/// ### REMARKS ###
+		/// The following codes are returned
+		/// - 200 - New generated token 
+		/// - 400 - The request is invalid
+		/// - 401 - Login credentials are invalid
+		/// </remarks>
+		/// <param name="request">The LoginRequestModel containing the username and password</param>
+		/// <returns>The token related information</returns>
+		/// <response code="200">Returns the token</response>
+		/// <response code="400">If the request in incomplete</response>      
+		/// <response code="401">If the login credentials are wrong</response>      
+		[AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(typeof(LoginResponseModel), 200)]
         [ProducesResponseType(typeof(LoginBadRequestModel), StatusCodes.Status400BadRequest)]

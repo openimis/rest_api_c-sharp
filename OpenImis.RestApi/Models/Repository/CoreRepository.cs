@@ -1,5 +1,4 @@
 ﻿using OpenImis.RestApi.Models.Interfaces;
-using OpenImis.RestApi.Models.TanzaniaRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +9,10 @@ namespace OpenImis.RestApi.Models.Repository
     /// <summary>
     /// This Service instanciates the Entities repositories and serves as an entry point to these 
     /// </summary>
-    public class IMISRepository: IIMISRepository
+    public class CoreRepository: ICoreRepository
     {
         private readonly IUserRepository userRepository;
-        public IMISRepository()
+        public CoreRepository()
         {
             userRepository = new UserRepository();
         }

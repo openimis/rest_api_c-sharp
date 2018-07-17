@@ -18,12 +18,12 @@ namespace OpenImis.RestApi.Security
     {
         private int _maxTokenSizeInBytes = TokenValidationParameters.DefaultMaximumTokenSizeInBytes;
         private readonly JwtSecurityTokenHandler _tokenHandler;
-        private readonly IIMISRepository _imisRepository;
+        private readonly ICoreRepository _imisRepository;
         
         public IMISJwtSecurityTokenHandler(IServiceCollection serviceCollection)
         {
             _tokenHandler = new JwtSecurityTokenHandler();
-            _imisRepository = serviceCollection.BuildServiceProvider().GetService<IIMISRepository>();
+            _imisRepository = serviceCollection.BuildServiceProvider().GetService<ICoreRepository>();
         }
 
         public bool CanValidateToken

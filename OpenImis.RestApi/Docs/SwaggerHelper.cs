@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -26,21 +27,21 @@ namespace OpenImis.RestApi.Docs
 
             swaggerGenOptions.DescribeAllEnumsAsStrings();
             swaggerGenOptions.OperationFilter<FormatXmlCommentProperties>();
-        }
+			swaggerGenOptions.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
+			swaggerGenOptions.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
+		}
 
         private static void AddSwaggerDocPerVersion(SwaggerGenOptions swaggerGenOptions, Assembly webApiAssembly)
         {
             var apiVersionDescriptions = new ApiVersionDescriptions();
             apiVersionDescriptions.AddDescription("1", File.ReadAllText("Docs\\ApiVersion1Description.md"));
-
-
-            var apiVersions = GetApiVersions(webApiAssembly);
+			var apiVersions = GetApiVersions(webApiAssembly);
             foreach (var apiVersion in apiVersions)
             {
                 swaggerGenOptions.SwaggerDoc($"v{apiVersion}",
                     new Info
                     {
-                        Title = "openIMIS API",
+                        Title = "openIMIS REST API",
                         Version = $"v{apiVersion}",
                         Description = apiVersionDescriptions.GetDescription(apiVersion),
 

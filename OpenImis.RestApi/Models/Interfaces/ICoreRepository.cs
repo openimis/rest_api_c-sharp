@@ -8,7 +8,7 @@ namespace OpenImis.RestApi.Models.Interfaces
     /// <summary>
     /// This interface serves to define a Service for the Entities repositories 
     /// </summary>
-    public interface IIMISRepository
+    public interface ICoreRepository
     {
         /// <summary>
         /// Return the user repository

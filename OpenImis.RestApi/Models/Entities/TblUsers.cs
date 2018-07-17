@@ -37,7 +37,7 @@ namespace OpenImis.RestApi.Models.Entities
         public ICollection<TblLogins> TblLogins { get; set; }
         public ICollection<TblUsersDistricts> TblUsersDistricts { get; set; }
 
-        public Dictionary<int, string> rolesMapping = new Dictionary<int, string>
+        public readonly Dictionary<int, string> rolesMapping = new Dictionary<int, string>
         {
             {1, "EnrollmentOfficer"},
             {2, "Manager"},

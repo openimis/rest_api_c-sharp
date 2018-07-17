@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.RestApi.Models.TanzaniaRepository
+namespace OpenImis.RestApi.Models.Repository
 {
     /// <summary>
     /// This class is actual implementation of IUserRepository methods for Tanzania implementation 

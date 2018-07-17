@@ -266,3 +266,5 @@ __pycache__/
 /Specs
 /OpenImis.RestApi.IntegrationTests/Asserts
 /OpenImis.RestApi/package commands.txt
+/OpenImis.RestApi/SonarScanner.bat
+/OpenImis.RestApi/.sonarqube/

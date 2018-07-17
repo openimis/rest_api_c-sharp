@@ -7,7 +7,7 @@
   <HasBeginStepCommandLineCredentials>true</HasBeginStepCommandLineCredentials>
   <SonarQubeHostUrl>https://sonarcloud.io</SonarQubeHostUrl>
   <SonarQubeVersion>7.3.0.14089</SonarQubeVersion>
-  <SonarProjectKey>OpenIMISWebAPI</SonarProjectKey>
+  <SonarProjectKey>OpenIMIS.RestAPI</SonarProjectKey>
   <AdditionalConfig>
     <ConfigSetting Id="BuildUri" />
     <ConfigSetting Id="TfsUri" />

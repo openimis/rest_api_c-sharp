@@ -28,7 +28,7 @@ namespace OpenImis.RestApi
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -55,7 +55,13 @@ namespace OpenImis.RestApi
 
             services.AddMvc();
 
-            services.AddSingleton<IIMISRepository, IMISRepository>();
+			services.AddApiVersioning(o => {
+				o.ReportApiVersions = true;
+				o.AssumeDefaultVersionWhenUnspecified = true;
+				o.DefaultApiVersion = new ApiVersion(1, 0);
+			});
+
+			services.AddSingleton<ICoreRepository, CoreRepository>();
 
             services.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
 
