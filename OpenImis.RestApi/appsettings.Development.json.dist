@@ -1,0 +1,13 @@
+﻿{
+	"ConnectionStrings": {
+		"IMISDatabase": "Server=Server;Database=IMIS;User ID=User;Password=Password"
+	},
+	"Logging": {
+		"IncludeScopes": false,
+		"LogLevel": {
+			"Default": "Debug",
+			"System": "Information",
+			"Microsoft": "Information"
+		}
+	}
+}
