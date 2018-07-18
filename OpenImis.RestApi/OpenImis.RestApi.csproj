@@ -21,6 +21,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="appsettings.Development.json.dist" />
+    <None Remove="appsettings.Production.json.dist" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.Development.json.dist" />
+    <Content Include="appsettings.Production.json.dist" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Globals\" />
   </ItemGroup>

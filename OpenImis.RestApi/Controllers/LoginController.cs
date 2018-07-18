@@ -19,8 +19,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OpenImis.RestApi.Controllers
 {
-    [ApiVersion("1")]
-    [Route("api/{version:apiVersion}/[controller]")]
+    [ApiVersionNeutral]
+    [Route("api/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
     {

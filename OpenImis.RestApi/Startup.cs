@@ -18,6 +18,7 @@ using OpenImis.RestApi.Models.Repository;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 using OpenImis.RestApi.Docs;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace OpenImis.RestApi
 {
@@ -53,12 +54,14 @@ namespace OpenImis.RestApi
                     options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(services));
                 });
 
-            services.AddMvc();
+            services.AddMvc()
+				.SetCompatibilityVersion(CompatibilityVersion.Version_2_1); ;
 
 			services.AddApiVersioning(o => {
 				o.ReportApiVersions = true;
 				o.AssumeDefaultVersionWhenUnspecified = true;
 				o.DefaultApiVersion = new ApiVersion(1, 0);
+				o.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader(), new HeaderApiVersionReader("api-version"));
 			});
 
 			services.AddSingleton<ICoreRepository, CoreRepository>();
