@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace ImisRestApi.Chanels.Payment.Response
+namespace ImisRestApi.Response
 {
     public class ControlNumberRequest
     {

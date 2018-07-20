@@ -1,11 +1,11 @@
-﻿using ImisRestApi.Chanels.Payment.Response;
+﻿using ImisRestApi.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace ImisRestApi.Chanels.Payment.Escape
+namespace ImisRestApi.Escape
 {
     public static class ControlNumberChanel
     {

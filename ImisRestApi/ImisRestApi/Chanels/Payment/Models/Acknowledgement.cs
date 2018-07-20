@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ImisRestApi.Chanels.Payment.Models
+namespace ImisRestApi.Models
 {
     public class Acknowledgement
     {

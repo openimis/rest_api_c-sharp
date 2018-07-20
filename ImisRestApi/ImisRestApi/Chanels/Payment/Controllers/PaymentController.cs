@@ -2,18 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ImisRestApi.Chanels.Payment.Escape;
-using ImisRestApi.Chanels.Payment.Models;
-using ImisRestApi.Chanels.Payment.Response;
+using ImisRestApi.Escape;
+using ImisRestApi.Models;
+using ImisRestApi.Repo;
+using ImisRestApi.Response;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace ImisRestApi.Chanels.Payment.Controllers
+namespace ImisRestApi.Controllers
 {
     public class PaymentController : Controller
     {
+        private PaymentRepo _paymentRepo;
+        private IConfiguration _configuration;
 
+        public PaymentController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            
+        }
         //Recieve Payment from Operator/
         [Route("api/Payment")]
         public IActionResult Index([FromBody]PaymentDetail payment)
@@ -34,9 +43,12 @@ namespace ImisRestApi.Chanels.Payment.Controllers
 
             if (intent.Renewal)
             {
-                //save the intent of pay 
 
-                foreach(var i in intent.PaymentDetails)
+                //save the intent of pay 
+                _paymentRepo = new PaymentRepo(_configuration,intent);
+                _paymentRepo.SaveIntent();
+
+                foreach (var i in intent.PaymentDetails)
                 {
                     //if i.InsureeNumber Exists
 
@@ -50,8 +62,10 @@ namespace ImisRestApi.Chanels.Payment.Controllers
 
                 if(response.ControlNumber != null)
                 {
-                    //Save THe control number 
+                    //Save THe control number
+                    
                     //SendSMS
+
                 }
                 else if (response.RequestAcknowledged)
                 {

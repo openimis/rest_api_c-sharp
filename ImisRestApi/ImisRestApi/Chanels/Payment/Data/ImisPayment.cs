@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ImisRestApi.Chanels.Payment.Data
+namespace ImisRestApi.Data
 {
     public class ImisPayment
     {

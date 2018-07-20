@@ -1,4 +1,4 @@
-﻿using ImisRestApi.Chanels.Payment.Escape;
+﻿using ImisRestApi.Escape;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
