@@ -41,37 +41,34 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (intent.Renewal)
+            //save the intent of pay 
+            _paymentRepo = new PaymentRepo(_configuration, intent);
+            _paymentRepo.SaveIntent();
+
+            //foreach (var i in intent.PaymentDetails)
+            //{
+            //    //if i.InsureeNumber Exists
+
+            //    //Else GetLocalDefaults
+            //    var memberCount = LocalDefault.FamilyMambers(); //get amount to be paid by these members (i.ExpectedAmount)
+
+            //    //Save i to database and get the internal identifier (i.Id)
+            //}
+
+            ControlNumberRequest response = ControlNumberChanel.PostRequest();
+
+            if (response.ControlNumber != null)
             {
+                //Save THe control number
 
-                //save the intent of pay 
-                _paymentRepo = new PaymentRepo(_configuration,intent);
-                _paymentRepo.SaveIntent();
+                //SendSMS
 
-                foreach (var i in intent.PaymentDetails)
-                {
-                    //if i.InsureeNumber Exists
-
-                    //Else GetLocalDefaults
-                    var memberCount = LocalDefault.FamilyMambers(); //get amount to be paid by these members (i.ExpectedAmount)
-                     
-                    //Save i to database and get the internal identifier (i.Id)
-                }
-
-                ControlNumberRequest response = ControlNumberChanel.PostRequest();
-
-                if(response.ControlNumber != null)
-                {
-                    //Save THe control number
-                    
-                    //SendSMS
-
-                }
-                else if (response.RequestAcknowledged)
-                {
-                    //Update Payment RewuestPosted = true
-                }
             }
+            else if (response.RequestAcknowledged)
+            {
+                //Update Payment RewuestPosted = true
+            }
+
             return Ok("Request sent");
         }
 

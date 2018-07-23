@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.ImisAttributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,11 +12,10 @@ namespace ImisRestApi.Models
         [Required]
         public string PhoneNumber { get; set; }
         [Required]
-        public bool Renewal { get; set; }
-        [Required]
         public DateTime Request_Date { get; set; }
         public string EnrolmentOfficerCode { get; set; }
         [Required]
+        [IsPayment]
         public List<PaymentDetail> PaymentDetails { get; set; }
     }
 }

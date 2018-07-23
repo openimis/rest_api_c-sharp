@@ -9,5 +9,7 @@ namespace ImisRestApi.Models
         [InsureeNumber]
         public string InsureeNumber { get; set; }
         public string ProductCode { get; set; }
+        [Required]
+        public bool Renewal { get; set; }
     }
 }
