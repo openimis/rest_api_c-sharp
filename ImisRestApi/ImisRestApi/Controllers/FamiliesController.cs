@@ -24,6 +24,7 @@ namespace ImisRestApi.Controllers
             family = new ImisFamily(configuration);
         }
         // GET api/Families
+        [HttpGet]
         [Route("api/Families/Get_Family")]
         public IActionResult Get(string insureeNumber)
         {
@@ -61,6 +62,7 @@ namespace ImisRestApi.Controllers
         }
 
         // GET api/Families/5
+        [HttpGet]
         [Route("api/Families/Get_Member_Family")]
         public IActionResult Get_Member_Family(string insureeNumber, int order)
         {

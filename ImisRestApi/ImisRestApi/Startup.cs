@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace ImisRestApi
 {
@@ -42,6 +43,9 @@ namespace ImisRestApi
            });
 
             services.AddMvc();
+            services.AddSwaggerGen(x => {
+                x.SwaggerDoc("v1", new Info { Title = "IMIS REST" , Version = "v1"});
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +68,11 @@ namespace ImisRestApi
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(x => {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "IMIS REST");
             });
         }
     }

@@ -24,6 +24,7 @@ namespace ImisRestApi.Controllers
             
         }
         //Recieve Payment from Operator/
+        [HttpGet]
         [Route("api/Payment")]
         public IActionResult Index([FromBody]PaymentDetail payment)
         {
