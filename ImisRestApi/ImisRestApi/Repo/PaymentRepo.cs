@@ -26,21 +26,26 @@ namespace ImisRestApi.Repo
 
         public void SaveIntent()
         {
-            XElement PaymentIntent = new XElement("Payment",
-                new XElement("PhoneNumber", _intent.PhoneNumber),
-                new XElement("RequestDate", _intent.Request_Date),
-                new XElement("EnrolmentOfficerCode", _intent.EnrolmentOfficerCode),
-                new XElement("PaymentDetails",
+            XElement PaymentIntent = new XElement("PaymentIntent",
+                new XElement("Header", 
+                    new XElement("OfficerCode", _intent.EnrolmentOfficerCode),
+                    new XElement("RequestDate", _intent.Request_Date),
+                    new XElement("PhoneNumber", _intent.PhoneNumber),
+                    new XElement("AuditUserId", -1)
+                ),         
+                new XElement("Details",
                               from d in _intent.PaymentDetails
                               select
-                              new XElement("Payment",
+                              new XElement("Detail",
                                   new XElement("InsureeNumber", d.InsureeNumber),
-                                  new XElement("ProductCode", d.ProductCode)
+                                  new XElement("ProductCode", d.ProductCode),
+                                  new XElement("EnrollmentDate", DateTime.UtcNow),
+                                  new XElement("IsRenewal", d.Renewal)
                                   )
                               ));
 
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@Xml", PaymentIntent),
+                new SqlParameter("@Xml", PaymentIntent.ToString()),
             };
             var data = Procedure("uspInsertPaymentIntent", sqlParameters);
         }
