@@ -21,7 +21,7 @@ local machine, you first need to install:
 To make a copy of this project on your local machine, please clone the repository.
 
 ```
-git clone https://github.com/openimis/web_app_vb
+git clone https://github.com/openimis/rest_api_c-sharp
 ```
 
 Restore the NuGet packages needed by the application using VS or [nuget CLI](https://www.nuget.org/downloads).
