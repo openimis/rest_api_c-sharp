@@ -4,16 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.RestApi.Models.HTTPModels
+namespace OpenImis.RestApi.Protocol.LoginModel
 {
     /// <summary>
     /// This class serves as a parameter class for the Login call 
     /// </summary>
-    public abstract class ARequestModel
+    public class LoginResponseModel
     {
-        private List<string> ErrorMessages { get; set; }
+        public string Token { get; set; }
 
-        private Boolean IsValidCalled = false;
-        
+        public DateTime Expires { get; set; }
     }
 }

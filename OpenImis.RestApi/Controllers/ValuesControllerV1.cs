@@ -9,8 +9,9 @@ namespace OpenImis.RestApi.Controllers
 {
     [ApiVersion("1")]
     [Authorize(Roles = "IMISAdmin")]
-    [Route("api/{version:apiVersion}/[controller]")]
-    public class ValuesController : Controller
+    [Route("api/values")]
+	[ApiController]
+	public class ValuesControllerV1 : Controller
     {
         // GET api/values
         [Authorize(Roles = "EnrollmentOfficer")]

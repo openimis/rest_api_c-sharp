@@ -33,7 +33,7 @@ namespace OpenImis.RestApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add our DbContext 
+            // Add the DbContext 
             services.AddDbContext<IMISContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IMISDatabase")));
 
             // Add the authentication scheme with the custom validator
@@ -55,7 +55,7 @@ namespace OpenImis.RestApi
                 });
 
             services.AddMvc()
-				.SetCompatibilityVersion(CompatibilityVersion.Version_2_1); ;
+				.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			services.AddApiVersioning(o => {
 				o.ReportApiVersions = true;

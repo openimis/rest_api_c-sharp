@@ -2,7 +2,7 @@ using FluentAssertions;
 using FluentAssertions.Json;
 using Newtonsoft.Json.Linq;
 using OpenImis.RestApi.IntegrationTests.Helpers;
-using OpenImis.RestApi.Models.HTTPModels;
+using OpenImis.RestApi.Protocol.LoginModel;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -14,8 +14,10 @@ namespace OpenImis.RestApi.IntegrationTests
     public class LoginTests
     {
         private TestFixture _testFixture;
+		 const string LOGIN_ROUTE = "/api/login";
 
-        public LoginTests()
+
+		public LoginTests()
         {
             _testFixture = new TestFixture();
         }
@@ -37,7 +39,7 @@ namespace OpenImis.RestApi.IntegrationTests
 			ByteArrayContent content = HttpBody.GetBodyFromJSONString(credentials);
 
 			// ACT
-			var response = await _testFixture.Client.PostAsync("/api/login", content);
+			var response = await _testFixture.Client.PostAsync(LOGIN_ROUTE, content);
             
 			// ASSERT
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -63,7 +65,7 @@ namespace OpenImis.RestApi.IntegrationTests
 			ByteArrayContent content = HttpBody.GetBodyFromJSONString(credentials);
 
 			// ACT
-			var response = await _testFixture.Client.PostAsync("/api/login", content);
+			var response = await _testFixture.Client.PostAsync(LOGIN_ROUTE, content);
 
 			// ASSERT
 			response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -81,7 +83,7 @@ namespace OpenImis.RestApi.IntegrationTests
 			ByteArrayContent content = HttpBody.GetBodyFromJSON(credentialObject);
 
 			// ACT
-			var response = await _testFixture.Client.PostAsync("/api/login", content);
+			var response = await _testFixture.Client.PostAsync(LOGIN_ROUTE, content);
 
 			// ASSERT
 			response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -121,7 +123,7 @@ namespace OpenImis.RestApi.IntegrationTests
 			}
 
 			// ACT
-			var response = await _testFixture.Client.PostAsync("/api/login", content);
+			var response = await _testFixture.Client.PostAsync(LOGIN_ROUTE, content);
 
 			// ASSERT
 			response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
