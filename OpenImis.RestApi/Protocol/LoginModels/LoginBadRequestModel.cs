@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.RestApi.Models.HTTPModels
+namespace OpenImis.RestApi.Protocol.LoginModel
 {
     /// <summary>
     /// Error messages for Login Bad Request

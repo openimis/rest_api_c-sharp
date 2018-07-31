@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using OpenImis.RestApi.Models.HTTPModels;
+using OpenImis.RestApi.Protocol.LoginModel;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,10 +19,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OpenImis.RestApi.Controllers
 {
-    [ApiVersionNeutral]
-    [Route("api/[controller]")]
+    [ApiVersion("1")]
+    [Route("api/login")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class LoginControllerV1 : ControllerBase
     {
         private readonly IConfiguration _configuration;
         private readonly ICoreRepository _imisRepository;
@@ -33,7 +33,7 @@ namespace OpenImis.RestApi.Controllers
         /// <param name="configuration"></param>
         /// <param name="imisContext"></param>
         /// <param name="imisRepository"></param>
-        public LoginController(IConfiguration configuration, ICoreRepository imisRepository)
+        public LoginControllerV1(IConfiguration configuration, ICoreRepository imisRepository)
         {
             _configuration = configuration;
             _imisRepository = imisRepository;
