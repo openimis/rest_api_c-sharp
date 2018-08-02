@@ -1,14 +1,15 @@
-﻿using System;
+﻿using OpenImis.Modules.UserModule;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.RestApi.Models.Interfaces
+namespace OpenImis.Modules
 {
     /// <summary>
     /// This interface serves to define a Service for the Entities repositories 
     /// </summary>
-    public interface ICoreRepository
+    public interface IImisModules
     {
         /// <summary>
         /// Return the user repository
@@ -16,6 +17,6 @@ namespace OpenImis.RestApi.Models.Interfaces
         /// <returns>
         /// The instance of the user repository
         /// </returns>
-        IUserRepository getUserRepository();
+        IUserModule getUserModule();
     }
 }

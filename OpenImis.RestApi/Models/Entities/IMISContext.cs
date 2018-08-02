@@ -1355,7 +1355,7 @@ namespace OpenImis.RestApi.Models.Entities
 
                 entity.Property(e => e.LogTime).HasColumnType("datetime");
 
-                entity.HasOne(d => d.User)
+                entity.HasOne(d => d.TblUsers)
                     .WithMany(p => p.TblLogins)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK_tblLogins_tblUsers");
@@ -2540,7 +2540,7 @@ namespace OpenImis.RestApi.Models.Entities
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_tblUsersDistricts_tblLocations");
 
-                entity.HasOne(d => d.User)
+                entity.HasOne(d => d.TblUsers)
                     .WithMany(p => p.TblUsersDistricts)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)

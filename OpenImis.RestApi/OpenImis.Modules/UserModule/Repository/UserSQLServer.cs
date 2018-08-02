@@ -1,45 +1,47 @@
 ﻿using OpenImis.RestApi.Models.Entities;
-using OpenImis.RestApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenImis.Modules.UserModule.Entities;
+using Newtonsoft.Json;
+using OpenImis.Modules.Utils;
 
-namespace OpenImis.RestApi.Models.Repository
+namespace OpenImis.Modules.UserModule.Repository
 {
     /// <summary>
     /// This class is actual implementation of IUserRepository methods for Tanzania implementation 
     /// </summary>
-    public class UserRepository: IUserRepository
-    {
+    public class UserSqlServer: IUserRepository
+	{
 
-        public UserRepository()
+        public UserSqlServer()
         {
         }
 
-        public TblUsers GetById(int userId)
+        public User GetById(int userId)
         {
-            return new TblUsers();
+            return new User();
         }
 
-        public async Task<TblUsers> GetByUsernameAsync(string username)
+        public async Task<User> GetByUsernameAsync(string username)
         {
             TblUsers user;
             using (var imisContext = new IMISContext())
             {
                 user = await imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefaultAsync();
             }
-            return user;
+            return TypeCast.Cast<User>(user); 
         }
 
-        public TblUsers GetByUsername(string username)
+        public User GetByUsername(string username)
         {
-            TblUsers user;
+            User user;
             using (var imisContext = new IMISContext())
             {
-                user = imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefault();
+                user = (User)imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefault();
             }
             return user;
         }
@@ -66,7 +68,7 @@ namespace OpenImis.RestApi.Models.Repository
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public async Task<TblUsers> GetByUsernameAndPasswordAsync(string username, string password)
+        public async Task<User> GetByUsernameAndPasswordAsync(string username, string password)
         {
             TblUsers user;
             using (var imisContext = new IMISContext())
@@ -76,24 +78,25 @@ namespace OpenImis.RestApi.Models.Repository
 
                 user = await imisContext.TblUsers.FromSql(GetByUsernameAndPasswordSQL(),userParameter, passwordParameter).SingleOrDefaultAsync();
             }
-            return user;
+            return TypeCast.Cast<User>(user);
         }
 
+		
         /// <summary>
         /// Get user by username and password by sychronious call
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public TblUsers GetByUsernameAndPassword(string username, string password)
+        public User GetByUsernameAndPassword(string username, string password)
         {
-            TblUsers user;
+            User user;
             using (var imisContext = new IMISContext())
             {
                 var userParameter = new SqlParameter("user", username);
                 var passwordParameter = new SqlParameter("password", password);
 
-                user = imisContext.TblUsers.FromSql(GetByUsernameAndPasswordSQL(), userParameter, passwordParameter).SingleOrDefault();
+                user = (User)imisContext.TblUsers.FromSql(GetByUsernameAndPasswordSQL(), userParameter, passwordParameter).SingleOrDefault();
             }
             return user;
         }

@@ -10,6 +10,6 @@ namespace OpenImis.RestApi.Models.Entities
         public DateTime? LogTime { get; set; }
         public int? LogAction { get; set; }
 
-        public TblUsers User { get; set; }
+        public TblUsers TblUsers { get; set; }
     }
 }

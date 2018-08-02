@@ -1,5 +1,5 @@
 ﻿using OpenImis.RestApi.Models.Entities;
-using OpenImis.RestApi.Models.Interfaces;
+using OpenImis.Modules;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using OpenImis.Modules.UserModule.Entities;
 
 namespace OpenImis.RestApi.Security
 {
@@ -18,12 +19,12 @@ namespace OpenImis.RestApi.Security
     {
         private int _maxTokenSizeInBytes = TokenValidationParameters.DefaultMaximumTokenSizeInBytes;
         private readonly JwtSecurityTokenHandler _tokenHandler;
-        private readonly ICoreRepository _imisRepository;
+        private readonly IImisModules _imisModules;
         
         public IMISJwtSecurityTokenHandler(IServiceCollection serviceCollection)
         {
             _tokenHandler = new JwtSecurityTokenHandler();
-            _imisRepository = serviceCollection.BuildServiceProvider().GetService<ICoreRepository>();
+            _imisModules = serviceCollection.BuildServiceProvider().GetService<IImisModules>();
         }
 
         public bool CanValidateToken
@@ -67,11 +68,11 @@ namespace OpenImis.RestApi.Security
             var tokenS = handler.ReadToken(securityToken) as JwtSecurityToken;
             var username = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
 
-            var serviceCollection = new ServiceCollection();
+            //var serviceCollection = new ServiceCollection();
 
-            IUserRepository userRepository = _imisRepository.getUserRepository();
+            //IUserSQL userRepository = _imisRepository.getUserRepository();
 
-            TblUsers user = userRepository.GetByUsername(username);
+            User user = _imisModules.getUserModule().GetUserController().GetByUsername(username);
 
             if (user != null)
             {
