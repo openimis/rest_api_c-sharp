@@ -1,4 +1,5 @@
 ﻿using ImisRestApi.Response;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,9 @@ namespace ImisRestApi.Escape
 {
     public static class ControlNumberChanel
     {
-        public static ControlNumberRequest PostRequest()
+
+        
+        public static ControlNumberRequest PostRequest(string Url, int PaymentId, float ExpectedAmount)
         {
             //Call Payment Getway
             //Request for Control Number Here

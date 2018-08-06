@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Escape;
 using ImisRestApi.Models;
 using ImisRestApi.Repo;
@@ -43,30 +45,25 @@ namespace ImisRestApi.Controllers
 
             //save the intent of pay 
             _paymentRepo = new PaymentRepo(_configuration, intent);
+
             _paymentRepo.SaveIntent();
 
-            //foreach (var i in intent.PaymentDetails)
-            //{
-            //    //if i.InsureeNumber Exists
+            string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
-            //    //Else GetLocalDefaults
-            //    var memberCount = LocalDefault.FamilyMambers(); //get amount to be paid by these members (i.ExpectedAmount)
-
-            //    //Save i to database and get the internal identifier (i.Id)
-            //}
-
-            ControlNumberRequest response = ControlNumberChanel.PostRequest();
+            ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
 
             if (response.ControlNumber != null)
             {
-                //Save THe control number
+                _paymentRepo.SaveControlNumber(response.ControlNumber);
 
-                //SendSMS
-
+            }
+            else if (response.ControlNumber == null)
+            {
+                _paymentRepo.SaveControlNumber();
             }
             else if (response.RequestAcknowledged)
             {
-                //Update Payment RewuestPosted = true
+                _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged,"");
             }
 
             return Ok("Request sent");
