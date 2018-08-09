@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.ImisAttributes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ImisRestApi.Models
@@ -8,7 +9,7 @@ namespace ImisRestApi.Models
         [Required]
         public int PaymentId { get; set; }
         public string ControlNumber { get; set; }
-        [Required]
+        [InsureeNumber]
         public string InsureeNumber { get; set; }
         [Required]
         public string ProductCode { get; set; }

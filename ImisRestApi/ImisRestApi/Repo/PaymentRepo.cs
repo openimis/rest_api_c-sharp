@@ -96,6 +96,11 @@ namespace ImisRestApi.Repo
             var data = Procedure("uspAcknowledgeControlNumberRequest", sqlParameters);
         }
 
+        public void SavePayment()
+        {
+
+        }
+
         public bool Valid(string InsureeNumber,string ProductCode)
         {
             return false;

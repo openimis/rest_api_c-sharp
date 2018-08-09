@@ -76,8 +76,10 @@ namespace ImisRestApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-  
+
             //update Payment with the Id model.PaymentId flags to RequestPosted
+            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId};
+            _paymentRepo.SaveControlNumberAkn(true, "");
 
             return Ok("Control Number Acknowledgement Received");
         }
@@ -89,7 +91,9 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            //update Control number table, PaymentId = model.PaymentId
+            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId };
+            _paymentRepo.SaveControlNumber(model.ControlNumber);
+
             //SendSMS
 
             ControlNumberChanel.SendAcknowledgement();
