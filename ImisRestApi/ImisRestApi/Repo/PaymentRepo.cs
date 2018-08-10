@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Models;
 using Microsoft.Extensions.Configuration;
 
@@ -70,6 +71,32 @@ namespace ImisRestApi.Repo
             var data = Procedure("uspRequestGetControlNumber", sqlParameters);
         }
 
+        public void UpdateControlNumberStatus(string ControlNumber,CnStatus status){
+
+            SqlParameter[] sqlParameters = {
+                  new SqlParameter("@ControlNumber", ControlNumber)
+            };
+
+            switch (status)
+            {
+                case CnStatus.Sent:
+                    break;
+                case CnStatus.Acknowledged:
+                    Procedure("uspAcknowledgeControlNumber", sqlParameters);
+                    break;
+                case CnStatus.Issued:                 
+                    Procedure("uspIssueControlNumber", sqlParameters);
+                    break;
+                case CnStatus.Paid:
+                    Procedure("uspPaidControlNumber", sqlParameters);
+                    break;
+                case CnStatus.Rejected:
+                    break;
+                default:
+                    break;
+            }
+        }
+
         public void SaveControlNumber(string ControlNumber)
         {
             SqlParameter[] sqlParameters = {
@@ -96,8 +123,20 @@ namespace ImisRestApi.Repo
             var data = Procedure("uspAcknowledgeControlNumberRequest", sqlParameters);
         }
 
-        public void SavePayment()
+        public void SavePayment(PaymentContainer payment)
         {
+            XElement PaymentIntent = new XElement("PaymentData",
+                new XElement("PaymentID", PaymentId),
+                   new XElement("ControlNumber", payment.ControlNumber),
+                   new XElement("Amount", payment.ReceivedAmount),
+                   new XElement("InsureeNumber", payment.InsureeNumber)
+                             );
+
+
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@Xml", PaymentIntent.ToString()),
+             };
+            var data = Procedure("uspReceivePayment", sqlParameters);
 
         }
 
