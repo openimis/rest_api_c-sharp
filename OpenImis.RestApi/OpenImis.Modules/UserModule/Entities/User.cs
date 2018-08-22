@@ -13,7 +13,7 @@ namespace OpenImis.Modules.UserModule.Entities
         //}
 
        
-        public readonly Dictionary<int, string> rolesMapping = new Dictionary<int, string>
+        private readonly Dictionary<int, string> rolesMapping = new Dictionary<int, string>
         {
             {1, "EnrollmentOfficer"},
             {2, "Manager"},

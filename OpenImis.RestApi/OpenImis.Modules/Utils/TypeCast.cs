@@ -13,8 +13,12 @@ namespace OpenImis.Modules.Utils
 			T result = default(T);
 			//try
 			//{
-			var serializedParent = JsonConvert.SerializeObject(parentInstance);
-			result = JsonConvert.DeserializeObject<T>(serializedParent);
+				var serializedParent = JsonConvert.SerializeObject(parentInstance);
+				result = JsonConvert.DeserializeObject<T>(serializedParent);
+			//}
+			//catch (Exception ex)
+			//{
+			//	return new T();
 			//}
 			return result;
 		}

@@ -38,12 +38,12 @@ namespace OpenImis.Modules.UserModule.Repository
 
         public User GetByUsername(string username)
         {
-            User user;
+			TblUsers user;
             using (var imisContext = new IMISContext())
             {
-                user = (User)imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefault();
+                user = imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefault();
             }
-            return user;
+            return TypeCast.Cast<User>(user);
         }
 
         /// <summary>
