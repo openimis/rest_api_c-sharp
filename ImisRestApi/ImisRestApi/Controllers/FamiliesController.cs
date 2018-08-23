@@ -4,6 +4,7 @@ using ImisRestApi.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +12,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ImisRestApi.Controllers
 {
@@ -161,6 +163,31 @@ namespace ImisRestApi.Controllers
             var response = family.DeleteMamber(insureeNumber);
 
             return Json(response);
+
+        }
+        
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("api/Enquire")]
+        public async Task<IActionResult> Enquire([FromBody]Enquire model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var response = family.Enquire(model.chfid);
+            var jsonResponse = JsonConvert.SerializeObject(response);
+            List<EnquireResponse> resp = JsonConvert.DeserializeObject<List<EnquireResponse>>(jsonResponse);
+
+            string message = "IMIS Insuree:"+ resp.FirstOrDefault().insureeName;
+
+            foreach (var item in resp)
+            {
+                message += item.productCode + " : " + item.status;
+            }
+
+            string test = await SmsTz.MessageCore.PushSMS("15200", "226", message, "+255767057265");
+
+            return Json(new { status = true,sms_reply=true,sms_text = resp });
 
         }
     }

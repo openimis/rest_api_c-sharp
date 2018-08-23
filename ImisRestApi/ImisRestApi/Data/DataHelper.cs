@@ -20,7 +20,7 @@ namespace ImisRestApi.Data
 
         public DataTable GetDataTable(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            var dt = new DataTable();
+            DataTable dt = new DataTable();
             var sqlConnection = new SqlConnection(ConnectionString);
             var command = new SqlCommand(SQL, sqlConnection)
             {
@@ -94,6 +94,7 @@ namespace ImisRestApi.Data
 
             return rv;
         }
+
 
         public DataTable Login(string UserName, string Password)
         {

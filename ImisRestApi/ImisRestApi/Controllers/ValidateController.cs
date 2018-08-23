@@ -23,6 +23,7 @@ namespace ImisRestApi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("api/Validate/Credentials")]
         public IActionResult Validate_Credentials([FromBody]UserLogin userlogin)
         {
@@ -37,7 +38,7 @@ namespace ImisRestApi.Controllers
 
                 if (data.Rows.Count > 0)
                 {
-                    response.CredentialsValid = true;
+                    response.success = true;
                     response.ErrorOccured = false;
                 }
                 else
@@ -47,7 +48,7 @@ namespace ImisRestApi.Controllers
             }
             catch (Exception)
             {
-                response.CredentialsValid = false;
+                response.success = false;
                 response.ErrorOccured = true;
                 
             }
