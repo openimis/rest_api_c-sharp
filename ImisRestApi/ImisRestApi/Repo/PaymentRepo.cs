@@ -13,7 +13,7 @@ namespace ImisRestApi.Repo
 {
     public class PaymentRepo : Connection
     {
-        public int PaymentId { get; set; }
+        public string PaymentId { get; set; }
         public float ExpectedAmount { get; set; }
 
         private IntentOfPay _intent { get; set; }
@@ -31,22 +31,21 @@ namespace ImisRestApi.Repo
         public void SaveIntent()
         {
             XElement PaymentIntent = new XElement("PaymentIntent",
-                new XElement("Header", 
-                    new XElement("OfficerCode", _intent.EnrolmentOfficerCode),
-                    new XElement("RequestDate", _intent.Request_Date.ToShortDateString()),
+                new XElement("Header",
+                    new XElement("OfficerCode", _intent.OfficerCode),
+                    new XElement("RequestDate", _intent.RequestDate.ToShortDateString()),
                     new XElement("PhoneNumber", _intent.PhoneNumber),
                     new XElement("AuditUserId", -1)
-                ),         
-                new XElement("Details",
-                              from d in _intent.PaymentDetails
-                              select
-                              new XElement("Detail",
-                                  new XElement("InsureeNumber", d.InsureeNumber),
-                                  new XElement("ProductCode", d.ProductCode),
+                ),
+                  new XElement("Details",
+                               new XElement("Detail",
+                                  new XElement("InsureeNumber", _intent.InsureeNumber),
+                                  new XElement("ProductCode", _intent.ProductCode),
                                   new XElement("EnrollmentDate", DateTime.UtcNow),
-                                  new XElement("IsRenewal", Convert.ToInt32(d.Renewal))
+                                  new XElement("IsRenewal", _intent.IsRenewal()))
                                   )
-                              ));
+                              );
+             // );
 
 
             SqlParameter[] sqlParameters = {
@@ -54,10 +53,20 @@ namespace ImisRestApi.Repo
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
                 new SqlParameter("@ExpectedAmount", SqlDbType.Int){Direction = ParameterDirection.Output }
              };
-            var data = Procedure("uspInsertPaymentIntent", sqlParameters);
 
-            PaymentId = Convert.ToInt32(data[0].Value.ToString());
-            ExpectedAmount = float.Parse(data[1].Value.ToString());
+            try
+            {
+                var data = Procedure("uspInsertPaymentIntent", sqlParameters);
+
+                PaymentId = data[0].Value.ToString();
+                ExpectedAmount = float.Parse(data[1].Value.ToString());
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception();
+            }
+            
 
         }
 

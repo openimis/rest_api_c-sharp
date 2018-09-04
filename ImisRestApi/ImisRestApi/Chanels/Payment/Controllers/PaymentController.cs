@@ -4,10 +4,12 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using ImisRestApi.Chanels.Payment.Models;
+using ImisRestApi.Data;
 using ImisRestApi.Escape;
 using ImisRestApi.Models;
 using ImisRestApi.Repo;
 using ImisRestApi.Response;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -19,11 +21,12 @@ namespace ImisRestApi.Controllers
     {
         private PaymentRepo _paymentRepo;
         private IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public PaymentController(IConfiguration configuration)
+        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _configuration = configuration;
-            
+            _hostingEnvironment = hostingEnvironment;
         }
         //Recieve Payment from Operator/
         [HttpGet]
@@ -39,60 +42,84 @@ namespace ImisRestApi.Controllers
         //Recieve Payment from Operator/
         [HttpPost]
         [Route("api/GetControlNumber")]
-        public IActionResult ControlNumber([FromBody]IntentOfPay intent)
+        public async Task<IActionResult> ControlNumber([FromBody]IntentOfPay intent)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (intent.PaymentDetails == null) {
+                PaymentDetail detail = new PaymentDetail();
+
+                if(intent.InsureeNumber != null && intent.EnrolmentType != null && intent.ProductCode != null)
+                {
+                    detail.InsureeNumber = intent.InsureeNumber;
+                    detail.ProductCode = intent.ProductCode;
+                    detail.PaymentType = intent.EnrolmentType;
+                   
+                }
+                else
+                {
+                    return BadRequest(ModelState);
+                }
+                List<PaymentDetail> details = new List<PaymentDetail>();
+                details.Add(detail);
+
+                intent.PaymentDetails = details;
+            }
             //save the intent of pay 
             _paymentRepo = new PaymentRepo(_configuration, intent);
-
             _paymentRepo.SaveIntent();
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
-            ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
+            ImisPayment payment = new ImisPayment(_configuration,_hostingEnvironment);
+            payment.GenerateCtrlNoRequest(intent.OfficerCode,intent.InsureeNumber,_paymentRepo.PaymentId,_paymentRepo.ExpectedAmount,intent.PaymentDetails);
 
-            if (response.ControlNumber != null)
-            {
-                _paymentRepo.SaveControlNumber(response.ControlNumber);
+            //ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
 
-            }
-            else if (response.ControlNumber == null)
-            {
-                _paymentRepo.SaveControlNumber();
-            }
-            else if (response.RequestAcknowledged)
-            {
-                _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged,"");
-            }
+            //if (response.ControlNumber != null)
+            //{
+            //    _paymentRepo.SaveControlNumber(response.ControlNumber);
 
-            return Ok("Request sent");
+            //}
+            //else if (response.ControlNumber == null)
+            //{
+            //    _paymentRepo.SaveControlNumber();
+            //}
+            //else if (response.RequestAcknowledged)
+            //{
+            //    _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged,"");
+            //}
+
+            string test = await SmsTz.MessageCore.PushSMS("15200", "226", "Your Request for control number was Sent", "+255767057265");
+
+            return Json(new { status = true, sms_reply = true, sms_text = "Your Request for control number was Sent" });
+            //return Ok("Request sent");
         }
 
-        [HttpPost]
-        [Route("api/GetControlNumberAck")]
-        public IActionResult ControlNumberAck([FromBody]Acknowledgement model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //[HttpPost]
+        //[Route("api/GetControlNumberAck")]
+        //public IActionResult ControlNumberAck([FromBody]Acknowledgement model)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            //update Payment with the Id model.PaymentId flags to RequestPosted
-            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId};
-            _paymentRepo.SaveControlNumberAkn(true, "");
+        //    //update Payment with the Id model.PaymentId flags to RequestPosted
+        //    _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId};
+        //    _paymentRepo.SaveControlNumberAkn(true, "");
 
-            return Ok("Control Number Acknowledgement Received");
-        }
+        //    return Ok("Control Number Acknowledgement Received");
+        //}
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public IActionResult ReceiveControlNumber([FromBody]ControlNumberContainer model)
+        public IActionResult ReceiveControlNumber([FromBody]BillTrxRespInf model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId };
-            _paymentRepo.SaveControlNumber(model.ControlNumber);
+            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.BillId };
+            _paymentRepo.SaveControlNumber(model.PayCntrNum.ToString());
 
             //SendSMS
 
@@ -108,7 +135,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId };
+            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId.ToString() };
             _paymentRepo.SavePayment(model);
             
             return Ok("Payment Received");
