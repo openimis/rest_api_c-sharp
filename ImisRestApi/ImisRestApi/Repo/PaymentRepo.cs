@@ -132,7 +132,7 @@ namespace ImisRestApi.Repo
             var data = Procedure("uspAcknowledgeControlNumberRequest", sqlParameters);
         }
 
-        public void SavePayment(PaymentContainer payment)
+        public void SavePayment(PaymentModels payment)
         {
             XElement PaymentIntent = new XElement("PaymentData",
                 new XElement("PaymentID", PaymentId),

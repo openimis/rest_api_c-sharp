@@ -19,7 +19,7 @@ namespace ImisRestApi.Controllers
 {
     public class PaymentController : Controller
     {
-        private PaymentRepo _paymentRepo;
+        private ImisPayment _imisPayment;
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -27,6 +27,7 @@ namespace ImisRestApi.Controllers
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
         }
         //Recieve Payment from Operator/
         [HttpGet]
@@ -67,13 +68,12 @@ namespace ImisRestApi.Controllers
                 intent.PaymentDetails = details;
             }
             //save the intent of pay 
-            _paymentRepo = new PaymentRepo(_configuration, intent);
-            _paymentRepo.SaveIntent();
+            _imisPayment.SaveIntent(intent);
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
             ImisPayment payment = new ImisPayment(_configuration,_hostingEnvironment);
-            payment.GenerateCtrlNoRequest(intent.OfficerCode,intent.InsureeNumber,_paymentRepo.PaymentId,_paymentRepo.ExpectedAmount,intent.PaymentDetails);
+            payment.GenerateCtrlNoRequest(intent.OfficerCode,intent.InsureeNumber, _imisPayment.PaymentId, _imisPayment.ExpectedAmount,intent.PaymentDetails);
 
             //ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
 
@@ -97,48 +97,63 @@ namespace ImisRestApi.Controllers
             //return Ok("Request sent");
         }
 
-        //[HttpPost]
-        //[Route("api/GetControlNumberAck")]
-        //public IActionResult ControlNumberAck([FromBody]Acknowledgement model)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    //update Payment with the Id model.PaymentId flags to RequestPosted
-        //    _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId};
-        //    _paymentRepo.SaveControlNumberAkn(true, "");
-
-        //    return Ok("Control Number Acknowledgement Received");
-        //}
-
         [HttpPost]
-        [Route("api/GetReqControlNumber")]
-        public IActionResult ReceiveControlNumber([FromBody]BillTrxRespInf model)
+        [Route("api/GetControlNumberAck")]
+        public IActionResult ControlNumberAck([FromBody]Acknowledgement model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.BillId };
-            _paymentRepo.SaveControlNumber(model.PayCntrNum.ToString());
+            //update Payment with the Id model.PaymentId flags to RequestPosted
+
+            _imisPayment.SaveControlNumberAkn(true, "");
+
+            return Ok("Control Number Acknowledgement Received");
+        }
+
+        [HttpPost]
+        [Route("api/GetReqControlNumber")]
+        public IActionResult ReceiveControlNumber([FromBody]GepgBillResponse model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+           
+            _imisPayment.PaymentId = model.BillTrxRespInf.BillId;
+            //_imisPayment.SaveControlNumber(model.BillTrxRespInf.PayCntrNum.ToString());
 
             //SendSMS
 
-            ControlNumberChanel.SendAcknowledgement();
-
-            return Ok("Control Number Received");
+            string resp = _imisPayment.ControlNumberResp();
+            return Ok(resp);
         }
 
         [HttpPost]
         [Route("api/GetPaymentData")]
-        public IActionResult GetPayment([FromBody]PaymentContainer model)
+        public IActionResult GetPayment([FromBody]GepgPaymentMessage model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            _paymentRepo = new PaymentRepo(_configuration) { PaymentId = model.PaymentId.ToString() };
-            _paymentRepo.SavePayment(model);
-            
-            return Ok("Payment Received");
+            List<PymtTrxInf> payments = model.gepgPmtSpInfo.PymtTrxInf;
+            foreach(var payment in payments)
+            {
+                _imisPayment.SavePayment(payment);
+
+            }
+
+            string resp = _imisPayment.PaymentResp();
+            return Ok(resp);
+        }
+
+        [HttpPost]
+        [Route("api/GetReconciliationData")]
+        public IActionResult GetReconciliation([FromBody]GepgReconcMessage model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var resp = _imisPayment.ReconciliationResp();
+            return Ok(resp);
         }
     }
 }

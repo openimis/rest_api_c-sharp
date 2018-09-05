@@ -13,6 +13,20 @@ namespace ImisRestApi.Chanels.Payment.Models
         public string gepgSignature { get; set; }
     }
 
+    [XmlRoot("Gepg")]
+    public class GepgBillResponse
+    {
+        public BillTrxRespInf BillTrxRespInf { get; set; }
+        public string gepgSignature { get; set; }
+    }
+
+    [XmlRoot("Gepg")]
+    public class GepgBillResponseAck
+    {
+        public gepgBillSubRespAck gepgBillSubRespAck { get; set; }
+        public string gepgSignature { get; set; }
+    }
+
     public class gepgBillSubReq
     {
         public BillHdr BillHdr { get; set; }

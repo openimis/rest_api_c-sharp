@@ -179,7 +179,7 @@ namespace ImisRestApi.Chanels.Payment.Data
             return outString;
         }
 
-        public string FinaliseSignedMsg(string content, string sign)
+        public string FinaliseSignedMsg(string sign)
         {
             GepgBillMessage gepgBill = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
 
@@ -218,7 +218,46 @@ namespace ImisRestApi.Chanels.Payment.Data
             return outString;
         }
 
-        public string SerializeClean(gepgBillSubReq bill)
+        public string FinaliseSignedMsg(object content, Type type)
+        {
+            //Gepg gepgBill = new Gepg() { Content = content, gepgSignature = sign };
+
+            XmlSerializer xs = null;
+            XmlSerializerNamespaces ns = null;
+            XmlWriterSettings settings = null;
+            XmlWriter xw = null;
+            String outString = String.Empty;
+
+            try
+            {
+                ns = new XmlSerializerNamespaces();
+                ns.Add("", "");
+                settings = new XmlWriterSettings();
+                //settings.Indent = true;
+                StringBuilder sb = new StringBuilder();
+                xs = new XmlSerializer(type);
+                xw = XmlWriter.Create(sb, settings);
+
+                xs.Serialize(xw, content, ns);
+                xw.Flush();
+                outString = sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                if (xw != null)
+                {
+                    xw.Close();
+                }
+            }
+
+            return outString;
+        }
+
+        public string SerializeClean(object bill,Type type)
         {
             XmlSerializer xs = null;
             //These are the objects that will free us from extraneous markup.
@@ -244,7 +283,7 @@ namespace ImisRestApi.Chanels.Payment.Data
 
                 StringBuilder sb = new StringBuilder();
 
-                xs = new XmlSerializer(typeof(gepgBillSubReq));
+                xs = new XmlSerializer(type);
 
                 //We create a new XmlWriter with the previously created settings 
                 //(to OmitXmlDeclaration).
@@ -444,5 +483,13 @@ namespace ImisRestApi.Chanels.Payment.Data
             string content = rawData.Substring(rawData.IndexOf(sigTag) + sigTag.Length + 1, rawData.LastIndexOf(sigTag) - rawData.IndexOf(sigTag) - sigTag.Length - 3);
             return content;
         }
+
+ 
+    }
+
+    public class Gepg
+    {
+        public object Content { get; set; }
+        public string gepgSignature { get; set; }
     }
 }
