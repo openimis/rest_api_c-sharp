@@ -44,6 +44,22 @@ namespace ImisRestApi.Data
            
             var signedMesg = gepg.FinaliseSignedMsg(signature);
             var billAck = gepg.SendHttpRequest(signedMesg);
+
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@PaymentID", BillId)
+             };
+
+            try
+            {
+                var data = dh.ExecProcedure("uspRequestGetControlNumber", sqlParameters);
+
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception();
+            }
+
             return billAck;
           
         }
@@ -59,7 +75,7 @@ namespace ImisRestApi.Data
                 ),
                   new XElement("Details",
                                new XElement("Detail",
-                                  new XElement("InsureeNumber", _intent.InsureeNumber),
+                                  new XElement("InsuranceNumber", _intent.InsureeNumber),
                                   new XElement("ProductCode", _intent.ProductCode),
                                   new XElement("EnrollmentDate", DateTime.UtcNow),
                                   new XElement("IsRenewal", _intent.IsRenewal()))
@@ -86,8 +102,6 @@ namespace ImisRestApi.Data
 
                 throw new Exception();
             }
-
-
         }
 
         public void SaveControlNumber()
@@ -131,8 +145,7 @@ namespace ImisRestApi.Data
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", PaymentId),
-                new SqlParameter("@RequestOrigin", "IMIS"),
-                new SqlParameter("@ControlNumber", "IMIS")
+                new SqlParameter("@ControlNumber", ControlNumber)
              };
 
             var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);

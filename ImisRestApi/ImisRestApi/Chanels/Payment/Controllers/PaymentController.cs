@@ -117,11 +117,15 @@ namespace ImisRestApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-           
-            _imisPayment.PaymentId = model.BillTrxRespInf.BillId;
-            //_imisPayment.SaveControlNumber(model.BillTrxRespInf.PayCntrNum.ToString());
 
-            //SendSMS
+            foreach (var bill in model.gepgBillSubResp.BillTrxInf)
+            {
+                _imisPayment.PaymentId = bill.BillId;
+                _imisPayment.SaveControlNumber(bill.PayCntrNum.ToString());
+
+                //SendSMS
+
+            }
 
             string resp = _imisPayment.ControlNumberResp();
             return Ok(resp);
