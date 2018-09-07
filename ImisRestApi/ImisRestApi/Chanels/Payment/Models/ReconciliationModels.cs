@@ -23,7 +23,8 @@ namespace ImisRestApi.Chanels.Payment.Models
     public class gepgSpReconcResp
     {
         public ReconcBatchInfo ReconcBatchInfo { get; set; }
-        public List<ReconcTrxInf> ReconcTrans { get; set; }
+        [XmlArray("ReconcTrans")]
+        public List<ReconcTrxInf> ReconcTrxInf { get; set; }
     }
 
     public class ReconcTrxInf
@@ -51,6 +52,12 @@ namespace ImisRestApi.Chanels.Payment.Models
         public string SpCode { get; set; }
         public string SpName { get; set; }
         public string ReconcStsCode { get; set; }
+    }
+
+    [XmlRoot("Gepg")]
+    public class ReconcRequest {
+        public gepgSpReconcReq gepgSpReconcReq { get; set; }
+        public string gepgSignature { get; set; }
     }
 
     public class gepgSpReconcReq

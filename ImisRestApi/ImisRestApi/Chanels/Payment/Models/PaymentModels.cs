@@ -9,7 +9,9 @@ namespace ImisRestApi.Models
     [XmlRoot("Gepg")]
     public class GepgPaymentMessage
     {
-        public gepgPmtSpInfo gepgPmtSpInfo { get; set; }
+        // public gepgPmtSpInfo gepgPmtSpInfo { get; set; }
+        [XmlArray("gepgPmtSpInfo")]
+        public List<PymtTrxInf> PymtTrxInf { get; set; }
         public string gepgSignature { get; set; }
     }
 
@@ -22,6 +24,7 @@ namespace ImisRestApi.Models
 
     public class gepgPmtSpInfo
     {
+        [XmlArray]
         public List<PymtTrxInf> PymtTrxInf { get; set; }
     }
     public class PymtTrxInf

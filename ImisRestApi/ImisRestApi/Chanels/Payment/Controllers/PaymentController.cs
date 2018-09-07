@@ -118,7 +118,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            foreach (var bill in model.gepgBillSubResp.BillTrxInf)
+            foreach (var bill in model.BillTrxInf)
             {
                 _imisPayment.PaymentId = bill.BillId;
                 _imisPayment.SaveControlNumber(bill.PayCntrNum.ToString());
@@ -138,7 +138,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            List<PymtTrxInf> payments = model.gepgPmtSpInfo.PymtTrxInf;
+            List<PymtTrxInf> payments = model.PymtTrxInf;
             foreach(var payment in payments)
             {
                 _imisPayment.SavePayment(payment);

@@ -16,7 +16,9 @@ namespace ImisRestApi.Chanels.Payment.Models
     [XmlRoot("Gepg")]
     public class GepgBillResponse
     {
-        public gepgBillSubResp gepgBillSubResp { get; set; }
+        //public gepgBillSubResp gepgBillSubResp { get; set; }
+        [XmlArray("gepgBillSubResp")]
+        public List<BillTrxRespInf> BillTrxInf { get; set; }
         public string gepgSignature { get; set; }
     }
 
@@ -79,6 +81,7 @@ namespace ImisRestApi.Chanels.Payment.Models
    
     public class gepgBillSubResp
     {
+        [XmlArrayItem]
         public List<BillTrxRespInf> BillTrxInf { get; set; }
     }
 

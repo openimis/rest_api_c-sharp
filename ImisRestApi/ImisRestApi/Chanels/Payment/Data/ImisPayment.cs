@@ -165,8 +165,7 @@ namespace ImisRestApi.Data
 
             var data = dh.ExecProcedure("uspAcknowledgeControlNumberRequest", sqlParameters);
         }
-
-       
+      
         public void SavePayment(PymtTrxInf payment)
         {
             XElement PaymentIntent = new XElement("PaymentData",
@@ -187,6 +186,29 @@ namespace ImisRestApi.Data
         public bool Valid(string InsureeNumber, string ProductCode)
         {
             return false;
+        }
+
+        public string RequestReconciliationReport()
+        {
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment);
+
+            ReconcRequest Reconciliation = new ReconcRequest();
+
+            gepgSpReconcReq request = new gepgSpReconcReq();
+            request.SpReconcReqId = Convert.ToInt32(DateTime.UtcNow.Year.ToString() + DateTime.UtcNow.Month.ToString() + DateTime.UtcNow.Day.ToString());
+            request.SpCode = Configuration["PaymentGateWay:GePG:SpCode"];
+            request.SpSysId = Configuration["PaymentGateWay:GePG:SystemId"];
+            request.TnxDt = DateTime.UtcNow.Date;
+            request.ReconcOpt = 2;
+
+            var requestString = gepg.SerializeClean(request, typeof(gepgSpReconcReq));
+            string signature = gepg.GenerateSignature(requestString);
+            var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
+
+            var result = gepg.SendHttpRequest(signedRequest);
+
+            return result;
+
         }
 
         public string ControlNumberResp() {
