@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 
 namespace OpenImis.Modules.UserModule
 {
-    public class UserModuleRepository
+    public class UserModuleRepositories: IUserModuleRepositories
 	{
-		private readonly IUserRepository _userRepository;
+		private IUserRepository _userRepository;
 
-		public UserModuleRepository()
+		public UserModuleRepositories()
 		{
-			_userRepository = new UserSqlServer();
+			
 		}
 
 		public IUserRepository GetUserSql()
 		{
+			if (_userRepository == null)
+			{
+				_userRepository = new UserSqlServer();
+			}
 			return _userRepository;
 		}
 

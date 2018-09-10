@@ -23,5 +23,12 @@ namespace OpenImis.Modules.Utils
 			return result;
 		}
 
+		public static T GetValue<T>(object value)
+		{
+			if (value == null || value == DBNull.Value)
+				return default(T);
+			else
+				return (T)value;
+		}
 	}
 }

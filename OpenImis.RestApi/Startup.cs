@@ -18,6 +18,7 @@ using OpenImis.RestApi.Security;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using OpenImis.RestApi.Docs;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.RestApi
 {
@@ -69,12 +70,14 @@ namespace OpenImis.RestApi
 
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
+				loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+				loggerFactory.AddDebug();
+			}
             if (!env.EnvironmentName.Equals("Test"))
             {
                 app.UseStaticFiles();

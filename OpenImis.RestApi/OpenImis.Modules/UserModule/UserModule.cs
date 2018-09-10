@@ -8,15 +8,20 @@ namespace OpenImis.Modules.UserModule
 {
     public class UserModule:IUserModule
     {
-		private readonly IUserController _userController;
+		private IUserController _userController;
+		private readonly IUserModuleRepositories _userModuleRepository;
 
-		public UserModule()
+		public UserModule(IUserModuleRepositories userModuleRepository)
 		{
-			_userController = new UserController();
+			_userModuleRepository = userModuleRepository;
 		}
 
 		public IUserController GetUserController()
 		{
+			if (_userController == null)
+			{
+				_userController = new UserController(_userModuleRepository);
+			}
 			return _userController;
 		}
 

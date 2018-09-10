@@ -17,11 +17,11 @@ namespace OpenImis.Modules.UserModule.Controller
     public class UserController: IUserController
     {
 
-		private readonly UserModuleRepository _sqlConfiguration;
+		private readonly IUserModuleRepositories _sqlConfiguration;
 
-        public UserController()
+        public UserController(IUserModuleRepositories sqlConfiguration) 
         {
-			_sqlConfiguration = new UserModuleRepository();
+			_sqlConfiguration = sqlConfiguration;
         }
 		
 		/// <summary>

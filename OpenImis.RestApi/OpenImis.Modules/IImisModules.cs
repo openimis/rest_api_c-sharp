@@ -1,4 +1,5 @@
 ﻿using OpenImis.Modules.UserModule;
+using OpenImis.Modules.WSModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,7 @@ namespace OpenImis.Modules
         /// The instance of the user repository
         /// </returns>
         IUserModule getUserModule();
+
+        IWSModule getWSModule();
     }
 }
