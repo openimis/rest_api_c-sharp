@@ -46,7 +46,7 @@ namespace ImisRestApi.Controllers
             {
 
             };
-
+ 
             return new JwtSecurityTokenHandler().WriteToken(JwtToken);
         }
     }

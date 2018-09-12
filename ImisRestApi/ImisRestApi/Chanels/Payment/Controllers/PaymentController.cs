@@ -105,6 +105,9 @@ namespace ImisRestApi.Controllers
         [Route("api/GetPaymentData")]
         public IActionResult GetPayment([FromBody]PaymentContainer model)
         {
+            if(ModelState.IsValid)
+                return BadRequest(ModelState);
+
             //Add to payment and payment details tables
             return Ok("Payment Received");
         }
