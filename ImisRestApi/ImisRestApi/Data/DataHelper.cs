@@ -20,7 +20,7 @@ namespace ImisRestApi.Data
 
         public DataTable GetDataTable(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            var dt = new DataTable();
+            DataTable dt = new DataTable();
             var sqlConnection = new SqlConnection(ConnectionString);
             var command = new SqlCommand(SQL, sqlConnection)
             {
@@ -93,6 +93,31 @@ namespace ImisRestApi.Data
             sqlConnection.Close();
 
             return rv;
+        }
+
+        public IList<SqlParameter> ExecProcedure(string StoredProcedure, SqlParameter[] parameters)
+        {
+            SqlConnection sqlConnection = new SqlConnection(ConnectionString);
+            SqlCommand command = new SqlCommand();
+
+
+            command.CommandText = StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
+            command.Connection = sqlConnection;
+
+
+            if (parameters.Length > 0)
+                command.Parameters.AddRange(parameters);
+
+            sqlConnection.Open();
+
+            command.ExecuteNonQuery();
+
+            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output));
+
+            sqlConnection.Close();
+
+            return rv.ToList();
         }
 
         public DataTable Login(string UserName, string Password)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace ImisRestApi.Responses
         {
             msg.Code = value;
             msg.ErrorOccured = error;
-            msg.Data = data;
+            msg.Data = JsonConvert.SerializeObject(data);
             Message = msg;
         }
 

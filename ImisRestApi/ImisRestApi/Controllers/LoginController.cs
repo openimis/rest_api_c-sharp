@@ -19,6 +19,7 @@ namespace ImisRestApi.Controllers
         public LoginController(IConfiguration configuration)
         {
             Configuration = configuration;
+           
         }
 
         [HttpPost]
@@ -40,7 +41,7 @@ namespace ImisRestApi.Controllers
 
         private string JwtTokenBuilder(UserData user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.PrivateKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:key"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var JwtToken = new JwtSecurityToken(issuer:Configuration["JWT:issuer"],audience:Configuration["JWT:audience"],signingCredentials:credentials,expires:DateTime.Now.AddDays(5))
             {

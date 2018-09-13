@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -41,8 +42,13 @@ namespace ImisRestApi
            {
                jwtconfig.TokenValidationParameters = tokenParams;
            });
-
-            services.AddMvc();
+            
+            services.AddMvc(config => {
+                config.RespectBrowserAcceptHeader = true;
+                config.InputFormatters.Add(new XmlSerializerInputFormatter());
+                config.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+            });
+            //services.ConfigureMvc();
             services.AddSwaggerGen(x => {
                 x.SwaggerDoc("v1", new Info { Title = "IMIS REST" , Version = "v1"});
             });

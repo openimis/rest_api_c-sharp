@@ -12,7 +12,7 @@ namespace ImisRestApi.Escape
     {
 
         
-        public static ControlNumberRequest PostRequest(string Url, int PaymentId, float ExpectedAmount)
+        public static ControlNumberRequest PostRequest(string Url, string PaymentId, float ExpectedAmount)
         {
             //Call Payment Getway
             //Request for Control Number Here

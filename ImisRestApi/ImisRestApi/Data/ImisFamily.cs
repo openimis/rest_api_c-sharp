@@ -109,6 +109,42 @@ namespace ImisRestApi.Data
             }
             return dt;
         }
+        public DataTable Enquire(string insureeNumber)
+        {
+            SqlParameter LocationId = new SqlParameter();
+            LocationId.Value = 0;
+            LocationId.SqlDbType = SqlDbType.Int;
+            LocationId.ParameterName = "@LocationId";
+
+            //SqlParameter[] parameters = {
+            //    new SqlParameter("@CHFID", insureeNumber),
+            //    new SqlParameter("@LocationId",0)
+            //};
+            SqlParameter[] parameters = {
+                new SqlParameter("@CHFID", insureeNumber),
+                LocationId
+            };
+
+            var data = new DataHelper(Configuration);
+
+            var dt = new DataTable();
+
+            try
+            {
+                dt = data.GetDataTable("uspPolicyInquiry", parameters, CommandType.StoredProcedure);
+               
+            }
+            catch (SqlException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+            return dt;
+        }
 
         public DataMessage DeleteMamber(string insureeNumber)
         {

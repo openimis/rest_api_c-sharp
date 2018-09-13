@@ -8,6 +8,6 @@ namespace ImisRestApi.Responses
     public class ValidateCredentialsResponse
     {
         public bool ErrorOccured { get; set; }
-        public bool CredentialsValid { get; set; }
+        public bool success { get; set; }
     }
 }

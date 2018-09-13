@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Models;
 using Microsoft.Extensions.Configuration;
 
@@ -12,7 +13,7 @@ namespace ImisRestApi.Repo
 {
     public class PaymentRepo : Connection
     {
-        public int PaymentId { get; set; }
+        public string PaymentId { get; set; }
         public float ExpectedAmount { get; set; }
 
         private IntentOfPay _intent { get; set; }
@@ -30,22 +31,21 @@ namespace ImisRestApi.Repo
         public void SaveIntent()
         {
             XElement PaymentIntent = new XElement("PaymentIntent",
-                new XElement("Header", 
-                    new XElement("OfficerCode", _intent.EnrolmentOfficerCode),
-                    new XElement("RequestDate", _intent.Request_Date.ToShortDateString()),
+                new XElement("Header",
+                    new XElement("OfficerCode", _intent.OfficerCode),
+                    new XElement("RequestDate", _intent.RequestDate.ToShortDateString()),
                     new XElement("PhoneNumber", _intent.PhoneNumber),
                     new XElement("AuditUserId", -1)
-                ),         
-                new XElement("Details",
-                              from d in _intent.PaymentDetails
-                              select
-                              new XElement("Detail",
-                                  new XElement("InsureeNumber", d.InsureeNumber),
-                                  new XElement("ProductCode", d.ProductCode),
+                ),
+                  new XElement("Details",
+                               new XElement("Detail",
+                                  new XElement("InsureeNumber", _intent.InsureeNumber),
+                                  new XElement("ProductCode", _intent.ProductCode),
                                   new XElement("EnrollmentDate", DateTime.UtcNow),
-                                  new XElement("IsRenewal", Convert.ToInt32(d.Renewal))
+                                  new XElement("IsRenewal", _intent.IsRenewal()))
                                   )
-                              ));
+                              );
+             // );
 
 
             SqlParameter[] sqlParameters = {
@@ -53,10 +53,20 @@ namespace ImisRestApi.Repo
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
                 new SqlParameter("@ExpectedAmount", SqlDbType.Int){Direction = ParameterDirection.Output }
              };
-            var data = Procedure("uspInsertPaymentIntent", sqlParameters);
 
-            PaymentId = Convert.ToInt32(data[0].Value.ToString());
-            ExpectedAmount = float.Parse(data[1].Value.ToString());
+            try
+            {
+                var data = Procedure("uspInsertPaymentIntent", sqlParameters);
+
+                PaymentId = data[0].Value.ToString();
+                ExpectedAmount = float.Parse(data[1].Value.ToString());
+            }
+            catch (Exception e)
+            {
+
+                throw new Exception();
+            }
+            
 
         }
 
@@ -68,6 +78,32 @@ namespace ImisRestApi.Repo
              };
 
             var data = Procedure("uspRequestGetControlNumber", sqlParameters);
+        }
+
+        public void UpdateControlNumberStatus(string ControlNumber,CnStatus status){
+
+            SqlParameter[] sqlParameters = {
+                  new SqlParameter("@ControlNumber", ControlNumber)
+            };
+
+            switch (status)
+            {
+                case CnStatus.Sent:
+                    break;
+                case CnStatus.Acknowledged:
+                    Procedure("uspAcknowledgeControlNumber", sqlParameters);
+                    break;
+                case CnStatus.Issued:                 
+                    Procedure("uspIssueControlNumber", sqlParameters);
+                    break;
+                case CnStatus.Paid:
+                    Procedure("uspPaidControlNumber", sqlParameters);
+                    break;
+                case CnStatus.Rejected:
+                    break;
+                default:
+                    break;
+            }
         }
 
         public void SaveControlNumber(string ControlNumber)
@@ -96,8 +132,20 @@ namespace ImisRestApi.Repo
             var data = Procedure("uspAcknowledgeControlNumberRequest", sqlParameters);
         }
 
-        public void SavePayment()
+        public void SavePayment(PaymentModels payment)
         {
+            XElement PaymentIntent = new XElement("PaymentData",
+                new XElement("PaymentID", PaymentId),
+                   new XElement("ControlNumber", payment.ControlNumber),
+                   new XElement("Amount", payment.ReceivedAmount),
+                   new XElement("InsureeNumber", payment.InsureeNumber)
+                             );
+
+
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@Xml", PaymentIntent.ToString()),
+             };
+            var data = Procedure("uspReceivePayment", sqlParameters);
 
         }
 
