@@ -185,7 +185,7 @@ namespace ImisRestApi.Controllers
                 message += item.productCode + " : " + item.status;
             }
 
-            string test = await SmsTz.MessageCore.PushSMS("15200", "226", message, "+255767057265");
+            string test = await Chanels.Sms.Message.PushSMS(message, "+255767057265");
 
             return Json(new { status = true,sms_reply=true,sms_text = resp });
 

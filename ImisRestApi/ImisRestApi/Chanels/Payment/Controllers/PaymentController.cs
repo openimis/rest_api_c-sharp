@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using ImisRestApi.Chanels.Payment.Models;
+using ImisRestApi.Chanels.Sms;
 using ImisRestApi.Data;
 using ImisRestApi.Escape;
 using ImisRestApi.Models;
@@ -68,12 +69,12 @@ namespace ImisRestApi.Controllers
                 intent.PaymentDetails = details;
             }
             //save the intent of pay 
-            _imisPayment.SaveIntent(intent);
+           // _imisPayment.SaveIntent(intent);
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
             ImisPayment payment = new ImisPayment(_configuration,_hostingEnvironment);
-            payment.GenerateCtrlNoRequest(intent.OfficerCode,intent.InsureeNumber, _imisPayment.PaymentId, _imisPayment.ExpectedAmount,intent.PaymentDetails);
+           // payment.GenerateCtrlNoRequest(intent.OfficerCode,intent.InsureeNumber, _imisPayment.PaymentId, _imisPayment.ExpectedAmount,intent.PaymentDetails);
 
             //ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
 
@@ -91,7 +92,7 @@ namespace ImisRestApi.Controllers
             //    _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged,"");
             //}
 
-            string test = await SmsTz.MessageCore.PushSMS("15200", "226", "Your Request for control number was Sent", "+255767057265");
+            string test = await Message.PushSMS("Your Request for control number was Sent", "+255767057265");
 
             return Json(new { status = true, sms_reply = true, sms_text = "Your Request for control number was Sent" });
             //return Ok("Request sent");
