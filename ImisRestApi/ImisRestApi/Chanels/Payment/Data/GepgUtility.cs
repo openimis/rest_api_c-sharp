@@ -112,11 +112,17 @@ namespace ImisRestApi.Chanels.Payment.Data
 
                 var data = new DataHelper(Configuration);
                 DataTable dt = data.GetDataTable(sSQL, parameters, CommandType.Text);
-                var row = dt.Rows[0];
 
                 billTrxInf.PyrId = InsureeNumber;
-                billTrxInf.PyrName = Convert.ToString(row["LastName"]) + Convert.ToString(row["OtherNames"]);
-                
+                if (dt.Rows.Count > 0)
+                {
+                    var row = dt.Rows[0];                  
+                    billTrxInf.PyrName = Convert.ToString(row["LastName"]) + Convert.ToString(row["OtherNames"]);
+                }
+                else
+                {
+                    billTrxInf.PyrName = InsureeNumber;
+                }
             }
             else
             {

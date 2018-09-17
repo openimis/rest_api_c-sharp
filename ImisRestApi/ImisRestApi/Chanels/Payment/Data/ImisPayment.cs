@@ -67,20 +67,24 @@ namespace ImisRestApi.Data
         public void SaveIntent(IntentOfPay _intent)
         {
             XElement PaymentIntent = new XElement("PaymentIntent",
-                new XElement("Header",
-                    new XElement("OfficerCode", _intent.OfficerCode),
-                    new XElement("RequestDate", _intent.RequestDate.ToShortDateString()),
-                    new XElement("PhoneNumber", _intent.PhoneNumber),
-                    new XElement("AuditUserId", -1)
-                ),
-                  new XElement("Details",
+                    new XElement("Header",
+                        new XElement("OfficerCode", _intent.OfficerCode),
+                        new XElement("RequestDate", _intent.RequestDate.ToShortDateString()),
+                        new XElement("PhoneNumber", _intent.PhoneNumber),
+                        new XElement("AuditUserId", -1)
+                    ),
+                      new XElement("Details",
+                    _intent.PaymentDetails.Select(x =>
+                                    
                                new XElement("Detail",
-                                 // new XElement("InsuranceNumber", _intent.InsureeNumber),
-                                 // new XElement("ProductCode", _intent.ProductCode),
-                                  new XElement("EnrollmentDate", DateTime.UtcNow))
-                                 // new XElement("IsRenewal", _intent.IsRenewal()))
-                                  )
-                              );
+                                  new XElement("InsuranceNumber", x.InsureeNumber),
+                                  new XElement("ProductCode", x.ProductCode),
+                                  new XElement("EnrollmentDate", DateTime.UtcNow),
+                                  new XElement("IsRenewal", x.IsRenewal())
+                                  )                      
+                    )
+                  )
+            );
             // );
 
 
@@ -169,10 +173,13 @@ namespace ImisRestApi.Data
         public void SavePayment(PymtTrxInf payment)
         {
             XElement PaymentIntent = new XElement("PaymentData",
-                new XElement("PaymentID", PaymentId),
-                   new XElement("ControlNumber", payment.PayCtrNum),
-                   new XElement("Amount", payment.PaidAmt),
-                   new XElement("InsureeNumber", payment.InsureeNumber)
+                new XElement("PaymentDate", payment.PaymentDate),
+                new XElement("ControlNumber", payment.PayCtrNum),
+                new XElement("Amount", payment.PaidAmt),
+                new XElement("ReceiptNo", payment.PspReceiptNumber),
+                new XElement("TransactionNo",payment.TrxId),
+                new XElement("PhoneNumber",payment.InsureeNumber),
+                new XElement("InsureeNumber", payment.InsureeNumber)
                              );
 
 
