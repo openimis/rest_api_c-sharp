@@ -1,4 +1,4 @@
-﻿using OpenImis.RestApi.Models.Entities;
+﻿using OpenImis.DB.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace OpenImis.Modules.UserModule.Repository
         public async Task<User> GetByUsernameAsync(string username)
         {
             TblUsers user;
-            using (var imisContext = new IMISContext())
+            using (var imisContext = new ImisDB())
             {
                 user = await imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefaultAsync();
             }
@@ -39,7 +39,7 @@ namespace OpenImis.Modules.UserModule.Repository
         public User GetByUsername(string username)
         {
 			TblUsers user;
-            using (var imisContext = new IMISContext())
+            using (var imisContext = new ImisDB())
             {
                 user = imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefault();
             }
@@ -71,7 +71,7 @@ namespace OpenImis.Modules.UserModule.Repository
         public async Task<User> GetByUsernameAndPasswordAsync(string username, string password)
         {
             TblUsers user;
-            using (var imisContext = new IMISContext())
+            using (var imisContext = new ImisDB())
             {
                 var userParameter = new SqlParameter("user", username);
                 var passwordParameter = new SqlParameter("password", password);
@@ -91,7 +91,7 @@ namespace OpenImis.Modules.UserModule.Repository
         public User GetByUsernameAndPassword(string username, string password)
         {
             User user;
-            using (var imisContext = new IMISContext())
+            using (var imisContext = new ImisDB())
             {
                 var userParameter = new SqlParameter("user", username);
                 var passwordParameter = new SqlParameter("password", password);

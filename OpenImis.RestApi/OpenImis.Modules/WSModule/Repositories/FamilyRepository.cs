@@ -1,4 +1,4 @@
-﻿using OpenImis.RestApi.Models.Entities;
+﻿using OpenImis.DB.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ namespace OpenImis.Modules.WSModule.Repositories
 		{
 			FamilyModel familyModel;
 
-			using (var imisContext = new IMISContext())
+			using (var imisContext = new ImisDB())
 			{
 				familyModel = await (from i in imisContext.TblInsuree
 									 join f in imisContext.TblFamilies on i.FamilyId equals f.FamilyId

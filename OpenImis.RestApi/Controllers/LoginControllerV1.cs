@@ -13,7 +13,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-using OpenImis.RestApi.Models.Entities;
 using OpenImis.Modules;
 using System.ComponentModel.DataAnnotations;
 using OpenImis.Modules.UserModule.Entities;

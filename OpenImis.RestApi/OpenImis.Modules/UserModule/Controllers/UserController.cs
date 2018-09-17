@@ -1,6 +1,4 @@
-﻿using OpenImis.RestApi.Models.Entities;
-//using OpenImis.RestApi.Models.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -17,7 +15,6 @@ namespace OpenImis.Modules.UserModule.Controllers
     public class UserController: IUserController
     {
 
-		//private readonly IUserModuleRepositories _sqlConfiguration;
 		private readonly IUserRepository _userRepository;
 
         public UserController() 

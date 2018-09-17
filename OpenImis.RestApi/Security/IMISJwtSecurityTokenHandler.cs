@@ -1,5 +1,4 @@
-﻿using OpenImis.RestApi.Models.Entities;
-using OpenImis.Modules;
+﻿using OpenImis.Modules;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;

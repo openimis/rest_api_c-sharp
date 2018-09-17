@@ -1,5 +1,4 @@
 ﻿using OpenImis.Modules.WSModule.Models;
-using OpenImis.RestApi.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

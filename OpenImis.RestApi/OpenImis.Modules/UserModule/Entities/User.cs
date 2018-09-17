@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
-using OpenImis.RestApi.Models.Entities;
+using OpenImis.DB.SqlServer;
 
 namespace OpenImis.Modules.UserModule.Entities
 {

@@ -1,5 +1,5 @@
 ﻿using OpenImis.Modules.Utils;
-using OpenImis.RestApi.Models.Entities;
+using OpenImis.DB.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;

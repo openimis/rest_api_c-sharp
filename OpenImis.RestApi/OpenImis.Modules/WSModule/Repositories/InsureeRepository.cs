@@ -1,6 +1,6 @@
 ﻿using OpenImis.Modules.Utils;
 using OpenImis.Modules.WSModule.Models;
-using OpenImis.RestApi.Models.Entities;
+using OpenImis.DB.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace OpenImis.Modules.WSModule.Repositories
 		{
 			InsureeModel insuree;
 
-			using (var imisContext = new IMISContext())
+			using (var imisContext = new ImisDB())
 			{
 				insuree = await (from i in imisContext.TblInsuree
 									 where i.Chfid == chfId
@@ -57,7 +57,7 @@ namespace OpenImis.Modules.WSModule.Repositories
 		{
 			IEnumerable<InsureeModel> insureeList;
 
-			using (var imisContext = new IMISContext())
+			using (var imisContext = new ImisDB())
 			{
 				
 				insureeList = await (from i in imisContext.TblInsuree
