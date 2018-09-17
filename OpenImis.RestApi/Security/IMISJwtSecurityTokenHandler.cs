@@ -20,10 +20,10 @@ namespace OpenImis.RestApi.Security
         private readonly JwtSecurityTokenHandler _tokenHandler;
         private readonly IImisModules _imisModules;
         
-        public IMISJwtSecurityTokenHandler(IServiceCollection serviceCollection)
+        public IMISJwtSecurityTokenHandler(IImisModules imisModules)
         {
             _tokenHandler = new JwtSecurityTokenHandler();
-            _imisModules = serviceCollection.BuildServiceProvider().GetService<IImisModules>();
+            _imisModules = imisModules;
         }
 
         public bool CanValidateToken

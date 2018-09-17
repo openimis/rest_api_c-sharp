@@ -18,9 +18,13 @@
 
   <ItemGroup>
     <Compile Remove="Models\**" />
+    <Compile Remove="OpenImis.Modules\**" />
     <Content Remove="Models\**" />
+    <Content Remove="OpenImis.Modules\**" />
     <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="OpenImis.Modules\**" />
     <None Remove="Models\**" />
+    <None Remove="OpenImis.Modules\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,7 +46,6 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Globals\" />
-    <Folder Include="OpenImis.Modules\WSModule\Entities\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,8 +64,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpenImis.DB.SqlServer\OpenImis.DB.SqlServer.csproj" />
     <ProjectReference Include="..\OpenImis.Extensions.Configuration\OpenImis.Extensions.Configuration.csproj" />
+    <ProjectReference Include="..\OpenImis.Modules\OpenImis.Modules.csproj" />
   </ItemGroup>
 
   <ItemGroup>

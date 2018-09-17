@@ -273,3 +273,4 @@ __pycache__/
 **/appsettings.Production.json
 **/appsettings.Test.json
 *.old
+/OpenImis.DB.SqlServer/importDBStructure.bat
