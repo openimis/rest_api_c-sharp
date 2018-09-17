@@ -72,7 +72,7 @@ namespace OpenImis.RestApi.Security
 
             //IUserSQL userRepository = _imisRepository.getUserRepository();
 
-            User user = _imisModules.getUserModule().GetUserController().GetByUsername(username);
+            User user = _imisModules.GetUserModule().GetUserController().GetByUsername(username);
 
             if (user != null)
             {

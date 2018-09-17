@@ -64,7 +64,7 @@ namespace OpenImis.RestApi.Controllers
           
             //IUserSQL userRepository = _imisRepository.getUserRepository();
 
-            User user = await _imisModules.getUserModule().GetUserController().GetByUsernameAndPasswordAsync(request.Username, request.Password);
+            User user = await _imisModules.GetUserModule().GetUserController().GetByUsernameAndPasswordAsync(request.Username, request.Password);
              
             if (user!=null)
             {

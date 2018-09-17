@@ -1,11 +1,12 @@
 ﻿using OpenImis.Modules.UserModule.Entities;
+using OpenImis.Modules.UserModule.Repository;
 using OpenImis.RestApi.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.Modules.UserModule.Controller
+namespace OpenImis.Modules.UserModule.Controllers
 {
     /// <summary>
     /// This interface serves to define the methods which must be implemented in any specific instance 

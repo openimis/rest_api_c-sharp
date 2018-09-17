@@ -1,9 +1,9 @@
-﻿//using OpenImis.RestApi.Models.Interfaces;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using OpenImis.Modules;
+﻿using Microsoft.Extensions.Logging;
 using OpenImis.Modules.UserModule;
+using OpenImis.Modules.UserModule.Controllers;
 using OpenImis.Modules.WSModule;
+using OpenImis.Modules.WSModule.Controllers;
+using OpenImis.RestApi.OpenImis.Modules.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,81 +12,63 @@ using System.Threading.Tasks;
 
 namespace OpenImis.Modules
 {
-    /// <summary>
-    /// This Service instanciates the modules that will be used in the application entry point 
-    /// </summary>
-    public class ImisModules: IImisModules
+	/// <summary>
+	/// This Service creates the entry point to the modules that will be used in the application entry point. 
+	/// It reads the openImisModules.json configuration file and instanciates the desired controllers for each module. 
+	/// Example of the configuration file:
+	/// {
+	///   "ImisModules": {
+	///     "UserModule": {
+	///       "UserController": "OpenImis.Modules.UserModule.Controllers.UserController"
+	///     },
+	///     "WSModule": {
+	///       "FamilyController": "OpenImis.Modules.WSModule.Controllers.FamilyController",
+	///       "InsureeController": "OpenImis.Modules.WSModule.Controllers.InsureeController"
+	///     }
+	///   }
+	/// }
+	/// </summary>
+	public class ImisModules: IImisModules
     {
         private IUserModule _userModule;
         private IWSModule _wsModule;
 
-		private readonly IConfiguration _configuration;
 		private readonly ILogger logger;
 
-		public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory)
+		public ImisModules(ILoggerFactory loggerFactory)
         {
-			_configuration = configuration;
 			logger = loggerFactory.CreateLogger("LoggerCategory");
 		}
 
-		private Type CreateTypeFromConfiguration(string moduleName, string sectionName, string defaultValue)
-		{
-			Type type;
-
-			string part = "";
-
-			if (_configuration.GetSection("ImisModules:" + moduleName).Exists())
-			{
-				var configSection = _configuration.GetSection("ImisModules:" + moduleName);
-
-				if (configSection[sectionName] != null)
-				{
-					part = configSection[sectionName];
-				}
-			}
-
-			type = Assembly.GetEntryAssembly().GetType(part);
-
-			if (type == null)
-			{
-				logger.LogError(moduleName + " " + sectionName + " error: the type " + part + " was not found. Using default " + defaultValue + " configuration.");
-				type = Assembly.GetEntryAssembly().GetType(defaultValue);
-			}
-			else
-			{
-				logger.LogInformation(moduleName + " load OK: " + part);
-			}
-
-			return type;
-		}
-
-        /// <summary>
+		/// <summary>
         /// Return the user module
         /// </summary>
         /// <returns>
         /// The instance of the user repository
         /// </returns>
-        public IUserModule getUserModule()
+        public IUserModule GetUserModule()
         {
 			if (_userModule == null)
 			{
-				Type moduleType = CreateTypeFromConfiguration("UserModule", "Controllers", "OpenImis.Modules.UserModule.UserModule");
-				Type repositoriesType = CreateTypeFromConfiguration("UserModule", "Repositories", "OpenImis.Modules.UserModule.UserModuleRepositories");
+				_userModule = new UserModule.UserModule();
+				Type userControllerType = Generators.CreateTypeFromConfiguration("UserModule", "UserController", "OpenImis.Modules.UserModule.Controllers.UserController", logger);
 				
-				_userModule = (IUserModule)Activator.CreateInstance(moduleType, (IUserModuleRepositories)Activator.CreateInstance(repositoriesType));
+				_userModule.SetUserController((IUserController)Activator.CreateInstance(userControllerType));
 			}
 			return _userModule;
         }
 
-		public IWSModule getWSModule()
+		public IWSModule GetWSModule()
 		{
 			if (_wsModule == null)
 			{
-				Type moduleType = CreateTypeFromConfiguration("WSModule", "Controllers", "OpenImis.Modules.WSModule.WSModule");
-				Type repositoriesType = CreateTypeFromConfiguration("WSModule", "Repositories", "OpenImis.Modules.WSModule.WSModuleRepositories");
-				Type validatorsType = CreateTypeFromConfiguration("WSModule", "Validators", "OpenImis.Modules.WSModule.WSValidators");
+				_wsModule = new WSModule.WSModule();
 
-				_wsModule = (IWSModule)Activator.CreateInstance(moduleType, (IWSModuleRepositories)Activator.CreateInstance(repositoriesType), (IWSValidators)Activator.CreateInstance(validatorsType));
+				Type insureeControllerType = Generators.CreateTypeFromConfiguration("WSModule", "InsureeController", "OpenImis.Modules.WSModule.Controllers.InsureeController", logger);
+				_wsModule.SetInsureeController((IInsureeController)Activator.CreateInstance(insureeControllerType));
+
+				Type familyControllerType = Generators.CreateTypeFromConfiguration("WSModule", "FamilyController", "OpenImis.Modules.WSModule.Controllers.FamilyController", logger);
+				_wsModule.SetFamilyController((IFamilyController)Activator.CreateInstance(familyControllerType));
 
 			}
 			return _wsModule;

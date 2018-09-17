@@ -40,7 +40,7 @@ namespace OpenImis.RestApi.Controllers
 
 			try
 			{
-				familyModel = await _imisModules.getWSModule().GetFamilyController().GetFamily(chfid);
+				familyModel = await _imisModules.GetWSModule().GetFamilyController().GetFamily(chfid);
 			}
 			catch (ValidationException e)
 			{

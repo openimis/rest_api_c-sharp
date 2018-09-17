@@ -16,11 +16,11 @@ namespace OpenImis.Modules.WSModule.Controllers
 	public class InsureeController: IInsureeController
     {
 
-		private readonly IWSModuleRepositories _repositories;
+		private readonly IInsureeRepository _insureeRepository;
 
-        public InsureeController(IWSModuleRepositories repositories)
+        public InsureeController()
         {
-			_repositories = repositories;
+			_insureeRepository = new InsureeRepository();
         }
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace OpenImis.Modules.WSModule.Controllers
 			
 			// Execute business behaviour
 			InsureeModel insuree;
-			insuree = await _repositories.GetInsureeRepository().GetInsureeByCHFIDAsync(chfId);
+			insuree = await _insureeRepository.GetInsureeByCHFIDAsync(chfId);
 
 			// Validate results
 

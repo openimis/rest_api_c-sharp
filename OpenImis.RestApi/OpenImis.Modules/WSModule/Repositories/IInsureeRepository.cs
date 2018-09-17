@@ -10,7 +10,7 @@ namespace OpenImis.Modules.WSModule.Repositories
     {
 
 		Task<InsureeModel> GetInsureeByCHFIDAsync(string chfId);
-		Task<IEnumerable<InsureeModel>> GetInsureeByFamilyId(int familyId);
+		Task<IEnumerable<InsureeModel>> GetInsureeByFamilyIdAsync(int familyId);
 
 	}
 }

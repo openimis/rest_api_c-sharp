@@ -1,4 +1,4 @@
-﻿using OpenImis.Modules.UserModule.Controller;
+﻿using OpenImis.Modules.UserModule.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,21 +9,27 @@ namespace OpenImis.Modules.UserModule
     public class UserModule:IUserModule
     {
 		private IUserController _userController;
-		private readonly IUserModuleRepositories _userModuleRepository;
-
-		public UserModule(IUserModuleRepositories userModuleRepository)
+		
+		public UserModule()
 		{
-			_userModuleRepository = userModuleRepository;
+			
 		}
 
 		public IUserController GetUserController()
 		{
 			if (_userController == null)
 			{
-				_userController = new UserController(_userModuleRepository);
+				_userController = new UserController();
 			}
 			return _userController;
 		}
 
-    }
+		public IUserModule SetUserController(IUserController userController)
+		{
+			_userController = userController;
+			return this;
+		}
+
+
+	}
 }

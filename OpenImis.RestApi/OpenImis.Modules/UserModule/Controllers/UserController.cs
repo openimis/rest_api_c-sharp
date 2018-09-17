@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using OpenImis.Modules.UserModule.Repository;
 using OpenImis.Modules.UserModule.Entities;
 
-namespace OpenImis.Modules.UserModule.Controller
+namespace OpenImis.Modules.UserModule.Controllers
 {
     /// <summary>
     /// This class is actual implementation of IUserRepository methods for Tanzania implementation 
@@ -17,13 +17,14 @@ namespace OpenImis.Modules.UserModule.Controller
     public class UserController: IUserController
     {
 
-		private readonly IUserModuleRepositories _sqlConfiguration;
+		//private readonly IUserModuleRepositories _sqlConfiguration;
+		private readonly IUserRepository _userRepository;
 
-        public UserController(IUserModuleRepositories sqlConfiguration) 
+        public UserController() 
         {
-			_sqlConfiguration = sqlConfiguration;
+			_userRepository = new UserSqlServer(); 
         }
-		
+				
 		/// <summary>
 		/// Get user by username
 		/// </summary>
@@ -33,7 +34,7 @@ namespace OpenImis.Modules.UserModule.Controller
 		{
 			User user;
 
-			user = _sqlConfiguration.GetUserSql().GetByUsername(username);
+			user = _userRepository.GetByUsername(username);
 
 			return user;
 		}
@@ -48,7 +49,7 @@ namespace OpenImis.Modules.UserModule.Controller
         {
             User user;
 
-			user = await _sqlConfiguration.GetUserSql().GetByUsernameAndPasswordAsync(username, password);
+			user = await _userRepository.GetByUsernameAndPasswordAsync(username, password);
 
 			return user;
         }
@@ -63,7 +64,7 @@ namespace OpenImis.Modules.UserModule.Controller
         {
             User user;
 
-			user = _sqlConfiguration.GetUserSql().GetByUsernameAndPassword(username, password);
+			user = _userRepository.GetByUsernameAndPassword(username, password);
 
 			return user;
 		}

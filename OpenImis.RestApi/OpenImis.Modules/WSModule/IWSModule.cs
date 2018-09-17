@@ -10,7 +10,8 @@ namespace OpenImis.Modules.WSModule
     {
 
 		IInsureeController GetInsureeController();
+		IWSModule SetInsureeController(IInsureeController insureeController);
 		IFamilyController GetFamilyController();
-
+		IWSModule SetFamilyController(IFamilyController familyController);
 	}
 }

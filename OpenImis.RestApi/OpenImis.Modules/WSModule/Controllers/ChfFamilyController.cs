@@ -1,4 +1,5 @@
-﻿using OpenImis.Modules.WSModule.Validators;
+﻿using OpenImis.Modules.WSModule.Repositories;
+using OpenImis.Modules.WSModule.Validators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace OpenImis.Modules.WSModule.Controllers
     public class ChfFamilyController: FamilyController
 	{
 
-		public ChfFamilyController(IWSModuleRepositories repositories, IWSValidators validators):base(repositories, validators)
+		public ChfFamilyController()
 		{
-			this._repositories = new WSModuleRepositories();
-			this._validators = new Validators.ChfValidators();
+			_familyRepository = new FamilyRepository();
+			_insureeNumberValidator = new ChfInsureeNumberValidator(null);
 		}
 
 	}

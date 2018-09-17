@@ -12,50 +12,39 @@ namespace OpenImis.Modules.WSModule
 		private IInsureeController _insureeController;
 		private IFamilyController _familyController;
 
-		private IWSModuleRepositories _repositories;
-		protected IWSValidators _validators;
-
-		public WSModule(IWSModuleRepositories repositories, IWSValidators validators)
+		public WSModule()
 		{
-			_repositories = repositories;
-			_validators = validators;
-		}
 
-		private IWSModuleRepositories GetRepositories()
-		{
-			if (_repositories == null)
-			{
-				_repositories = new WSModuleRepositories();
-			}
-			return _repositories;
-		}
-
-		private IWSValidators GetValidators()
-		{
-			if (_validators == null)
-			{
-				//_validators = new Validators.WSValidators();
-			}
-			return _validators;
 		}
 
 		public IInsureeController GetInsureeController()
 		{
 			if (_insureeController == null)
 			{
-				_insureeController = new InsureeController(GetRepositories());
+				_insureeController = new InsureeController();
 			}
 			return _insureeController;
+		}
+
+		public IWSModule SetInsureeController(IInsureeController insureeController)
+		{
+			_insureeController = insureeController;
+			return this;
 		}
 
 		public IFamilyController GetFamilyController()
 		{
 			if (_familyController == null)
 			{
-				_familyController = new FamilyController(GetRepositories(), GetValidators());
+				_familyController = new FamilyController();
 			}
 			return _familyController;
 		}
 
-    }
+		public IWSModule SetFamilyController(IFamilyController familyController)
+		{
+			_familyController = familyController;
+			return this;
+		}
+	}
 }

@@ -53,7 +53,7 @@ namespace OpenImis.Modules.WSModule.Repositories
 		}
 
 
-		public async Task<IEnumerable<InsureeModel>> GetInsureeByFamilyId(int familyId)
+		public async Task<IEnumerable<InsureeModel>> GetInsureeByFamilyIdAsync(int familyId)
 		{
 			IEnumerable<InsureeModel> insureeList;
 
