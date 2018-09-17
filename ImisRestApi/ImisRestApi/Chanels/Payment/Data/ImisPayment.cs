@@ -75,10 +75,10 @@ namespace ImisRestApi.Data
                 ),
                   new XElement("Details",
                                new XElement("Detail",
-                                  new XElement("InsuranceNumber", _intent.InsureeNumber),
-                                  new XElement("ProductCode", _intent.ProductCode),
-                                  new XElement("EnrollmentDate", DateTime.UtcNow),
-                                  new XElement("IsRenewal", _intent.IsRenewal()))
+                                 // new XElement("InsuranceNumber", _intent.InsureeNumber),
+                                 // new XElement("ProductCode", _intent.ProductCode),
+                                  new XElement("EnrollmentDate", DateTime.UtcNow))
+                                 // new XElement("IsRenewal", _intent.IsRenewal()))
                                   )
                               );
             // );

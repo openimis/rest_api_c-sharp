@@ -18,7 +18,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace ImisRestApi.Controllers
 {
-    public class PaymentController : Controller
+    public partial class PaymentController : Controller
     {
         private ImisPayment _imisPayment;
         private IConfiguration _configuration;
@@ -49,27 +49,8 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (intent.PaymentDetails == null) {
-                PaymentDetail detail = new PaymentDetail();
-
-                if(intent.InsureeNumber != null && intent.EnrolmentType != null && intent.ProductCode != null)
-                {
-                    detail.InsureeNumber = intent.InsureeNumber;
-                    detail.ProductCode = intent.ProductCode;
-                    detail.PaymentType = intent.EnrolmentType;
-                   
-                }
-                else
-                {
-                    return BadRequest(ModelState);
-                }
-                List<PaymentDetail> details = new List<PaymentDetail>();
-                details.Add(detail);
-
-                intent.PaymentDetails = details;
-            }
             //save the intent of pay 
-           // _imisPayment.SaveIntent(intent);
+            _imisPayment.SaveIntent(intent);
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
