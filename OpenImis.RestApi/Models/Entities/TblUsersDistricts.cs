@@ -14,6 +14,6 @@ namespace OpenImis.RestApi.Models.Entities
         public int AuditUserId { get; set; }
 
         public TblLocations Location { get; set; }
-        public TblUsers User { get; set; }
+        public TblUsers TblUsers { get; set; }
     }
 }

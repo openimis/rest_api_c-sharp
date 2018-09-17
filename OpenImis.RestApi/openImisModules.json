@@ -1,0 +1,11 @@
+﻿{
+	"ImisModules": {
+		"UserModule": {
+			"UserController": "OpenImis.Modules.UserModule.Controllers.UserController"
+		},
+		"WSModule": {
+			"FamilyController": "OpenImis.Modules.WSModule.Controllers.FamilyController",
+			"InsureeController": "OpenImis.Modules.WSModule.Controllers.InsureeController"
+		}
+	}
+}

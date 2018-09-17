@@ -1,10 +1,11 @@
-﻿using OpenImis.RestApi.Models.Entities;
+﻿using OpenImis.Modules.UserModule.Entities;
+using OpenImis.RestApi.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.RestApi.Models.Interfaces
+namespace OpenImis.Modules.UserModule.Repository
 {
     /// <summary>
     /// This interface serves to define the methods which must be implemented in any specific instance 
@@ -16,21 +17,21 @@ namespace OpenImis.RestApi.Models.Interfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        TblUsers GetById(int userId);
+        User GetById(int userId);
 
         /// <summary>
         /// Get user by username
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        Task<TblUsers> GetByUsernameAsync(string username);
+        Task<User> GetByUsernameAsync(string username);
 
         /// <summary>
         /// Get user by username
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        TblUsers GetByUsername(string username);
+        User GetByUsername(string username);
 
         /// <summary>
         /// Get user by username and password
@@ -38,7 +39,7 @@ namespace OpenImis.RestApi.Models.Interfaces
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<TblUsers> GetByUsernameAndPasswordAsync(string username, string password);
+        Task<User> GetByUsernameAndPasswordAsync(string username, string password);
 
         /// <summary>
         /// Get user by username and password by sychronious call
@@ -46,7 +47,7 @@ namespace OpenImis.RestApi.Models.Interfaces
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        TblUsers GetByUsernameAndPassword(string username, string password);
+        User GetByUsernameAndPassword(string username, string password);
 
 
     }

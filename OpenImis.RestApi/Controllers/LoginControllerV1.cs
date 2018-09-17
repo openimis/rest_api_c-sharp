@@ -14,8 +14,9 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 
 using OpenImis.RestApi.Models.Entities;
-using OpenImis.RestApi.Models.Interfaces;
+using OpenImis.Modules;
 using System.ComponentModel.DataAnnotations;
+using OpenImis.Modules.UserModule.Entities;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -25,18 +26,17 @@ namespace OpenImis.RestApi.Controllers
     public class LoginControllerV1 : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly ICoreRepository _imisRepository;
+        private readonly IImisModules _imisModules;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="imisContext"></param>
-        /// <param name="imisRepository"></param>
-        public LoginControllerV1(IConfiguration configuration, ICoreRepository imisRepository)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="configuration"></param>
+		/// <param name="imisModules"></param>
+		public LoginControllerV1(IConfiguration configuration, IImisModules imisModules)
         {
             _configuration = configuration;
-            _imisRepository = imisRepository;
+            _imisModules = imisModules;
         }
 
 		/// <summary>
@@ -62,9 +62,9 @@ namespace OpenImis.RestApi.Controllers
         public async Task<IActionResult> Login([FromBody]LoginRequestModel request)
         {
           
-            IUserRepository userRepository = _imisRepository.getUserRepository();
+            //IUserSQL userRepository = _imisRepository.getUserRepository();
 
-            TblUsers user = await userRepository.GetByUsernameAndPasswordAsync(request.Username, request.Password);
+            User user = await _imisModules.GetUserModule().GetUserController().GetByUsernameAndPasswordAsync(request.Username, request.Password);
              
             if (user!=null)
             {
