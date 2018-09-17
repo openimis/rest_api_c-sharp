@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.Models.Payment;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace ImisRestApi.Chanels.Payment.Models
     }
 
     [XmlRoot("Gepg")]
-    public class GepgBillResponse
+    public class GepgBillResponse: ControlNumberResp
     {
         //public gepgBillSubResp gepgBillSubResp { get; set; }
         [XmlArray("gepgBillSubResp")]
