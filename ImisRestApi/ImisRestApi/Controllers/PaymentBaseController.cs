@@ -30,7 +30,7 @@ namespace ImisRestApi.Controllers
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
-            
+            _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
        
         //Recieve Payment from Operator/
@@ -39,10 +39,11 @@ namespace ImisRestApi.Controllers
         public virtual async Task<IActionResult> ControlNumber([FromBody]IntentOfPay intent)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(new { error_occured = false, error_message = ModelState.FirstOrDefault().Value, control_number = "" });
 
-           
-            return Ok("Request sent");
+            var response = _payment.SaveIntent(intent);
+
+            return Ok(new { error_occured=false,error_message = "",control_number = ""});
         }
 
         [HttpPost]

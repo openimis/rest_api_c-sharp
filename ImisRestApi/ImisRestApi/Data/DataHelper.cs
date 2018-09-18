@@ -113,7 +113,7 @@ namespace ImisRestApi.Data
 
             command.ExecuteNonQuery();
 
-            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output));
+            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output) || x.Direction.Equals(ParameterDirection.ReturnValue));
 
             sqlConnection.Close();
 

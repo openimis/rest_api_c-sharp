@@ -34,11 +34,11 @@ namespace ImisRestApi.Data
         }
 
 
-        public string GenerateCtrlNoRequest(string OfficerCode, string InsureeNumber,string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        public string GenerateCtrlNoRequest(string OfficerCode,string BillId, double ExpectedAmount, List<PaymentDetail> products)
         {
 
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-            var bill = gepg.CreateBill(Configuration, OfficerCode, InsureeNumber, BillId, ExpectedAmount, products);
+            var bill = gepg.CreateBill(Configuration, OfficerCode, BillId, ExpectedAmount, products);
             var signature = gepg.GenerateSignature(bill);
 
            
@@ -79,7 +79,6 @@ namespace ImisRestApi.Data
                                new XElement("Detail",
                                   new XElement("InsuranceNumber", x.InsureeNumber),
                                   new XElement("ProductCode", x.ProductCode),
-                                  new XElement("EnrollmentDate", DateTime.UtcNow),
                                   new XElement("IsRenewal", x.IsRenewal())
                                   )                      
                     )
@@ -91,7 +90,8 @@ namespace ImisRestApi.Data
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@Xml", PaymentIntent.ToString()),
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
-                new SqlParameter("@ExpectedAmount", SqlDbType.Int){Direction = ParameterDirection.Output }
+                new SqlParameter("@ExpectedAmount", SqlDbType.Int){Direction = ParameterDirection.Output },
+                new SqlParameter("@RV",SqlDbType.Int){Direction = ParameterDirection.ReturnValue }
              };
 
             try
