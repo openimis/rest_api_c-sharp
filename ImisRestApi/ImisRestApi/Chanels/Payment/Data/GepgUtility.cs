@@ -35,7 +35,7 @@ namespace ImisRestApi.Chanels.Payment.Data
             GepgPublicCertStorePath = hostingEnvironment.ContentRootPath + @"\Certificates\gepgpubliccertificate.pfx";
         }
 
-        public String CreateBill(IConfiguration Configuration, string OfficerCode, string InsureeNumber, string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        public String CreateBill(IConfiguration Configuration, string OfficerCode, string BillId, double ExpectedAmount, List<PaymentDetail> products)
         {
             DataHelper dh = new DataHelper(Configuration);
 
@@ -103,6 +103,8 @@ namespace ImisRestApi.Chanels.Payment.Data
 
             if (OfficerCode == null)
             {
+                var InsureeNumber = products.FirstOrDefault().InsureeNumber;
+
                 var sSQL = @"SELECT CHFID,LastName,OtherNames,Phone,Email
                              FROM tblInsuree WHERE CHFID = @InsureeNumber";
 

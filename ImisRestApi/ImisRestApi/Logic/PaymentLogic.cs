@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 using ImisRestApi.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
-using ImisRestApi.Models.Payment;
 
 namespace ImisRestApi.Logic
 {
     public class PaymentLogic
     {
-        public ImisBasePayment _imisPayment;
+
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -20,17 +19,19 @@ namespace ImisRestApi.Logic
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
-            _imisPayment = new ImisBasePayment(configuration, hostingEnvironment);
+           
         }
         public bool SaveIntent(IntentOfPay intent)
         {
-             //save the intent of pay
-            _imisPayment.SaveIntent(intent);
+
+            //save the intent of pay
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            payment.SaveIntent(intent);
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
-            ImisBasePayment payment = new ImisBasePayment(_configuration,_hostingEnvironment);
-            payment.GenerateCtrlNoRequest(intent.OfficerCode,intent.InsureeNumber, _imisPayment.PaymentId, _imisPayment.ExpectedAmount,intent.PaymentDetails);
+           
+            payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
 
             //ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
 
@@ -54,13 +55,7 @@ namespace ImisRestApi.Logic
             return true;
         }
 
-        internal void ReceiveControlNumberAck(Acknowledgement model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public String ReceiveControlNumber(ControlNumberResp model)
-        {
+        public String ReceiveControlNumber(){
             return "0";
         }
 
