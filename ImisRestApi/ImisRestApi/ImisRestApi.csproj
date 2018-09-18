@@ -27,9 +27,4 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Chanels\Sms\" />
-    <Folder Include="Chanels\PaymentTz\" />
-  </ItemGroup>
-
 </Project>
