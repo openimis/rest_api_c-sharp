@@ -24,14 +24,12 @@ namespace ImisRestApi.Logic
         public bool SaveIntent(IntentOfPay intent)
         {
 
-            //save the intent of pay
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             payment.SaveIntent(intent);
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
-           
-            payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
+            payment.GenerateCtrlNoRequest(intent.OfficerCode,payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
 
             //ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
 

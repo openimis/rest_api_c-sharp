@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace ImisRestApi.Chanels.Payment.Data
+namespace ImisRestApi.Data
 {
     public class GepgUtility
     {

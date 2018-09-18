@@ -1,5 +1,4 @@
-﻿using ImisRestApi.Chanels.Payment.Data;
-using ImisRestApi.Chanels.Payment.Models;
+﻿using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -53,7 +52,7 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual int GenerateCtrlNoRequest(string OfficerCode, string InsureeNumber,string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        public virtual int GenerateCtrlNoRequest(string OfficerCode,string BillId, double ExpectedAmount, List<PaymentDetail> products)
         {
             bool result = SaveControlNumberRequest(BillId);
 

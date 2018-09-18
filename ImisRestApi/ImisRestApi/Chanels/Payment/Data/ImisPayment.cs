@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ImisRestApi.Chanels.Payment.Data
+namespace ImisRestApi.Data
 {
     public class ImisPayment:ImisBasePayment
     {
@@ -40,17 +40,16 @@ namespace ImisRestApi.Chanels.Payment.Data
 
         }
 
-        public override int GenerateCtrlNoRequest(string OfficerCode, string InsureeNumber, string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        public override int GenerateCtrlNoRequest(string OfficerCode, string BillId, double ExpectedAmount, List<PaymentDetail> products)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-            var bill = gepg.CreateBill(Configuration, OfficerCode, InsureeNumber, BillId, ExpectedAmount, products);
+            var bill = gepg.CreateBill(Configuration, OfficerCode, BillId, ExpectedAmount, products);
             var signature = gepg.GenerateSignature(bill);
-
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
             var billAck = gepg.SendHttpRequest(signedMesg);
 
-            base.GenerateCtrlNoRequest(OfficerCode, InsureeNumber, BillId, ExpectedAmount, products);
+            base.GenerateCtrlNoRequest(OfficerCode, BillId, ExpectedAmount, products);
 
             return 0;
         }

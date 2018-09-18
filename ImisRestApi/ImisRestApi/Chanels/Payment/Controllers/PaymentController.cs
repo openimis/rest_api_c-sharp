@@ -52,6 +52,8 @@ namespace ImisRestApi.Controllers
             return base.GetPayment(model);
         }
 
+        [HttpPost]
+        [Route("api/GetReqControlNumber")]
         public IActionResult ReceiveControlNumberChf([FromBody] GepgBillResponse model)
         {
             foreach (var bill in model.BillTrxInf)
@@ -74,7 +76,8 @@ namespace ImisRestApi.Controllers
                     throw new Exception();
                 }
             }
-           
+
+            return Ok();
         }
     }
 }
