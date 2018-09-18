@@ -18,5 +18,38 @@ namespace ImisRestApi.Controllers
 
         }
 
+        [HttpPost]
+        [Route("api/GetControlNumber/Single")]
+        public IActionResult Index([FromBody]IntentOfSinglePay payment)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            _payment.SaveIntent(payment);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("api/GetReconciliationData")]
+        public IActionResult GetReconciliation([FromBody]GepgReconcMessage model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok();
+        }
+
+        [NonAction]
+        public override IActionResult ReceiveControlNumber([FromBody] ControlNumberResp model)
+        {
+            return base.ReceiveControlNumber(model);
+        }
+
+        [NonAction]
+        public override IActionResult GetPayment([FromBody] PaymentData model)
+        {
+            return base.GetPayment(model);
+        }
     }
 }
