@@ -41,9 +41,9 @@ namespace OpenImis.RestApi
                 {
                     var secretsMode = GetSecretsMode(hostingContext.HostingEnvironment);
                     config.AddOpenImisConfig(secretsMode, "REGISTRY_CONFIG_FILE");
-                    //config.AddOpenImisConfig(SecretsMode.LocalFile, $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
+					//config.AddOpenImisConfig(SecretsMode.LocalFile, $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
 					config.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: false, reloadOnChange: true);
-					//config.AddJsonFile("openImisModules.json", optional: true, reloadOnChange: true);
+					config.AddJsonFile("openImisModules.json", optional: true, reloadOnChange: true);
 				})
                 .UseStartup<Startup>();
 

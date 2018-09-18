@@ -17,6 +17,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\**" />
+    <Compile Remove="OpenImis.Modules\**" />
+    <Content Remove="Models\**" />
+    <Content Remove="OpenImis.Modules\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="OpenImis.Modules\**" />
+    <None Remove="Models\**" />
+    <None Remove="OpenImis.Modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controllers\AccountController.cs" />
   </ItemGroup>
 
@@ -35,16 +46,13 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Globals\" />
-    <Folder Include="OpenImis.Modules\WSModule\Entities\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Examples" Version="2.9.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.4" />
@@ -57,6 +65,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenImis.Extensions.Configuration\OpenImis.Extensions.Configuration.csproj" />
+    <ProjectReference Include="..\OpenImis.Modules\OpenImis.Modules.csproj" />
   </ItemGroup>
 
   <ItemGroup>
