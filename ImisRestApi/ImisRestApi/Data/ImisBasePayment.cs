@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -17,33 +18,23 @@ using System.Xml.Linq;
 
 namespace ImisRestApi.Data
 {
-    public class ImisPayment
+    public class ImisBasePayment
     {
         public string PaymentId { get; set; }
         public float ExpectedAmount { get; set; }
 
-        private IConfiguration Configuration;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private DataHelper dh;
+        protected IConfiguration Configuration;
+        protected readonly IHostingEnvironment _hostingEnvironment;
+        protected DataHelper dh;
 
-        public ImisPayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public ImisBasePayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
             dh = new DataHelper(configuration);
         }
 
-
-        public string GenerateCtrlNoRequest(string OfficerCode, string InsureeNumber,string BillId, double ExpectedAmount, List<PaymentDetail> products)
-        {
-
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-            var bill = gepg.CreateBill(Configuration, OfficerCode, InsureeNumber, BillId, ExpectedAmount, products);
-            var signature = gepg.GenerateSignature(bill);
-
-           
-            var signedMesg = gepg.FinaliseSignedMsg(signature);
-            var billAck = gepg.SendHttpRequest(signedMesg);
+        public bool SaveControlNumberRequest(string BillId) {
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", BillId)
@@ -56,12 +47,17 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-
-                throw new Exception();
+                throw e;
             }
 
-            return billAck;
-          
+            return true;
+        }
+
+        public virtual int GenerateCtrlNoRequest(string OfficerCode, string InsureeNumber,string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        {
+            bool result = SaveControlNumberRequest(BillId);
+
+            return 1;
         }
 
         public void SaveIntent(IntentOfPay _intent)
@@ -193,70 +189,6 @@ namespace ImisRestApi.Data
         public bool Valid(string InsureeNumber, string ProductCode)
         {
             return false;
-        }
-
-        public string RequestReconciliationReport()
-        {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-
-            ReconcRequest Reconciliation = new ReconcRequest();
-
-            gepgSpReconcReq request = new gepgSpReconcReq();
-            request.SpReconcReqId = Convert.ToInt32(DateTime.UtcNow.Year.ToString() + DateTime.UtcNow.Month.ToString() + DateTime.UtcNow.Day.ToString());
-            request.SpCode = Configuration["PaymentGateWay:GePG:SpCode"];
-            request.SpSysId = Configuration["PaymentGateWay:GePG:SystemId"];
-            request.TnxDt = DateTime.UtcNow.Date;
-            request.ReconcOpt = 2;
-
-            var requestString = gepg.SerializeClean(request, typeof(gepgSpReconcReq));
-            string signature = gepg.GenerateSignature(requestString);
-            var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
-
-            var result = gepg.SendHttpRequest(signedRequest);
-
-            return result;
-
-        }
-
-        public string ControlNumberResp() {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-
-            gepgBillSubRespAck CnAck = new gepgBillSubRespAck();
-            CnAck.TrxStsCode = 7101;
-
-            var CnAckString = gepg.SerializeClean(CnAck, typeof(gepgBillSubRespAck));
-            string signature = gepg.GenerateSignature(CnAckString);
-            var signedCnAck = gepg.FinaliseSignedMsg(new GepgBillResponseAck() { gepgBillSubRespAck = CnAck, gepgSignature = signature}, typeof(GepgBillResponseAck));
-
-            return signedCnAck;
-        }
-
-        public string PaymentResp()
-        {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-
-            gepgPmtSpInfoAck PayAck = new gepgPmtSpInfoAck();
-            PayAck.TrxStsCode = 7101;
-
-            var PayAckString = gepg.SerializeClean(PayAck, typeof(gepgPmtSpInfoAck));
-            string signature = gepg.GenerateSignature(PayAckString);
-            var signedPayAck = gepg.FinaliseSignedMsg(new GepgPaymentAck() { gepgPmtSpInfoAck = PayAck, gepgSignature = signature}, typeof(GepgPaymentAck));
-
-            return signedPayAck;
-        }
-
-        public string ReconciliationResp()
-        {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-
-            gepgSpReconcReqAck ReconcAck = new gepgSpReconcReqAck();
-            ReconcAck.ReconcStsCode = 7101;
-
-            var ReconcAckString = gepg.SerializeClean(ReconcAck, typeof(gepgSpReconcReqAck));
-            string signature = gepg.GenerateSignature(ReconcAckString);
-            var signedReconcAck = gepg.FinaliseSignedMsg(new GepgReconcAck() { gepgSpReconcReqAck = ReconcAck, gepgSignature = signature }, typeof(GepgReconcAck));
-
-            return signedReconcAck;
         }
     }
 }

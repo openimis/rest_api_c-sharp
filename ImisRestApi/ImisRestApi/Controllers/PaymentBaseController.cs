@@ -41,6 +41,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            _payment.SaveIntent(intent);
            
             return Ok("Request sent");
         }
@@ -52,6 +53,8 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            _payment.ReceiveControlNumberAck(model);
+
             return Ok("Control Number Acknowledgement Received");
         }
 
@@ -61,6 +64,8 @@ namespace ImisRestApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            _payment.ReceiveControlNumber(model);
 
             return Ok();
         }

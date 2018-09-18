@@ -51,5 +51,30 @@ namespace ImisRestApi.Controllers
         {
             return base.GetPayment(model);
         }
+
+        public IActionResult ReceiveControlNumberChf([FromBody] GepgBillResponse model)
+        {
+            foreach (var bill in model.BillTrxInf)
+            {
+                ControlNumberResp ControlNumberResponse = new ControlNumberResp()
+                {
+                    PaymentId = bill.BillId,
+                    ControlNumber = bill.PayCntrNum.ToString(),
+                    ErrorOccured = false,
+                    ErrorMessage = bill.TrxStsCode
+                };
+
+                try
+                {
+                    base.ReceiveControlNumber(ControlNumberResponse);
+                }
+                catch (Exception e)
+                {
+
+                    throw new Exception();
+                }
+            }
+           
+        }
     }
 }

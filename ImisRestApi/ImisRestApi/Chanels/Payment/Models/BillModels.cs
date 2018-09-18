@@ -15,7 +15,7 @@ namespace ImisRestApi.Chanels.Payment.Models
     }
 
     [XmlRoot("Gepg")]
-    public class GepgBillResponse: ControlNumberResp
+    public class GepgBillResponse
     {
         //public gepgBillSubResp gepgBillSubResp { get; set; }
         [XmlArray("gepgBillSubResp")]
