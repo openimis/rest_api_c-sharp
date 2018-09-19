@@ -1,5 +1,7 @@
-﻿using ImisRestApi.Data;
+﻿using ImisRestApi.Chanels.Sms;
+using ImisRestApi.Data;
 using ImisRestApi.Models;
+using ImisRestApi.Models.Sms;
 using ImisRestApi.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -178,14 +180,18 @@ namespace ImisRestApi.Controllers
             var jsonResponse = JsonConvert.SerializeObject(response);
             List<EnquireResponse> resp = JsonConvert.DeserializeObject<List<EnquireResponse>>(jsonResponse);
 
-            string message = "IMIS Insuree:"+ resp.FirstOrDefault().insureeName;
+            string msgString = "IMIS Insuree:"+ resp.FirstOrDefault().insureeName;
 
             foreach (var item in resp)
             {
-                message += item.productCode + " : " + item.status;
+                msgString += item.productCode + " : " + item.status;
             }
 
-            string test = await Chanels.Sms.Message.PushSMS(message, "+255767057265");
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = msgString, Recepients = "+255767057265" });
+
+            ImisSms sms = new ImisSms();
+            string test = await sms.PushSMS(message);
 
             return Json(new { status = true,sms_reply=true,sms_text = resp });
 

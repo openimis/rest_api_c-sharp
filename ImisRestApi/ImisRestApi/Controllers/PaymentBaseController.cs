@@ -41,9 +41,9 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = false, error_message = ModelState.FirstOrDefault().Value, control_number = "" });
 
-            var response = _payment.SaveIntent(intent);
+            var response = await _payment.SaveIntent(intent);
 
-            return Ok(new { error_occured=false,error_message = "",control_number = ""});
+            return Ok(new { error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
         }
 
         [HttpPost]
@@ -55,7 +55,7 @@ namespace ImisRestApi.Controllers
 
             var response = _payment.SaveAcknowledgement(model);
 
-            return Ok("Control Number Acknowledgement Received");
+            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data, control_number = response.Data });
         }
 
         [HttpPost]
@@ -66,7 +66,7 @@ namespace ImisRestApi.Controllers
                 return BadRequest(ModelState);
 
             var response = _payment.SaveControlNumber(model);
-            return Ok();
+            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data });
         }
 
         [HttpPost]
@@ -76,7 +76,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var response = _payment.SavePayment(model);
-            return Ok();
+            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data});
         }
 
       

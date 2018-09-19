@@ -7,6 +7,9 @@ using ImisRestApi.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using ImisRestApi.Models.Payment;
+using ImisRestApi.Responses;
+using ImisRestApi.Models.Sms;
+using ImisRestApi.Chanels.Sms;
 
 namespace ImisRestApi.Logic
 {
@@ -22,10 +25,9 @@ namespace ImisRestApi.Logic
             _hostingEnvironment = hostingEnvironment;
            
         }
-        public bool SaveIntent(IntentOfPay intent)
+        public async Task<DataMessage> SaveIntent(IntentOfPay intent)
         {
 
-            //save the intent of pay
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             payment.SaveIntent(intent);
 
@@ -34,45 +36,53 @@ namespace ImisRestApi.Logic
            
             var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
 
+            DataMessage return_message = new DataMessage();
 
             if (response.ControlNumber != null)
             {
-                _paymentRepo.SaveControlNumber(response.ControlNumber);
+                return_message = payment.SaveControlNumber(response.ControlNumber);
 
             }
             else if (response.ControlNumber == null)
             {
-                _paymentRepo.SaveControlNumber();
+                return_message = payment.SaveControlNumber();
             }
-            else if (response.RequestAcknowledged)
+            else if (response.ErrorOccured == true)
             {
-                _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged, "");
+                return_message = payment.SaveControlNumberAkn(response.ErrorOccured, "");
             }
 
-            // string test = await Message.PushSMS("Your Request for control number was Sent", "+255767057265");
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = "Your Request for control number was Sent", Recepients = "+255767057265" });
 
-            //  return Json(new { status = true, sms_reply = true, sms_text = "Your Request for control number was Sent" });
-            return true;
+            ImisSms sms = new ImisSms();
+            string test = await sms.PushSMS(message);
+            
+            return return_message;
         }
 
-        internal object SaveAcknowledgement(Acknowledgement model)
+        public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
-            throw new NotImplementedException();
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var response = payment.SaveControlNumberAkn(model.Success, model.Description);
+
+            return response;
         }
 
-        public String ReceiveControlNumber(){
-            return "0";
-        }
-
-
-        internal object SavePayment(PaymentData model)
+        public DataMessage SavePayment(PaymentData model)
         {
-            throw new NotImplementedException();
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var response = payment.SavePayment(model);
+
+            return response;
         }
 
-        internal object SaveControlNumber(ControlNumberResp model)
+        public DataMessage SaveControlNumber(ControlNumberResp model)
         {
-            throw new NotImplementedException();
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var response = payment.SaveControlNumber(model);
+
+            return response;
         }
     }
 }

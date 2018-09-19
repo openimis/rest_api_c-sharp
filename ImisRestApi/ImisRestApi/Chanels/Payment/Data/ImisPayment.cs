@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using ImisRestApi.Models.Payment;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace ImisRestApi.Data
         {
 
         }
+
     }
 }
