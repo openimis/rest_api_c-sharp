@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ImisRestApi.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using ImisRestApi.Models.Payment;
 
 namespace ImisRestApi.Logic
 {
@@ -31,28 +32,32 @@ namespace ImisRestApi.Logic
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
            
-            payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
+            var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
 
-            //ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
 
-            //if (response.ControlNumber != null)
-            //{
-            //    _paymentRepo.SaveControlNumber(response.ControlNumber);
+            if (response.ControlNumber != null)
+            {
+                _paymentRepo.SaveControlNumber(response.ControlNumber);
 
-            //}
-            //else if (response.ControlNumber == null)
-            //{
-            //    _paymentRepo.SaveControlNumber();
-            //}
-            //else if (response.RequestAcknowledged)
-            //{
-            //    _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged,"");
-            //}
+            }
+            else if (response.ControlNumber == null)
+            {
+                _paymentRepo.SaveControlNumber();
+            }
+            else if (response.RequestAcknowledged)
+            {
+                _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged, "");
+            }
 
-           // string test = await Message.PushSMS("Your Request for control number was Sent", "+255767057265");
+            // string test = await Message.PushSMS("Your Request for control number was Sent", "+255767057265");
 
-          //  return Json(new { status = true, sms_reply = true, sms_text = "Your Request for control number was Sent" });
+            //  return Json(new { status = true, sms_reply = true, sms_text = "Your Request for control number was Sent" });
             return true;
+        }
+
+        internal object SaveAcknowledgement(Acknowledgement model)
+        {
+            throw new NotImplementedException();
         }
 
         public String ReceiveControlNumber(){
@@ -60,5 +65,14 @@ namespace ImisRestApi.Logic
         }
 
 
+        internal object SavePayment(PaymentData model)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal object SaveControlNumber(ControlNumberResp model)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
