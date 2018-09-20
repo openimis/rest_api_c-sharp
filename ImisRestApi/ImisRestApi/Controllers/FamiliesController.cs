@@ -22,9 +22,10 @@ namespace ImisRestApi.Controllers
     public class FamiliesController : Controller
     {
         private ImisFamily family;
-
+        private IConfiguration config;
         public FamiliesController(IConfiguration configuration)
         {
+            config = configuration;
             family = new ImisFamily(configuration);
         }
         // GET api/Families
@@ -190,7 +191,7 @@ namespace ImisRestApi.Controllers
             List<SmsContainer> message = new List<SmsContainer>();
             message.Add(new SmsContainer() { Message = msgString, Recepients = "+255767057265" });
 
-            ImisSms sms = new ImisSms();
+            ImisSms sms = new ImisSms(config);
             string test = await sms.PushSMS(message);
 
             return Json(new { status = true,sms_reply=true,sms_text = resp });

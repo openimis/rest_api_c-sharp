@@ -1,6 +1,8 @@
 ﻿using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
+using ImisRestApi.Models.Payment;
+using ImisRestApi.Responses;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -33,7 +35,8 @@ namespace ImisRestApi.Data
             dh = new DataHelper(configuration);
         }
 
-        public bool SaveControlNumberRequest(string BillId) {
+        public bool SaveControlNumberRequest(string BillId)
+        {
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", BillId)
@@ -52,14 +55,22 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual int GenerateCtrlNoRequest(string OfficerCode,string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, double ExpectedAmount, List<PaymentDetail> products)
         {
-            bool result = SaveControlNumberRequest(BillId);
+            bool result = SaveControlNumberRequest(PaymentId);
 
-            return 1;
+            ControlNumberResp response = new ControlNumberResp()
+            {
+                PaymentId = PaymentId,
+                ControlNumber = "",
+                ErrorMessage = "",
+                ErrorOccured = false
+            };
+
+            return response;
         }
 
-        public void SaveIntent(IntentOfPay _intent)
+        public DataMessage SaveIntent(IntentOfPay _intent)
         {
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
@@ -70,13 +81,13 @@ namespace ImisRestApi.Data
                     ),
                       new XElement("Details",
                     _intent.PaymentDetails.Select(x =>
-                                    
+
                                new XElement("Detail",
                                   new XElement("InsuranceNumber", x.InsureeNumber),
                                   new XElement("ProductCode", x.ProductCode),
                                   new XElement("EnrollmentDate", DateTime.UtcNow),
                                   new XElement("IsRenewal", x.IsRenewal())
-                                  )                      
+                                  )
                     )
                   )
             );
@@ -89,28 +100,93 @@ namespace ImisRestApi.Data
                 new SqlParameter("@ExpectedAmount", SqlDbType.Int){Direction = ParameterDirection.Output }
              };
 
+            DataMessage message;
+
             try
             {
                 var data = dh.ExecProcedure("uspInsertPaymentIntent", sqlParameters);
 
                 PaymentId = data[0].Value.ToString();
                 ExpectedAmount = float.Parse(data[1].Value.ToString());
+
+                message = new SaveIntentResponse(int.Parse(data[2].Value.ToString()), false).Message;
             }
             catch (Exception e)
             {
 
-                throw new Exception();
+                message = new SaveIntentResponse(e).Message;
             }
+
+            return message;
         }
 
-        public void SaveControlNumber()
+        public DataMessage SaveControlNumber()
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", PaymentId),
                 new SqlParameter("@RequestOrigin", "IMIS")
              };
 
-            var data = dh.ExecProcedure("uspRequestGetControlNumber", sqlParameters);
+            DataMessage message;
+
+            try
+            {
+                var data = dh.ExecProcedure("uspRequestGetControlNumber", sqlParameters);
+                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+            }
+            catch (Exception e)
+            {
+                message = new ImisApiResponse(e).Message;
+            }
+
+            return message;
+        }
+
+        public DataMessage SaveControlNumber(string ControlNumber)
+        {
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@PaymentID", PaymentId),
+                new SqlParameter("@ControlNumber", ControlNumber)
+             };
+
+            DataMessage message;
+
+            try
+            {
+                var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
+                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+            }
+            catch (Exception e)
+            {
+
+                message = new ImisApiResponse(e).Message;
+            }
+
+            return message;
+
+        }
+
+        public DataMessage SaveControlNumber(ControlNumberResp model)
+        {
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@PaymentID", model.PaymentId),
+                new SqlParameter("@ControlNumber", model.ControlNumber)
+             };
+
+            DataMessage message;
+
+            try
+            {
+                var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
+                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+            }
+            catch (Exception e)
+            {
+
+                message = new ImisApiResponse(e).Message;
+            }
+
+            return message;
         }
 
         public void UpdateControlNumberStatus(string ControlNumber, CnStatus status)
@@ -140,40 +216,46 @@ namespace ImisRestApi.Data
             }
         }
 
-        public void SaveControlNumber(string ControlNumber)
-        {
-            SqlParameter[] sqlParameters = {
-                new SqlParameter("@PaymentID", PaymentId),
-                new SqlParameter("@ControlNumber", ControlNumber)
-             };
 
-            var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
-        }
-
-        public void SaveControlNumberAkn(bool Success, string Comment)
+        public DataMessage SaveControlNumberAkn(bool Success, string Comment)
         {
             XElement CNAcknowledgement = new XElement("ControlNumberAcknowledge",
                   new XElement("PaymentID", PaymentId),
-                  new XElement("Success", Success),
+                  new XElement("Success", Convert.ToInt32(Success)),
                   new XElement("Comment", Comment)
                   );
 
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@Xml", CNAcknowledgement)
+                new SqlParameter("@Xml",CNAcknowledgement.ToString())
              };
 
-            var data = dh.ExecProcedure("uspAcknowledgeControlNumberRequest", sqlParameters);
+
+            DataMessage message;
+
+            try
+            {
+                var data = dh.ExecProcedure("uspAcknowledgeControlNumberRequest", sqlParameters);
+                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+            }
+            catch (Exception e)
+            {
+
+                message = new ImisApiResponse(e).Message;
+            }
+
+            return message;
+
         }
-      
-        public void SavePayment(PymtTrxInf payment)
+
+        public DataMessage SavePayment(PaymentData payment)
         {
             XElement PaymentIntent = new XElement("PaymentData",
                 new XElement("PaymentDate", payment.PaymentDate),
-                new XElement("ControlNumber", payment.PayCtrNum),
-                new XElement("Amount", payment.PaidAmt),
-                new XElement("ReceiptNo", payment.PspReceiptNumber),
-                new XElement("TransactionNo",payment.TrxId),
-                new XElement("PhoneNumber",payment.InsureeNumber),
+                new XElement("ControlNumber", payment.ControlNumber),
+                new XElement("Amount", payment.ReceivedAmount),
+                new XElement("ReceiptNo", payment.ReceiptNumber),
+                new XElement("TransactionNo", payment.TransactionId),
+                new XElement("PhoneNumber", payment.PhoneNumber),
                 new XElement("InsureeNumber", payment.InsureeNumber)
                              );
 
@@ -181,7 +263,20 @@ namespace ImisRestApi.Data
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@Xml", PaymentIntent.ToString()),
              };
-            var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
+
+            DataMessage message;
+
+            try
+            {
+                var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
+                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+            }
+            catch (Exception e)
+            {
+                message = new ImisApiResponse(e).Message;
+            }
+
+            return message;
 
         }
 

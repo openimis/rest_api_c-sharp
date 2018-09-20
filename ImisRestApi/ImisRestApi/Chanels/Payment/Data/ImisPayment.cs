@@ -1,6 +1,7 @@
 ﻿using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
+using ImisRestApi.Models.Payment;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -40,18 +41,16 @@ namespace ImisRestApi.Data
 
         }
 
-        public override int GenerateCtrlNoRequest(string OfficerCode, string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        public override ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, double ExpectedAmount, List<PaymentDetail> products)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-            var bill = gepg.CreateBill(Configuration, OfficerCode, BillId, ExpectedAmount, products);
+            var bill = gepg.CreateBill(Configuration, OfficerCode, PaymentId, ExpectedAmount, products);
             var signature = gepg.GenerateSignature(bill);
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
             var billAck = gepg.SendHttpRequest(signedMesg);
 
-            base.GenerateCtrlNoRequest(OfficerCode, BillId, ExpectedAmount, products);
-
-            return 0;
+            return base.GenerateCtrlNoRequest(OfficerCode, PaymentId, ExpectedAmount, products);
         }
 
         public string ControlNumberResp()

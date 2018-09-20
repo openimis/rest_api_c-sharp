@@ -87,7 +87,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            ImisSms sms = new ImisSms();
+            ImisSms sms = new ImisSms(_configuration);
             var response = sms.PushSMS(model);
 
             return Ok();

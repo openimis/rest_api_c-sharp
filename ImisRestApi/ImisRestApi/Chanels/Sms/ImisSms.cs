@@ -24,7 +24,7 @@ namespace ImisRestApi.Chanels.Sms
         private static string service = string.Empty;
         private static Dictionary<string, string> configuredHeaders;
 
-        public ImisSms(IConfiguration config)
+        public ImisSms(IConfiguration config):base(config)
         {
             PRIVATE_KEY = config["SmsGateWay:PrivateKey"];
             USER_ID = config["SmsGateWay:UserId"];
