@@ -12,7 +12,7 @@ namespace ImisRestApi.Data
 {
     public class ImisBaseSms
     {
-        public ImisBaseSms(IConfiguration cnfiguration)
+        public ImisBaseSms(IConfiguration config)
         {
 
         }
