@@ -1,4 +1,5 @@
 ﻿using ImisRestApi.Models.Sms;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,11 @@ namespace ImisRestApi.Data
 {
     public class ImisBaseSms
     {
+        public ImisBaseSms(IConfiguration config)
+        {
+
+        }
+
         public virtual async Task<string> PushSMS(List<SmsContainer> containers)
         {
             string response_message = string.Empty;

@@ -14,6 +14,9 @@ namespace ImisRestApi.Chanels.Sms
 {
     public class ImisSms:ImisBaseSms
     {
-        
+        public ImisSms(IConfiguration config):base(config)
+        {
+
+        }
     }
 }
