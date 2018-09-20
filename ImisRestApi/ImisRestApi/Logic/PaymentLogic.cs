@@ -51,6 +51,10 @@ namespace ImisRestApi.Logic
             {
                 return_message = payment.SaveControlNumberAkn(response.ErrorOccured, "");
             }
+            else
+            {
+
+            }
 
             List<SmsContainer> message = new List<SmsContainer>();
             message.Add(new SmsContainer() { Message = "Your Request for control number was Sent", Recepients = "+255767057265" });
@@ -63,7 +67,7 @@ namespace ImisRestApi.Logic
 
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.PaymentId.ToString()};
             var response = payment.SaveControlNumberAkn(model.Success, model.Description);
 
             return response;

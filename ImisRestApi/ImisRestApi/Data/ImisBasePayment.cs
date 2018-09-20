@@ -220,12 +220,12 @@ namespace ImisRestApi.Data
         {
             XElement CNAcknowledgement = new XElement("ControlNumberAcknowledge",
                   new XElement("PaymentID", PaymentId),
-                  new XElement("Success", Success),
+                  new XElement("Success", Convert.ToInt32(Success)),
                   new XElement("Comment", Comment)
                   );
 
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@Xml", CNAcknowledgement)
+                new SqlParameter("@Xml",CNAcknowledgement.ToString())
              };
 
 

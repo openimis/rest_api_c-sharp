@@ -10,6 +10,7 @@ using ImisRestApi.Escape;
 using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
+using ImisRestApi.Models.Sms;
 using ImisRestApi.Repo;
 using ImisRestApi.Response;
 using Microsoft.AspNetCore.Hosting;
@@ -79,6 +80,19 @@ namespace ImisRestApi.Controllers
             return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data});
         }
 
-      
+        [HttpPost]
+        [Route("api/SendSms")]
+        public virtual IActionResult SendSms([FromBody]List<SmsContainer> model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            ImisSms sms = new ImisSms();
+            var response = sms.PushSMS(model);
+
+            return Ok();
+        }
+
+
     }
 }
