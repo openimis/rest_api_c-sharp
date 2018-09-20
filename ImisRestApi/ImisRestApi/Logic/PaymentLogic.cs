@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using ImisRestApi.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using ImisRestApi.Models.Payment;
+using ImisRestApi.Responses;
+using ImisRestApi.Models.Sms;
+using ImisRestApi.Chanels.Sms;
 
 namespace ImisRestApi.Logic
 {
@@ -21,7 +25,7 @@ namespace ImisRestApi.Logic
             _hostingEnvironment = hostingEnvironment;
            
         }
-        public bool SaveIntent(IntentOfPay intent)
+        public async Task<DataMessage> SaveIntent(IntentOfPay intent)
         {
 
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
@@ -29,34 +33,60 @@ namespace ImisRestApi.Logic
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
-            payment.GenerateCtrlNoRequest(intent.OfficerCode,payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
+           
+            var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
 
-            //ControlNumberRequest response = ControlNumberChanel.PostRequest(url, _paymentRepo.PaymentId, _paymentRepo.ExpectedAmount);
+            DataMessage return_message = new DataMessage();
 
-            //if (response.ControlNumber != null)
-            //{
-            //    _paymentRepo.SaveControlNumber(response.ControlNumber);
+            if (response.ControlNumber != null)
+            {
+                return_message = payment.SaveControlNumber(response.ControlNumber);
 
-            //}
-            //else if (response.ControlNumber == null)
-            //{
-            //    _paymentRepo.SaveControlNumber();
-            //}
-            //else if (response.RequestAcknowledged)
-            //{
-            //    _paymentRepo.SaveControlNumberAkn(response.RequestAcknowledged,"");
-            //}
+            }
+            else if (response.ControlNumber == null)
+            {
+                return_message = payment.SaveControlNumber();
+            }
+            else if (response.ErrorOccured == true)
+            {
+                return_message = payment.SaveControlNumberAkn(response.ErrorOccured, "");
+            }
+            else
+            {
 
-           // string test = await Message.PushSMS("Your Request for control number was Sent", "+255767057265");
+            }
 
-          //  return Json(new { status = true, sms_reply = true, sms_text = "Your Request for control number was Sent" });
-            return true;
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = "Your Request for control number was Sent", Recepients = "+255767057265" });
+
+            ImisSms sms = new ImisSms();
+            string test = await sms.PushSMS(message);
+            
+            return return_message;
         }
 
-        public String ReceiveControlNumber(){
-            return "0";
+        public DataMessage SaveAcknowledgement(Acknowledgement model)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.PaymentId.ToString()};
+            var response = payment.SaveControlNumberAkn(model.Success, model.Description);
+
+            return response;
         }
 
+        public DataMessage SavePayment(PaymentData model)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var response = payment.SavePayment(model);
 
+            return response;
+        }
+
+        public DataMessage SaveControlNumber(ControlNumberResp model)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var response = payment.SaveControlNumber(model);
+
+            return response;
+        }
     }
 }

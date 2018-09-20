@@ -10,6 +10,7 @@ using ImisRestApi.Escape;
 using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
+using ImisRestApi.Models.Sms;
 using ImisRestApi.Repo;
 using ImisRestApi.Response;
 using Microsoft.AspNetCore.Hosting;
@@ -41,9 +42,9 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = false, error_message = ModelState.FirstOrDefault().Value, control_number = "" });
 
-            var response = _payment.SaveIntent(intent);
+            var response = await _payment.SaveIntent(intent);
 
-            return Ok(new { error_occured=false,error_message = "",control_number = ""});
+            return Ok(new { error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
         }
 
         [HttpPost]
@@ -53,7 +54,9 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok("Control Number Acknowledgement Received");
+            var response = _payment.SaveAcknowledgement(model);
+
+            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data, control_number = response.Data });
         }
 
         [HttpPost]
@@ -63,7 +66,8 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok();
+            var response = _payment.SaveControlNumber(model);
+            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data });
         }
 
         [HttpPost]
@@ -72,10 +76,23 @@ namespace ImisRestApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            var response = _payment.SavePayment(model);
+            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data});
+        }
+
+        [HttpPost]
+        [Route("api/SendSms")]
+        public virtual IActionResult SendSms([FromBody]List<SmsContainer> model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            ImisSms sms = new ImisSms();
+            var response = sms.PushSMS(model);
 
             return Ok();
         }
 
-      
+
     }
 }
