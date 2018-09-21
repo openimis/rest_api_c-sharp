@@ -34,7 +34,18 @@ namespace ImisRestApi.Chanels.Sms
 
             sender = config["SmsGateWay:SenderId"];
             service = config["SmsGateWay:ServiceId"];
-            configuredHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(config["SmsGateWay:Headers"]);
+
+            var headerKeys = config["SmsGateWay:HeaderKeys"].Split(",");
+            var headerValues = config["SmsGateWay:HeaderValues"].Split(",");
+
+            configuredHeaders = new Dictionary<string, string>();
+
+            for (int i = 0;i < headerKeys.Count();i++)
+            {
+                configuredHeaders.Add(headerKeys[i], headerValues[i]);
+            }
+
+            //configuredHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(headers);
         }
 
         public override async Task<string> PushSMS(List<SmsContainer> containers)

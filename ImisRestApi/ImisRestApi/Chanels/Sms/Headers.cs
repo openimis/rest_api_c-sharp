@@ -15,6 +15,7 @@ namespace ImisRestApi.Chanels.Sms
         private string _messageBody;
         private string _privateKey;
         private string _requestType;
+        private Type thisType;
 
         public Headers(string userId,string privateKey, string messageBody, string requestType)
         {
@@ -22,12 +23,13 @@ namespace ImisRestApi.Chanels.Sms
             _messageBody = messageBody;
             _privateKey = privateKey;
             _requestType = requestType;
+            thisType = this.GetType();
         }
         public Dictionary<string, string> GetHeaders(Dictionary<string,string> requiredheaders) {
 
             foreach (var requiredheader in requiredheaders)
             {
-                Type thisType = this.GetType();
+                
                 MethodInfo _method = thisType.GetMethod(requiredheader.Value);
                 var headerVal =_method.Invoke(this,null);
 
@@ -37,12 +39,12 @@ namespace ImisRestApi.Chanels.Sms
             return OutputHeaders;
         }
 
-        private string UserId()
+        public string UserId()
         {
             return _userId;
         }
 
-        private string HashMessage1()
+        public string HashMessage1()
         {
             var encoding = new System.Text.ASCIIEncoding();
             byte[] keyBytes = encoding.GetBytes(_privateKey);
@@ -54,7 +56,7 @@ namespace ImisRestApi.Chanels.Sms
             return hashmessage;
         }
 
-        private string RequestType() {
+        public string RequestType() {
             return _requestType;
         }
     }

@@ -4,30 +4,36 @@ using System.Linq;
 using System.Threading.Tasks;
 using ImisRestApi.Chanels;
 using ImisRestApi.Chanels.Payment.Models;
+using ImisRestApi.Data;
+using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace ImisRestApi.Controllers
 {
     public class PaymentController : PaymentBaseController
     {
+        private ImisPayment p;
         public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment) :base(configuration, hostingEnvironment)
         {
-
+            p = new ImisPayment(configuration, hostingEnvironment);
         }
 
         [HttpPost]
         [Route("api/GetControlNumber/Single")]
-        public IActionResult Index([FromBody]IntentOfSinglePay payment)
+        public async Task<IActionResult> Index([FromBody]IntentOfSinglePay payment)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            _payment.SaveIntent(payment);
+            payment.SetDetails();
 
-            return Ok();
+            var response = await _payment.SaveIntent(payment);
+
+            return Ok(new { error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
         }
 
         [HttpPost]
@@ -37,7 +43,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok();
+            return Ok(p.ReconciliationResp());
         }
 
         [NonAction]
@@ -50,6 +56,43 @@ namespace ImisRestApi.Controllers
         public override IActionResult GetPayment([FromBody] PaymentData model)
         {
             return base.GetPayment(model);
+        }
+
+        [NonAction]
+        public override IActionResult ControlNumberAck([FromBody] Acknowledgement model)
+        {
+            return base.ControlNumberAck(model);
+        }
+
+        [HttpPost]
+        [Route("api/GetPaymentData")]
+        public IActionResult GetPaymentChf([FromBody]GepgPaymentMessage model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            List<PymtTrxInf> payments = model.PymtTrxInf;
+            foreach (var payment in payments)
+            {
+                PaymentData pay = new PaymentData() {
+                    PaymentId = payment.BillId,
+                    ControlNumber = payment.PayCtrNum.ToString(),
+                    ProductCode = payment.PayRefId,
+                    EnrolmentOfficerCode = payment.PyrName,
+                    TransactionId = payment.TrxId,
+                    ReceivedAmount = Convert.ToDouble(payment.BillAmt),
+                    ReceivedDate = payment.PaymentDate,
+                    PaymentDate = payment.PaymentDate,
+                    PaymentOrigin = payment.PaymentOrigin,
+                    ReceiptNumber = payment.PspReceiptNumber,
+                    PhoneNumber = payment.PyrCellNum.ToString()
+                };
+
+                base.GetPayment(pay);
+
+            }
+
+            return Ok(p.PaymentResp());
         }
 
         [HttpPost]
@@ -68,16 +111,16 @@ namespace ImisRestApi.Controllers
 
                 try
                 {
-                    base.ReceiveControlNumber(ControlNumberResponse);
+                    var response = base.ReceiveControlNumber(ControlNumberResponse);
                 }
                 catch (Exception e)
                 {
 
-                    throw new Exception();
+                    throw e;
                 }
             }
-
-            return Ok();
+            
+            return Ok(p.ControlNumberResp());
         }
     }
 }

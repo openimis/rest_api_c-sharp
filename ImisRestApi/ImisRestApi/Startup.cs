@@ -16,9 +16,13 @@ namespace ImisRestApi
 {
     public class Startup
     {
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            //
+            //Configuration.Bind(head);
         }
 
         public IConfiguration Configuration { get; }
@@ -52,6 +56,7 @@ namespace ImisRestApi
             services.AddSwaggerGen(x => {
                 x.SwaggerDoc("v1", new Info { Title = "IMIS REST" , Version = "v1"});
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
