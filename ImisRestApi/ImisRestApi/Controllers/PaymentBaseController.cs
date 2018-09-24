@@ -35,7 +35,7 @@ namespace ImisRestApi.Controllers
 
 
         [HttpPost]
-        [Route("api/Match")]
+        [Route("api/MatchPayment")]
         public virtual IActionResult Match([FromBody]MatchModel model)
         {
             if (!ModelState.IsValid)

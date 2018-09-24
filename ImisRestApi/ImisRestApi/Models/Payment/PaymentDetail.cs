@@ -8,7 +8,9 @@ namespace ImisRestApi.Models
     {
         [InsureeNumber]
         public string InsureeNumber { get; set; }
+        [Required]
         public string ProductCode { get; set; }
+        [Required]
         public EnrolmentType PaymentType { get; set; }
         public int IsRenewal()
         {
