@@ -41,9 +41,9 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = false, error_message = ModelState.Values.FirstOrDefault().Errors});
 
-            bool response = _payment.Match(model);           
+            var response = _payment.Match(model);           
            
-            return Ok(new { error_occured = response });
+            return Ok(new { isMatched = response});
         }
 
         //Recieve Payment from Operator/

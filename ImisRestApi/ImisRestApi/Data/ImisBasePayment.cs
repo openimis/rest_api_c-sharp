@@ -290,8 +290,26 @@ namespace ImisRestApi.Data
 
             try
             {
-                var data = dh.ExecProcedure("uspMatchPayment", sqlParameters);
-                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
+                DataTable dt = data.Tables[data.Tables.Count - 1];
+
+                bool error = true;
+
+                if (dt.Rows.Count > 0) {
+                    var firstRow = dt.Rows[0];
+
+                    if(Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
+                    {
+                        error = false;
+                    }
+                    
+                }
+                else
+                {
+                    error = true;
+                }
+                
+                message = new ImisApiResponse(0,error,dt).Message;
             }
             catch (Exception e)
             {
