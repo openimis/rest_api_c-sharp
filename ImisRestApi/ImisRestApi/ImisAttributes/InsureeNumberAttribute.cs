@@ -16,16 +16,18 @@ namespace ImisRestApi.ImisAttributes
         {
             
         }
-         
-        
-        protected override ValidationResult IsValid(object value,ValidationContext validationContext)
+
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            Validation val = new Validation();
-            ValidationResult result = val.InsureeNumber(value.ToString());
+            if (value != null) {
+                Validation val = new Validation();
+                ValidationResult result = val.InsureeNumber(value.ToString());
 
-            return result;
-        }
-
-       
+                return result;
+            }
+            return new ValidationResult("Insuree Number can not be Empty.");
+           
+        }     
     }
 }

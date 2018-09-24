@@ -39,7 +39,7 @@ namespace ImisRestApi.Controllers
         public virtual IActionResult Match([FromBody]MatchModel model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { error_occured = false, error_message = ModelState.FirstOrDefault().Value});
+                return BadRequest(new { error_occured = false, error_message = ModelState.Values.FirstOrDefault().Errors});
 
             bool response = _payment.Match(model);           
            
@@ -52,7 +52,7 @@ namespace ImisRestApi.Controllers
         public virtual async Task<IActionResult> ControlNumber([FromBody]IntentOfPay intent)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { error_occured = false, error_message = ModelState.FirstOrDefault().Value, control_number = "" });
+                return BadRequest(new { error_occured = false, error_message = ModelState.Values.FirstOrDefault().Errors, control_number = "" });
 
             var response = await _payment.SaveIntent(intent);
 

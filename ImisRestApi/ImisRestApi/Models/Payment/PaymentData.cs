@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,7 +8,9 @@ namespace ImisRestApi.Models.Payment
 {
     public class PaymentData
     {
+        [Required]
         public string PaymentId { get; set; }
+        [Required]
         public string ControlNumber { get; set; }
         public string ProductCode { get; set; }
         public string EnrolmentOfficerCode { get; set; }

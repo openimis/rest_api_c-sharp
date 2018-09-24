@@ -10,7 +10,10 @@ namespace ImisRestApi.Logic
     {
         public virtual ValidationResult InsureeNumber(string insureeNumber)
         {
-            return ValidationResult.Success;
+            if (insureeNumber != null)
+                return ValidationResult.Success;
+
+            return new ValidationResult("Insuree Number can not be Empty.");
         }
     }
 }
