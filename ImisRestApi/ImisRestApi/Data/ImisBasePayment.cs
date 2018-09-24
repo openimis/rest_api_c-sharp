@@ -279,6 +279,28 @@ namespace ImisRestApi.Data
 
         }
 
+        public DataMessage Match(MatchModel model)
+        {
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@PaymentID", model.PaymentId.ToString()),
+                new SqlParameter("@AuditUserId", model.AuditUserId)
+             };
+
+            DataMessage message;
+
+            try
+            {
+                var data = dh.ExecProcedure("uspMatchPayment", sqlParameters);
+                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+            }
+            catch (Exception e)
+            {
+                message = new ImisApiResponse(e).Message;
+            }
+
+            return message;
+        }
+
         public bool Valid(string InsureeNumber, string ProductCode)
         {
             return false;

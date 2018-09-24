@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Chanels.Sms;
 
-using ImisRestApi.Escape;
 using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
@@ -33,7 +32,20 @@ namespace ImisRestApi.Controllers
             _hostingEnvironment = hostingEnvironment;
             _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
-       
+
+
+        [HttpPost]
+        [Route("api/Match")]
+        public virtual IActionResult Match([FromBody]MatchModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { error_occured = false, error_message = ModelState.FirstOrDefault().Value});
+
+            bool response = _payment.Match(model);           
+           
+            return Ok(new { error_occured = response });
+        }
+
         //Recieve Payment from Operator/
         [HttpPost]
         [Route("api/GetControlNumber")]

@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ImisRestApi.Escape
+namespace ImisRestApi.Logic
 {
-    public static class Validation
+    public class ValidationBase
     {
-        public static ValidationResult InsureeNumber(string insureeNumber)
+        public virtual ValidationResult InsureeNumber(string insureeNumber)
         {
             return ValidationResult.Success;
         }

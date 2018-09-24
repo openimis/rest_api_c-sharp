@@ -65,6 +65,14 @@ namespace ImisRestApi.Logic
             return return_message;
         }
 
+        public bool Match(MatchModel model)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var response = payment.Match(model);
+
+            return false;
+        }
+
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.PaymentId.ToString()};

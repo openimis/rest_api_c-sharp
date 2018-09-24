@@ -6,6 +6,7 @@ namespace ImisRestApi.Models
 {
     public class PaymentDetail
     {
+        [InsureeNumber]
         public string InsureeNumber { get; set; }
         public string ProductCode { get; set; }
         public EnrolmentType PaymentType { get; set; }

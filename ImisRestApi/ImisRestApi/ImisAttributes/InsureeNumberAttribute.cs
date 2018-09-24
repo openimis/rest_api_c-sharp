@@ -1,4 +1,4 @@
-﻿using ImisRestApi.Escape;
+﻿using ImisRestApi.Logic;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -20,7 +20,8 @@ namespace ImisRestApi.ImisAttributes
         
         protected override ValidationResult IsValid(object value,ValidationContext validationContext)
         {
-            ValidationResult result = Validation.InsureeNumber(value.ToString());
+            Validation val = new Validation();
+            ValidationResult result = val.InsureeNumber(value.ToString());
 
             return result;
         }
