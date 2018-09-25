@@ -25,35 +25,42 @@ namespace ImisRestApi.Logic
             _hostingEnvironment = hostingEnvironment;
            
         }
-        public async Task<DataMessage> SaveIntent(IntentOfPay intent)
+        public async Task<DataMessage> SaveIntent(IntentOfPay intent,int? errorNumber = 0,string errorMessage = null)
         {
 
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            payment.SaveIntent(intent);
+            var intentResponse = payment.SaveIntent(intent,errorNumber,errorMessage);
 
             string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
 
-           
-            var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount,intent.PaymentDetails);
-
             DataMessage return_message = new DataMessage();
 
-            if (response.ControlNumber != null)
+            if (intentResponse.Code == 0)
             {
-                return_message = payment.SaveControlNumber(response.ControlNumber);
+                var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails);
 
-            }
-            else if (response.ControlNumber == null)
-            {
-                return_message = payment.SaveControlNumber();
-            }
-            else if (response.ErrorOccured == true)
-            {
-                return_message = payment.SaveControlNumberAkn(response.ErrorOccured, "");
+               
+                if (response.ControlNumber != null)
+                {
+                    return_message = payment.SaveControlNumber(response.ControlNumber);
+
+                }
+                else if (response.ControlNumber == null)
+                {
+                    return_message = payment.SaveControlNumber();
+                }
+                else if (response.ErrorOccured == true)
+                {
+                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, "");
+                }
+                else
+                {
+
+                }
             }
             else
             {
-
+                return_message = intentResponse;
             }
 
             List<SmsContainer> message = new List<SmsContainer>();

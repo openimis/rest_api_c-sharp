@@ -8,7 +8,7 @@ namespace ImisRestApi.Models
 {
     public class IntentOfPay
     {
-        [Required]
+        [Required(ErrorMessage = "001: Phone number not provided")]
         public string PhoneNumber { get; set; }
         public DateTime RequestDate { get; set; }
         public string OfficerCode { get; set; }

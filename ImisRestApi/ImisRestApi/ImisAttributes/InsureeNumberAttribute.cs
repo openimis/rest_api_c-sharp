@@ -26,7 +26,7 @@ namespace ImisRestApi.ImisAttributes
 
                 return result;
             }
-            return new ValidationResult("Insuree Number can not be Empty.");
+            return new ValidationResult("002: Insuree number is not valid.");
            
         }     
     }

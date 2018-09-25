@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Chanels.Sms;
-
+using ImisRestApi.Extensions;
 using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
@@ -43,7 +43,7 @@ namespace ImisRestApi.Controllers
 
             var response = _payment.Match(model);           
            
-            return Ok(new { isMatched = response});
+            return Ok(new { isMatched = !response.ErrorOccured});
         }
 
         //Recieve Payment from Operator/
@@ -52,7 +52,12 @@ namespace ImisRestApi.Controllers
         public virtual async Task<IActionResult> ControlNumber([FromBody]IntentOfPay intent)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { error_occured = false, error_message = ModelState.Values.FirstOrDefault().Errors, control_number = "" });
+            {
+                
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
+                return BadRequest(new { error_occured = false, error_message = error, control_number = "" });
+            }
 
             var response = await _payment.SaveIntent(intent);
 
