@@ -56,7 +56,7 @@ namespace ImisRestApi.Controllers
                 
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
-                return BadRequest(new { error_occured = false, error_message = error, control_number = "" });
+                return BadRequest(new { error_occured = false, error_message = error, control_number = resp.Data });
             }
 
             var response = await _payment.SaveIntent(intent);
