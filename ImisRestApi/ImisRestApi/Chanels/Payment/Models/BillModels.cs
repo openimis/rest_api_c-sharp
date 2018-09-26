@@ -46,7 +46,7 @@ namespace ImisRestApi.Chanels.Payment.Models
         public string BillId { get; set; }
         public int SubSpCode { get; set; }
         public string SpSysId { get; set; }
-        public double BillAmt { get; set; }
+        public decimal BillAmt { get; set; }
         public double MiscAmt { get; set; }
         public DateTime BillExpDt { get; set; }
         public string PyrId { get; set; }
@@ -58,7 +58,7 @@ namespace ImisRestApi.Chanels.Payment.Models
         public string PyrCellNum { get; set; }
         public string PyrEmail { get; set; }
         public string Ccy { get; set; }
-        public double BillEqvAmt { get; set; }
+        public decimal BillEqvAmt { get; set; }
         public bool RemFlag { get; set; }
         public int BillPayOpt { get; set; }
         public List<BillItem> BillItems { get; set; }

@@ -41,7 +41,7 @@ namespace ImisRestApi.Data
 
         }
 
-        public override ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, double ExpectedAmount, List<PaymentDetail> products)
+        public override ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
             var bill = gepg.CreateBill(Configuration, OfficerCode, PaymentId, ExpectedAmount, products);

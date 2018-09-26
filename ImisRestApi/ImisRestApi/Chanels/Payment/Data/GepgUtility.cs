@@ -35,7 +35,7 @@ namespace ImisRestApi.Data
             GepgPublicCertStorePath = hostingEnvironment.ContentRootPath + @"\Chanels\Payment\Certificates\gepgpubliccertificate.pfx";
         }
 
-        public String CreateBill(IConfiguration Configuration, string OfficerCode, string BillId, double ExpectedAmount, List<PaymentDetail> products)
+        public String CreateBill(IConfiguration Configuration, string OfficerCode, string BillId, decimal ExpectedAmount, List<PaymentDetail> products)
         {
             DataHelper dh = new DataHelper(Configuration);
 
