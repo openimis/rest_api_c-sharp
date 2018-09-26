@@ -55,16 +55,16 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products)
+        public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
             bool result = SaveControlNumberRequest(PaymentId);
 
             ControlNumberResp response = new ControlNumberResp() {
                 PaymentId = PaymentId,
-                ControlNumber = null,
-                RequestAcknowledged = false,
+                ControlNumber = controlNumber,
+                RequestAcknowledged = acknowledge,
                 ErrorMessage = "",
-                ErrorOccured = false
+                ErrorOccured = error
             };
 
             return response;
