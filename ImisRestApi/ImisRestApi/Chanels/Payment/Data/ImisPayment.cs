@@ -41,7 +41,7 @@ namespace ImisRestApi.Data
 
         }
 
-        public override ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products)
+        public override ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
             var bill = gepg.CreateBill(Configuration, OfficerCode, PaymentId, ExpectedAmount, products);
@@ -50,7 +50,7 @@ namespace ImisRestApi.Data
             var signedMesg = gepg.FinaliseSignedMsg(signature);
             var billAck = gepg.SendHttpRequest(signedMesg);
 
-            return base.GenerateCtrlNoRequest(OfficerCode, PaymentId, ExpectedAmount, products);
+            return base.GenerateCtrlNoRequest(OfficerCode, PaymentId, ExpectedAmount, products,null,true,false);
         }
 
         public string ControlNumberResp()
