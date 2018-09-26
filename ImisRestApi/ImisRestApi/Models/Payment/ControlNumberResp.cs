@@ -11,6 +11,7 @@ namespace ImisRestApi.Models.Payment
         [Required]
         public string PaymentId { get; set; }
         public string ControlNumber { get; set; }
+        public bool RequestAcknowledged { get; set; }
         [Required]
         public bool ErrorOccured { get; set; }
         public string ErrorMessage { get; set; }
