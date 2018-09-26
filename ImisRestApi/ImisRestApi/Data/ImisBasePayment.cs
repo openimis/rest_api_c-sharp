@@ -205,7 +205,7 @@ namespace ImisRestApi.Data
             SqlParameter[] sqlParameters = {
                   new SqlParameter("@ControlNumber", ControlNumber)
             };
-
+             
             switch (status)
             {
                 case CnStatus.Sent:
