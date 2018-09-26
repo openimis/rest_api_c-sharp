@@ -59,9 +59,10 @@ namespace ImisRestApi.Data
         {
             bool result = SaveControlNumberRequest(PaymentId);
 
-            ControlNumberResp response = new ControlNumberResp() {   
+            ControlNumberResp response = new ControlNumberResp() {
                 PaymentId = PaymentId,
-                ControlNumber = "",
+                ControlNumber = null,
+                RequestAcknowledged = false,
                 ErrorMessage = "",
                 ErrorOccured = false
             };

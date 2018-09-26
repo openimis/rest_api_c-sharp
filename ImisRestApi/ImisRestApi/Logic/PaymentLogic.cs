@@ -45,13 +45,13 @@ namespace ImisRestApi.Logic
                     return_message = payment.SaveControlNumber(response.ControlNumber);
 
                 }
-                else if (response.ControlNumber == null)
+                else if (response.RequestAcknowledged == true)
                 {
-                    return_message = payment.SaveControlNumber();
+                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured,response.ErrorMessage);
                 }
                 else if (response.ErrorOccured == true)
                 {
-                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, "");
+                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured,response.ErrorMessage);
                 }
                 else
                 {
