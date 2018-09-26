@@ -9,7 +9,7 @@ namespace ImisRestApi.Responses
 {
     public class ImisApiResponse
     {
-        public DataMessage msg = new DataMessage() { MessageValue = "Success"};
+        public DataMessage msg = new DataMessage();
 
         public ImisApiResponse(Exception e)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,6 +18,7 @@ namespace ImisRestApi.Chanels.Payment.Models
         public DateTime ValidityTo { get; set; }
         public int AuditedUserID { get; set; }
         public int RequestID { get; set; }
+        [Required]
         public int PaymentID { get; set; }
         public string Value { get; set; }
         public DateTime IssuedDate { get; set; }

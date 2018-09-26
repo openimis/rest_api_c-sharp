@@ -22,7 +22,7 @@ namespace ImisRestApi.Data
     public class ImisBasePayment
     {
         public string PaymentId { get; set; }
-        public float ExpectedAmount { get; set; }
+        public decimal ExpectedAmount { get; set; }
 
         protected IConfiguration Configuration;
         protected readonly IHostingEnvironment _hostingEnvironment;
@@ -55,12 +55,11 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, double ExpectedAmount, List<PaymentDetail> products)
+        public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products)
         {
             bool result = SaveControlNumberRequest(PaymentId);
 
-            ControlNumberResp response = new ControlNumberResp()
-            {
+            ControlNumberResp response = new ControlNumberResp() {   
                 PaymentId = PaymentId,
                 ControlNumber = "",
                 ErrorMessage = "",
@@ -70,7 +69,7 @@ namespace ImisRestApi.Data
             return response;
         }
 
-        public DataMessage SaveIntent(IntentOfPay _intent)
+        public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
@@ -89,14 +88,21 @@ namespace ImisRestApi.Data
                                   new XElement("IsRenewal", x.IsRenewal())
                                   )
                     )
-                  )
+                  ),
+                   new XElement("ProxySettings",
+                        new XElement("AdultMembers",Configuration["DefaultFamily:Adults"]),
+                        new XElement("ChildMembers", Configuration["DefaultFamily:Children"])
+                   )
             );
+
 
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@Xml", PaymentIntent.ToString()),
+                new SqlParameter("@ErrorNumber",errorNumber),
+                new SqlParameter("@ErrorMsg",errorMessage),
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
-                new SqlParameter("@ExpectedAmount", SqlDbType.Int){Direction = ParameterDirection.Output }
+                new SqlParameter("@ExpectedAmount", SqlDbType.Decimal){Direction = ParameterDirection.Output }
              };
 
             DataMessage message;
@@ -105,10 +111,15 @@ namespace ImisRestApi.Data
             {
                 var data = dh.ExecProcedure("uspInsertPaymentIntent", sqlParameters);
 
-                PaymentId = data[0].Value.ToString();
-                ExpectedAmount = float.Parse(data[1].Value.ToString());
+                var rv = int.Parse(data[2].Value.ToString());
 
-                message = new SaveIntentResponse(int.Parse(data[2].Value.ToString()), false).Message;
+                if (rv == 0)
+                {
+                    PaymentId = data[0].Value.ToString();
+                    ExpectedAmount = decimal.Parse(data[1].Value.ToString());
+                }
+                
+                message = new SaveIntentResponse(rv,false).Message;
             }
             catch (Exception e)
             {
@@ -194,7 +205,7 @@ namespace ImisRestApi.Data
             SqlParameter[] sqlParameters = {
                   new SqlParameter("@ControlNumber", ControlNumber)
             };
-
+             
             switch (status)
             {
                 case CnStatus.Sent:
@@ -215,7 +226,7 @@ namespace ImisRestApi.Data
             }
         }
 
-
+      
         public DataMessage SaveControlNumberAkn(bool Success, string Comment)
         {
             XElement CNAcknowledgement = new XElement("ControlNumberAcknowledge",
@@ -262,7 +273,7 @@ namespace ImisRestApi.Data
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@Xml", PaymentIntent.ToString()),
              };
-
+            
             DataMessage message;
 
             try
@@ -277,6 +288,46 @@ namespace ImisRestApi.Data
 
             return message;
 
+        }
+
+        public DataMessage Match(MatchModel model)
+        {
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@PaymentID", model.PaymentId),
+                new SqlParameter("@AuditUserId", model.AuditUserId)
+             };
+
+            DataMessage message;
+
+            try
+            {
+                DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
+                DataTable dt = data.Tables[data.Tables.Count - 1];
+
+                bool error = true;
+
+                if (dt.Rows.Count > 0) {
+                    var firstRow = dt.Rows[0];
+
+                    if(Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
+                    {
+                        error = false;
+                    }
+                    
+                }
+                else
+                {
+                    error = true;
+                }
+                
+                message = new ImisApiResponse(0,error,dt).Message;
+            }
+            catch (Exception e)
+            {
+                message = new ImisApiResponse(e).Message;
+            }
+
+            return message;
         }
 
         public bool Valid(string InsureeNumber, string ProductCode)

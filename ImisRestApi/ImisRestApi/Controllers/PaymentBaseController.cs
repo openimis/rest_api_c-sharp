@@ -5,8 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Chanels.Sms;
-
-using ImisRestApi.Escape;
+using ImisRestApi.Extensions;
 using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
@@ -33,14 +32,32 @@ namespace ImisRestApi.Controllers
             _hostingEnvironment = hostingEnvironment;
             _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
-       
+
+
+        [HttpPost]
+        [Route("api/MatchPayment")]
+        public virtual IActionResult Match([FromBody]MatchModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { error_occured = false, error_message = ModelState.Values.FirstOrDefault().Errors});
+
+            var response = _payment.Match(model);           
+           
+            return Ok(new { isMatched = !response.ErrorOccured});
+        }
+
         //Recieve Payment from Operator/
         [HttpPost]
         [Route("api/GetControlNumber")]
         public virtual async Task<IActionResult> ControlNumber([FromBody]IntentOfPay intent)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { error_occured = false, error_message = ModelState.FirstOrDefault().Value, control_number = "" });
+            {
+                
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
+                return BadRequest(new { error_occured = false, error_message = error, control_number = resp.Data });
+            }
 
             var response = await _payment.SaveIntent(intent);
 

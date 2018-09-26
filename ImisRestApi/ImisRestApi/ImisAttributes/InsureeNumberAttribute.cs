@@ -1,4 +1,4 @@
-﻿using ImisRestApi.Escape;
+﻿using ImisRestApi.Logic;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,15 +16,18 @@ namespace ImisRestApi.ImisAttributes
         {
             
         }
-         
-        
-        protected override ValidationResult IsValid(object value,ValidationContext validationContext)
+
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            ValidationResult result = Validation.InsureeNumber(value.ToString());
+            if (value != null) {
+                Validation val = new Validation();
+                ValidationResult result = val.InsureeNumber(value.ToString());
 
-            return result;
-        }
-
-       
+                return result;
+            }
+            return new ValidationResult("002: Insuree number is not valid.");
+           
+        }     
     }
 }

@@ -18,6 +18,28 @@ namespace ImisRestApi.Data
             ConnectionString = configuration["ConnectionStrings:DefaultConnection"];
         }
 
+        public DataSet FillDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
+        {
+            DataSet ds = new DataSet();
+            var sqlConnection = new SqlConnection(ConnectionString);
+            var command = new SqlCommand(SQL, sqlConnection)
+            {
+                CommandType = commandType
+            };
+
+            var adapter = new SqlDataAdapter(command);
+
+            using (command)
+            {
+                if (parameters.Length > 0)
+                    command.Parameters.AddRange(parameters);
+                adapter.Fill(ds);
+               
+            }
+
+            return ds;
+        }
+
         public DataTable GetDataTable(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
             DataTable dt = new DataTable();
