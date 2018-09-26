@@ -47,11 +47,11 @@ namespace ImisRestApi.Logic
                 }
                 else if (response.RequestAcknowledged == true)
                 {
-                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured,response.ErrorMessage);
+                    return_message = payment.SaveControlNumberAkn(!response.ErrorOccured,response.ErrorMessage);
                 }
                 else if (response.ErrorOccured == true)
                 {
-                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured,response.ErrorMessage);
+                    return_message = payment.SaveControlNumberAkn(!response.ErrorOccured,response.ErrorMessage);
                 }
                 else
                 {
