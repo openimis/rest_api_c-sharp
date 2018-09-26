@@ -11,14 +11,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
     public class PaymentController : PaymentBaseController
     {
         private ImisPayment p;
+        public string ReconciliationFolder;
+
         public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment) :base(configuration, hostingEnvironment)
         {
+            ReconciliationFolder = hostingEnvironment.ContentRootPath + @"\Chanels\Payment\Reconciliation";
             p = new ImisPayment(configuration, hostingEnvironment);
         }
 
@@ -43,6 +47,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            //System.IO.File.WriteAllText(ReconciliationFolder, JsonConvert.SerializeObject(model));
             return Ok(p.ReconciliationResp());
         }
 
