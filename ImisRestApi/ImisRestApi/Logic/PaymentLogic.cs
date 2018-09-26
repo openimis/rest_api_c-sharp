@@ -39,7 +39,7 @@ namespace ImisRestApi.Logic
             {
                 var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails);
 
-               
+                
                 if (response.ControlNumber != null)
                 {
                     return_message = payment.SaveControlNumber(response.ControlNumber);
