@@ -277,10 +277,11 @@ namespace ImisRestApi.Data
                 new XElement("ReceiptNo", payment.ReceiptNumber),
                 new XElement("TransactionNo", payment.TransactionId),
                 new XElement("PhoneNumber", payment.PhoneNumber),
+                new XElement("OfficerCode", payment.EnrolmentOfficerCode),
                 new XElement("Detail",
                     new XElement("InsureeNumber", payment.InsureeNumber),
                     new XElement("ProductCode", payment.ProductCode),
-                    new XElement("IsRenewal", null)
+                    new XElement("IsRenewal", (int)payment.PaymentType)
                             )
                );
 

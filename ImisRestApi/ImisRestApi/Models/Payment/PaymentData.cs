@@ -25,5 +25,6 @@ namespace ImisRestApi.Models.Payment
         public string PhoneNumber { get; set; }
         [InsureeNumber]
         public string InsureeNumber { get; set; }
+        public EnrolmentType PaymentType { get; set; }
     }
 }
