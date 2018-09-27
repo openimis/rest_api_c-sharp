@@ -7,6 +7,6 @@ namespace ImisRestApi.Models
 {
     public enum EnrolmentType
     {
-        Renewal,New
+        New,Renewal
     }
 }
