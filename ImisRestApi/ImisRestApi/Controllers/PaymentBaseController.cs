@@ -36,12 +36,12 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/MatchPayment")]
-        public virtual IActionResult Match([FromBody]MatchModel model)
+        public virtual async Task<IActionResult> Match([FromBody]MatchModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = false, error_message = ModelState.Values.FirstOrDefault().Errors});
 
-            var response = _payment.Match(model);           
+            var response = await _payment.Match(model);           
            
             return Ok(new { isMatched = !response.ErrorOccured});
         }
