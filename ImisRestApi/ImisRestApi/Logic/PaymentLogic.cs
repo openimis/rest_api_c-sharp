@@ -72,10 +72,16 @@ namespace ImisRestApi.Logic
             return return_message;
         }
 
-        public DataMessage Match(MatchModel model)
+        public async Task<DataMessage> Match(MatchModel model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.Match(model);
+
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = "Your Payment has been Matched", Recepients = "+255767057265" });
+
+            ImisSms sms = new ImisSms(_configuration);
+            string test = await sms.PushSMS(message);
 
             return response;
         }

@@ -9,9 +9,9 @@ namespace ImisRestApi.Models.Payment
 {
     public class PaymentData
     {
-        [Required]
         public string PaymentId { get; set; }
         public string ControlNumber { get; set; }
+        [RequiredIf("Product Code")]
         public string ProductCode { get; set; }
         public string EnrolmentOfficerCode { get; set; }
         public string TransactionId { get; set; }
@@ -24,7 +24,10 @@ namespace ImisRestApi.Models.Payment
         public string ReceiptNumber { get; set; }
         public string PhoneNumber { get; set; }
         [InsureeNumber]
+        [RequiredIf("Insuree number")]
         public string InsureeNumber { get; set; }
-        public EnrolmentType PaymentType { get; set; }
+        [RequiredIf("PaymentType")]
+        public EnrolmentType? PaymentType { get; set; }
+
     }
 }

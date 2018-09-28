@@ -269,6 +269,13 @@ namespace ImisRestApi.Data
 
         public DataMessage SavePayment(PaymentData payment,bool failed = false)
         {
+            int? isRenewal = null;
+
+            if((payment.PaymentType != null))
+            {
+                isRenewal = (int)payment.PaymentType;
+            }
+            
             XElement PaymentIntent = new XElement("PaymentData",
                 new XElement("PaymentID", payment.PaymentId),
                 new XElement("PaymentDate", payment.PaymentDate),
@@ -281,7 +288,7 @@ namespace ImisRestApi.Data
                 new XElement("Detail",
                     new XElement("InsureeNumber", payment.InsureeNumber),
                     new XElement("ProductCode", payment.ProductCode),
-                    new XElement("IsRenewal", (int)payment.PaymentType)
+                    new XElement("IsRenewal", isRenewal)
                             )
                );
 

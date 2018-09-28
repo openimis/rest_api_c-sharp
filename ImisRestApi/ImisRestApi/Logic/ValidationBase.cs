@@ -18,7 +18,7 @@ namespace ImisRestApi.Logic
                     return new ValidationResult("001:Wrong format of insurance number ");
             }
 
-            return new ValidationResult("001:Wrong format of insurance number ");
+            return ValidationResult.Success;
         }
 
         public virtual ValidationResult OfficerCode(object value)
