@@ -11,9 +11,26 @@ namespace ImisRestApi.Logic
         public virtual ValidationResult InsureeNumber(string insureeNumber)
         {
             if (insureeNumber != null)
-                return ValidationResult.Success;
+            {
+                if (insureeNumber.Length < 12 && insureeNumber.Length > 0)
+                    return ValidationResult.Success;
+                else
+                    return new ValidationResult("001:Wrong format of insurance number ");
+            }
 
-            return new ValidationResult("Insuree Number can not be Empty.");
+            return ValidationResult.Success;
+        }
+
+        public virtual ValidationResult OfficerCode(object value)
+        {
+            if (value != null)
+            {
+                if (value.ToString().Length < 8)
+                    return ValidationResult.Success;
+                else
+                    return new ValidationResult("003:Not valid enrolment officer code");
+            }
+            return ValidationResult.Success;
         }
     }
 }

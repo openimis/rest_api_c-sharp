@@ -52,11 +52,10 @@ namespace ImisRestApi.Controllers
         public virtual async Task<IActionResult> ControlNumber([FromBody]IntentOfPay intent)
         {
             if (!ModelState.IsValid)
-            {
-                
+            {           
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
-                return BadRequest(new { error_occured = false, error_message = error, control_number = resp.Data });
+                return BadRequest(new { error_occured = true, error_message = error, control_number = resp.Data });
             }
 
             var response = await _payment.SaveIntent(intent);
@@ -69,7 +68,10 @@ namespace ImisRestApi.Controllers
         public virtual IActionResult ControlNumberAck([FromBody]Acknowledgement model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error});
+            }
 
             var response = _payment.SaveAcknowledgement(model);
 
@@ -81,7 +83,10 @@ namespace ImisRestApi.Controllers
         public virtual IActionResult ReceiveControlNumber([FromBody]ControlNumberResp model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = _payment.SaveControlNumber(model);
             return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data });
@@ -92,7 +97,11 @@ namespace ImisRestApi.Controllers
         public virtual IActionResult GetPayment([FromBody]PaymentData model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
             var response = _payment.SavePayment(model);
             return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data});
         }
@@ -102,7 +111,10 @@ namespace ImisRestApi.Controllers
         public virtual IActionResult SendSms([FromBody]List<SmsContainer> model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             ImisSms sms = new ImisSms(_configuration);
             var response = sms.PushSMS(model);

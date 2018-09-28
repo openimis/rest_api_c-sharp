@@ -38,12 +38,11 @@ namespace ImisRestApi.Logic
             if (intentResponse.Code == 0)
             {
                 var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails);
-
-                
+              
                 if (response.ControlNumber != null)
                 {
-                    return_message = payment.SaveControlNumber(response.ControlNumber);
-
+                    var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
+                    return_message = payment.SaveControlNumber(response.ControlNumber,controlNumberExists);
                 }
                 else if (response.RequestAcknowledged == true)
                 {
@@ -60,6 +59,7 @@ namespace ImisRestApi.Logic
             }
             else
             {
+                var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails,null,false,true);
                 return_message = intentResponse;
             }
 
@@ -72,10 +72,16 @@ namespace ImisRestApi.Logic
             return return_message;
         }
 
-        public DataMessage Match(MatchModel model)
+        public async Task<DataMessage> Match(MatchModel model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.Match(model);
+
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = "Your Payment has been Matched", Recepients = "+255767057265" });
+
+            ImisSms sms = new ImisSms(_configuration);
+            string test = await sms.PushSMS(message);
 
             return response;
         }
@@ -90,8 +96,10 @@ namespace ImisRestApi.Logic
 
         public DataMessage SavePayment(PaymentData model)
         {
+            
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var response = payment.SavePayment(model);
+            var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
+            var response = payment.SavePayment(model,controlNumberExists);
 
             return response;
         }
@@ -99,7 +107,8 @@ namespace ImisRestApi.Logic
         public DataMessage SaveControlNumber(ControlNumberResp model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var response = payment.SaveControlNumber(model);
+            var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
+            var response = payment.SaveControlNumber(model,controlNumberExists);
 
             return response;
         }

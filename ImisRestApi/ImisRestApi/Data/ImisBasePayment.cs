@@ -35,11 +35,12 @@ namespace ImisRestApi.Data
             dh = new DataHelper(configuration);
         }
 
-        public bool SaveControlNumberRequest(string BillId)
+        public bool SaveControlNumberRequest(string BillId,bool failed)
         {
 
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@PaymentID", BillId)
+                new SqlParameter("@PaymentID", BillId),
+                new SqlParameter("@Failed", failed)
              };
 
             try
@@ -57,7 +58,7 @@ namespace ImisRestApi.Data
 
         public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
-            bool result = SaveControlNumberRequest(PaymentId);
+            bool result = SaveControlNumberRequest(PaymentId,error);
 
             ControlNumberResp response = new ControlNumberResp() {
                 PaymentId = PaymentId,
@@ -110,17 +111,19 @@ namespace ImisRestApi.Data
 
             try
             {
+                bool error = true;
                 var data = dh.ExecProcedure("uspInsertPaymentIntent", sqlParameters);
 
                 var rv = int.Parse(data[2].Value.ToString());
 
                 if (rv == 0)
-                {
-                    PaymentId = data[0].Value.ToString();
-                    ExpectedAmount = decimal.Parse(data[1].Value.ToString());
+                { 
+                    error = false;
                 }
-                
-                message = new SaveIntentResponse(rv,false).Message;
+
+                PaymentId = data[0].Value.ToString();
+                ExpectedAmount = decimal.Parse(data[1].Value.ToString());
+                message = new SaveIntentResponse(rv, error).Message;
             }
             catch (Exception e)
             {
@@ -131,33 +134,12 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public DataMessage SaveControlNumber()
+        public DataMessage SaveControlNumber(string ControlNumber,bool failed)
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", PaymentId),
-                new SqlParameter("@RequestOrigin", "IMIS")
-             };
-
-            DataMessage message;
-
-            try
-            {
-                var data = dh.ExecProcedure("uspRequestGetControlNumber", sqlParameters);
-                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
-            }
-            catch (Exception e)
-            {
-                message = new ImisApiResponse(e).Message;
-            }
-
-            return message;
-        }
-
-        public DataMessage SaveControlNumber(string ControlNumber)
-        {
-            SqlParameter[] sqlParameters = {
-                new SqlParameter("@PaymentID", PaymentId),
-                new SqlParameter("@ControlNumber", ControlNumber)
+                new SqlParameter("@ControlNumber", ControlNumber),
+                new SqlParameter("@Failed", failed)
              };
 
             DataMessage message;
@@ -165,23 +147,24 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
-                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
             }
             catch (Exception e)
             {
 
-                message = new ImisApiResponse(e).Message;
+                message = new CtrlNumberResponse(e).Message;
             }
 
             return message;
 
         }
 
-        public DataMessage SaveControlNumber(ControlNumberResp model)
+        public DataMessage SaveControlNumber(ControlNumberResp model,bool failed)
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", model.PaymentId),
-                new SqlParameter("@ControlNumber", model.ControlNumber)
+                new SqlParameter("@ControlNumber", model.ControlNumber),
+                new SqlParameter("@Failed", failed)
              };
 
             DataMessage message;
@@ -189,15 +172,41 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
-                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
             }
             catch (Exception e)
             {
 
-                message = new ImisApiResponse(e).Message;
+                message = new CtrlNumberResponse(e).Message;
             }
 
             return message;
+        }
+
+        public bool CheckControlNumber(string PaymentID, string ControlNumber)
+        {
+            var sSQL = @"SELECT * FROM tblControlNumber WHERE PaymentID != @PaymentID AND ControlNumber = @ControlNumber";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", PaymentID),
+                new SqlParameter("@ControlNumber", ControlNumber)
+            };
+            bool result = false;
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    result = true;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return result;
         }
 
         public void UpdateControlNumberStatus(string ControlNumber, CnStatus status)
@@ -246,29 +255,42 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspAcknowledgeControlNumberRequest", sqlParameters);
-                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                message = new SaveAckResponse(int.Parse(data[0].Value.ToString()), false).Message;
             }
             catch (Exception e)
             {
 
-                message = new ImisApiResponse(e).Message;
+                message = new SaveAckResponse(e).Message;
             }
 
             return message;
 
         }
 
-        public DataMessage SavePayment(PaymentData payment)
+        public DataMessage SavePayment(PaymentData payment,bool failed = false)
         {
+            int? isRenewal = null;
+
+            if((payment.PaymentType != null))
+            {
+                isRenewal = (int)payment.PaymentType;
+            }
+            
             XElement PaymentIntent = new XElement("PaymentData",
+                new XElement("PaymentID", payment.PaymentId),
                 new XElement("PaymentDate", payment.PaymentDate),
                 new XElement("ControlNumber", payment.ControlNumber),
                 new XElement("Amount", payment.ReceivedAmount),
                 new XElement("ReceiptNo", payment.ReceiptNumber),
                 new XElement("TransactionNo", payment.TransactionId),
                 new XElement("PhoneNumber", payment.PhoneNumber),
-                new XElement("InsureeNumber", payment.InsureeNumber)
-                             );
+                new XElement("OfficerCode", payment.EnrolmentOfficerCode),
+                new XElement("Detail",
+                    new XElement("InsureeNumber", payment.InsureeNumber),
+                    new XElement("ProductCode", payment.ProductCode),
+                    new XElement("IsRenewal", isRenewal)
+                            )
+               );
 
 
             SqlParameter[] sqlParameters = {
@@ -280,11 +302,11 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
-                message = new ImisApiResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                message = new SavePayResponse(int.Parse(data[0].Value.ToString()), false).Message;
             }
             catch (Exception e)
             {
-                message = new ImisApiResponse(e).Message;
+                message = new SavePayResponse(e).Message;
             }
 
             return message;
