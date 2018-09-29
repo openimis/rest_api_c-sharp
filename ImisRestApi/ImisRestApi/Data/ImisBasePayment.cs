@@ -76,7 +76,7 @@ namespace ImisRestApi.Data
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
                         new XElement("OfficerCode", _intent.OfficerCode),
-                        new XElement("RequestDate", _intent.RequestDate.ToShortDateString()),
+                        new XElement("RequestDate",_intent.RequestDate),
                         new XElement("PhoneNumber", _intent.PhoneNumber),
                         new XElement("AuditUserId", -1)
                     ),
