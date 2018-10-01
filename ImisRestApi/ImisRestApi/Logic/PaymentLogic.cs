@@ -63,10 +63,12 @@ namespace ImisRestApi.Logic
                 return_message = intentResponse;
             }
 
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            var txtmsg = string.Format(sms.GetMessage("ControlNumber"),1,2,3);
+
             List<SmsContainer> message = new List<SmsContainer>();
             message.Add(new SmsContainer() { Message = "Your Request for control number was Sent", Recepients = "+255767057265" });
 
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
             string test = await sms.PushSMS(message);
             
             return return_message;

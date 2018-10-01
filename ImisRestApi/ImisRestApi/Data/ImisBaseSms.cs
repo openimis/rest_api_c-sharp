@@ -18,7 +18,7 @@ namespace ImisRestApi.Data
 
         public ImisBaseSms(IConfiguration config,IHostingEnvironment environment)
         {
-            SmsTampletes = environment.ContentRootPath + @"\Chanels\Payment\Sms\Strings";
+            SmsTampletes = environment.ContentRootPath + @"\Chanels\Sms\Strings\";
         }
 
         public virtual async Task<string> PushSMS(List<SmsContainer> containers)
