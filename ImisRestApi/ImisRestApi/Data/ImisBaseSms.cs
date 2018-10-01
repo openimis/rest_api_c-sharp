@@ -18,7 +18,7 @@ namespace ImisRestApi.Data
 
         public ImisBaseSms(IConfiguration config,IHostingEnvironment environment)
         {
-
+            SmsTampletes = environment.ContentRootPath + @"\Chanels\Payment\Sms\Strings";
         }
 
         public virtual async Task<string> PushSMS(List<SmsContainer> containers)
@@ -47,9 +47,9 @@ namespace ImisRestApi.Data
 
         }
 
-        public virtual string GetMessage()
+        public virtual string GetMessage(string filename)
         {
-            string text = File.ReadAllText(@"c:\file.txt", Encoding.UTF8);
+            string text = File.ReadAllText(SmsTampletes + filename +".txt", Encoding.UTF8);
             return text;
         }
     }
