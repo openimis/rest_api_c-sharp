@@ -116,7 +116,7 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            ImisSms sms = new ImisSms(_configuration);
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
             var response = sms.PushSMS(model);
 
             return Ok();

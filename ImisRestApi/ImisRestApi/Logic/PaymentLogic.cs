@@ -66,7 +66,7 @@ namespace ImisRestApi.Logic
             List<SmsContainer> message = new List<SmsContainer>();
             message.Add(new SmsContainer() { Message = "Your Request for control number was Sent", Recepients = "+255767057265" });
 
-            ImisSms sms = new ImisSms(_configuration);
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
             string test = await sms.PushSMS(message);
             
             return return_message;
@@ -80,7 +80,7 @@ namespace ImisRestApi.Logic
             List<SmsContainer> message = new List<SmsContainer>();
             message.Add(new SmsContainer() { Message = "Your Payment has been Matched", Recepients = "+255767057265" });
 
-            ImisSms sms = new ImisSms(_configuration);
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
             string test = await sms.PushSMS(message);
 
             return response;

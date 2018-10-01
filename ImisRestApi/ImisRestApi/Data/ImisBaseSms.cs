@@ -1,8 +1,10 @@
 ﻿using ImisRestApi.Models.Sms;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -12,7 +14,9 @@ namespace ImisRestApi.Data
 {
     public class ImisBaseSms
     {
-        public ImisBaseSms(IConfiguration config)
+        private string SmsTampletes = string.Empty;
+
+        public ImisBaseSms(IConfiguration config,IHostingEnvironment environment)
         {
 
         }
@@ -43,5 +47,10 @@ namespace ImisRestApi.Data
 
         }
 
+        public virtual string GetMessage()
+        {
+            string text = File.ReadAllText(@"c:\file.txt", Encoding.UTF8);
+            return text;
+        }
     }
 }

@@ -173,7 +173,7 @@ namespace ImisRestApi.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("api/Enquire")]
-        public async Task<IActionResult> Enquire([FromBody]Enquire model)
+        public IActionResult Enquire([FromBody]Enquire model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -188,12 +188,6 @@ namespace ImisRestApi.Controllers
             {
                 msgString += item.productCode + " : " + item.status;
             }
-
-            List<SmsContainer> message = new List<SmsContainer>();
-            message.Add(new SmsContainer() { Message = msgString, Recepients = "+255767057265" });
-
-            ImisSms sms = new ImisSms(config);
-            string test = await sms.PushSMS(message);
 
             return Json(new { status = true,sms_reply=true,sms_text = resp });
 
