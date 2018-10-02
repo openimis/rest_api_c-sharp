@@ -43,6 +43,21 @@ namespace ImisRestApi.Logic
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
                     return_message = payment.SaveControlNumber(response.ControlNumber,controlNumberExists);
+
+                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+                    var txtmsg = string.Format(sms.GetMessage("ControlNumberAssigned"),
+                        response.ControlNumber,
+                        DateTime.UtcNow.ToLongDateString(),
+                        DateTime.UtcNow.ToLongTimeString(),
+                        intent.PaymentDetails.FirstOrDefault().InsureeNumber,
+                        intent.PaymentDetails.FirstOrDefault().InsureeNumber,
+                        intent.PaymentDetails.FirstOrDefault().ProductCode,
+                        payment.ExpectedAmount);
+
+                    List<SmsContainer> message = new List<SmsContainer>();
+                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = intent.PhoneNumber });
+
+                    string test = await sms.PushSMS(message);
                 }
                 else if (response.RequestAcknowledged == true)
                 {
@@ -62,14 +77,6 @@ namespace ImisRestApi.Logic
                 var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails,null,false,true);
                 return_message = intentResponse;
             }
-
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-            var txtmsg = string.Format(sms.GetMessage("ControlNumber"),1,2,3);
-
-            List<SmsContainer> message = new List<SmsContainer>();
-            message.Add(new SmsContainer() { Message = "Your Request for control number was Sent", Recepients = "+255767057265" });
-
-            string test = await sms.PushSMS(message);
             
             return return_message;
         }
@@ -80,7 +87,7 @@ namespace ImisRestApi.Logic
             var response = payment.Match(model);
 
             List<SmsContainer> message = new List<SmsContainer>();
-            message.Add(new SmsContainer() { Message = "Your Payment has been Matched", Recepients = "+255767057265" });
+            message.Add(new SmsContainer() { Message = "Your Payment has been Matched", Recepient = "+255767057265" });
 
             ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
             string test = await sms.PushSMS(message);

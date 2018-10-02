@@ -1,0 +1,1 @@
+﻿The payment {0} performed on {1} for the control number {2} received  but the policies in the set containing  the family/group {3} - {4} with the insurance product {5} - {6}  cannot be matched for time being.

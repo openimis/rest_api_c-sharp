@@ -1,1 +1,1 @@
-﻿InsuranceId: {0}  ProductCode: {1} Error Message: {2}
+﻿The control number {0} cannot be assigned for the request issued on {1} at  {2} for payment of the set of policies containing the family/group {3}  with the insurance product {4} .   The reason is {5}

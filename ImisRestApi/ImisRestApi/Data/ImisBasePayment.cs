@@ -23,6 +23,11 @@ namespace ImisRestApi.Data
     {
         public string PaymentId { get; set; }
         public decimal ExpectedAmount { get; set; }
+        public DateTime EffectiveDate { get; set; }
+        public DateTime ExpiryDate { get; set; }
+        public DateTime PaymentDate { get; set; }
+        public decimal PaidAmount { get; set; }
+        public List<InsureeProduct> InsureeProducts { get; set; }
 
         protected IConfiguration Configuration;
         protected readonly IHostingEnvironment _hostingEnvironment;
@@ -62,7 +67,7 @@ namespace ImisRestApi.Data
 
             ControlNumberResp response = new ControlNumberResp() {
                 PaymentId = PaymentId,
-                ControlNumber = controlNumber,
+                ControlNumber = "233332",
                 RequestAcknowledged = acknowledge,
                 ErrorMessage = "",
                 ErrorOccured = error

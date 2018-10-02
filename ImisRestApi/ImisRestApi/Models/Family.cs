@@ -22,13 +22,13 @@ namespace ImisRestApi.Models
         /// An insuree number belonging to the head of a family
         /// </summary>
         [Required]
-        [MaxLength(11, ErrorMessage = "The village Code must be 11 characters long.")]
+        [MaxLength(11, ErrorMessage = "The HeadOf Family Id must be 11 characters long.")]
         public string HeadOfFamilyId { get; set; }
         [Required]
-        [MaxLength(20, ErrorMessage = "The village Code must be 20 characters long.")]
+        [MaxLength(20, ErrorMessage = "OtherName must be 20 characters long.")]
         public string OtherName { get; set; }
         [Required]
-        [MaxLength(20, ErrorMessage = "The village Code must be 20 characters long.")]
+        [MaxLength(20, ErrorMessage = "LastName must be 20 characters long.")]
         public string LastName { get; set; }
         [Required]
         public DateTime BirthDate { get; set; }
