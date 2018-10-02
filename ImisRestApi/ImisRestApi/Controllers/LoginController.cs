@@ -23,7 +23,8 @@ namespace ImisRestApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(LoginModel model)
+        [Route("login")]
+        public IActionResult Index([FromBody]LoginModel model)
         {
             IActionResult response = Unauthorized();
 
