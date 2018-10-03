@@ -23,8 +23,8 @@ namespace ImisRestApi.Data
     {
         public string PaymentId { get; set; }
         public decimal ExpectedAmount { get; set; }
-        public DateTime EffectiveDate { get; set; }
-        public DateTime ExpiryDate { get; set; }
+        public string ControlNum { get; set; }
+
         public DateTime PaymentDate { get; set; }
         public decimal PaidAmount { get; set; }
         public List<InsureeProduct> InsureeProducts { get; set; }
@@ -240,7 +240,6 @@ namespace ImisRestApi.Data
                     break;
             }
         }
-
       
         public DataMessage SaveControlNumberAkn(bool Success, string Comment)
         {
@@ -359,9 +358,76 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public bool Valid(string InsureeNumber, string ProductCode)
+        public void GetPaymentInfo(string Id)
         {
-            return false;
+            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
+                        tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,
+                        tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus
+                        FROM tblControlNumber 
+                        RIGHT OUTER JOIN tblInsuree 
+                        RIGHT OUTER JOIN tblProduct 
+                        RIGHT OUTER JOIN tblPayment 
+                        INNER JOIN tblPaymentDetails 
+                        ON tblPayment.PaymentID = tblPaymentDetails.PaymentID 
+                        ON tblProduct.ProductCode = tblPaymentDetails.ProductCode 
+                        ON tblInsuree.CHFID = tblPaymentDetails.InsuranceNumber 
+                        ON tblControlNumber.PaymentID = tblPayment.PaymentID 
+                        LEFT OUTER JOIN tblPremium 
+                        LEFT OUTER JOIN tblPolicy 
+                        ON tblPremium.PolicyID = tblPolicy.PolicyID 
+                        ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
+                        WHERE (tblPayment.PaymentID = @PaymentID) AND (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", Id)
+            };
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+               
+                if (data.Rows.Count > 0)
+                {
+                    var row1 = data.Rows[0];
+                    PaymentId = Id;
+                    ControlNum = Convert.ToString(row1["ControlNumber"]);
+                    ExpectedAmount = Convert.ToDecimal(row1["ExpectedAmount"]);
+                    PaymentDate = Convert.ToDateTime(row1["PaymentDate"]);
+                    PaidAmount = Convert.ToDecimal(row1["ReceivedAmount"]);
+                    InsureeProducts = new List<InsureeProduct>();
+
+                    for (int i = 0; i < data.Rows.Count; i++)
+                    {
+                        var rw = data.Rows[i];
+
+                        bool active = false;
+
+                        if (Convert.ToInt32(rw["PolicyStatus"]) == 1) {
+                            active = true;
+                        }
+
+                        InsureeProducts.Add(
+                                new InsureeProduct()
+                                {
+                                    InsureeNumber = Convert.ToString("InsuranceNumber"),
+                                    InsureeName = Convert.ToString(rw["OtherNames"]) + Convert.ToString(rw["LastName"]),
+                                    ProductName = Convert.ToString(rw["ProductName"]),
+                                    ProductCode = Convert.ToString(rw["ProductCode"]),
+                                    ExpiryDate = Convert.ToDateTime(rw["ExpiryDate"]),
+                                    EffectiveDate = Convert.ToDateTime(rw["EffectiveDate"]),
+                                    PolicyActivated = active
+                                }
+                            );
+                        
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
         }
     }
 }

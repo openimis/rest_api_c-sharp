@@ -28,7 +28,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Validate_Credentials([FromBody]UserLogin userlogin)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             ValidateCredentialsResponse response = new ValidateCredentialsResponse();
 

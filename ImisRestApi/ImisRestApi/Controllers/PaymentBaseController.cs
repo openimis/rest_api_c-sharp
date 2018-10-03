@@ -39,7 +39,7 @@ namespace ImisRestApi.Controllers
         public virtual async Task<IActionResult> Match([FromBody]MatchModel model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new { error_occured = false, error_message = ModelState.Values.FirstOrDefault().Errors});
+                return BadRequest(new { error_occured = true, error_message = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage });
 
             var response = await _payment.Match(model);           
            

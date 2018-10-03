@@ -42,12 +42,12 @@ namespace ImisRestApi.Controllers
                     }
                     else
                     {
-                        response = new GetCoverageResponse(2, false).Message;
+                        response = new GetCoverageResponse(2, true).Message;
                     }
                 }
                 else
                 {
-                    response = new GetCoverageResponse(1, false).Message;
+                    response = new GetCoverageResponse(1, true).Message;
                 }
 
               

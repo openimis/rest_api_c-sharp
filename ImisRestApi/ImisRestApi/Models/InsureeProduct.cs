@@ -1,4 +1,6 @@
-﻿namespace ImisRestApi.Models
+﻿using System;
+
+namespace ImisRestApi.Models
 {
     public class InsureeProduct
     {
@@ -6,5 +8,8 @@
         public string InsureeName { get; set; }
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
+        public DateTime EffectiveDate { get; set; }
+        public DateTime ExpiryDate { get; set; }
+        public bool PolicyActivated { get; set; }
     }
 }

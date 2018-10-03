@@ -53,7 +53,7 @@ namespace ImisRestApi.Controllers
                 }
                 else
                 {
-                    response = new GetFamilyResponse(1, false).Message;
+                    response = new GetFamilyResponse(1, true).Message;
                 }
                 
             }
@@ -88,12 +88,12 @@ namespace ImisRestApi.Controllers
                     }
                     else
                     {
-                        response = new GetMemberFamilyResponse(2, false).Message;
+                        response = new GetMemberFamilyResponse(2, true).Message;
                     }
                 }
                 else
                 {
-                    response = new GetMemberFamilyResponse(1, false).Message;
+                    response = new GetMemberFamilyResponse(1, true).Message;
                 }
 
             }
@@ -110,7 +110,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Enter_Family([FromBody]Family model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.AddNew(model);
 
@@ -123,7 +126,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Enter_Member_Family([FromBody]FamilyMamber model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.AddMamber(model);
 
@@ -136,7 +142,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Edit_Family([FromBody]Family model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.Edit(model);
 
@@ -149,7 +158,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Edit_Member_Family([FromBody]FamilyMamber model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.EditMamber(model);
 
@@ -162,7 +174,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Delete_Member_Family([FromBody]string insureeNumber)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.DeleteMamber(insureeNumber);
 
@@ -176,7 +191,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Enquire([FromBody]Enquire model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.Enquire(model.chfid);
             var jsonResponse = JsonConvert.SerializeObject(response);

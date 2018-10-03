@@ -46,12 +46,13 @@ namespace ImisRestApi.Logic
 
                     ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
                     var txtmsg = string.Format(sms.GetMessage("ControlNumberAssigned"),
-                        response.ControlNumber,
+                        payment.ControlNum,
                         DateTime.UtcNow.ToLongDateString(),
                         DateTime.UtcNow.ToLongTimeString(),
-                        intent.PaymentDetails.FirstOrDefault().InsureeNumber,
-                        intent.PaymentDetails.FirstOrDefault().InsureeNumber,
-                        intent.PaymentDetails.FirstOrDefault().ProductCode,
+                        payment.InsureeProducts.FirstOrDefault().InsureeNumber,
+                        payment.InsureeProducts.FirstOrDefault().InsureeName,
+                        payment.InsureeProducts.FirstOrDefault().ProductCode,
+                        payment.InsureeProducts.FirstOrDefault().ProductName,
                         payment.ExpectedAmount);
 
                     List<SmsContainer> message = new List<SmsContainer>();
@@ -66,6 +67,20 @@ namespace ImisRestApi.Logic
                 else if (response.ErrorOccured == true)
                 {
                     return_message = payment.SaveControlNumberAkn(!response.ErrorOccured,response.ErrorMessage);
+
+                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+                    var txtmsg = string.Format(sms.GetMessage("ControlNumberError"),
+                        payment.ControlNum,
+                        DateTime.UtcNow.ToLongDateString(),
+                        DateTime.UtcNow.ToLongTimeString(),
+                        payment.InsureeProducts.FirstOrDefault().InsureeNumber,
+                        payment.InsureeProducts.FirstOrDefault().ProductCode,
+                        response.ErrorMessage);
+
+                    List<SmsContainer> message = new List<SmsContainer>();
+                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = intent.PhoneNumber });
+
+                    string test = await sms.PushSMS(message);
                 }
                 else
                 {
@@ -109,6 +124,49 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
             var response = payment.SavePayment(model,controlNumberExists);
+
+            if(model.EnrolmentOfficerCode == null)
+            {
+                var familyproduct = payment.InsureeProducts.FirstOrDefault();
+
+                if (familyproduct.PolicyActivated)
+                {
+                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+                    var txtmsg = string.Format(sms.GetMessage("PaidAndActivated"),
+                        payment.PaymentId,
+                        DateTime.UtcNow.ToLongDateString(),
+                        payment.ControlNum,
+                        familyproduct.InsureeNumber,
+                        familyproduct.InsureeName,
+                        familyproduct.ProductCode,
+                        familyproduct.ProductName,
+                        familyproduct.EffectiveDate,
+                        familyproduct.ExpiryDate,
+                        payment.PaidAmount);
+
+                    List<SmsContainer> message = new List<SmsContainer>();
+                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = "" });
+
+                }
+                else
+                {
+                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+                    var txtmsg = string.Format(sms.GetMessage("PaidAndNotActivated"),
+                        payment.PaymentId,
+                        DateTime.UtcNow.ToLongDateString(),
+                        payment.ControlNum,
+                        familyproduct.InsureeNumber,
+                        familyproduct.InsureeName,
+                        familyproduct.ProductCode,
+                        familyproduct.ProductName,
+                        payment.PaidAmount,
+                        payment.PaidAmount);
+
+                    List<SmsContainer> message = new List<SmsContainer>();
+                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = "" });
+
+                }
+            }
 
             return response;
         }

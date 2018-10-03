@@ -26,7 +26,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Enter_Contribution([FromBody]Contribution model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = contribution.Enter(model);
 
