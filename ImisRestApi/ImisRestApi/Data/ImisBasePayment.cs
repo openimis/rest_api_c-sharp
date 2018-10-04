@@ -24,9 +24,10 @@ namespace ImisRestApi.Data
         public string PaymentId { get; set; }
         public decimal ExpectedAmount { get; set; }
         public string ControlNum { get; set; }
+        public string PhoneNumber { get; set; }
 
-        public DateTime PaymentDate { get; set; }
-        public decimal PaidAmount { get; set; }
+        public DateTime? PaymentDate { get; set; }
+        public decimal? PaidAmount { get; set; }
         public List<InsureeProduct> InsureeProducts { get; set; }
 
         protected IConfiguration Configuration;
@@ -51,7 +52,7 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspRequestGetControlNumber", sqlParameters);
-
+                GetPaymentInfo(BillId);
             }
             catch (Exception e)
             {
@@ -129,6 +130,7 @@ namespace ImisRestApi.Data
                 PaymentId = data[0].Value.ToString();
                 ExpectedAmount = decimal.Parse(data[1].Value.ToString());
                 message = new SaveIntentResponse(rv, error).Message;
+                GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
             {
@@ -153,6 +155,7 @@ namespace ImisRestApi.Data
             {
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
             {
@@ -178,6 +181,7 @@ namespace ImisRestApi.Data
             {
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                GetPaymentInfo(model.PaymentId);
             }
             catch (Exception e)
             {
@@ -205,6 +209,7 @@ namespace ImisRestApi.Data
                 {
                     result = true;
                 }
+                GetPaymentInfo(PaymentID);
             }
             catch (Exception e)
             {
@@ -260,6 +265,7 @@ namespace ImisRestApi.Data
             {
                 var data = dh.ExecProcedure("uspAcknowledgeControlNumberRequest", sqlParameters);
                 message = new SaveAckResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
             {
@@ -308,6 +314,7 @@ namespace ImisRestApi.Data
             {
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
                 message = new SavePayResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                GetPaymentInfo(payment.PaymentId);
             }
             catch (Exception e)
             {
@@ -347,8 +354,10 @@ namespace ImisRestApi.Data
                 {
                     error = true;
                 }
+
                 
                 message = new ImisApiResponse(0,error,dt).Message;
+                GetPaymentInfo(model.PaymentId.ToString());
             }
             catch (Exception e)
             {
@@ -361,7 +370,7 @@ namespace ImisRestApi.Data
         public void GetPaymentInfo(string Id)
         {
             var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
-                        tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,
+                        tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
                         tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus
                         FROM tblControlNumber 
                         RIGHT OUTER JOIN tblInsuree 
@@ -392,8 +401,9 @@ namespace ImisRestApi.Data
                     PaymentId = Id;
                     ControlNum = Convert.ToString(row1["ControlNumber"]);
                     ExpectedAmount = Convert.ToDecimal(row1["ExpectedAmount"]);
-                    PaymentDate = Convert.ToDateTime(row1["PaymentDate"]);
-                    PaidAmount = Convert.ToDecimal(row1["ReceivedAmount"]);
+                    PhoneNumber = Convert.ToString(row1["PhoneNumber"]);
+                    PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
+                    PaidAmount = (decimal?)(row1["ReceivedAmount"] != System.DBNull.Value ? row1["ReceivedAmount"] : null);
                     InsureeProducts = new List<InsureeProduct>();
 
                     for (int i = 0; i < data.Rows.Count; i++)
@@ -402,7 +412,7 @@ namespace ImisRestApi.Data
 
                         bool active = false;
 
-                        if (Convert.ToInt32(rw["PolicyStatus"]) == 1) {
+                        if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 1) {
                             active = true;
                         }
 
@@ -413,8 +423,8 @@ namespace ImisRestApi.Data
                                     InsureeName = Convert.ToString(rw["OtherNames"]) + Convert.ToString(rw["LastName"]),
                                     ProductName = Convert.ToString(rw["ProductName"]),
                                     ProductCode = Convert.ToString(rw["ProductCode"]),
-                                    ExpiryDate = Convert.ToDateTime(rw["ExpiryDate"]),
-                                    EffectiveDate = Convert.ToDateTime(rw["EffectiveDate"]),
+                                    ExpiryDate = (DateTime?)(rw["ExpiryDate"] != System.DBNull.Value?rw["ExpiryDate"] :null),
+                                    EffectiveDate = (DateTime?)(rw["EffectiveDate"] != System.DBNull.Value ? rw["EffectiveDate"] : null),
                                     PolicyActivated = active
                                 }
                             );

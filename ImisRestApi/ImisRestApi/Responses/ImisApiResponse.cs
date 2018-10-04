@@ -21,6 +21,9 @@ namespace ImisRestApi.Responses
 
         public ImisApiResponse(int value,bool error)
         {
+            if (value != 0)
+                error = true;
+
             msg.Code = value;
             msg.ErrorOccured = error;
             Message = msg;
@@ -29,6 +32,9 @@ namespace ImisRestApi.Responses
 
         public ImisApiResponse(int value, bool error, DataTable data)
         {
+            if (value != 0)
+                error = true;
+
             msg.Code = value;
             msg.ErrorOccured = error;
             msg.Data = JsonConvert.SerializeObject(data);

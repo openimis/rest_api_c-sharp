@@ -44,21 +44,13 @@ namespace ImisRestApi.Logic
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
                     return_message = payment.SaveControlNumber(response.ControlNumber,controlNumberExists);
 
-                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-                    var txtmsg = string.Format(sms.GetMessage("ControlNumberAssigned"),
-                        payment.ControlNum,
-                        DateTime.UtcNow.ToLongDateString(),
-                        DateTime.UtcNow.ToLongTimeString(),
-                        payment.InsureeProducts.FirstOrDefault().InsureeNumber,
-                        payment.InsureeProducts.FirstOrDefault().InsureeName,
-                        payment.InsureeProducts.FirstOrDefault().ProductCode,
-                        payment.InsureeProducts.FirstOrDefault().ProductName,
-                        payment.ExpectedAmount);
-
-                    List<SmsContainer> message = new List<SmsContainer>();
-                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = intent.PhoneNumber });
-
-                    string test = await sms.PushSMS(message);
+                    if (!return_message.ErrorOccured && controlNumberExists) {
+                        ControlNumberAssignedSms(payment);
+                    }
+                    else
+                    {
+                        ControlNumberNotassignedSms(payment,return_message.MessageValue);
+                    }
                 }
                 else if (response.RequestAcknowledged == true)
                 {
@@ -67,20 +59,8 @@ namespace ImisRestApi.Logic
                 else if (response.ErrorOccured == true)
                 {
                     return_message = payment.SaveControlNumberAkn(!response.ErrorOccured,response.ErrorMessage);
-
-                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-                    var txtmsg = string.Format(sms.GetMessage("ControlNumberError"),
-                        payment.ControlNum,
-                        DateTime.UtcNow.ToLongDateString(),
-                        DateTime.UtcNow.ToLongTimeString(),
-                        payment.InsureeProducts.FirstOrDefault().InsureeNumber,
-                        payment.InsureeProducts.FirstOrDefault().ProductCode,
-                        response.ErrorMessage);
-
-                    List<SmsContainer> message = new List<SmsContainer>();
-                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = intent.PhoneNumber });
-
-                    string test = await sms.PushSMS(message);
+                    ControlNumberNotassignedSms(payment,response.ErrorMessage);
+                   
                 }
                 else
                 {
@@ -101,14 +81,12 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.Match(model);
 
-            List<SmsContainer> message = new List<SmsContainer>();
-            message.Add(new SmsContainer() { Message = "Your Payment has been Matched", Recepient = "+255767057265" });
-
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-            string test = await sms.PushSMS(message);
+            SendMatchSms(payment);
 
             return response;
         }
+
+        
 
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
@@ -127,49 +105,11 @@ namespace ImisRestApi.Logic
 
             if(model.EnrolmentOfficerCode == null)
             {
-                var familyproduct = payment.InsureeProducts.FirstOrDefault();
-
-                if (familyproduct.PolicyActivated)
-                {
-                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-                    var txtmsg = string.Format(sms.GetMessage("PaidAndActivated"),
-                        payment.PaymentId,
-                        DateTime.UtcNow.ToLongDateString(),
-                        payment.ControlNum,
-                        familyproduct.InsureeNumber,
-                        familyproduct.InsureeName,
-                        familyproduct.ProductCode,
-                        familyproduct.ProductName,
-                        familyproduct.EffectiveDate,
-                        familyproduct.ExpiryDate,
-                        payment.PaidAmount);
-
-                    List<SmsContainer> message = new List<SmsContainer>();
-                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = "" });
-
-                }
-                else
-                {
-                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-                    var txtmsg = string.Format(sms.GetMessage("PaidAndNotActivated"),
-                        payment.PaymentId,
-                        DateTime.UtcNow.ToLongDateString(),
-                        payment.ControlNum,
-                        familyproduct.InsureeNumber,
-                        familyproduct.InsureeName,
-                        familyproduct.ProductCode,
-                        familyproduct.ProductName,
-                        payment.PaidAmount,
-                        payment.PaidAmount);
-
-                    List<SmsContainer> message = new List<SmsContainer>();
-                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = "" });
-
-                }
+                SendPaymentSms(payment);
             }
 
             return response;
-        }
+        }      
 
         public DataMessage SaveControlNumber(ControlNumberResp model)
         {
@@ -178,6 +118,148 @@ namespace ImisRestApi.Logic
             var response = payment.SaveControlNumber(model,controlNumberExists);
 
             return response;
+        }
+
+        public async void ControlNumberAssignedSms(ImisPayment payment)
+        {
+
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            var txtmsgTemplate = string.Empty;
+            string othersCount = string.Empty;
+
+            if (payment.InsureeProducts.Count > 1)
+            {
+                txtmsgTemplate = sms.GetMessage("ControlNumberAssignedV2");
+                othersCount = Convert.ToString(payment.InsureeProducts.Count - 1);
+            }
+            else
+            {
+                txtmsgTemplate = sms.GetMessage("ControlNumberAssigned");
+            }
+            var txtmsg = string.Format(txtmsgTemplate,
+                payment.ControlNum,
+                DateTime.UtcNow.ToLongDateString(),
+                DateTime.UtcNow.ToLongTimeString(),
+                payment.InsureeProducts.FirstOrDefault().InsureeNumber,
+                payment.InsureeProducts.FirstOrDefault().InsureeName,
+                payment.InsureeProducts.FirstOrDefault().ProductCode,
+                payment.InsureeProducts.FirstOrDefault().ProductName,
+                payment.ExpectedAmount,
+                othersCount);
+
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+
+            string test = await sms.PushSMS(message);
+        }
+
+        public async void ControlNumberNotassignedSms(ImisPayment payment,string error)
+        {
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            var txtmsgTemplate = string.Empty;
+            string othersCount = string.Empty;
+
+            if (payment.InsureeProducts.Count > 1)
+            {
+                txtmsgTemplate = sms.GetMessage("ControlNumberErrorV2");
+                othersCount = Convert.ToString(payment.InsureeProducts.Count - 1);
+            }
+            else
+            {
+                txtmsgTemplate = sms.GetMessage("ControlNumberError");
+            }
+
+            var txtmsg = string.Format(txtmsgTemplate,
+                payment.ControlNum,
+                DateTime.UtcNow.ToLongDateString(),
+                DateTime.UtcNow.ToLongTimeString(),
+                payment.InsureeProducts.FirstOrDefault().InsureeNumber,
+                payment.InsureeProducts.FirstOrDefault().ProductCode,
+                error);
+
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+
+            string test = await sms.PushSMS(message);
+        }
+
+        public async void SendPaymentSms(ImisPayment payment)
+        {
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            List<SmsContainer> message = new List<SmsContainer>();
+            var familyproduct = payment.InsureeProducts.FirstOrDefault();
+
+            if (familyproduct.PolicyActivated)
+            {
+                
+                var txtmsg = string.Format(sms.GetMessage("PaidAndActivated"),
+                    payment.PaymentId,
+                    DateTime.UtcNow.ToLongDateString(),
+                    payment.ControlNum,
+                    familyproduct.InsureeNumber,
+                    familyproduct.InsureeName,
+                    familyproduct.ProductCode,
+                    familyproduct.ProductName,
+                    familyproduct.EffectiveDate,
+                    familyproduct.ExpiryDate,
+                    payment.PaidAmount);
+
+                
+                message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+
+            }
+            else
+            {
+
+                var txtmsg = string.Format(sms.GetMessage("PaidAndNotActivated"),
+                    payment.PaymentId,
+                    DateTime.UtcNow.ToLongDateString(),
+                    payment.ControlNum,
+                    familyproduct.InsureeNumber,
+                    familyproduct.InsureeName,
+                    familyproduct.ProductCode,
+                    familyproduct.ProductName,
+                    payment.PaidAmount,
+                    payment.PaidAmount);
+
+                message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+
+            }
+
+            string test = await sms.PushSMS(message);
+        }
+
+        public async void SendMatchSms(ImisPayment payment)
+        {
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            List<SmsContainer> message = new List<SmsContainer>();
+
+            var txtmsgTemplate = string.Empty;
+            string othersCount = string.Empty;
+
+            if (payment.InsureeProducts.Count > 1)
+            {
+                txtmsgTemplate = sms.GetMessage("PaidAndNotMatchedV2");
+                othersCount = Convert.ToString(payment.InsureeProducts.Count - 1);
+            }
+            else
+            {
+                txtmsgTemplate = sms.GetMessage("PaidAndNotMatched");
+            }
+            var familyproduct = payment.InsureeProducts.FirstOrDefault();
+            var txtmsg = string.Format(txtmsgTemplate,
+                     payment.PaymentId,
+                     DateTime.UtcNow.ToLongDateString(),
+                     payment.ControlNum,
+                     familyproduct.InsureeNumber,
+                     familyproduct.InsureeName,
+                     familyproduct.ProductCode,
+                     familyproduct.ProductName,
+                     othersCount);
+
+
+            message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+            string test = await sms.PushSMS(message);
         }
     }
 }

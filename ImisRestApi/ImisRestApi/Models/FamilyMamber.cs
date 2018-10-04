@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.ImisAttributes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ImisRestApi.Models
@@ -6,10 +7,10 @@ namespace ImisRestApi.Models
     public class FamilyMamber
     {
         [Required]
-        [MaxLength(11)]
+        [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number  of member")]
         public string InsureeNumber { get; set; }
         [Required]
-        [MaxLength(11)]
+        [InsureeNumber]
         public string HeadInsureeNumber { get; set; }
         [Required]
         public string OtherName { get; set; }

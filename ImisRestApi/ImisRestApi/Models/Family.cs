@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.ImisAttributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,24 +16,23 @@ namespace ImisRestApi.Models
         /// <summary>
         /// 4 digit string that represents a village
         /// </summary>
-        [Required]
-        [MaxLength(11, ErrorMessage = "The village Code must be 11 characters long.")]
+        [Required(ErrorMessage = "3:Wrong or missing permanent village code")]
         public string VillageCode { get; set; }
         /// <summary>
         /// An insuree number belonging to the head of a family
         /// </summary>
         [Required]
-        [MaxLength(11, ErrorMessage = "The HeadOf Family Id must be 11 characters long.")]
+        [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number of head")]
         public string HeadOfFamilyId { get; set; }
-        [Required]
-        [MaxLength(20, ErrorMessage = "OtherName must be 20 characters long.")]
+        [Required(ErrorMessage = "8:Missing other name ")]
         public string OtherName { get; set; }
-        [Required]
-        [MaxLength(20, ErrorMessage = "LastName must be 20 characters long.")]
+        [Required(ErrorMessage = "7:Missing last name ")]
         public string LastName { get; set; }
-        [Required]
-        public DateTime BirthDate { get; set; }
-        [Required]
+        
+        [Required(ErrorMessage = "6:Wrong format or missing birth date")]
+        [ValidDate]
+        public string BirthDate { get; set; }
+        [Required(ErrorMessage = "5:Wrong or missing  gender")]
         public Gender Gender { get; set; }
         
         public bool PovertyStatus { get; set; }
