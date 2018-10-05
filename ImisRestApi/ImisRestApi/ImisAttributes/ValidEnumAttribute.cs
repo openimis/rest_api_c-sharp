@@ -4,35 +4,32 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace ImisRestApi.ImisAttributes
 {
     [AttributeUsage(AttributeTargets.Property, Inherited = false)]
-    public class ValidDateAttribute : ValidationAttribute
+    public class ValidEnumAttribute : ValidationAttribute
     {
-        public ValidDateAttribute()
+        public Type _type;
+
+        public ValidEnumAttribute(Type type)
         {
-
+            _type = type;
         }
-
-
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value == null)
-                return ValidationResult.Success;
-
             try
             {
-                Convert.ToDateTime(value.ToString());
+                Convert.ChangeType(value,_type);
                 return ValidationResult.Success;
             }
             catch (Exception)
             {
 
-                return new ValidationResult("6:Wrong format or missing birth date");
+                return new ValidationResult("Error");
             }
-           
+
 
         }
     }
+
 }

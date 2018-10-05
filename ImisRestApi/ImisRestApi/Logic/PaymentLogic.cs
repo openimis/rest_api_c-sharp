@@ -117,6 +117,15 @@ namespace ImisRestApi.Logic
             var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
             var response = payment.SaveControlNumber(model,controlNumberExists);
 
+            if (!response.ErrorOccured && controlNumberExists)
+            {
+                ControlNumberAssignedSms(payment);
+            }
+            else
+            {
+                ControlNumberNotassignedSms(payment, response.MessageValue);
+            }
+
             return response;
         }
 
@@ -193,7 +202,7 @@ namespace ImisRestApi.Logic
             {
                 
                 var txtmsg = string.Format(sms.GetMessage("PaidAndActivated"),
-                    payment.PaymentId,
+                    payment.PaidAmount,
                     DateTime.UtcNow.ToLongDateString(),
                     payment.ControlNum,
                     familyproduct.InsureeNumber,
@@ -212,15 +221,15 @@ namespace ImisRestApi.Logic
             {
 
                 var txtmsg = string.Format(sms.GetMessage("PaidAndNotActivated"),
-                    payment.PaymentId,
+                    payment.PaidAmount,
                     DateTime.UtcNow.ToLongDateString(),
                     payment.ControlNum,
                     familyproduct.InsureeNumber,
                     familyproduct.InsureeName,
                     familyproduct.ProductCode,
                     familyproduct.ProductName,
-                    payment.PaidAmount,
-                    payment.PaidAmount);
+                    payment.ExpectedAmount,
+                    payment.ExpectedAmount - payment.PaidAmount);
 
                 message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
 

@@ -1,31 +1,31 @@
 ﻿using ImisRestApi.ImisAttributes;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ImisRestApi.Models
 {
-    public class FamilyMamber
+    public class EditFamily
     {
-        [Required]
-        [InsureeNumber(ErrorMessage = "3:Wrong format or missing insurance number  of member")]
-        public string InsureeNumber { get; set; }
-        [Required]
+        public string VillageCode { get; set; }
+        [Required(ErrorMessage = "1:Wrong format or missing insurance number of head")]
         [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number of head")]
-        public string HeadInsureeNumber { get; set; }
-        [Required(ErrorMessage = "7:Missing other name")]
+        public string HeadOfFamilyId { get; set; }
         public string OtherName { get; set; }
-        [Required(ErrorMessage = "6:Missing last name")]
         public string LastName { get; set; }
-        [Required(ErrorMessage = "5:Wrong format or missing birth date")]
-        [ValidDate]
-        public DateTime BirthDate { get; set; }
-        [StringLength(1, ErrorMessage = "11:Wrong marital status")]
+        [ValidDate(ErrorMessage = "6:Wrong format or missing birth date")]
+        public string BirthDate { get; set; }
         public string Gender { get; set; }
-
-        public string Relationship { get; set; }
+        public bool PovertyStatus { get; set; }
+        public string ConfirmationType { get; set; }
+        public string GroupType { get; set; }
+        public string ConfrimationNo { get; set; }
+        public string PermanentAddressDetails { get; set; }
         [StringLength(1, ErrorMessage = "11:Wrong marital status")]
         public string MaritalStatus { get; set; }
-        public bool Beneficiary_Card { get; set; }
+        public bool BeneficiaryCard { get; set; }
         public string CurrentVillageCode { get; set; }
         public string CurrentAddressDetails { get; set; }
         public string Profession { get; set; }

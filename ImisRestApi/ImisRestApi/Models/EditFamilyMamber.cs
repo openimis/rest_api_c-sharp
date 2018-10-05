@@ -1,23 +1,20 @@
 ﻿using ImisRestApi.ImisAttributes;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ImisRestApi.Models
 {
-    public class FamilyMamber
+    public class EditFamilyMamber
     {
         [Required]
         [InsureeNumber(ErrorMessage = "3:Wrong format or missing insurance number  of member")]
         public string InsureeNumber { get; set; }
-        [Required]
-        [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number of head")]
-        public string HeadInsureeNumber { get; set; }
-        [Required(ErrorMessage = "7:Missing other name")]
         public string OtherName { get; set; }
-        [Required(ErrorMessage = "6:Missing last name")]
         public string LastName { get; set; }
-        [Required(ErrorMessage = "5:Wrong format or missing birth date")]
-        [ValidDate]
+        [ValidDate(ErrorMessage = "5:Wrong format or missing birth date")]
         public DateTime BirthDate { get; set; }
         [StringLength(1, ErrorMessage = "11:Wrong marital status")]
         public string Gender { get; set; }

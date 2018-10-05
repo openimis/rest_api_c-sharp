@@ -53,7 +53,6 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-
                 throw e;
             }
             
@@ -186,13 +185,13 @@ namespace ImisRestApi.Data
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", Convert.ToDateTime(model.BirthDate)),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@PovertyStatus", model.PovertyStatus),
                 new SqlParameter("@ConfirmationType", model.ConfirmationType),
                 new SqlParameter("@GroupType", model.GroupType),
               //  new SqlParameter("@ConfrimationNo", model.ConfrimationNo),
                 new SqlParameter("@PermanentAddress", model.PermanentAddressDetails),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.BeneficiaryCard),
                 new SqlParameter("@CurrentVillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),
@@ -223,7 +222,7 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public DataMessage Edit(Family model)
+        public DataMessage Edit(EditFamily model)
         {
 
             DataHelper helper = new DataHelper(Configuration);
@@ -234,13 +233,13 @@ namespace ImisRestApi.Data
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", Convert.ToDateTime(model.BirthDate)),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@PovertyStatus", model.PovertyStatus),
                 new SqlParameter("@ConfirmationType", model.ConfirmationType),
                // new SqlParameter("@GroupType", model.GroupType),
                // new SqlParameter("@ConfrimationNo", model.ConfrimationNo),
                 new SqlParameter("@PermanentAddress", model.PermanentAddressDetails),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.BeneficiaryCard),
                 new SqlParameter("@VillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),
@@ -280,9 +279,9 @@ namespace ImisRestApi.Data
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@Relationship", model.Relationship),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.Beneficiary_Card),
                 new SqlParameter("@VillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),
@@ -312,7 +311,7 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public DataMessage EditMamber(FamilyMamber model)
+        public DataMessage EditMamber(EditFamilyMamber model)
         {
             DataHelper helper = new DataHelper(Configuration);
 
@@ -322,9 +321,9 @@ namespace ImisRestApi.Data
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@Gender", model.Gender),
                // new SqlParameter("@Relationship", model.Relationship),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus",model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.Beneficiary_Card),
                 new SqlParameter("@VillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),

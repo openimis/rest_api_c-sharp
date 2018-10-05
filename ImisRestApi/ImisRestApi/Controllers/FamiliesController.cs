@@ -1,5 +1,6 @@
 ﻿using ImisRestApi.Chanels.Sms;
 using ImisRestApi.Data;
+using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Sms;
 using ImisRestApi.Responses;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -139,7 +141,7 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/Families/Edit_Family")]
-        public IActionResult Edit_Family([FromBody]Family model)
+        public IActionResult Edit_Family([FromBody]EditFamily model)
         {
             if (!ModelState.IsValid)
             {
@@ -155,7 +157,7 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/Families/Edit_Member_Family")]
-        public IActionResult Edit_Member_Family([FromBody]FamilyMamber model)
+        public IActionResult Edit_Member_Family([FromBody]EditFamilyMamber model)
         {
             if (!ModelState.IsValid)
             {
@@ -173,10 +175,9 @@ namespace ImisRestApi.Controllers
         [Route("api/Families/Delete_Member_Family")]
         public IActionResult Delete_Member_Family([FromBody]string insureeNumber)
         {
-            if (!ModelState.IsValid)
+            if (new ValidationBase().InsureeNumber(insureeNumber) != ValidationResult.Success)
             {
-                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
+                return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
             }
 
             var response = family.DeleteMamber(insureeNumber);
