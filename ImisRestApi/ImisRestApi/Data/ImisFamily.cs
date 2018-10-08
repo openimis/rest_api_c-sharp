@@ -161,12 +161,12 @@ namespace ImisRestApi.Data
             try
             {
                 var response = data.Procedure("uspAPIDeleteMemberFamily", parameters);
-                message = new EditFamilyResponse(response, false).Message;
+                message = new DeleteMamberFamilyResponse(response, false).Message;
             }
             catch (Exception e)
             {
 
-                message = new EditFamilyResponse(e).Message;
+                message = new DeleteMamberFamilyResponse(e).Message;
             }
 
 
@@ -232,7 +232,7 @@ namespace ImisRestApi.Data
                 //new SqlParameter("@LocationCode", model.HeadOfFamilyId),
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
-                new SqlParameter("@BirthDate", Convert.ToDateTime(model.BirthDate)),
+                new SqlParameter("@BirthDate", model.BirthDate),
                 new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@PovertyStatus", model.PovertyStatus),
                 new SqlParameter("@ConfirmationType", model.ConfirmationType),

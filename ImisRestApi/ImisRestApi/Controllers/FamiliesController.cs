@@ -186,30 +186,5 @@ namespace ImisRestApi.Controllers
 
         }
         
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("api/Enquire")]
-        public IActionResult Enquire([FromBody]Enquire model)
-        {
-            if (!ModelState.IsValid)
-            {
-                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
-            }
-
-            var response = family.Enquire(model.chfid);
-            var jsonResponse = JsonConvert.SerializeObject(response);
-            List<EnquireResponse> resp = JsonConvert.DeserializeObject<List<EnquireResponse>>(jsonResponse);
-
-            string msgString = "IMIS Insuree:"+ resp.FirstOrDefault().insureeName;
-
-            foreach (var item in resp)
-            {
-                msgString += item.productCode + " : " + item.status;
-            }
-
-            return Json(new { status = true,sms_reply=true,sms_text = resp });
-
-        }
     }
 }

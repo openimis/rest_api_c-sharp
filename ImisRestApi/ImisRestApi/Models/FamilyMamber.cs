@@ -18,7 +18,7 @@ namespace ImisRestApi.Models
         public string LastName { get; set; }
         [Required(ErrorMessage = "5:Wrong format or missing birth date")]
         [ValidDate]
-        public DateTime BirthDate { get; set; }
+        public string BirthDate { get; set; }
         [StringLength(1, ErrorMessage = "11:Wrong marital status")]
         public string Gender { get; set; }
 

@@ -44,6 +44,7 @@ namespace ImisRestApi.Controllers
 
                     if (data.Rows.Count > 0)
                     {
+                        
                         response = new GetCoverageResponse(0, false, data).Message;
 
                     }

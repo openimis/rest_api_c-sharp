@@ -65,10 +65,20 @@ namespace ImisRestApi.Data
         public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
             bool result = SaveControlNumberRequest(PaymentId,error);
+            string ctrlNumber = null;
+
+            //BEGIN Temporary Control Number Generator(Simulation For Testing Only)
+            var randomNumber = new Random().Next(100000, 999999);
+            
+            if(randomNumber%2 == 0)
+            {
+                ctrlNumber = randomNumber.ToString();
+            }
+            //END Temporary 
 
             ControlNumberResp response = new ControlNumberResp() {
                 PaymentId = PaymentId,
-                ControlNumber = "233332",
+                ControlNumber = ctrlNumber,
                 RequestAcknowledged = acknowledge,
                 ErrorMessage = "",
                 ErrorOccured = error
