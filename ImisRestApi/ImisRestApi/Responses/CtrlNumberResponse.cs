@@ -34,7 +34,12 @@ namespace ImisRestApi.Responses
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "1-Control number cannot be assigned by the external payment gateway ";
+                    msg.MessageValue = "1-Control number cannot be assigned by the external payment gateway";
+                    Message = msg;
+                    break;
+                case 2:
+                    msg.Code = value;
+                    msg.MessageValue = "2-Duplicate Control Number";
                     Message = msg;
                     break;
             }

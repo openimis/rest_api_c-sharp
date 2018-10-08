@@ -39,12 +39,25 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-
                 response_message = e.ToString();
             }
 
+            var msg = JsonConvert.SerializeObject(containers);
+            SaveMessage(msg);
+
             return response_message;
 
+        }
+
+        public virtual void SaveMessage(string message)
+        {
+            string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string namepart = new Random().Next(100000, 999999).ToString();
+
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "rest_api_messages"+namepart+".json")))
+            {
+                    outputFile.WriteLine(message);
+            }
         }
 
         public virtual string GetMessage(string filename)

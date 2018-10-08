@@ -44,7 +44,7 @@ namespace ImisRestApi.Logic
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
                     return_message = payment.SaveControlNumber(response.ControlNumber,controlNumberExists);
 
-                    if (!return_message.ErrorOccured && controlNumberExists) {
+                    if (!return_message.ErrorOccured && !controlNumberExists) {
                         ControlNumberAssignedSms(payment);
                     }
                     else
