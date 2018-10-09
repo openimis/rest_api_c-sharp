@@ -20,7 +20,7 @@ namespace ImisRestApi.Data
         }
         public DataTable Get(string insureeNumber)
         {
-            var sSQL = @"SELECT I.CHFID InsuranceNumber, I.OtherNames, I.LastName, I.DOB BirthDate, I.Gender, F.Poverty PoveryStatus, C.ConfirmationTypeCode ConfirmationType, F.ConfirmationNo ConfirmationNo, F.FamilyAddress PermanentAddress, I.Marital MaritalStatus, I.CardIssued BeneficiaryCard, l.LocationCode CurrentVillageCode, I.CurrentAddress CurrentAddress, P.Profession, I.Education,  I.Phone PhoneNumber,I.Email, I.TypeOfId IdentificationType, I.passport IdentificationNumber, HF.HFCode FSPCode  FROM tblFamilies F 
+            var sSQL = @"SELECT I.CHFID InsuranceNumber, I.OtherNames, I.LastName, I.DOB BirthDate, I.Gender, F.Poverty PoveryStatus, C.ConfirmationTypeCode ConfirmationType, F.FamilyType GroupType, F.FamilyAddress PermanentAddress, I.Marital MaritalStatus, I.CardIssued BeneficiaryCard, l.LocationCode CurrentVillageCode, I.CurrentAddress CurrentAddress, P.Profession, I.Education,  I.Phone PhoneNumber,I.Email, I.TypeOfId IdentificationType, I.passport IdentificationNumber, HF.HFCode FSPCode  FROM tblFamilies F 
                             LEFT OUTER JOIN tblInsuree I ON F.InsureeID = I.InsureeID
                             LEFT OUTER JOIN tblLocations L ON L.LocationId = F.LocationId
                             LEFT OUTER JOIN tblConfirmationTypes C ON C.ConfirmationTypeCode =F.ConfirmationType

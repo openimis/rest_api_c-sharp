@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -18,7 +19,11 @@ namespace ImisRestApi.Responses
         }
         public GetCoverageResponse(int value,bool error,DataTable data) : base(value,error,data)
         {
-
+            var firstRow = data.Rows[0];
+            var jsonString = JsonConvert.SerializeObject(data);
+            var coverage_products = JsonConvert.DeserializeObject<List<CoverageProduct>>(jsonString);
+            var _data = new { OtherNames = firstRow["CHFID"], LastNames = firstRow["InsureeName"],BirthDate = firstRow["DOB"],CoverageProducts = data};
+            msg.Data = _data;
             SetMessage(value);
         }
 
@@ -45,5 +50,12 @@ namespace ImisRestApi.Responses
             }
         }
 
+        private class CoverageProduct
+        {
+            public string ProductCode { get; set; }
+            public string ValuePolicy { get; set; }
+            public string EffectiveDate { get; set; }
+            public string ExpiryDate { get; set; }
+        }
     }
 }
