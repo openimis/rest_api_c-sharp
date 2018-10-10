@@ -49,7 +49,7 @@ namespace ImisRestApi.Data
                 {
                     UserID = Convert.ToString(rw["UserID"]),
                     LoginName = Convert.ToString(rw["LoginName"]),
-                    PrivateKey = Convert.ToString(rw["PrivateKey"])
+                    //PrivateKey = Convert.ToString(rw["PrivateKey"])
                 };
 
                 list.Add(user);

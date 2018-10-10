@@ -7,27 +7,21 @@ using System.Threading.Tasks;
 
 namespace ImisRestApi.ImisAttributes
 {
-   
     [AttributeUsage(AttributeTargets.Property, Inherited = false)]
-    public class InsureeNumberAttribute : ValidationAttribute
+    public class OfficerCodeAttribute : ValidationAttribute
     {
-        
-        public InsureeNumberAttribute()
+        public OfficerCodeAttribute()
         {
-            
+
         }
 
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value != null) {
-                Validation val = new Validation();
-                ValidationResult result = val.InsureeNumber(value.ToString());
+            Validation val = new Validation();
+            ValidationResult result = val.OfficerCode(value);
 
-                return result;
-            }
-            return ValidationResult.Success;
-           
-        }     
+            return result;
+        }
     }
 }

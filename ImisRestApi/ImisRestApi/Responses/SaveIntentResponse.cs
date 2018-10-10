@@ -34,40 +34,46 @@ namespace ImisRestApi.Responses
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "Missing OfficerCode or Phonenumber";
+                    msg.MessageValue = "1-Wrong format of insurance number";
                     Message = msg;
                     break;
                 case 2:
                     msg.Code = value;
-                    msg.MessageValue = "Invalid Officer Code";
+                    msg.MessageValue = "2-Not valid insurance or missing product code";
                     Message = msg;
                     break;
                 case 3:
                     msg.Code = value;
-                    msg.MessageValue = "Empty InsuranceNumber";
+                    msg.MessageValue = "3-Not valid enrolment officer code";
                     Message = msg;
                     break;
                 case 4:
                     msg.Code = value;
-                    msg.MessageValue = "Missing product or Product does not exists";
+                    msg.MessageValue = "4-Enrolment officer code and insurance product code are not compatible";
                     Message = msg;
                     break;
                 case 5:
                     msg.Code = value;
-                    msg.MessageValue = "The family does't contain this product for renewal";
+                    msg.MessageValue = "5-Beneficiary has no policy of specified insurance product for renewal";
                     Message = msg;
                     break;
                 case 6:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong match of Enrollment Officer agaists Product";
+                    msg.MessageValue = "6-Missing insurance number";
                     Message = msg;
                     break;
                 case 7:
                     msg.Code = value;
-                    msg.MessageValue = "Invalid Insuree/Product Match";
+                    msg.MessageValue = "7-Control number cannot be assigned";
                     Message = msg;
                     break;
-               
+                case 8:
+                    msg.Code = value;
+                    msg.MessageValue = "8-Duplicated control number assigned";
+                    Message = msg;
+                    break;
+            
+
             }
         }
 

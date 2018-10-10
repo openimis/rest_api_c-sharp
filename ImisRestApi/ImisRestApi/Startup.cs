@@ -54,7 +54,7 @@ namespace ImisRestApi
             });
             //services.ConfigureMvc();
             services.AddSwaggerGen(x => {
-                x.SwaggerDoc("v1", new Info { Title = "IMIS REST" , Version = "v1"});
+                x.SwaggerDoc("v1", new Info { Title = "IMIS CHF REST" , Version = "v1"});
             });
 
         }
@@ -83,7 +83,7 @@ namespace ImisRestApi
 
             app.UseSwagger();
             app.UseSwaggerUI(x => {
-                x.SwaggerEndpoint("/swagger/v1/swagger.json", "IMIS REST");
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "IMIS CHF REST");
             });
         }
     }

@@ -20,7 +20,7 @@ namespace ImisRestApi.Data
         }
         public DataTable Get(string insureeNumber)
         {
-            var sSQL = @"SELECT I.CHFID InsuranceNumber, I.OtherNames, I.LastName, I.DOB BirthDate, I.Gender, F.Poverty PoveryStatus, C.ConfirmationTypeCode ConfirmationType, F.ConfirmationNo ConfirmationNo, F.FamilyAddress PermanentAddress, I.Marital MaritalStatus, I.CardIssued BeneficiaryCard, l.LocationCode CurrentVillageCode, I.CurrentAddress CurrentAddress, P.Profession, I.Education,  I.Phone PhoneNumber,I.Email, I.TypeOfId IdentificationType, I.passport IdentificationNumber, HF.HFCode FSPCode  FROM tblFamilies F 
+            var sSQL = @"SELECT I.CHFID InsuranceNumber, I.OtherNames, I.LastName, I.DOB BirthDate, I.Gender, F.Poverty PoveryStatus, C.ConfirmationTypeCode ConfirmationType, F.FamilyType GroupType, F.FamilyAddress PermanentAddress, I.Marital MaritalStatus, I.CardIssued BeneficiaryCard, l.LocationCode CurrentVillageCode, I.CurrentAddress CurrentAddress, P.Profession, I.Education,  I.Phone PhoneNumber,I.Email, I.TypeOfId IdentificationType, I.passport IdentificationNumber, HF.HFCode FSPCode  FROM tblFamilies F 
                             LEFT OUTER JOIN tblInsuree I ON F.InsureeID = I.InsureeID
                             LEFT OUTER JOIN tblLocations L ON L.LocationId = F.LocationId
                             LEFT OUTER JOIN tblConfirmationTypes C ON C.ConfirmationTypeCode =F.ConfirmationType
@@ -53,7 +53,6 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-
                 throw e;
             }
             
@@ -162,12 +161,12 @@ namespace ImisRestApi.Data
             try
             {
                 var response = data.Procedure("uspAPIDeleteMemberFamily", parameters);
-                message = new EditFamilyResponse(response, false).Message;
+                message = new DeleteMamberFamilyResponse(response, false).Message;
             }
             catch (Exception e)
             {
 
-                message = new EditFamilyResponse(e).Message;
+                message = new DeleteMamberFamilyResponse(e).Message;
             }
 
 
@@ -185,14 +184,14 @@ namespace ImisRestApi.Data
                 new SqlParameter("@InsuranceNumber", model.HeadOfFamilyId),
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
-                new SqlParameter("@BirthDate", model.BirthDate),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@BirthDate", Convert.ToDateTime(model.BirthDate)),
+                new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@PovertyStatus", model.PovertyStatus),
                 new SqlParameter("@ConfirmationType", model.ConfirmationType),
                 new SqlParameter("@GroupType", model.GroupType),
               //  new SqlParameter("@ConfrimationNo", model.ConfrimationNo),
                 new SqlParameter("@PermanentAddress", model.PermanentAddressDetails),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.BeneficiaryCard),
                 new SqlParameter("@CurrentVillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),
@@ -223,7 +222,7 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public DataMessage Edit(Family model)
+        public DataMessage Edit(EditFamily model)
         {
 
             DataHelper helper = new DataHelper(Configuration);
@@ -234,13 +233,13 @@ namespace ImisRestApi.Data
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@PovertyStatus", model.PovertyStatus),
                 new SqlParameter("@ConfirmationType", model.ConfirmationType),
                // new SqlParameter("@GroupType", model.GroupType),
                // new SqlParameter("@ConfrimationNo", model.ConfrimationNo),
                 new SqlParameter("@PermanentAddress", model.PermanentAddressDetails),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.BeneficiaryCard),
                 new SqlParameter("@VillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),
@@ -280,9 +279,9 @@ namespace ImisRestApi.Data
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@Relationship", model.Relationship),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.Beneficiary_Card),
                 new SqlParameter("@VillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),
@@ -312,7 +311,7 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public DataMessage EditMamber(FamilyMamber model)
+        public DataMessage EditMamber(EditFamilyMamber model)
         {
             DataHelper helper = new DataHelper(Configuration);
 
@@ -322,9 +321,9 @@ namespace ImisRestApi.Data
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),
-                new SqlParameter("@Gender", new GenderValue(model.Gender).Value),
+                new SqlParameter("@Gender", model.Gender),
                // new SqlParameter("@Relationship", model.Relationship),
-                new SqlParameter("@MaritalStatus", new MaritalStatusVal(model.MaritalStatus).Value),
+                new SqlParameter("@MaritalStatus",model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.Beneficiary_Card),
                 new SqlParameter("@VillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),

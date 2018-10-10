@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using ImisRestApi.ImisAttributes;
 using ImisRestApi.Models;
 using Newtonsoft.Json;
 
@@ -6,9 +8,15 @@ namespace ImisRestApi.Chanels
 {
     public class IntentOfSinglePay:IntentOfPay
     {
+        [Required]
+        public override string PhoneNumber { get; set; }
+        [Required]
+        [InsureeNumber]
         public string InsureeNumber { get; set; }
+        [Required]
         public string ProductCode { get; set; }
-        public EnrolmentType EnrolmentType { get; set; }
+        [Required]
+        public EnrolmentType? EnrolmentType { get; set; }
         [JsonIgnore]
         public override List<PaymentDetail> PaymentDetails { get => base.PaymentDetails; set => base.PaymentDetails = value; }
 

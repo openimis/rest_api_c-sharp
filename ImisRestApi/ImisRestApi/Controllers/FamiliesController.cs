@@ -1,5 +1,6 @@
 ﻿using ImisRestApi.Chanels.Sms;
 using ImisRestApi.Data;
+using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Sms;
 using ImisRestApi.Responses;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -52,7 +54,7 @@ namespace ImisRestApi.Controllers
                 }
                 else
                 {
-                    response = new GetFamilyResponse(1, false).Message;
+                    response = new GetFamilyResponse(1, true).Message;
                 }
                 
             }
@@ -87,12 +89,12 @@ namespace ImisRestApi.Controllers
                     }
                     else
                     {
-                        response = new GetMemberFamilyResponse(2, false).Message;
+                        response = new GetMemberFamilyResponse(2, true).Message;
                     }
                 }
                 else
                 {
-                    response = new GetMemberFamilyResponse(1, false).Message;
+                    response = new GetMemberFamilyResponse(1, true).Message;
                 }
 
             }
@@ -109,7 +111,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Enter_Family([FromBody]Family model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.AddNew(model);
 
@@ -122,7 +127,10 @@ namespace ImisRestApi.Controllers
         public IActionResult Enter_Member_Family([FromBody]FamilyMamber model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.AddMamber(model);
 
@@ -132,10 +140,13 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/Families/Edit_Family")]
-        public IActionResult Edit_Family([FromBody]Family model)
+        public IActionResult Edit_Family([FromBody]EditFamily model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.Edit(model);
 
@@ -145,10 +156,13 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/Families/Edit_Member_Family")]
-        public IActionResult Edit_Member_Family([FromBody]FamilyMamber model)
+        public IActionResult Edit_Member_Family([FromBody]EditFamilyMamber model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             var response = family.EditMamber(model);
 
@@ -160,8 +174,10 @@ namespace ImisRestApi.Controllers
         [Route("api/Families/Delete_Member_Family")]
         public IActionResult Delete_Member_Family([FromBody]string insureeNumber)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (new ValidationBase().InsureeNumber(insureeNumber) != ValidationResult.Success)
+            {
+                return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
+            }
 
             var response = family.DeleteMamber(insureeNumber);
 
@@ -169,33 +185,5 @@ namespace ImisRestApi.Controllers
 
         }
         
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("api/Enquire")]
-        public async Task<IActionResult> Enquire([FromBody]Enquire model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var response = family.Enquire(model.chfid);
-            var jsonResponse = JsonConvert.SerializeObject(response);
-            List<EnquireResponse> resp = JsonConvert.DeserializeObject<List<EnquireResponse>>(jsonResponse);
-
-            string msgString = "IMIS Insuree:"+ resp.FirstOrDefault().insureeName;
-
-            foreach (var item in resp)
-            {
-                msgString += item.productCode + " : " + item.status;
-            }
-
-            List<SmsContainer> message = new List<SmsContainer>();
-            message.Add(new SmsContainer() { Message = msgString, Recepients = "+255767057265" });
-
-            ImisSms sms = new ImisSms(config);
-            string test = await sms.PushSMS(message);
-
-            return Json(new { status = true,sms_reply=true,sms_text = resp });
-
-        }
     }
 }
