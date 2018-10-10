@@ -22,7 +22,7 @@ namespace ImisRestApi.Responses
             var firstRow = data.Rows[0];
             var jsonString = JsonConvert.SerializeObject(data);
             var coverage_products = JsonConvert.DeserializeObject<List<CoverageProduct>>(jsonString);
-            var _data = new { OtherNames = firstRow["CHFID"], LastNames = firstRow["InsureeName"],BirthDate = firstRow["DOB"],CoverageProducts = data};
+            var _data = new { OtherNames = firstRow["OtherNames"], LastNames = firstRow["LastName"],BirthDate = firstRow["DOB"],CoverageProducts = coverage_products };
             msg.Data = _data;
             SetMessage(value);
         }
@@ -53,9 +53,23 @@ namespace ImisRestApi.Responses
         private class CoverageProduct
         {
             public string ProductCode { get; set; }
-            public string ValuePolicy { get; set; }
+            public string PolicyValue { get; set; }
             public string EffectiveDate { get; set; }
             public string ExpiryDate { get; set; }
+            public string Status { get; set; }
+            public string DedType { get; set; }
+            public string Ded1 { get; set; }
+            public string Ded2 { get; set; }
+            public string Ceiling1 { get; set; }
+            public string Ceiling2 { get; set; }
+            public string AntenatalAmountLeft { get; set; }
+            public string ConsultationAmountLeft { get; set; }
+            public string DeliveryAmountLeft { get; set; }
+            public string HospitalizationAmountLeft { get; set; }
+            public string SurgeryAmountLeft { get; set; }
+            public string TotalAdmissionsLeft { get; set; }
+            public string TotalAntenatalLeft { get; set; }
+            public string TotalConsultationsLeft { get; set; }        
         }
     }
 }
