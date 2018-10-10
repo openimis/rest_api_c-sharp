@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -20,6 +21,12 @@ namespace ImisRestApi.Responses
  
         public GetFamilyResponse(int value, bool error, DataTable data) : base(value, error, data)
         {
+            if (data.Rows.Count > 0)
+            {
+                var jsonString = JsonConvert.SerializeObject(data);
+                var ObjectList = JsonConvert.DeserializeObject<List<object>>(jsonString);
+                msg.Data = ObjectList.FirstOrDefault();
+            }
             SetMessage(value);
         }
 

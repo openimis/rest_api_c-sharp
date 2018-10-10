@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.ImisAttributes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ImisRestApi.Models
@@ -6,10 +7,11 @@ namespace ImisRestApi.Models
     public class Policy
     {
         [Required]
-        [MaxLength(11)]
+        [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number")]
         public string InsuranceNumber { get; set; }
         [Required]
-        public DateTime Date { get; set; }
+        [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
+        public string Date { get; set; }
         [Required]
         public string ProductCode { get; set; }
         [Required]

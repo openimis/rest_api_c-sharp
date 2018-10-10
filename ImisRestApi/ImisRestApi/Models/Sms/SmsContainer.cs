@@ -8,6 +8,6 @@ namespace ImisRestApi.Models.Sms
     public class SmsContainer
     {
         public string Message { get; set; }
-        public string Recepients { get; set; }
+        public string Recepient { get; set; }
     }
 }

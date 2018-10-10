@@ -1,8 +1,10 @@
 ﻿using ImisRestApi.Models.Sms;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -12,9 +14,11 @@ namespace ImisRestApi.Data
 {
     public class ImisBaseSms
     {
-        public ImisBaseSms(IConfiguration config)
-        {
+        private string SmsTampletes = string.Empty;
 
+        public ImisBaseSms(IConfiguration config,IHostingEnvironment environment)
+        {
+            SmsTampletes = environment.ContentRootPath + @"\Chanels\Sms\Strings\";
         }
 
         public virtual async Task<string> PushSMS(List<SmsContainer> containers)
@@ -35,13 +39,31 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-
                 response_message = e.ToString();
             }
+
+            var msg = JsonConvert.SerializeObject(containers);
+            SaveMessage(msg);
 
             return response_message;
 
         }
 
+        public virtual void SaveMessage(string message)
+        {
+            string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string namepart = new Random().Next(100000, 999999).ToString();
+
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "rest_api_messages"+namepart+".json")))
+            {
+                    outputFile.WriteLine(message);
+            }
+        }
+
+        public virtual string GetMessage(string filename)
+        {
+            string text = File.ReadAllText(SmsTampletes + filename +".txt", Encoding.UTF8);
+            return text;
+        }
     }
 }

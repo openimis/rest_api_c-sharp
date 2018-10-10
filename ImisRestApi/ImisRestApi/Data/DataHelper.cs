@@ -148,7 +148,7 @@ namespace ImisRestApi.Data
         public DataTable Login(string UserName, string Password)
         {
             var sSQL = @"OPEN SYMMETRIC KEY EncryptionKey DECRYPTION BY Certificate EncryptData
-                        SELECT UserID,LoginName, LanguageID, RoleID, PrivateKey
+                        SELECT UserID,LoginName, LanguageID, RoleID
                         FROM tblUsers
                         WHERE LoginName = @LoginName
                         AND  CONVERT(NVARCHAR(25), DECRYPTBYKEY(Password)) COLLATE LATIN1_GENERAL_CS_AS = @Password
