@@ -109,6 +109,12 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "FSP code not found";
                     Message = msg;
                     break;
+                case 15:
+
+                    msg.Code = value;
+                    msg.MessageValue = "Wrong Identification Type";
+                    Message = msg;
+                    break;
             }
         }
     }
