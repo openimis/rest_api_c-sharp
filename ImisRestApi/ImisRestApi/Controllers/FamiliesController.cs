@@ -16,6 +16,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ImisRestApi.Controllers
@@ -35,6 +36,7 @@ namespace ImisRestApi.Controllers
         [Route("api/Families/Get_Family")]
         public IActionResult Get(string insureeNumber)
         {
+
             DataMessage response;
             try
             {
@@ -116,6 +118,9 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            family.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
+
             var response = family.AddNew(model);
 
             return Json(response);
@@ -132,6 +137,9 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            family.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
+
             var response = family.AddMamber(model);
 
             return Json(response);
@@ -147,6 +155,8 @@ namespace ImisRestApi.Controllers
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 return BadRequest(new { error_occured = true, error_message = error });
             }
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            family.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
 
             var response = family.Edit(model);
 
@@ -163,6 +173,8 @@ namespace ImisRestApi.Controllers
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 return BadRequest(new { error_occured = true, error_message = error });
             }
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            family.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
 
             var response = family.EditMamber(model);
 
@@ -178,6 +190,8 @@ namespace ImisRestApi.Controllers
             {
                 return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
             }
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            family.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
 
             var response = family.DeleteMamber(insureeNumber);
 

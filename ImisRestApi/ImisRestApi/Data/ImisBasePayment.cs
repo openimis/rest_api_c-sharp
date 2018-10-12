@@ -1,10 +1,12 @@
 ﻿using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Data;
+using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using ImisRestApi.Responses;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -89,6 +91,8 @@ namespace ImisRestApi.Data
 
         public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
+            var Proxyfamily = LocalDefault.FamilyMambers(Configuration);
+
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
                         new XElement("OfficerCode", _intent.OfficerCode),
@@ -108,8 +112,10 @@ namespace ImisRestApi.Data
                     )
                   ),
                    new XElement("ProxySettings",
-                        new XElement("AdultMembers",Configuration["DefaultFamily:Adults"]),
-                        new XElement("ChildMembers", Configuration["DefaultFamily:Children"])
+                        new XElement("AdultMembers", Proxyfamily.Adults),
+                        new XElement("ChildMembers", Proxyfamily.Children),
+                        new XElement("OAdultMembers", Proxyfamily.OtherAdults),
+                        new XElement("OChildMembers", Proxyfamily.OtherChildren)
                    )
             );
 
@@ -120,7 +126,9 @@ namespace ImisRestApi.Data
                 new SqlParameter("@ErrorNumber",errorNumber),
                 new SqlParameter("@ErrorMsg",errorMessage),
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
-                new SqlParameter("@ExpectedAmount", SqlDbType.Decimal){Direction = ParameterDirection.Output }
+                new SqlParameter("@ExpectedAmount", SqlDbType.Decimal){Direction = ParameterDirection.Output },
+                new SqlParameter("@ProvidedAmount",_intent.Amount),
+                new SqlParameter("@PriorEnrolment",LocalDefault.PriorEnrolmentRequired(Configuration))
              };
 
             DataMessage message;
@@ -442,12 +450,104 @@ namespace ImisRestApi.Data
                     }
 
                 }
+                else
+                {
+                    throw new DataException("There was a data error.");
+                }
             }
             catch (Exception e)
             {
                 throw e;
             }
 
+        }
+
+
+        public List<MatchSms> GetPaymentIdsForSms()
+        {
+            
+            var sSQl = @"SELECT tblPayment.PaymentID,tblPayment.DateLastSMS,tblPayment.MatchedDate
+                        FROM tblControlNumber 
+                        RIGHT OUTER JOIN tblInsuree 
+                        RIGHT OUTER JOIN tblProduct 
+                        RIGHT OUTER JOIN tblPayment 
+                        INNER JOIN tblPaymentDetails 
+                        ON tblPayment.PaymentID = tblPaymentDetails.PaymentID 
+                        ON tblProduct.ProductCode = tblPaymentDetails.ProductCode 
+                        ON tblInsuree.CHFID = tblPaymentDetails.InsuranceNumber 
+                        ON tblControlNumber.PaymentID = tblPayment.PaymentID 
+                        LEFT OUTER JOIN tblPremium 
+                        LEFT OUTER JOIN tblPolicy 
+                        ON tblPremium.PolicyID = tblPolicy.PolicyID 
+                        ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
+                        WHERE (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)
+						AND tblPayment.PaymentStatus >= 4
+						AND tblPayment.SentActivatedSms = 0";
+
+            SqlParameter[] parameters = {};
+
+            try
+            {
+                var data = dh.GetDataTable(sSQl, parameters, CommandType.Text);
+                List<MatchSms> Ids = null;
+                if (data.Rows.Count > 0)
+                {
+                    var jsonString = JsonConvert.SerializeObject(data);
+                    Ids = JsonConvert.DeserializeObject<List<MatchSms>>(jsonString);                   
+                }
+
+                return Ids;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
+
+        public void UnMatchedSmsSent(int Id)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET DateLastSMS = @Today
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", Id),
+                new SqlParameter("@Today",DateTime.UtcNow)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public void MatchedSmsSent()
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET DateLastSMS = @Today, SentActivatedSms = @SentActivatedSms
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", PaymentId),
+                new SqlParameter("@Today",DateTime.UtcNow),
+                new SqlParameter("@SentActivatedSms",true)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

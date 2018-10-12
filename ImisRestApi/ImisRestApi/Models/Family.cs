@@ -25,9 +25,9 @@ namespace ImisRestApi.Models
         [Required(ErrorMessage = "1:Wrong format or missing insurance number of head")]
         [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number of head")]
         public string HeadOfFamilyId { get; set; }
-        [Required(ErrorMessage = "8:Missing other name ")]
+        [Required(ErrorMessage = "8:Missing other name",AllowEmptyStrings = false)]
         public string OtherName { get; set; }
-        [Required(ErrorMessage = "7:Missing last name ")]
+        [Required(ErrorMessage = "7:Missing last name", AllowEmptyStrings = false)]
         public string LastName { get; set; }
         
         [Required(ErrorMessage = "6:Wrong format or missing birth date")]

@@ -12,18 +12,18 @@ namespace ImisRestApi.Models
         [Required]
         [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number of head")]
         public string HeadInsureeNumber { get; set; }
-        [Required(ErrorMessage = "7:Missing other name")]
+        [Required(ErrorMessage = "7:Missing other name", AllowEmptyStrings = false)]
         public string OtherName { get; set; }
-        [Required(ErrorMessage = "6:Missing last name")]
+        [Required(ErrorMessage = "6:Missing last name", AllowEmptyStrings = false)]
         public string LastName { get; set; }
         [Required(ErrorMessage = "5:Wrong format or missing birth date")]
         [ValidDate]
         public string BirthDate { get; set; }
-        [StringLength(1, ErrorMessage = "11:Wrong marital status")]
+        [StringLength(1, ErrorMessage = "4:Wrong or missing gender")]
         public string Gender { get; set; }
 
         public string Relationship { get; set; }
-        [StringLength(1, ErrorMessage = "11:Wrong marital status")]
+        [StringLength(1, ErrorMessage = "10:Wrong marital status")]
         public string MaritalStatus { get; set; }
         public bool Beneficiary_Card { get; set; }
         public string CurrentVillageCode { get; set; }

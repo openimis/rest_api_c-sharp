@@ -43,14 +43,17 @@ namespace ImisRestApi.Logic
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
                     return_message = payment.SaveControlNumber(response.ControlNumber,controlNumberExists);
-
-                    if (!return_message.ErrorOccured && !controlNumberExists) {
-                        ControlNumberAssignedSms(payment);
-                    }
-                    else
+                    if (payment.PaymentId != null)
                     {
-                        ControlNumberNotassignedSms(payment,return_message.MessageValue);
-                    }
+                        if (!return_message.ErrorOccured && !controlNumberExists)
+                        {
+                            ControlNumberAssignedSms(payment);
+                        }
+                        else
+                        {
+                            ControlNumberNotassignedSms(payment, return_message.MessageValue);
+                        }
+                    }                    
                 }
                 else if (response.RequestAcknowledged == true)
                 {
@@ -81,8 +84,20 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.Match(model);
 
-            SendMatchSms(payment);
-
+            if (model.PaymentId != null)
+            {
+                if (payment.PaymentId != null)
+                {
+                    SendPaymentSms(payment);
+                }
+            }
+            else
+            {
+                List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
+                SendMatchSms(PaymentIds);
+            }
+           
+            
             return response;
         }
 
@@ -103,7 +118,7 @@ namespace ImisRestApi.Logic
             var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
             var response = payment.SavePayment(model,controlNumberExists);
 
-            if(model.EnrolmentOfficerCode == null)
+            if(payment.PaymentId != null && model.EnrolmentOfficerCode == null)
             {
                 SendPaymentSms(payment);
             }
@@ -117,14 +132,18 @@ namespace ImisRestApi.Logic
             var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
             var response = payment.SaveControlNumber(model,controlNumberExists);
 
-            if (!response.ErrorOccured && controlNumberExists)
+            if (payment.PaymentId != null)
             {
-                ControlNumberAssignedSms(payment);
+                if (!response.ErrorOccured && controlNumberExists)
+                {
+                    ControlNumberAssignedSms(payment);
+                }
+                else
+                {
+                    ControlNumberNotassignedSms(payment, response.MessageValue);
+                }
             }
-            else
-            {
-                ControlNumberNotassignedSms(payment, response.MessageValue);
-            }
+           
 
             return response;
         }
@@ -236,6 +255,7 @@ namespace ImisRestApi.Logic
             }
 
             string test = await sms.PushSMS(message);
+            payment.MatchedSmsSent();
         }
 
         public async void SendMatchSms(ImisPayment payment)
@@ -257,7 +277,7 @@ namespace ImisRestApi.Logic
             }
             var familyproduct = payment.InsureeProducts.FirstOrDefault();
             var txtmsg = string.Format(txtmsgTemplate,
-                     payment.PaymentId,
+                     payment.PaidAmount,
                      DateTime.UtcNow.ToLongDateString(),
                      payment.ControlNum,
                      familyproduct.InsureeNumber,
@@ -268,6 +288,59 @@ namespace ImisRestApi.Logic
 
 
             message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+            string test = await sms.PushSMS(message);
+        }
+
+        public async void SendMatchSms(List<MatchSms> Ids)
+        {
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            List<SmsContainer> message = new List<SmsContainer>();
+
+            foreach (var m in Ids)
+            {
+                bool shoulSendSms = LocalDefault.ShouldSendSms(_configuration, m.DateLastSms, m.MatchedDate);
+
+                if (shoulSendSms)
+                {
+                    var txtmsgTemplate = string.Empty;
+                    string othersCount = string.Empty;
+
+                    ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment);
+                    _pay.GetPaymentInfo(m.PaymentId.ToString());
+
+                    if (_pay.PaymentId != null)
+                    {
+                        if (_pay.InsureeProducts.Count > 1)
+                        {
+                            txtmsgTemplate = sms.GetMessage("PaidAndNotMatchedV2");
+                            othersCount = Convert.ToString(_pay.InsureeProducts.Count - 1);
+                        }
+                        else
+                        {
+                            txtmsgTemplate = sms.GetMessage("PaidAndNotMatched");
+                        }
+                        var familyproduct = _pay.InsureeProducts.FirstOrDefault();
+                        var txtmsg = string.Format(txtmsgTemplate,
+                                 _pay.PaidAmount,
+                                 DateTime.UtcNow.ToLongDateString(),
+                                 _pay.ControlNum,
+                                 familyproduct.InsureeNumber,
+                                 familyproduct.InsureeName,
+                                 familyproduct.ProductCode,
+                                 familyproduct.ProductName,
+                                 othersCount);
+
+
+                        message.Add(new SmsContainer() { Message = txtmsg, Recepient = _pay.PhoneNumber });
+                        _pay.UnMatchedSmsSent(m.PaymentId);
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                
+            }          
             string test = await sms.PushSMS(message);
         }
     }

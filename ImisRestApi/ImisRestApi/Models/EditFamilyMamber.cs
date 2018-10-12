@@ -16,11 +16,11 @@ namespace ImisRestApi.Models
         public string LastName { get; set; }
         [ValidDate(ErrorMessage = "5:Wrong format or missing birth date")]
         public string BirthDate { get; set; }
-        [StringLength(1, ErrorMessage = "11:Wrong marital status")]
+        [StringLength(1, ErrorMessage = "6:Wrong gender")]
         public string Gender { get; set; }
 
         public string Relationship { get; set; }
-        [StringLength(1, ErrorMessage = "11:Wrong marital status")]
+        [StringLength(1, ErrorMessage = "7:Wrong marital status")]
         public string MaritalStatus { get; set; }
         public bool Beneficiary_Card { get; set; }
         public string CurrentVillageCode { get; set; }
