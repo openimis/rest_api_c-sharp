@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 
 namespace ImisRestApi.Controllers
 {
@@ -30,6 +31,9 @@ namespace ImisRestApi.Controllers
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 return BadRequest(new { error_occured = true, error_message = error });
             }
+
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            contribution.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
 
             var response = contribution.Enter(model);
 

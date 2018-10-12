@@ -13,6 +13,7 @@ namespace ImisRestApi.Data
     public class ImisFamily
     {
         private IConfiguration Configuration;
+        public int UserId { get; set; }
 
         public ImisFamily(IConfiguration configuration)
         {
@@ -149,7 +150,8 @@ namespace ImisRestApi.Data
         {
 
             SqlParameter[] parameters = {
-                new SqlParameter("@InsuranceNumber", insureeNumber)
+                new SqlParameter("@InsuranceNumber", insureeNumber),
+                new SqlParameter("@AuditUserID", UserId)
             };
 
             var data = new DataHelper(Configuration);
@@ -180,6 +182,7 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@PermanentVillageCode", model.VillageCode),
                 new SqlParameter("@InsuranceNumber", model.HeadOfFamilyId),
                 new SqlParameter("@OtherNames", model.OtherName),
@@ -228,6 +231,7 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsuranceNumberOfHead", model.HeadOfFamilyId),
                 new SqlParameter("@VillageCode", model.VillageCode),
                 new SqlParameter("@OtherNames", model.OtherName),
@@ -274,6 +278,7 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsureeNumber", model.InsureeNumber),
                 new SqlParameter("@InsureeNumberOfHead", model.HeadInsureeNumber),
                 new SqlParameter("@OtherNames", model.OtherName),
@@ -316,8 +321,8 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsureeNumber", model.InsureeNumber),
-               // new SqlParameter("@InsureeNumberOfHead", model.HeadInsureeNumber),
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),

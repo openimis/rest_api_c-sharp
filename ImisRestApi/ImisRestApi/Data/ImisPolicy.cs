@@ -12,6 +12,7 @@ namespace ImisRestApi.Data
     public class ImisPolicy
     {
         private IConfiguration Configuration;
+        public int UserId { get; set; }
 
         public ImisPolicy(IConfiguration configuration)
         {
@@ -23,6 +24,7 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsuranceNumber", model.InsuranceNumber),
                 new SqlParameter("@EnrollmentDate", model.Date),
                 new SqlParameter("@ProductCode", model.ProductCode),
@@ -53,6 +55,7 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsuranceNumber", model.InsuranceNumber),
                 new SqlParameter("@RenewalDate", model.Date),
                 new SqlParameter("@ProductCode", model.ProductCode),

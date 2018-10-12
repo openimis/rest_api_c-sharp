@@ -466,7 +466,7 @@ namespace ImisRestApi.Data
         public List<MatchSms> GetPaymentIdsForSms()
         {
             
-            var sSQl = @"SELECT tblPayment.PaymentID,tblPayment.DateLastSMS
+            var sSQl = @"SELECT tblPayment.PaymentID,tblPayment.DateLastSMS,tblPayment.MatchedDate
                         FROM tblControlNumber 
                         RIGHT OUTER JOIN tblInsuree 
                         RIGHT OUTER JOIN tblProduct 
@@ -502,6 +502,51 @@ namespace ImisRestApi.Data
             {
 
                 throw e;
+            }
+        }
+
+        public void UnMatchedSmsSent(int Id)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET DateLastSMS = @Today
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", Id),
+                new SqlParameter("@Today",DateTime.UtcNow)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public void MatchedSmsSent()
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET DateLastSMS = @Today, SentActivatedSms = @SentActivatedSms
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", PaymentId),
+                new SqlParameter("@Today",DateTime.UtcNow),
+                new SqlParameter("@SentActivatedSms",true)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
     }

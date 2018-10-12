@@ -9,5 +9,6 @@ namespace ImisRestApi.Models
     {
         public int PaymentId { get; set; }
         public DateTime? DateLastSms { get; set; }
+        public DateTime? MatchedDate { get; set; }
     }
 }

@@ -88,7 +88,7 @@ namespace ImisRestApi.Logic
             {
                 if (payment.PaymentId != null)
                 {
-                    SendMatchSms(payment);
+                    SendPaymentSms(payment);
                 }
             }
             else
@@ -255,6 +255,7 @@ namespace ImisRestApi.Logic
             }
 
             string test = await sms.PushSMS(message);
+            payment.MatchedSmsSent();
         }
 
         public async void SendMatchSms(ImisPayment payment)
@@ -276,7 +277,7 @@ namespace ImisRestApi.Logic
             }
             var familyproduct = payment.InsureeProducts.FirstOrDefault();
             var txtmsg = string.Format(txtmsgTemplate,
-                     payment.PaymentId,
+                     payment.PaidAmount,
                      DateTime.UtcNow.ToLongDateString(),
                      payment.ControlNum,
                      familyproduct.InsureeNumber,
@@ -297,41 +298,48 @@ namespace ImisRestApi.Logic
 
             foreach (var m in Ids)
             {
-                var txtmsgTemplate = string.Empty;
-                string othersCount = string.Empty;
+                bool shoulSendSms = LocalDefault.ShouldSendSms(_configuration, m.DateLastSms, m.MatchedDate);
 
-                ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment);
-                _pay.GetPaymentInfo(m.PaymentId.ToString());
-
-                if(_pay.PaymentId != null)
+                if (shoulSendSms)
                 {
-                    if (_pay.InsureeProducts.Count > 1)
+                    var txtmsgTemplate = string.Empty;
+                    string othersCount = string.Empty;
+
+                    ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment);
+                    _pay.GetPaymentInfo(m.PaymentId.ToString());
+
+                    if (_pay.PaymentId != null)
                     {
-                        txtmsgTemplate = sms.GetMessage("PaidAndNotMatchedV2");
-                        othersCount = Convert.ToString(_pay.InsureeProducts.Count - 1);
+                        if (_pay.InsureeProducts.Count > 1)
+                        {
+                            txtmsgTemplate = sms.GetMessage("PaidAndNotMatchedV2");
+                            othersCount = Convert.ToString(_pay.InsureeProducts.Count - 1);
+                        }
+                        else
+                        {
+                            txtmsgTemplate = sms.GetMessage("PaidAndNotMatched");
+                        }
+                        var familyproduct = _pay.InsureeProducts.FirstOrDefault();
+                        var txtmsg = string.Format(txtmsgTemplate,
+                                 _pay.PaidAmount,
+                                 DateTime.UtcNow.ToLongDateString(),
+                                 _pay.ControlNum,
+                                 familyproduct.InsureeNumber,
+                                 familyproduct.InsureeName,
+                                 familyproduct.ProductCode,
+                                 familyproduct.ProductName,
+                                 othersCount);
+
+
+                        message.Add(new SmsContainer() { Message = txtmsg, Recepient = _pay.PhoneNumber });
+                        _pay.UnMatchedSmsSent(m.PaymentId);
                     }
                     else
                     {
-                        txtmsgTemplate = sms.GetMessage("PaidAndNotMatched");
+                        throw new Exception();
                     }
-                    var familyproduct = _pay.InsureeProducts.FirstOrDefault();
-                    var txtmsg = string.Format(txtmsgTemplate,
-                             _pay.PaymentId,
-                             DateTime.UtcNow.ToLongDateString(),
-                             _pay.ControlNum,
-                             familyproduct.InsureeNumber,
-                             familyproduct.InsureeName,
-                             familyproduct.ProductCode,
-                             familyproduct.ProductName,
-                             othersCount);
-
-
-                    message.Add(new SmsContainer() { Message = txtmsg, Recepient = _pay.PhoneNumber });
                 }
-                else
-                {
-                    throw new Exception();
-                }
+                
             }          
             string test = await sms.PushSMS(message);
         }

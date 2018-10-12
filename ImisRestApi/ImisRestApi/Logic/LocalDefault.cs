@@ -48,48 +48,51 @@ namespace ImisRestApi.Logic
             }
         }
 
-        public static bool ShouldSendSms(IConfiguration config,DateTime? lastSmsDate) {
+        public static bool ShouldSendSms(IConfiguration config,DateTime? lastSmsDate, DateTime? matchedDate) {
             try
             {
                 
                 var value = Convert.ToInt32(config["Defaults:PeriodPayNotMatchedSms"]);
                 if (value == 0)
                     return false;
-                DateTime today = DateTime.UtcNow;
-                DateTime thatday = (DateTime)lastSmsDate;
 
-                int interval = (today - thatday).Days;
+                DateTime today = DateTime.UtcNow;
 
                 if (lastSmsDate != null)
-                {
+                {                 
+                    DateTime thatday = (DateTime)lastSmsDate;
+                    int interval = (today - thatday).Days;
+
                     if (value > 0)
                     {
-                        if (interval / value >= 1 && lastSmsDate == null)
+                        return false;
+                    }
+                    else
+                    {
+                        value *= -1;
+                        if (interval % value == 0)
                         {
                             return true;
                         }
                         else
                         {
-
                             return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
+                        }                       
                     }
                 }
                 else
                 {
-                    if (value > 0)
+                    if (matchedDate != null)
                     {
-                        if (interval / value >= 1 && lastSmsDate == null)
+                        DateTime thatday = (DateTime)matchedDate;
+                        int interval = (today - thatday).Days;
+
+                        if (interval / value >= 1)
                         {
                             return true;
                         }
                         else
                         {
-
                             return false;
                         }
                     }
