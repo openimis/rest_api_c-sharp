@@ -58,11 +58,16 @@ namespace ImisRestApi.Responses
             public string ExpiryDate { get; set; }
             public string Status { get; set; }
             public string DedType { get; set; }
+            [JsonProperty(PropertyName = "DeductionHospital")]
             public string Ded1 { get; set; }
+            [JsonProperty(PropertyName = "DeductionNonHospital")]
             public string Ded2 { get; set; }
+            [JsonProperty(PropertyName = "CeilingHospital")]
             public string Ceiling1 { get; set; }
+            [JsonProperty(PropertyName = "CeilingNonHospital")]
             public string Ceiling2 { get; set; }
             public string AntenatalAmountLeft { get; set; }
+            public string TotalVisitsLeft { get; set; }
             public string ConsultationAmountLeft { get; set; }
             public string DeliveryAmountLeft { get; set; }
             public string HospitalizationAmountLeft { get; set; }

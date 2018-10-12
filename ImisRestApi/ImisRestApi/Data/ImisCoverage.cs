@@ -11,6 +11,7 @@ namespace ImisRestApi.Data
     public class ImisCoverage
     {
         private IConfiguration Configuration;
+        public int UserId { get; set; }
 
         public ImisCoverage(IConfiguration configuration)
         {

@@ -13,6 +13,7 @@ namespace ImisRestApi.Data
     public class ImisFamily
     {
         private IConfiguration Configuration;
+        public int UserId { get; set; }
 
         public ImisFamily(IConfiguration configuration)
         {
@@ -149,7 +150,8 @@ namespace ImisRestApi.Data
         {
 
             SqlParameter[] parameters = {
-                new SqlParameter("@InsuranceNumber", insureeNumber)
+                new SqlParameter("@InsuranceNumber", insureeNumber),
+                new SqlParameter("@AuditUserID", UserId)
             };
 
             var data = new DataHelper(Configuration);
@@ -180,16 +182,17 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@PermanentVillageCode", model.VillageCode),
                 new SqlParameter("@InsuranceNumber", model.HeadOfFamilyId),
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
-                new SqlParameter("@BirthDate", Convert.ToDateTime(model.BirthDate)),
+                new SqlParameter("@BirthDate", model.BirthDate),
                 new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@PovertyStatus", model.PovertyStatus),
                 new SqlParameter("@ConfirmationType", model.ConfirmationType),
                 new SqlParameter("@GroupType", model.GroupType),
-              //  new SqlParameter("@ConfrimationNo", model.ConfrimationNo),
+                new SqlParameter("@ConfirmationNo", model.ConfrimationNo),
                 new SqlParameter("@PermanentAddress", model.PermanentAddressDetails),
                 new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.BeneficiaryCard),
@@ -199,7 +202,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@Education", model.Education),
                 new SqlParameter("@PhoneNumber", model.PhoneNumber),
                 new SqlParameter("@Email", model.Email),
-               // new SqlParameter("@IdentificationType", model.IdentificationType),
+                new SqlParameter("@IdentificationType", model.IdentificationType),
                 new SqlParameter("@IdentificationNumber", model.IdentificationNumber),
                 new SqlParameter("@FspCode", model.FspCode),
             };
@@ -228,26 +231,27 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsuranceNumberOfHead", model.HeadOfFamilyId),
-                //new SqlParameter("@LocationCode", model.HeadOfFamilyId),
+                new SqlParameter("@VillageCode", model.VillageCode),
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),
                 new SqlParameter("@Gender", model.Gender),
                 new SqlParameter("@PovertyStatus", model.PovertyStatus),
                 new SqlParameter("@ConfirmationType", model.ConfirmationType),
-               // new SqlParameter("@GroupType", model.GroupType),
-               // new SqlParameter("@ConfrimationNo", model.ConfrimationNo),
+                new SqlParameter("@GroupType", model.GroupType),
+                new SqlParameter("@ConfirmationNumber", model.ConfrimationNo),
                 new SqlParameter("@PermanentAddress", model.PermanentAddressDetails),
                 new SqlParameter("@MaritalStatus", model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.BeneficiaryCard),
-                new SqlParameter("@VillageCode", model.CurrentVillageCode),
+                new SqlParameter("@CurrentVillageCode", model.CurrentVillageCode),
                 new SqlParameter("@CurrentAddress", model.CurrentAddressDetails),
                 new SqlParameter("@Proffesion", model.Profession),
                 new SqlParameter("@Education", model.Education),
                 new SqlParameter("@PhoneNumber", model.PhoneNumber),
                 new SqlParameter("@Email", model.Email),
-               // new SqlParameter("@IdentificationType", model.IdentificationType),
+                new SqlParameter("@IdentificationType", model.IdentificationType),
                 new SqlParameter("@IdentificationNumber", model.IdentificationNumber),
                 new SqlParameter("@FSPCode", model.FspCode),
             };
@@ -274,6 +278,7 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsureeNumber", model.InsureeNumber),
                 new SqlParameter("@InsureeNumberOfHead", model.HeadInsureeNumber),
                 new SqlParameter("@OtherNames", model.OtherName),
@@ -289,7 +294,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@Education", model.Education),
                 new SqlParameter("@PhoneNumber", model.PhoneNumber),
                 new SqlParameter("@Email", model.Email),
-               // new SqlParameter("@IdentificationType", model.IdentificationType),
+                new SqlParameter("@IdentificationType", model.IdentificationType),
                 new SqlParameter("@IdentificationNumber", model.IdentificationNumber),
                 new SqlParameter("@FspCode", model.FspCode)
             };
@@ -316,13 +321,13 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             SqlParameter[] sqlParameters = {
+                new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsureeNumber", model.InsureeNumber),
-               // new SqlParameter("@InsureeNumberOfHead", model.HeadInsureeNumber),
                 new SqlParameter("@OtherNames", model.OtherName),
                 new SqlParameter("@LastName", model.LastName),
                 new SqlParameter("@BirthDate", model.BirthDate),
                 new SqlParameter("@Gender", model.Gender),
-               // new SqlParameter("@Relationship", model.Relationship),
+                new SqlParameter("@Relationship", model.Relationship),
                 new SqlParameter("@MaritalStatus",model.MaritalStatus),
                 new SqlParameter("@BeneficiaryCard", model.Beneficiary_Card),
                 new SqlParameter("@VillageCode", model.CurrentVillageCode),
@@ -331,7 +336,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@Education", model.Education),
                 new SqlParameter("@PhoneNumber", model.PhoneNumber),
                 new SqlParameter("@Email", model.Email),
-               // new SqlParameter("@IdentificationType", model.IdentificationType),
+                new SqlParameter("@IdentificationType", model.IdentificationType),
                 new SqlParameter("@IdentificationNumber", model.IdentificationNumber),
                 new SqlParameter("@FspCode", model.FspCode)
             };

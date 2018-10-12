@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImisRestApi.Repo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -45,6 +46,8 @@ namespace ImisRestApi
            .AddJwtBearer(jwtconfig =>
            {
                jwtconfig.TokenValidationParameters = tokenParams;
+              // jwtconfig.SecurityTokenValidators.Clear();
+              // jwtconfig.SecurityTokenValidators.Add(new TokenValidatorImis());
            });
             
             services.AddMvc(config => {

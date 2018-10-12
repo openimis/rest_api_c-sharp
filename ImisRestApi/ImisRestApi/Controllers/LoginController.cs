@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ImisRestApi.Data;
@@ -44,7 +45,18 @@ namespace ImisRestApi.Controllers
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:key"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var JwtToken = new JwtSecurityToken(issuer:Configuration["JWT:issuer"],audience:Configuration["JWT:audience"],signingCredentials:credentials,expires:DateTime.Now.AddDays(5))
+
+            var claims = new[]
+            {
+               new Claim("UserId", user.UserID),
+            };
+
+            var JwtToken = new JwtSecurityToken(
+                issuer:Configuration["JWT:issuer"],
+                audience:Configuration["JWT:audience"],
+                claims: claims,
+                signingCredentials:credentials,expires:DateTime.Now.AddDays(5)
+                )
             {
 
             };

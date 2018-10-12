@@ -6,14 +6,107 @@ using System.Threading.Tasks;
 
 namespace ImisRestApi.Logic
 {
+    public class FamilyDefaults
+    {
+        public int Adults { get; set; }
+        public int Children { get; set; }
+        public int OtherAdults { get; internal set; }
+        public int OtherChildren { get; internal set; }
+    }
     public static class LocalDefault
     {
-        public static object FamilyMambers(IConfiguration config)
+        public static FamilyDefaults FamilyMambers(IConfiguration config)
         {
-            var adults = config["DefaultFamily:Adults"];
-            var children = config["DefaultFamily:Children"];
+            try
+            {
+                var adults = Convert.ToInt32(config["Defaults:Family:Adults"]);
+                var children = Convert.ToInt32(config["Defaults:Family:Children"]);
+                var other_adults = Convert.ToInt32(config["Defaults:Family:OtherAdults"]);
+                var other_children = Convert.ToInt32(config["Defaults:Family:OtherChildren"]);
 
-            return new { Adults = adults, Children = children };
+                FamilyDefaults fam = new FamilyDefaults() { Adults = adults, Children = children,OtherAdults = other_adults,OtherChildren = other_children };
+                return fam;
+            }
+            catch (Exception)
+            {
+
+                throw new Exception("A Family property is not properly defined in config file");
+            }
+            
+        }
+
+        public static bool PriorEnrolmentRequired(IConfiguration config)
+        {
+            try
+            {
+                var value = Convert.ToBoolean(config["Defaults:PriorEnrolment"]);
+                return value;
+            }
+            catch (Exception)
+            {
+                throw new Exception("This property is not properly defined in config file");
+            }
+        }
+
+        public static bool ShouldSendSms(IConfiguration config,DateTime? lastSmsDate, DateTime? matchedDate) {
+            try
+            {
+                
+                var value = Convert.ToInt32(config["Defaults:PeriodPayNotMatchedSms"]);
+                if (value == 0)
+                    return false;
+
+                DateTime today = DateTime.UtcNow;
+
+                if (lastSmsDate != null)
+                {                 
+                    DateTime thatday = (DateTime)lastSmsDate;
+                    int interval = (today - thatday).Days;
+
+                    if (value > 0)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        value *= -1;
+                        if (interval % value == 0)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }                       
+                    }
+                }
+                else
+                {
+                    if (matchedDate != null)
+                    {
+                        DateTime thatday = (DateTime)matchedDate;
+                        int interval = (today - thatday).Days;
+
+                        if (interval / value >= 1)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                
+            }
+            catch (Exception)
+            {
+                throw new Exception("This property is not properly defined in config file");
+            }
         }
     }
 }

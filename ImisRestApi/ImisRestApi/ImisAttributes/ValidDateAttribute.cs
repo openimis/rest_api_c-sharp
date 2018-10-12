@@ -23,13 +23,22 @@ namespace ImisRestApi.ImisAttributes
 
             try
             {
-                Convert.ToDateTime(value.ToString());
-                return ValidationResult.Success;
+                DateTime date = Convert.ToDateTime(value.ToString());
+
+                if(date.Year > 1753)
+                {
+                    return ValidationResult.Success;
+                }
+                else
+                {
+                    return new ValidationResult(null);
+                }
+               
             }
             catch (Exception)
             {
 
-                return new ValidationResult("6:Wrong format or missing birth date");
+                return new ValidationResult(null);
             }
            
 

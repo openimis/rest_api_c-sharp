@@ -68,12 +68,12 @@ namespace ImisRestApi.Responses
                     break;
                 case 8:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong confirmation type";
+                    msg.MessageValue = "Insurance number of member duplicated ";
                     Message = msg;
                     break;
                 case 9:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong group type";
+                    msg.MessageValue = "Wrong current village code";
                     Message = msg;
                     break;
                 case 10:
@@ -94,6 +94,16 @@ namespace ImisRestApi.Responses
                 case 13:
                     msg.Code = value;
                     msg.MessageValue = "FSP code not found";
+                    Message = msg;
+                    break;
+                case 14:
+                    msg.Code = value;
+                    msg.MessageValue = "Wrong Relationship";
+                    Message = msg;
+                    break;
+                case 15:
+                    msg.Code = value;
+                    msg.MessageValue = "Wrong Identification Type";
                     Message = msg;
                     break;
             }
