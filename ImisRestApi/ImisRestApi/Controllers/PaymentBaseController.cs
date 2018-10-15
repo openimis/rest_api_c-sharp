@@ -60,7 +60,7 @@ namespace ImisRestApi.Controllers
 
             var response = await _payment.SaveIntent(intent);
 
-            return Ok(new { error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
+            return Ok(new { code = response.Code, error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
         }
 
         [HttpPost]
@@ -75,7 +75,7 @@ namespace ImisRestApi.Controllers
 
             var response = _payment.SaveAcknowledgement(model);
 
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data, control_number = response.Data });
+            return Ok(new { code = response.Code,error_occured = response.ErrorOccured, error_message = response.Data, control_number = response.Data });
         }
 
         [HttpPost]
@@ -89,7 +89,7 @@ namespace ImisRestApi.Controllers
             }
 
             var response = _payment.SaveControlNumber(model);
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data });
+            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.Data });
         }
 
         [HttpPost]
@@ -103,7 +103,7 @@ namespace ImisRestApi.Controllers
             }
 
             var response = _payment.SavePayment(model);
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data});
+            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.Data});
         }
 
         [HttpPost]

@@ -30,6 +30,7 @@ namespace ImisRestApi.Data
 
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
+        public decimal? OutStAmount { get; set; }
         public List<InsureeProduct> InsureeProducts { get; set; }
 
         protected IConfiguration Configuration;
@@ -70,12 +71,12 @@ namespace ImisRestApi.Data
             string ctrlNumber = null;
 
             //BEGIN Temporary Control Number Generator(Simulation For Testing Only)
-            var randomNumber = new Random().Next(100000, 999999);
+            //var randomNumber = new Random().Next(100000, 999999);
             
-            if(randomNumber%2 == 0)
-            {
-                ctrlNumber = randomNumber.ToString();
-            }
+            //if(randomNumber%2 == 0)
+            //{
+            //    ctrlNumber = randomNumber.ToString();
+            //}
             //END Temporary 
 
             ControlNumberResp response = new ControlNumberResp() {
@@ -227,7 +228,7 @@ namespace ImisRestApi.Data
                 {
                     result = true;
                 }
-                GetPaymentInfo(PaymentID);
+                //GetPaymentInfo(PaymentID);
             }
             catch (Exception e)
             {
@@ -389,7 +390,7 @@ namespace ImisRestApi.Data
         {
             var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
                         tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
-                        tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus
+                        tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus, tblPolicy.PolicyValue - ISNULL(mp.PrPaid,0) Outstanding
                         FROM tblControlNumber 
                         RIGHT OUTER JOIN tblInsuree 
                         RIGHT OUTER JOIN tblProduct 
@@ -400,7 +401,10 @@ namespace ImisRestApi.Data
                         ON tblInsuree.CHFID = tblPaymentDetails.InsuranceNumber 
                         ON tblControlNumber.PaymentID = tblPayment.PaymentID 
                         LEFT OUTER JOIN tblPremium 
-                        LEFT OUTER JOIN tblPolicy 
+                        LEFT OUTER JOIN tblPolicy
+						LEFT OUTER JOIN (
+						select P.PolicyID PolID, SUM(P.Amount) PrPaid from tblpremium P inner join tblPaymentDetails PD ON PD.PremiumID = P.PremiumId INNER JOIN tblPayment Pay ON Pay.PaymentID = PD.PaymentID  where P.ValidityTo IS NULL AND Pay.PaymentStatus  = 5 GROUP BY P.PolicyID
+						) MP ON MP.PolID = tblPolicy.PolicyID
                         ON tblPremium.PolicyID = tblPolicy.PolicyID 
                         ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
                         WHERE (tblPayment.PaymentID = @PaymentID) AND (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)";
@@ -422,6 +426,7 @@ namespace ImisRestApi.Data
                     PhoneNumber = Convert.ToString(row1["PhoneNumber"]);
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
                     PaidAmount = (decimal?)(row1["ReceivedAmount"] != System.DBNull.Value ? row1["ReceivedAmount"] : null);
+                    OutStAmount = (decimal?)(row1["Outstanding"] != System.DBNull.Value ? row1["Outstanding"] : null);
                     InsureeProducts = new List<InsureeProduct>();
 
                     for (int i = 0; i < data.Rows.Count; i++)
@@ -430,7 +435,7 @@ namespace ImisRestApi.Data
 
                         bool active = false;
 
-                        if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 1) {
+                        if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 2) {
                             active = true;
                         }
 

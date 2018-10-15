@@ -120,6 +120,8 @@ namespace ImisRestApi.Logic
 
             if(payment.PaymentId != null && model.EnrolmentOfficerCode == null)
             {
+                MatchModel matchModel = new MatchModel() { PaymentId = Convert.ToInt32(model.PaymentId), AuditUserId = -3 };
+                var matchresponse = Match(matchModel);
                 SendPaymentSms(payment);
             }
 
@@ -248,7 +250,7 @@ namespace ImisRestApi.Logic
                     familyproduct.ProductCode,
                     familyproduct.ProductName,
                     payment.ExpectedAmount,
-                    payment.ExpectedAmount - payment.PaidAmount);
+                    payment.OutStAmount);
 
                 message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
 
