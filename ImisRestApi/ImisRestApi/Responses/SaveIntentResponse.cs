@@ -64,7 +64,7 @@ namespace ImisRestApi.Responses
                     break;
                 case 7:
                     msg.Code = value;
-                    msg.MessageValue = "7-Control number cannot be assigned";
+                    msg.MessageValue = "7-Insuree not enrolled while prior enrollment mandatory.";
                     Message = msg;
                     break;
                 case 8:
@@ -72,7 +72,12 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "8-Duplicated control number assigned";
                     Message = msg;
                     break;
-            
+                case 9:
+                    msg.Code = value;
+                    msg.MessageValue = "9-Control number cannot be assigned";
+                    Message = msg;
+                    break;
+
 
             }
         }
