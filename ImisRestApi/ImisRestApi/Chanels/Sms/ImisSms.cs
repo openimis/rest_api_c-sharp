@@ -1,5 +1,6 @@
 ﻿using ImisRestApi.Data;
 using ImisRestApi.Models.Sms;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -24,7 +25,7 @@ namespace ImisRestApi.Chanels.Sms
         private static string service = string.Empty;
         private static Dictionary<string, string> configuredHeaders;
 
-        public ImisSms(IConfiguration config):base(config)
+        public ImisSms(IConfiguration config, IHostingEnvironment env) :base(config,env)
         {
             PRIVATE_KEY = config["SmsGateWay:PrivateKey"];
             USER_ID = config["SmsGateWay:UserId"];
@@ -55,7 +56,7 @@ namespace ImisRestApi.Chanels.Sms
             foreach (var container in containers)
             {
                 string message = container.Message;
-                string recipients = container.Recepients;
+                string recipients = container.Recepient;
 
                 string json = GetRequestBody(message, recipients);
 
