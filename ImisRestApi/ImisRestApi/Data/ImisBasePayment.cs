@@ -128,7 +128,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
                 new SqlParameter("@ExpectedAmount", SqlDbType.Decimal){Direction = ParameterDirection.Output },
                 new SqlParameter("@ProvidedAmount",_intent.Amount),
-                new SqlParameter("@PriorEnrolment",LocalDefault.PriorEnrolmentRequired(Configuration))
+                new SqlParameter("@PriorEnrollment",LocalDefault.PriorEnrolmentRequired(Configuration))
              };
 
             DataMessage message;
