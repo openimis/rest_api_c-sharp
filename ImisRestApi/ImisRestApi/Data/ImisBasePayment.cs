@@ -232,7 +232,7 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-                throw e;
+                return false;
             }
 
             return result;
@@ -325,15 +325,16 @@ namespace ImisRestApi.Data
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@Xml", PaymentIntent.ToString()),
+                new SqlParameter("@Payment_ID",SqlDbType.BigInt){Direction = ParameterDirection.Output }
              };
             
             DataMessage message;
 
             try
             {
-                var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
-                message = new SavePayResponse(int.Parse(data[0].Value.ToString()), false).Message;
-                GetPaymentInfo(payment.PaymentId);
+                var data = dh.ExecProcedure("uspReceivePaymentTEST", sqlParameters);
+                message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
+                GetPaymentInfo(data[0].Value.ToString());
             }
             catch (Exception e)
             {
@@ -421,9 +422,9 @@ namespace ImisRestApi.Data
                 {
                     var row1 = data.Rows[0];
                     PaymentId = Id;
-                    ControlNum = Convert.ToString(row1["ControlNumber"]);
-                    ExpectedAmount = Convert.ToDecimal(row1["ExpectedAmount"]);
-                    PhoneNumber = Convert.ToString(row1["PhoneNumber"]);
+                    ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]):null;
+                    ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]):0;
+                    PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]):null;
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
                     PaidAmount = (decimal?)(row1["ReceivedAmount"] != System.DBNull.Value ? row1["ReceivedAmount"] : null);
                     OutStAmount = (decimal?)(row1["Outstanding"] != System.DBNull.Value ? row1["Outstanding"] : null);
@@ -438,14 +439,16 @@ namespace ImisRestApi.Data
                         if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 2) {
                             active = true;
                         }
-
+                        var othernames = rw["OtherNames"] != System.DBNull.Value ? Convert.ToString(rw["OtherNames"]):null;
+                        var lastname = rw["LastName"] != System.DBNull.Value ? Convert.ToString(rw["LastName"]):null;
                         InsureeProducts.Add(
                                 new InsureeProduct()
                                 {
-                                    InsureeNumber = Convert.ToString("InsuranceNumber"),
-                                    InsureeName = Convert.ToString(rw["OtherNames"]) + Convert.ToString(rw["LastName"]),
-                                    ProductName = Convert.ToString(rw["ProductName"]),
-                                    ProductCode = Convert.ToString(rw["ProductCode"]),
+                                    
+                                    InsureeNumber = rw["InsuranceNumber"] != System.DBNull.Value ? Convert.ToString(rw["InsuranceNumber"]):null,
+                                    InsureeName = othernames +" "+lastname,
+                                    ProductName = rw["ProductName"] != System.DBNull.Value ? Convert.ToString(rw["ProductName"]):null,
+                                    ProductCode = rw["ProductCode"] != System.DBNull.Value ? Convert.ToString(rw["ProductCode"]):null,
                                     ExpiryDate = (DateTime?)(rw["ExpiryDate"] != System.DBNull.Value?rw["ExpiryDate"] :null),
                                     EffectiveDate = (DateTime?)(rw["EffectiveDate"] != System.DBNull.Value ? rw["EffectiveDate"] : null),
                                     PolicyActivated = active

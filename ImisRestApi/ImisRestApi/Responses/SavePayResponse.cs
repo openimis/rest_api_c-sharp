@@ -47,6 +47,11 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "3-Wrong control_number";
                     Message = msg;
                     break;
+                case 4:
+                    msg.Code = value;
+                    msg.MessageValue = "4-Wrong Amount";
+                    Message = msg;
+                    break;
             }
         }
     }
