@@ -129,7 +129,7 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/Families/Enter_Member_Family")]
-        public IActionResult Enter_Member_Family([FromBody]FamilyMamber model)
+        public IActionResult Enter_Member_Family([FromBody]FamilyMember model)
         {
             if (!ModelState.IsValid)
             {
@@ -166,7 +166,7 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/Families/Edit_Member_Family")]
-        public IActionResult Edit_Member_Family([FromBody]EditFamilyMamber model)
+        public IActionResult Edit_Member_Family([FromBody]EditFamilyMember model)
         {
             if (!ModelState.IsValid)
             {
