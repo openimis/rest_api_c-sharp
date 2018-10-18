@@ -15,7 +15,7 @@ namespace ImisRestApi.Logic
     }
     public static class LocalDefault
     {
-        public static FamilyDefaults FamilyMambers(IConfiguration config)
+        public static FamilyDefaults FamilyMembers(IConfiguration config)
         {
             try
             {

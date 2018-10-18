@@ -84,20 +84,11 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.Match(model);
 
-            if (model.PaymentId != null)
-            {
-                if (payment.PaymentId != null)
-                {
-                    SendPaymentSms(payment);
-                }
-            }
-            else
-            {
+            if (model.PaymentId == null) {
                 List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
                 SendMatchSms(PaymentIds);
-            }
-           
-            
+            }         
+
             return response;
         }
 
@@ -118,8 +109,10 @@ namespace ImisRestApi.Logic
             var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
             var response = payment.SavePayment(model,controlNumberExists);
 
-            if(payment.PaymentId != null && model.EnrolmentOfficerCode == null)
+            if(payment.PaymentId != null && model.EnrolmentOfficerCode == null && !response.ErrorOccured)
             {
+                MatchModel matchModel = new MatchModel() { PaymentId = Convert.ToInt32(model.PaymentId), AuditUserId = -3 };
+                var matchresponse = Match(matchModel);
                 SendPaymentSms(payment);
             }
 
@@ -134,7 +127,7 @@ namespace ImisRestApi.Logic
 
             if (payment.PaymentId != null)
             {
-                if (!response.ErrorOccured && controlNumberExists)
+                if (!response.ErrorOccured && !controlNumberExists)
                 {
                     ControlNumberAssignedSms(payment);
                 }
@@ -176,9 +169,11 @@ namespace ImisRestApi.Logic
                 othersCount);
 
             List<SmsContainer> message = new List<SmsContainer>();
-            message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+            message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
 
-            string test = await sms.PushSMS(message);
+            var fileName = "CnAssigned_" + payment.PhoneNumber;
+
+            string test = await sms.PushSMS(message,fileName);
         }
 
         public async void ControlNumberNotassignedSms(ImisPayment payment,string error)
@@ -206,9 +201,11 @@ namespace ImisRestApi.Logic
                 error);
 
             List<SmsContainer> message = new List<SmsContainer>();
-            message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+            message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
 
-            string test = await sms.PushSMS(message);
+            var fileName = "CnError_" + payment.PhoneNumber;
+
+            string test = await sms.PushSMS(message,fileName);
         }
 
         public async void SendPaymentSms(ImisPayment payment)
@@ -228,12 +225,12 @@ namespace ImisRestApi.Logic
                     familyproduct.InsureeName,
                     familyproduct.ProductCode,
                     familyproduct.ProductName,
-                    familyproduct.EffectiveDate,
-                    familyproduct.ExpiryDate,
+                    familyproduct.EffectiveDate.Value.ToShortDateString(),
+                    familyproduct.ExpiryDate.Value.ToShortDateString(),
                     payment.PaidAmount);
 
                 
-                message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+                message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
 
             }
             else
@@ -248,13 +245,14 @@ namespace ImisRestApi.Logic
                     familyproduct.ProductCode,
                     familyproduct.ProductName,
                     payment.ExpectedAmount,
-                    payment.ExpectedAmount - payment.PaidAmount);
+                    payment.OutStAmount);
 
-                message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
+                message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
 
             }
+            var fileName = "PayStatSms_" + payment.PhoneNumber;
 
-            string test = await sms.PushSMS(message);
+            string test = await sms.PushSMS(message,fileName);
             payment.MatchedSmsSent();
         }
 
@@ -287,8 +285,11 @@ namespace ImisRestApi.Logic
                      othersCount);
 
 
-            message.Add(new SmsContainer() { Message = txtmsg, Recepient = payment.PhoneNumber });
-            string test = await sms.PushSMS(message);
+            message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
+
+            var fileName = "PayNotMatched_" + payment.PhoneNumber;
+
+            string test = await sms.PushSMS(message, fileName);
         }
 
         public async void SendMatchSms(List<MatchSms> Ids)
@@ -331,7 +332,7 @@ namespace ImisRestApi.Logic
                                  othersCount);
 
 
-                        message.Add(new SmsContainer() { Message = txtmsg, Recepient = _pay.PhoneNumber });
+                        message.Add(new SmsContainer() { Message = txtmsg, Recipient = _pay.PhoneNumber });
                         _pay.UnMatchedSmsSent(m.PaymentId);
                     }
                     else
@@ -340,8 +341,10 @@ namespace ImisRestApi.Logic
                     }
                 }
                 
-            }          
-            string test = await sms.PushSMS(message);
+            }
+            var fileName = "PayNotMatched_";
+
+            string test = await sms.PushSMS(message, fileName);
         }
     }
 }

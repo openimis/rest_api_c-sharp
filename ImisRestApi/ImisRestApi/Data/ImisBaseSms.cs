@@ -21,7 +21,7 @@ namespace ImisRestApi.Data
             SmsTampletes = environment.ContentRootPath + @"\Chanels\Sms\Strings\";
         }
 
-        public virtual async Task<string> PushSMS(List<SmsContainer> containers)
+        public virtual async Task<string> PushSMS(List<SmsContainer> containers,string filename)
         {
             string response_message = string.Empty;
 
@@ -43,18 +43,18 @@ namespace ImisRestApi.Data
             }
 
             var msg = JsonConvert.SerializeObject(containers);
-            SaveMessage(msg);
+            SaveMessage(msg,filename);
 
             return response_message;
 
         }
 
-        public virtual void SaveMessage(string message)
+        public virtual void SaveMessage(string message,string name)
         {
             string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string namepart = new Random().Next(100000, 999999).ToString();
 
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "rest_api_messages"+namepart+".json")))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, name +namepart+".json")))
             {
                     outputFile.WriteLine(message);
             }

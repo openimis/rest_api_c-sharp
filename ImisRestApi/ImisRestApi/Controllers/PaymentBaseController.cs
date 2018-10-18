@@ -43,7 +43,7 @@ namespace ImisRestApi.Controllers
 
             var response = await _payment.Match(model);           
            
-            return Ok(new { isMatched = !response.ErrorOccured});
+            return Ok(new { code = response.Code, error = response.ErrorOccured, errorMessage = response.MessageValue});
         }
 
         //Recieve Payment from Operator/
@@ -60,7 +60,7 @@ namespace ImisRestApi.Controllers
 
             var response = await _payment.SaveIntent(intent);
 
-            return Ok(new { error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
+            return Ok(new { code = response.Code, error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
         }
 
         [HttpPost]
@@ -75,7 +75,7 @@ namespace ImisRestApi.Controllers
 
             var response = _payment.SaveAcknowledgement(model);
 
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data, control_number = response.Data });
+            return Ok(new { code = response.Code,error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
         }
 
         [HttpPost]
@@ -89,7 +89,7 @@ namespace ImisRestApi.Controllers
             }
 
             var response = _payment.SaveControlNumber(model);
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data });
+            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue });
         }
 
         [HttpPost]
@@ -103,24 +103,24 @@ namespace ImisRestApi.Controllers
             }
 
             var response = _payment.SavePayment(model);
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.Data});
+            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue});
         }
 
-        [HttpPost]
-        [Route("api/SendSms")]
-        public virtual IActionResult SendSms([FromBody]List<SmsContainer> model)
-        {
-            if (!ModelState.IsValid)
-            {
-                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
-            }
+        //[HttpPost]
+        //[Route("api/SendSms")]
+        //public virtual IActionResult SendSms([FromBody]List<SmsContainer> model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+        //        return BadRequest(new { error_occured = true, error_message = error });
+        //    }
 
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-            var response = sms.PushSMS(model);
+        //    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+        //    var response = sms.PushSMS(model,"");
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
 
 
     }

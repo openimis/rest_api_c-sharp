@@ -79,7 +79,11 @@ namespace ImisRestApi
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+            });
+
             app.UseSwaggerUI(x => {
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "IMIS REST");
             });
