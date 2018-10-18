@@ -12,6 +12,7 @@ namespace ImisRestApi.Data
     {
         private readonly string ConnectionString;
 
+        public int ReturnValue { get; set; }
 
         public DataHelper(IConfiguration configuration)
         {
@@ -22,13 +23,17 @@ namespace ImisRestApi.Data
         {
             DataSet ds = new DataSet();
             var sqlConnection = new SqlConnection(ConnectionString);
+
+            SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
+            returnParameter.Direction = ParameterDirection.ReturnValue;
+            
             var command = new SqlCommand(SQL, sqlConnection)
             {
                 CommandType = commandType
             };
+            command.Parameters.Add(returnParameter);
 
             var adapter = new SqlDataAdapter(command);
-
             using (command)
             {
                 if (parameters.Length > 0)
@@ -36,6 +41,8 @@ namespace ImisRestApi.Data
                 adapter.Fill(ds);
                
             }
+
+            ReturnValue = int.Parse(returnParameter.Value.ToString());
 
             return ds;
         }

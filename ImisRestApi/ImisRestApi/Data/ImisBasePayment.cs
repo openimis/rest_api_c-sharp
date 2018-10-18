@@ -92,7 +92,7 @@ namespace ImisRestApi.Data
 
         public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
-            var Proxyfamily = LocalDefault.FamilyMambers(Configuration);
+            var Proxyfamily = LocalDefault.FamilyMembers(Configuration);
 
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
@@ -332,7 +332,7 @@ namespace ImisRestApi.Data
 
             try
             {
-                var data = dh.ExecProcedure("uspReceivePaymentTEST", sqlParameters);
+                var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
                 message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
                 GetPaymentInfo(data[0].Value.ToString());
             }
@@ -357,27 +357,37 @@ namespace ImisRestApi.Data
             try
             {
                 DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
-                DataTable dt = data.Tables[data.Tables.Count - 1];
 
-                bool error = true;
+                bool error = false;
+                DataTable dt = new DataTable();
 
-                if (dt.Rows.Count > 0) {
-                    var firstRow = dt.Rows[0];
-
-                    if(Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
-                    {
-                        error = false;
-                    }
-                    
-                }
-                else
+                if (data.Tables.Count > 0)
                 {
-                    error = true;
-                }
+                    dt = data.Tables[data.Tables.Count - 1];
 
+                    error = true;
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        var firstRow = dt.Rows[0];
+
+                        if (Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
+                        {
+                            error = false;
+                        }
+
+                    }
+                    else
+                    {
+                        error = true;
+                    }
+                }
                 
-                message = new ImisApiResponse(0,error,dt).Message;
-                GetPaymentInfo(model.PaymentId.ToString());
+                message = new MatchPayResponse(dh.ReturnValue,error,dt).Message;
+                if(model.PaymentId != null && !message.ErrorOccured)
+                {
+                    GetPaymentInfo(model.PaymentId.ToString());
+                }
             }
             catch (Exception e)
             {
@@ -489,8 +499,7 @@ namespace ImisRestApi.Data
                         ON tblPremium.PolicyID = tblPolicy.PolicyID 
                         ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
                         WHERE (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)
-						AND tblPayment.PaymentStatus >= 4
-						AND tblPayment.SentActivatedSms = 0";
+						AND tblPayment.PaymentStatus = 4";
 
             SqlParameter[] parameters = {};
 
@@ -538,13 +547,12 @@ namespace ImisRestApi.Data
         public void MatchedSmsSent()
         {
             var sSQL = @"UPDATE tblPayment
-                         SET DateLastSMS = @Today, SentActivatedSms = @SentActivatedSms
+                         SET DateLastSMS = @Today
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", PaymentId),
-                new SqlParameter("@Today",DateTime.UtcNow),
-                new SqlParameter("@SentActivatedSms",true)
+                new SqlParameter("@Today",DateTime.UtcNow)
             };
 
             try

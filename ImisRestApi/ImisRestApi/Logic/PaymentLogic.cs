@@ -84,8 +84,10 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.Match(model);
 
-            List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
-            SendMatchSms(PaymentIds);
+            if (model.PaymentId == null) {
+                List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
+                SendMatchSms(PaymentIds);
+            }         
 
             return response;
         }

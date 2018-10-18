@@ -52,6 +52,11 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "4-Wrong Amount";
                     Message = msg;
                     break;
+                case 5:
+                    msg.Code = value;
+                    msg.MessageValue = "5-Duplicate Payment Amount";
+                    Message = msg;
+                    break;
             }
         }
     }

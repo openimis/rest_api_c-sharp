@@ -273,7 +273,7 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public DataMessage AddMamber(FamilyMamber model)
+        public DataMessage AddMamber(FamilyMember model)
         {
             DataHelper helper = new DataHelper(Configuration);
 
@@ -316,7 +316,7 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        public DataMessage EditMamber(EditFamilyMamber model)
+        public DataMessage EditMamber(EditFamilyMember model)
         {
             DataHelper helper = new DataHelper(Configuration);
 
