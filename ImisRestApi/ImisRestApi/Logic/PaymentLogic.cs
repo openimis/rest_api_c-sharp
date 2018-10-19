@@ -86,7 +86,9 @@ namespace ImisRestApi.Logic
 
             if (model.PaymentId == null) {
                 List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
-                SendMatchSms(PaymentIds);
+
+                if(PaymentIds != null)
+                    SendMatchSms(PaymentIds);
             }         
 
             return response;
