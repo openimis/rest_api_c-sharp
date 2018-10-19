@@ -49,14 +49,14 @@ namespace ImisRestApi.Chanels.Sms
             //configuredHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(headers);
         }
 
-        public override async Task<string> PushSMS(List<SmsContainer> containers)
+        public override async Task<string> PushSMS(List<SmsContainer> containers,string filename = null)
         {
             string response_message = string.Empty;
 
             foreach (var container in containers)
             {
                 string message = container.Message;
-                string recipients = container.Recepient;
+                string recipients = container.Recipient;
 
                 string json = GetRequestBody(message, recipients);
 

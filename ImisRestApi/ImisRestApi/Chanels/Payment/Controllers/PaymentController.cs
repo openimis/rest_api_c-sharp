@@ -98,8 +98,8 @@ namespace ImisRestApi.Controllers
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         public IActionResult ReceiveControlNumberChf([FromBody] GepgBillResponse model)
-        {
-            foreach (var bill in model.BillTrxInf)
+         {
+            foreach (var bill in model.BillTrxRespInf)
             {
                 ControlNumberResp ControlNumberResponse = new ControlNumberResp()
                 {
@@ -119,7 +119,7 @@ namespace ImisRestApi.Controllers
                     throw e;
                 }
             }
-            
+
             return Ok(p.ControlNumberResp());
         }
     }

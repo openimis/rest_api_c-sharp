@@ -167,7 +167,6 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-
                 message = new DeleteMamberFamilyResponse(e).Message;
             }
 
