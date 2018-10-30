@@ -358,32 +358,32 @@ namespace ImisRestApi.Data
             {
                 DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
 
-                bool error = false;
+                //bool error = false;
                 DataTable dt = new DataTable();
 
                 if (data.Tables.Count > 0)
                 {
                     dt = data.Tables[data.Tables.Count - 1];
 
-                    error = true;
+                //    error = true;
 
-                    if (dt.Rows.Count > 0)
-                    {
-                        var firstRow = dt.Rows[0];
+                //    if (dt.Rows.Count > 0)
+                //    {
+                //        var firstRow = dt.Rows[0];
 
-                        if (Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
-                        {
-                            error = false;
-                        }
+                //        if (Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
+                //        {
+                //            error = false;
+                //        }
 
-                    }
-                    else
-                    {
-                        error = true;
-                    }
+                //    }
+                //    else
+                //    {
+                //        error = true;
+                //    }
                 }
                 
-                message = new MatchPayResponse(dh.ReturnValue,error,dt).Message;
+                message = new MatchPayResponse(dh.ReturnValue,false,dt).Message;
                 if(model.PaymentId != null && !message.ErrorOccured)
                 {
                     GetPaymentInfo(model.PaymentId.ToString());
