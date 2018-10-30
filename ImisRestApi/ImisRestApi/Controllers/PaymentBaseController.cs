@@ -43,7 +43,7 @@ namespace ImisRestApi.Controllers
 
             var response = await _payment.Match(model);           
            
-            return Ok(new { code = response.Code, error = response.ErrorOccured, errorMessage = response.MessageValue});
+            return Ok(response);
         }
 
         //Recieve Payment from Operator/
