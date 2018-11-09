@@ -37,7 +37,7 @@ namespace ImisRestApi.Logic
 
             if (intentResponse.Code == 0)
             {
-                var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails);
+                var response = payment.PostReqControlNumber(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails);
               
                 if (response.ControlNumber != null)
                 {
@@ -72,7 +72,7 @@ namespace ImisRestApi.Logic
             }
             else
             {
-                var response = payment.GenerateCtrlNoRequest(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails,null,false,true);
+                var response = payment.PostReqControlNumber(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails,null,false,true);
                 return_message = intentResponse;
             }
             
@@ -113,6 +113,8 @@ namespace ImisRestApi.Logic
 
             if(payment.PaymentId != null && model.EnrolmentOfficerCode == null && !response.ErrorOccured)
             {
+                var ackResponse = payment.GetPaymentDataAck(payment.PaymentId,payment.ControlNum);
+
                 MatchModel matchModel = new MatchModel() { PaymentId = Convert.ToInt32(model.PaymentId), AuditUserId = -3 };
                 var matchresponse = Match(matchModel);
                 SendPaymentSms(payment);
@@ -129,6 +131,8 @@ namespace ImisRestApi.Logic
 
             if (payment.PaymentId != null)
             {
+                var ackResponse = payment.GetReqControlNumberAck(payment.PaymentId);
+
                 if (!response.ErrorOccured && !controlNumberExists)
                 {
                     ControlNumberAssignedSms(payment);
@@ -175,7 +179,7 @@ namespace ImisRestApi.Logic
 
             var fileName = "CnAssigned_" + payment.PhoneNumber;
 
-            string test = await sms.PushSMS(message,fileName);
+            string test = await sms.SendSMS(message,fileName);
         }
 
         public async void ControlNumberNotassignedSms(ImisPayment payment,string error)
@@ -200,14 +204,15 @@ namespace ImisRestApi.Logic
                 DateTime.UtcNow.ToLongTimeString(),
                 payment.InsureeProducts.FirstOrDefault().InsureeNumber,
                 payment.InsureeProducts.FirstOrDefault().ProductCode,
-                error);
+                error,
+                othersCount);
 
             List<SmsContainer> message = new List<SmsContainer>();
             message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
 
             var fileName = "CnError_" + payment.PhoneNumber;
 
-            string test = await sms.PushSMS(message,fileName);
+            string test = await sms.SendSMS(message,fileName);
         }
 
         public async void SendPaymentSms(ImisPayment payment)
@@ -254,7 +259,7 @@ namespace ImisRestApi.Logic
             }
             var fileName = "PayStatSms_" + payment.PhoneNumber;
 
-            string test = await sms.PushSMS(message,fileName);
+            string test = await sms.SendSMS(message,fileName);
             payment.MatchedSmsSent();
         }
 
@@ -291,7 +296,7 @@ namespace ImisRestApi.Logic
 
             var fileName = "PayNotMatched_" + payment.PhoneNumber;
 
-            string test = await sms.PushSMS(message, fileName);
+            string test = await sms.SendSMS(message, fileName);
         }
 
         public async void SendMatchSms(List<MatchSms> Ids)
@@ -346,7 +351,7 @@ namespace ImisRestApi.Logic
             }
             var fileName = "PayNotMatched_";
 
-            string test = await sms.PushSMS(message, fileName);
+            string test = await sms.SendSMS(message, fileName);
         }
     }
 }
