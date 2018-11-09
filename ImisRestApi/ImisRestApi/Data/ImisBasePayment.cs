@@ -65,7 +65,7 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
+        public virtual ControlNumberResp PostReqControlNumber(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
             bool result = SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
@@ -90,6 +90,15 @@ namespace ImisRestApi.Data
             return response;
         }
 
+        public virtual int GetReqControlNumberAck(string paymentId)
+        {
+            return 0;
+        }
+
+        public virtual int GetPaymentDataAck(string paymentId, string controlNumber)
+        {
+            return 0;
+        }
         public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
             var Proxyfamily = LocalDefault.FamilyMembers(Configuration);

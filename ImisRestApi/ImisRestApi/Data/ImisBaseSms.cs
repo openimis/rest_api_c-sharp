@@ -21,7 +21,7 @@ namespace ImisRestApi.Data
             SmsTampletes = environment.ContentRootPath + @"\Chanels\Sms\Strings\";
         }
 
-        public virtual async Task<string> PushSMS(List<SmsContainer> containers,string filename)
+        public virtual async Task<string> SendSMS(List<SmsContainer> containers,string filename)
         {
             string response_message = string.Empty;
 
