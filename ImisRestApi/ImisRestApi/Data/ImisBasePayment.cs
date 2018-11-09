@@ -30,6 +30,7 @@ namespace ImisRestApi.Data
 
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
+        public decimal? OutStAmount { get; set; }
         public List<InsureeProduct> InsureeProducts { get; set; }
 
         protected IConfiguration Configuration;
@@ -64,18 +65,18 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual ControlNumberResp GenerateCtrlNoRequest(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
+        public virtual ControlNumberResp PostReqControlNumber(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
             bool result = SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
 
             //BEGIN Temporary Control Number Generator(Simulation For Testing Only)
-            var randomNumber = new Random().Next(100000, 999999);
+            //var randomNumber = new Random().Next(100000, 999999);
             
-            if(randomNumber%2 == 0)
-            {
-                ctrlNumber = randomNumber.ToString();
-            }
+            //if(randomNumber%2 == 0)
+            //{
+            //    ctrlNumber = randomNumber.ToString();
+            //}
             //END Temporary 
 
             ControlNumberResp response = new ControlNumberResp() {
@@ -89,9 +90,18 @@ namespace ImisRestApi.Data
             return response;
         }
 
+        public virtual int GetReqControlNumberAck(string paymentId)
+        {
+            return 0;
+        }
+
+        public virtual int GetPaymentDataAck(string paymentId, string controlNumber)
+        {
+            return 0;
+        }
         public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
-            var Proxyfamily = LocalDefault.FamilyMambers(Configuration);
+            var Proxyfamily = LocalDefault.FamilyMembers(Configuration);
 
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
@@ -128,7 +138,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
                 new SqlParameter("@ExpectedAmount", SqlDbType.Decimal){Direction = ParameterDirection.Output },
                 new SqlParameter("@ProvidedAmount",_intent.Amount),
-                new SqlParameter("@PriorEnrolment",LocalDefault.PriorEnrolmentRequired(Configuration))
+                new SqlParameter("@PriorEnrollment",LocalDefault.PriorEnrolmentRequired(Configuration))
              };
 
             DataMessage message;
@@ -227,11 +237,11 @@ namespace ImisRestApi.Data
                 {
                     result = true;
                 }
-                GetPaymentInfo(PaymentID);
+                //GetPaymentInfo(PaymentID);
             }
             catch (Exception e)
             {
-                throw e;
+                return false;
             }
 
             return result;
@@ -324,6 +334,7 @@ namespace ImisRestApi.Data
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@Xml", PaymentIntent.ToString()),
+                new SqlParameter("@Payment_ID",SqlDbType.BigInt){Direction = ParameterDirection.Output }
              };
             
             DataMessage message;
@@ -331,8 +342,8 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
-                message = new SavePayResponse(int.Parse(data[0].Value.ToString()), false).Message;
-                GetPaymentInfo(payment.PaymentId);
+                message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
+                GetPaymentInfo(data[0].Value.ToString());
             }
             catch (Exception e)
             {
@@ -355,27 +366,37 @@ namespace ImisRestApi.Data
             try
             {
                 DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
-                DataTable dt = data.Tables[data.Tables.Count - 1];
 
-                bool error = true;
+                //bool error = false;
+                DataTable dt = new DataTable();
 
-                if (dt.Rows.Count > 0) {
-                    var firstRow = dt.Rows[0];
-
-                    if(Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
-                    {
-                        error = false;
-                    }
-                    
-                }
-                else
+                if (data.Tables.Count > 0)
                 {
-                    error = true;
-                }
+                    dt = data.Tables[data.Tables.Count - 1];
 
+                //    error = true;
+
+                //    if (dt.Rows.Count > 0)
+                //    {
+                //        var firstRow = dt.Rows[0];
+
+                //        if (Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
+                //        {
+                //            error = false;
+                //        }
+
+                //    }
+                //    else
+                //    {
+                //        error = true;
+                //    }
+                }
                 
-                message = new ImisApiResponse(0,error,dt).Message;
-                GetPaymentInfo(model.PaymentId.ToString());
+                message = new MatchPayResponse(dh.ReturnValue,false,dt).Message;
+                if(model.PaymentId != null && !message.ErrorOccured)
+                {
+                    GetPaymentInfo(model.PaymentId.ToString());
+                }
             }
             catch (Exception e)
             {
@@ -389,7 +410,7 @@ namespace ImisRestApi.Data
         {
             var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
                         tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
-                        tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus
+                        tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus, tblPolicy.PolicyValue - ISNULL(mp.PrPaid,0) Outstanding
                         FROM tblControlNumber 
                         RIGHT OUTER JOIN tblInsuree 
                         RIGHT OUTER JOIN tblProduct 
@@ -400,7 +421,10 @@ namespace ImisRestApi.Data
                         ON tblInsuree.CHFID = tblPaymentDetails.InsuranceNumber 
                         ON tblControlNumber.PaymentID = tblPayment.PaymentID 
                         LEFT OUTER JOIN tblPremium 
-                        LEFT OUTER JOIN tblPolicy 
+                        LEFT OUTER JOIN tblPolicy
+						LEFT OUTER JOIN (
+						select P.PolicyID PolID, SUM(P.Amount) PrPaid from tblpremium P inner join tblPaymentDetails PD ON PD.PremiumID = P.PremiumId INNER JOIN tblPayment Pay ON Pay.PaymentID = PD.PaymentID  where P.ValidityTo IS NULL AND Pay.PaymentStatus  = 5 GROUP BY P.PolicyID
+						) MP ON MP.PolID = tblPolicy.PolicyID
                         ON tblPremium.PolicyID = tblPolicy.PolicyID 
                         ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
                         WHERE (tblPayment.PaymentID = @PaymentID) AND (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)";
@@ -417,11 +441,12 @@ namespace ImisRestApi.Data
                 {
                     var row1 = data.Rows[0];
                     PaymentId = Id;
-                    ControlNum = Convert.ToString(row1["ControlNumber"]);
-                    ExpectedAmount = Convert.ToDecimal(row1["ExpectedAmount"]);
-                    PhoneNumber = Convert.ToString(row1["PhoneNumber"]);
+                    ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]):null;
+                    ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]):0;
+                    PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]):null;
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
                     PaidAmount = (decimal?)(row1["ReceivedAmount"] != System.DBNull.Value ? row1["ReceivedAmount"] : null);
+                    OutStAmount = (decimal?)(row1["Outstanding"] != System.DBNull.Value ? row1["Outstanding"] : null);
                     InsureeProducts = new List<InsureeProduct>();
 
                     for (int i = 0; i < data.Rows.Count; i++)
@@ -430,17 +455,19 @@ namespace ImisRestApi.Data
 
                         bool active = false;
 
-                        if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 1) {
+                        if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 2) {
                             active = true;
                         }
-
+                        var othernames = rw["OtherNames"] != System.DBNull.Value ? Convert.ToString(rw["OtherNames"]):null;
+                        var lastname = rw["LastName"] != System.DBNull.Value ? Convert.ToString(rw["LastName"]):null;
                         InsureeProducts.Add(
                                 new InsureeProduct()
                                 {
-                                    InsureeNumber = Convert.ToString("InsuranceNumber"),
-                                    InsureeName = Convert.ToString(rw["OtherNames"]) + Convert.ToString(rw["LastName"]),
-                                    ProductName = Convert.ToString(rw["ProductName"]),
-                                    ProductCode = Convert.ToString(rw["ProductCode"]),
+                                    
+                                    InsureeNumber = rw["InsuranceNumber"] != System.DBNull.Value ? Convert.ToString(rw["InsuranceNumber"]):null,
+                                    InsureeName = othernames +" "+lastname,
+                                    ProductName = rw["ProductName"] != System.DBNull.Value ? Convert.ToString(rw["ProductName"]):null,
+                                    ProductCode = rw["ProductCode"] != System.DBNull.Value ? Convert.ToString(rw["ProductCode"]):null,
                                     ExpiryDate = (DateTime?)(rw["ExpiryDate"] != System.DBNull.Value?rw["ExpiryDate"] :null),
                                     EffectiveDate = (DateTime?)(rw["EffectiveDate"] != System.DBNull.Value ? rw["EffectiveDate"] : null),
                                     PolicyActivated = active
@@ -481,8 +508,7 @@ namespace ImisRestApi.Data
                         ON tblPremium.PolicyID = tblPolicy.PolicyID 
                         ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
                         WHERE (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)
-						AND tblPayment.PaymentStatus >= 4
-						AND tblPayment.SentActivatedSms = 0";
+						AND tblPayment.PaymentStatus = 4";
 
             SqlParameter[] parameters = {};
 
@@ -530,13 +556,12 @@ namespace ImisRestApi.Data
         public void MatchedSmsSent()
         {
             var sSQL = @"UPDATE tblPayment
-                         SET DateLastSMS = @Today, SentActivatedSms = @SentActivatedSms
+                         SET DateLastSMS = @Today
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", PaymentId),
-                new SqlParameter("@Today",DateTime.UtcNow),
-                new SqlParameter("@SentActivatedSms",true)
+                new SqlParameter("@Today",DateTime.UtcNow)
             };
 
             try

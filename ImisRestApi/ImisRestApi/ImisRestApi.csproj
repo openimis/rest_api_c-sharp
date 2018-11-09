@@ -32,8 +32,4 @@
     <Folder Include="Chanels\Payment\Response\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Desktop\SmsModule\SmsTz\SmsTz.csproj" />
-  </ItemGroup>
-
 </Project>

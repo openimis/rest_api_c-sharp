@@ -20,7 +20,6 @@ namespace ImisRestApi.Models.Payment
         public DateTime ReceivedDate { get; set; }
         public DateTime PaymentDate { get; set; }
         public string PaymentOrigin { get; set; }
-        public bool ErrorOccured { get; set; }
         public string ReceiptNumber { get; set; }
         public string PhoneNumber { get; set; }
         [InsureeNumber]
