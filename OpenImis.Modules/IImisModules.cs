@@ -1,5 +1,5 @@
 ﻿using OpenImis.Modules.UserModule;
-using OpenImis.Modules.WSModule;
+using OpenImis.Modules.InsureeManagementModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +20,6 @@ namespace OpenImis.Modules
 		/// </returns>
 		IUserModule GetUserModule();
 
-        IWSModule GetWSModule();
+        IInsureeManagementModule GetInsureeManagementModule();
     }
 }

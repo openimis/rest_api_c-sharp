@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.Modules.WSModule.Models
+namespace OpenImis.Modules.InsureeManagementModule.Models
 {
     public class FamilyModel
     {

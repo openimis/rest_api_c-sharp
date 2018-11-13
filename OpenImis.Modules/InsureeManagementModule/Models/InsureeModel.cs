@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.Modules.WSModule.Models
+namespace OpenImis.Modules.InsureeManagementModule.Models
 {
     public class InsureeModel
     {
@@ -25,7 +25,7 @@ namespace OpenImis.Modules.WSModule.Models
 		public int Education { get; set; }
 		public string Email { get; set; }
 		public char TypeOfId { get; set; }
-		public string HFID { get; set; }
+		public int HFID { get; set; }
 		public string CurrentAddress { get; set; }
 		public string GeoLocation { get; set; }
 		public string CurVillage { get; set; }
@@ -61,7 +61,7 @@ namespace OpenImis.Modules.WSModule.Models
 			this.Education = TypeCast.GetValue<int>(tblInsuree.Education);
 			this.Email = tblInsuree.Email;
 			this.TypeOfId = tblInsuree.TypeOfId == null ? ' ' : tblInsuree.TypeOfId[0];
-			this.HFID = TypeCast.GetValue<string>(tblInsuree.Hfid);
+			this.HFID = TypeCast.GetValue<short>(tblInsuree.Hfid);
 			this.CurrentAddress = tblInsuree.CurrentAddress;
 			this.GeoLocation = tblInsuree.GeoLocation;
 			this.CurVillage = TypeCast.GetValue<string>(tblInsuree.CurrentVillage); // todo: is there any link missing?

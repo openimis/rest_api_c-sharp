@@ -1,23 +1,23 @@
-﻿using OpenImis.Modules.WSModule.Models;
+﻿using OpenImis.Modules.InsureeManagementModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.Modules.WSModule.Controllers
+namespace OpenImis.Modules.InsureeManagementModule.Logic
 {
     /// <summary>
     /// This interface serves to define the methods which must be implemented in any specific instance 
     /// </summary>
-    public interface IInsureeController
+    public interface IInsureeLogic
     {
 
 		/// <summary>
 		/// Get insuree by insuree number
 		/// </summary>
-		/// <param name="chfId"></param>
+		/// <param name="insureeId"></param>
 		/// <returns>InsureeModel</returns>
-		Task<InsureeModel> GetInsuree(string chfId);
+		Task<InsureeModel> GetInsureeById(string insureeId);
 				
 	}
 }

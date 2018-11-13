@@ -1,5 +1,5 @@
 ﻿using OpenImis.Modules.Utils;
-using OpenImis.Modules.WSModule.Models;
+using OpenImis.Modules.InsureeManagementModule.Models;
 using OpenImis.DB.SqlServer;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace OpenImis.Modules.WSModule.Repositories
+namespace OpenImis.Modules.InsureeManagementModule.Repositories
 {
     public class InsureeRepository: IInsureeRepository
     {
@@ -39,7 +39,7 @@ namespace OpenImis.Modules.WSModule.Repositories
 										 Education = TypeCast.GetValue<short>(i.Education),
 										 Email = i.Email,
 										 TypeOfId = i.TypeOfId == null ? ' ' : i.TypeOfId[0],
-										 HFID = TypeCast.GetValue<string>(i.Hfid),
+										 HFID = TypeCast.GetValue<short>(i.Hfid),
 										 CurrentAddress = i.CurrentAddress,
 										 GeoLocation = i.GeoLocation,
 										 CurVillage = TypeCast.GetValue<string>(i.CurrentVillage), // todo: is there any link missing?
@@ -81,7 +81,7 @@ namespace OpenImis.Modules.WSModule.Repositories
 								Education = TypeCast.GetValue<short>(i.Education),
 								Email = i.Email,
 								TypeOfId = i.TypeOfId == null ? ' ' : i.TypeOfId[0],
-								HFID = TypeCast.GetValue<string>(i.Hfid),
+								HFID = TypeCast.GetValue<int>(i.Hfid),
 								CurrentAddress = i.CurrentAddress,
 								GeoLocation = i.GeoLocation,
 								CurVillage = TypeCast.GetValue<string>(i.CurrentVillage), // todo: is there any link missing?

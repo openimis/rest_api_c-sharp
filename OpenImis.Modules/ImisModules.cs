@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using OpenImis.Modules.UserModule;
 using OpenImis.Modules.UserModule.Controllers;
-using OpenImis.Modules.WSModule;
-using OpenImis.Modules.WSModule.Controllers;
+using OpenImis.Modules.InsureeManagementModule;
+using OpenImis.Modules.InsureeManagementModule.Logic;
 using System;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -31,7 +31,7 @@ namespace OpenImis.Modules
     {
 
 		private IUserModule _userModule;
-        private IWSModule _wsModule;
+        private IInsureeManagementModule _wsModule;
 
 		private readonly IConfiguration _configuration;
 		private readonly ILogger logger;
@@ -66,17 +66,17 @@ namespace OpenImis.Modules
 		/// <returns>
 		/// The Web Services integration module.
 		/// </returns>
-		public IWSModule GetWSModule()
+		public IInsureeManagementModule GetInsureeManagementModule()
 		{
 			if (_wsModule == null)
 			{
-				_wsModule = new WSModule.WSModule();
+				_wsModule = new InsureeManagementModule.WSModule();
 
-				Type insureeControllerType = CreateTypeFromConfiguration("WSModule", "InsureeController", "OpenImis.Modules.WSModule.Controllers.InsureeController");
-				_wsModule.SetInsureeController((IInsureeController)Activator.CreateInstance(insureeControllerType));
+				Type insureeControllerType = CreateTypeFromConfiguration("InsureeManagementModule", "InsureeLogic", "OpenImis.Modules.WSModule.Logic.InsureeLogic");
+				_wsModule.SetInsureeLogic((IInsureeLogic)Activator.CreateInstance(insureeControllerType));
 
-				Type familyControllerType = CreateTypeFromConfiguration("WSModule", "FamilyController", "OpenImis.Modules.WSModule.Controllers.FamilyController");
-				_wsModule.SetFamilyController((IFamilyController)Activator.CreateInstance(familyControllerType));
+				Type familyControllerType = CreateTypeFromConfiguration("InsureeManagementModule", "FamilyLogic", "OpenImis.Modules.WSModule.Logic.FamilyLogic");
+				_wsModule.SetFamilyLogic((IFamilyLogic)Activator.CreateInstance(familyControllerType));
 
 			}
 			return _wsModule;

@@ -1,23 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
-using OpenImis.Modules.WSModule.Repositories;
-using OpenImis.Modules.WSModule.Models;
+﻿using System.Threading.Tasks;
+using OpenImis.Modules.InsureeManagementModule.Repositories;
+using OpenImis.Modules.InsureeManagementModule.Models;
 
-namespace OpenImis.Modules.WSModule.Controllers
+namespace OpenImis.Modules.InsureeManagementModule.Logic
 {
 	/// <summary>
 	/// This class is actual implementation of IInsureeController methods for Master Version implementation 
 	/// </summary>
-	public class InsureeController: IInsureeController
+	public class InsureeLogic: IInsureeLogic
     {
 
 		private readonly IInsureeRepository _insureeRepository;
 
-        public InsureeController()
+        public InsureeLogic()
         {
 			_insureeRepository = new InsureeRepository();
         }
@@ -25,15 +20,15 @@ namespace OpenImis.Modules.WSModule.Controllers
 		/// <summary>
 		/// Get insuree by insuree number
 		/// </summary>
-		/// <param name="chfId"></param>
+		/// <param name="insureeId"></param>
 		/// <returns>InsureeModel</returns>
-		public async Task<InsureeModel> GetInsuree(string chfId)
+		public async Task<InsureeModel> GetInsureeById(string insureeId)
 		{
 			// Validate input
 			
 			// Execute business behaviour
 			InsureeModel insuree;
-			insuree = await _insureeRepository.GetInsureeByCHFIDAsync(chfId);
+			insuree = await _insureeRepository.GetInsureeByCHFIDAsync(insureeId);
 
 			// Validate results
 

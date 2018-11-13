@@ -3,9 +3,9 @@
 		"UserModule": {
 			"UserController": "OpenImis.Modules.UserModule.Controllers.UserController"
 		},
-		"WSModule": {
-			"FamilyController": "OpenImis.Modules.WSModule.Controllers.FamilyController",
-			"InsureeController": "OpenImis.Modules.WSModule.Controllers.InsureeController"
-		}
+			"InsureeManagementModule": {
+				"FamilyLogic": "OpenImis.Modules.InsureeManagementModule.Logic.FamilyLogic",
+				"InsureeLogic": "OpenImis.Modules.InsureeManagementModule.Logic.InsureeLogic"
+			}
 	}
 }

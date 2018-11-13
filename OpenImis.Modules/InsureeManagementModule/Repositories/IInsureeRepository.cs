@@ -1,10 +1,10 @@
-﻿using OpenImis.Modules.WSModule.Models;
+﻿using OpenImis.Modules.InsureeManagementModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.Modules.WSModule.Repositories
+namespace OpenImis.Modules.InsureeManagementModule.Repositories
 {
     public interface IInsureeRepository
     {
