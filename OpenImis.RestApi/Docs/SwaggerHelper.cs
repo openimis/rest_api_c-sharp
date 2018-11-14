@@ -81,9 +81,11 @@ namespace OpenImis.RestApi.Docs
         public static void ConfigureSwagger(SwaggerOptions swaggerOptions)
         {
             swaggerOptions.RouteTemplate = "api-docs/{documentName}/swagger.json";
-        }
+			swaggerOptions.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
 
-        public static void ConfigureSwaggerUI(SwaggerUIOptions swaggerUIOptions)
+		}
+
+		public static void ConfigureSwaggerUI(SwaggerUIOptions swaggerUIOptions)
         {
             var webApiAssembly = Assembly.GetEntryAssembly();
             var apiVersions = GetApiVersions(webApiAssembly);

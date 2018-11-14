@@ -39,7 +39,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 			return familyModel;
 		}
 
-		public async Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 0)
+		public async Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 20)
 		{
 			// Authorize user
 
@@ -47,7 +47,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 			
 			// Execute business behaviour
 			FamilyModel[] families;
-			families = await _familyRepository.GetAllFamilies();
+			families = await _familyRepository.GetAllFamilies(page, numberPerPage);
 
 			// Validate results
 
@@ -57,5 +57,24 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 			return families;
 		}
 
+		public async Task AddFamily(FamilyModel family)
+		{
+			// Authorize user
+
+			// Validate input
+			// check if the insuree number is correct 
+			foreach (InsureeModel insuree in family.Insurees) { 
+				_insureeNumberValidator.Validate(insuree.CHFID);
+			}	
+
+			// Execute business behaviour
+			await _familyRepository.AddNewFamily(family);
+
+			// Validate results
+
+			// Validate data access rights
+
+			// Return results 
+		}
 	}
 }

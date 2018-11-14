@@ -22,6 +22,28 @@ namespace OpenImis.Modules.InsureeManagementModule.Validators
 				validator.Validate(input);
 			}
 
+			string insuranceNumber = (string)input;
+
+			if (insuranceNumber.Length == 0)
+			{
+				throw new ValidationException("The insuree number is missing");
+			}
+
+			if (!this.IsValidInsuranceNumber(insuranceNumber))
+			{
+				throw new ValidationException("The insuree number is not valid");
+			}
+
+
+			//if (!isValid) throw new ValidationException();
 		}
+
+		private bool IsValidInsuranceNumber(string insuranceNumber)
+		{
+			if (insuranceNumber.Length > 12) return false;
+
+			return true;			
+		}
+
 	}
 }

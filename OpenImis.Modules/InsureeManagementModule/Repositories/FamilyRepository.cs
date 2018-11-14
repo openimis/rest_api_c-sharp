@@ -17,9 +17,9 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 	public class FamilyRepository : IFamilyRepository
 	{
 
-        public FamilyRepository()
-        {
-        }
+		public FamilyRepository()
+		{
+		}
 
 		public async Task<FamilyModel> GetFamilyByInsureeId(string insureeId)
 		{
@@ -27,59 +27,24 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 
 			using (var imisContext = new ImisDB())
 			{
-				familyModel = await (from i in imisContext.TblInsuree
-									 join f in imisContext.TblFamilies on i.FamilyId equals f.FamilyId
-									 where i.Chfid == insureeId
-									 select new FamilyModel()
-									 {
-										FamilyId = f.FamilyId,
-										LocationId = TypeCast.GetValue<int>(f.LocationId),
-										Poverty = TypeCast.GetValue<bool>(f.Poverty),
-										FamilyType = f.FamilyType == null ? ' ' : f.FamilyType[0],
-										FamilyAddress = f.FamilyAddress,
-										Ethnicity = f.Ethnicity,
-										ConfirmationNo = f.ConfirmationNo,
-										ConfirmationType = f.ConfirmationType,
-										IsOffline = TypeCast.GetValue<bool>(f.IsOffline),
-									}).FirstOrDefaultAsync();
+				familyModel = await
+									 //(from i in imisContext.TblInsuree
+									 //				 join f in imisContext.TblFamilies on i.FamilyId equals f.FamilyId
+									 //				 where i.ValidityTo == null && i.Chfid == insureeId && f.ValidityTo == null
+									 //				 select FamilyModel.FromTblFamilies(f))
+									 imisContext.TblInsuree
+										.Where(i => i.ValidityTo == null && i.Chfid == insureeId)
+										.Join(imisContext.TblFamilies, i => i.FamilyId, f => f.FamilyId, (i, f) => f)
+										.Where(f => f.ValidityTo == null)
+										.Include(f => f.TblInsuree)
+										.Select(f => FamilyModel.FromTblFamilies(f))
+										.FirstOrDefaultAsync();
 
 
 				if (familyModel == null)
 				{
 					return null;
 				}
-
-				IEnumerable<InsureeModel> insurees = await (from i in imisContext.TblInsuree
-												   where i.FamilyId == familyModel.FamilyId
-												   && i.ValidityTo == null 
-												   select new InsureeModel()
-												   {
-													   InsureeId = i.InsureeId,
-														IdentificationNumber = i.Passport,
-														CHFID = i.Chfid,
-														LastName = i.LastName,
-														OtherNames = i.OtherNames,
-														DOB = i.Dob.ToShortDateString(),
-														Gender = i.Gender == null ? ' ' : i.Gender[0],
-														Marital = i.Marital == null ? ' ' : i.Marital[0],
-														IsHead = i.IsHead,
-														Phone = i.Phone,
-														CardIssued = i.CardIssued,
-														Relationship = TypeCast.GetValue<short>(i.Relationship),
-														Profession = TypeCast.GetValue<short>(i.Profession),
-														Education = TypeCast.GetValue<short>(i.Education),
-														Email = i.Email,
-														TypeOfId = i.TypeOfId == null ? ' ' : i.TypeOfId[0],
-														HFID = TypeCast.GetValue<int>(i.Hfid),
-														CurrentAddress = i.CurrentAddress,
-														GeoLocation = i.GeoLocation,
-														CurVillage = TypeCast.GetValue<string>(i.CurrentVillage), // todo: is there any link missing?
-														PhotoPath = i.Photo.PhotoFileName,
-														IdentificationTypes = i.TypeOf.IdentificationTypes,
-														IsOffline = TypeCast.GetValue<bool>(i.IsOffline),
-													}).ToListAsync();
-
-				familyModel.Insurees = familyModel.Insurees.Concat(insurees);
 
 			}
 
@@ -91,104 +56,62 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 		/// </summary>
 		/// <returns></returns>
 		/// TODO: add location constraint
-		public async Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 0)
+		public async Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 20)
 		{
 			FamilyModel[] families;
 
 			using (var imisContext = new ImisDB())
 			{
-				families = await (from f in imisContext.TblFamilies
-								  where f.ValidityTo == null
-									  //group f.TblInsuree by f.FamilyId into i
-									  //where i.Chfid == insureeId
-								  select new FamilyModel()
-									 {
-										 FamilyId = f.FamilyId,
-										 LocationId = TypeCast.GetValue<int>(f.LocationId),
-										 Poverty = TypeCast.GetValue<bool>(f.Poverty),
-										 FamilyType = f.FamilyType == null ? ' ' : f.FamilyType[0],
-										 FamilyAddress = f.FamilyAddress,
-										 Ethnicity = f.Ethnicity,
-										 ConfirmationNo = f.ConfirmationNo,
-										 ConfirmationType = f.ConfirmationType,
-										 IsOffline = TypeCast.GetValue<bool>(f.IsOffline),
-										 Insurees = imisContext.TblInsuree
-													.Where(i => i.FamilyId == f.FamilyId && i.ValidityTo == null)
-													.Select(i => new InsureeModel()
-													  {
-														  InsureeId = i.InsureeId,
-														  IdentificationNumber = i.Passport,
-														  CHFID = i.Chfid,
-														  LastName = i.LastName,
-														  OtherNames = i.OtherNames,
-														  DOB = i.Dob.ToShortDateString(),
-														  Gender = i.Gender == null ? ' ' : i.Gender[0],
-														  Marital = i.Marital == null ? ' ' : i.Marital[0],
-														  IsHead = i.IsHead,
-														  Phone = i.Phone,
-														  CardIssued = i.CardIssued,
-														  Relationship = TypeCast.GetValue<short>(i.Relationship),
-														  Profession = TypeCast.GetValue<short>(i.Profession),
-														  Education = TypeCast.GetValue<short>(i.Education),
-														Email = i.Email,
-														TypeOfId = i.TypeOfId == null ? ' ' : i.TypeOfId[0],
-														HFID = TypeCast.GetValue<int>(i.Hfid),
-														CurrentAddress = i.CurrentAddress,
-														GeoLocation = i.GeoLocation,
-														CurVillage = imisContext.TblLocations
-																	.Where(l => l.LocationId == i.CurrentVillage)
-																	.Select(l => l.LocationName)
-																	.FirstOrDefault(), // todo: is there any link missing?
-														PhotoPath = i.Photo.PhotoFileName,
-														IdentificationTypes = i.TypeOf.IdentificationTypes,
-														IsOffline = TypeCast.GetValue<bool>(i.IsOffline),
-													}).ToList()
-								  }).ToArrayAsync();
+				families = await imisContext.TblFamilies
+								  .Where(f => f.ValidityTo == null)
+								  .Include(f => f.TblInsuree)
+								  .Page(numberPerPage <= 0 ? 20 : numberPerPage, page <= 1 ? 1 : page)
+								  .Select(f => FamilyModel.FromTblFamilies(f))
+								  .ToArrayAsync();
 
 
 				if (families == null)
 				{
 					return null;
 				}
-
-				//IEnumerable<InsureeModel> insurees;
-
-				//foreach (FamilyModel family in families) 
-				//{
-				//	insurees = await (from i in imisContext.TblInsuree
-				//					  where i.FamilyId == family.FamilyId
-				//					  && i.ValidityTo == null
-				//					  select new InsureeModel()
-				//					  {
-				//						  InsureeId = i.InsureeId,
-				//						  IdentificationNumber = i.Passport,
-				//						  CHFID = i.Chfid,
-				//						  LastName = i.LastName,
-				//						  OtherNames = i.OtherNames,
-				//						  DOB = i.Dob.ToShortDateString(),
-				//						  Gender = i.Gender == null ? ' ' : i.Gender[0],
-				//						  Marital = i.Marital == null ? ' ' : i.Marital[0],
-				//						  IsHead = i.IsHead,
-				//						  Phone = i.Phone,
-				//						  CardIssued = i.CardIssued,
-				//						  Relationship = TypeCast.GetValue<short>(i.Relationship),
-				//						  Profession = TypeCast.GetValue<short>(i.Profession),
-				//						  Education = TypeCast.GetValue<short>(i.Education),
-				//						  //Email = i.Email,
-				//						  //TypeOfId = i.TypeOfId == null ? ' ' : i.TypeOfId[0],
-				//						  //HFID = TypeCast.GetValue<string>(i.Hfid),
-				//						  //CurrentAddress = i.CurrentAddress,
-				//						  //GeoLocation = i.GeoLocation,
-				//						  //CurVillage = TypeCast.GetValue<string>(i.CurrentVillage), // todo: is there any link missing?
-				//						  //PhotoPath = i.Photo.PhotoFileName,
-				//						  //IdentificationTypes = i.TypeOf.IdentificationTypes,
-				//						  //IsOffline = TypeCast.GetValue<bool>(i.IsOffline),
-				//					  }).ToListAsync();
-				//	family.Insurees = family.Insurees.Concat(insurees);
-				//}
 			}
 
 			return families;
+		}
+
+		public async Task AddNewFamily(FamilyModel family)
+		{
+			using (var imisContext = new ImisDB())
+			{
+				var tblFamily = family.ToTblFamilies();
+				//	new TblFamilies()
+				//{
+				//	LocationId = family.LocationId,
+				//	Poverty = family.Poverty,
+				//	FamilyType = family.FamilyType.ToString(),
+				//	FamilyAddress = family.FamilyAddress,
+				//	Ethnicity = family.Ethnicity,
+				//	ConfirmationNo = family.ConfirmationNo,
+				//	ConfirmationType = family.ConfirmationType,
+				//	IsOffline = family.IsOffline,
+				//	TblInsuree = new List<TblInsuree>()
+				//};
+				//// add first all insurees
+				//foreach (InsureeModel insuree in family.Insurees)
+				//{
+				//	var tblInsuree = insuree.ToTblInsuree();
+				//	if (insuree.IsHead)
+				//	{
+				//		tblFamily.Insuree = tblInsuree;
+				//	}
+				//	tblFamily.TblInsuree.Add(tblInsuree);
+				//}
+
+				imisContext.Add(tblFamily);
+				await imisContext.SaveChangesAsync();
+
+			}
+
 		}
 
 	}

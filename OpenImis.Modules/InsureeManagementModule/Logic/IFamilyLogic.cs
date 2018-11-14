@@ -11,6 +11,8 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 
 		Task<FamilyModel> GetFamilyByInsureeId(string insureeId);
 
-		Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 0);
+		Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 20);
+
+		Task AddFamily(FamilyModel family);
 	}
 }

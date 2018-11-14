@@ -21,32 +21,8 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 				insuree = await (from i in imisContext.TblInsuree
 									 where i.Chfid == chfId
 									 && i.ValidityTo == null
-									 select new InsureeModel()
-									 {
-										 InsureeId = i.InsureeId,
-										 IdentificationNumber = i.Passport,
-										 CHFID = i.Chfid,
-										 LastName = i.LastName,
-										 OtherNames = i.OtherNames,
-										 DOB = i.Dob.ToShortDateString(),
-										 Gender = i.Gender == null ? ' ' : i.Gender[0],
-										 Marital = i.Marital == null ? ' ' : i.Marital[0],
-										 IsHead = i.IsHead,
-										 Phone = i.Phone,
-										 CardIssued = i.CardIssued,
-										 Relationship = TypeCast.GetValue<short>(i.Relationship),
-										 Profession = TypeCast.GetValue<short>(i.Profession),
-										 Education = TypeCast.GetValue<short>(i.Education),
-										 Email = i.Email,
-										 TypeOfId = i.TypeOfId == null ? ' ' : i.TypeOfId[0],
-										 HFID = TypeCast.GetValue<short>(i.Hfid),
-										 CurrentAddress = i.CurrentAddress,
-										 GeoLocation = i.GeoLocation,
-										 CurVillage = TypeCast.GetValue<string>(i.CurrentVillage), // todo: is there any link missing?
-										 PhotoPath = i.Photo.PhotoFileName,
-										 IdentificationTypes = i.TypeOf.IdentificationTypes,
-										 IsOffline = TypeCast.GetValue<bool>(i.IsOffline)
-									 }).FirstOrDefaultAsync();
+									 select InsureeModel.FromTblInsuree(i))
+									 .FirstOrDefaultAsync();
 			}
 
 			return insuree;
@@ -63,32 +39,8 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 				insureeList = await (from i in imisContext.TblInsuree
 							where i.FamilyId == familyId
 							&& i.ValidityTo == null
-							select new InsureeModel()
-							{
-								InsureeId = i.InsureeId,
-								IdentificationNumber = i.Passport,
-								CHFID = i.Chfid,
-								LastName = i.LastName,
-								OtherNames = i.OtherNames,
-								DOB = i.Dob.ToShortDateString(),
-								Gender = i.Gender == null ? ' ' : i.Gender[0],
-								Marital = i.Marital == null ? ' ' : i.Marital[0],
-								IsHead = i.IsHead,
-								Phone = i.Phone,
-								CardIssued = i.CardIssued,
-								Relationship = TypeCast.GetValue<short>(i.Relationship),
-								Profession = TypeCast.GetValue<short>(i.Profession),
-								Education = TypeCast.GetValue<short>(i.Education),
-								Email = i.Email,
-								TypeOfId = i.TypeOfId == null ? ' ' : i.TypeOfId[0],
-								HFID = TypeCast.GetValue<int>(i.Hfid),
-								CurrentAddress = i.CurrentAddress,
-								GeoLocation = i.GeoLocation,
-								CurVillage = TypeCast.GetValue<string>(i.CurrentVillage), // todo: is there any link missing?
-								PhotoPath = i.Photo.PhotoFileName,
-								IdentificationTypes = i.TypeOf.IdentificationTypes,
-								IsOffline = TypeCast.GetValue<bool>(i.IsOffline)
-							}).ToListAsync();
+							select InsureeModel.FromTblInsuree(i))
+							.ToListAsync();
 
 			}
 

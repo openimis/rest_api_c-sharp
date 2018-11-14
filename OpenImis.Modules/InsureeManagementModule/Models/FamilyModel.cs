@@ -11,9 +11,9 @@ namespace OpenImis.Modules.InsureeManagementModule.Models
     {
 		public int FamilyId { get; set; }
 		public IEnumerable<InsureeModel> Insurees { get; set; }
-		public int LocationId { get; set; }
+		public int LocationId { get; set; } /// TODO: set to Location type
 		public bool Poverty { get; set; }
-		public char FamilyType { get; set; }
+		public string FamilyType { get; set; }
 		public string FamilyAddress { get; set; }
 		public string Ethnicity { get; set; }
 		public string ConfirmationNo { get; set; }
@@ -26,23 +26,56 @@ namespace OpenImis.Modules.InsureeManagementModule.Models
 			this.Insurees = new List<InsureeModel>();
 		}
 
-		public FamilyModel(TblFamilies tblFamilies):this()
+		//public FamilyModel(TblFamilies tblFamilies):this()
+		//{
+		//	this.ConvertFromTblFamilies(tblFamilies);
+		//}
+
+		public static FamilyModel FromTblFamilies(TblFamilies tblFamilies)
 		{
-			this.ConvertFromTblFamilies(tblFamilies);
+			FamilyModel familyModel = new FamilyModel()
+			{
+				FamilyId = tblFamilies.FamilyId,
+				LocationId = TypeCast.GetValue<int>(tblFamilies.LocationId),
+				Poverty = TypeCast.GetValue<bool>(tblFamilies.Poverty),
+				FamilyType = tblFamilies.FamilyType,
+				FamilyAddress = tblFamilies.FamilyAddress,
+				Ethnicity = tblFamilies.Ethnicity,
+				ConfirmationNo = tblFamilies.ConfirmationNo,
+				ConfirmationType = tblFamilies.ConfirmationType,
+				IsOffline = TypeCast.GetValue<bool>(tblFamilies.IsOffline),
+				Insurees = tblFamilies.TblInsuree
+						.Where(i => i.ValidityTo == null)
+						.Select(i => InsureeModel.FromTblInsuree(i))
+						.ToList()
+			};
+			return familyModel;
 		}
 
-		public void ConvertFromTblFamilies(TblFamilies tblFamilies) 
+		public TblFamilies ToTblFamilies()
 		{
-			this.FamilyId = tblFamilies.FamilyId;
-			this.LocationId = TypeCast.GetValue<int>(tblFamilies.LocationId);
-			this.Poverty = TypeCast.GetValue<bool>(tblFamilies.Poverty);
-			this.FamilyType = tblFamilies.FamilyType == null ? ' ' : tblFamilies.FamilyType[0];
-			this.FamilyAddress = tblFamilies.FamilyAddress;
-			this.Ethnicity = tblFamilies.Ethnicity;
-			this.ConfirmationNo = tblFamilies.ConfirmationNo;
-			this.ConfirmationType = tblFamilies.ConfirmationType;
-			this.IsOffline = TypeCast.GetValue<bool>(tblFamilies.IsOffline);
-
+			TblFamilies tblFamilies = new TblFamilies()
+			{
+				FamilyId = this.FamilyId,
+				LocationId =this.LocationId,
+				Poverty = this.Poverty,
+				FamilyType = this.FamilyType,
+				FamilyAddress = this.FamilyAddress,
+				Ethnicity = this.Ethnicity,
+				ConfirmationNo = this.ConfirmationNo,
+				ConfirmationType = this.ConfirmationType,
+				IsOffline = this.IsOffline,
+				TblInsuree = this.Insurees
+						//.Where(i => i.ValidTo == null)
+						.Select(i => i.ToTblInsuree())
+						.ToList(),
+				
+		};
+			tblFamilies.InsureeId = tblFamilies.TblInsuree
+						.Where(i => i.ValidityTo == null && i.IsHead)
+						.Select(i => i.InsureeId)
+						.FirstOrDefault();
+			return tblFamilies;
 		}
     }
 }
