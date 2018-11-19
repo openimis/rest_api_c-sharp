@@ -86,6 +86,7 @@ namespace ImisRestApi.Chanels.Payment.Models
         public List<BillTrxRespInf> BillTrxInf { get; set; }
     }
 
+    [XmlRoot("BillTrxInf")]
     public class BillTrxRespInf
     {
         public string BillId { get; set; }
