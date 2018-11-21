@@ -1,5 +1,1 @@
-﻿The control number {0} was assigned for the request issued on 
-{1} at  
-{2} for payment of the set of policies containing the family/group 
-{3} - {4}  with the insurance product {5} - {6} and {8} others.   
-The amount of payment associated with the request is {7}.
+﻿The control number {0} was assigned for the request issued on {1} at {2} for payment of the set of policies containing the family/group {3}-{4} with the insurance product {5}-{6} and {8} others. The amount of payment associated with the request is {7}.

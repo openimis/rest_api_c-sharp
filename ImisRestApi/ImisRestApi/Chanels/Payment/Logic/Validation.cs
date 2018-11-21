@@ -11,7 +11,7 @@ namespace ImisRestApi.Logic
         public override ValidationResult InsureeNumber(string insureeNumber)
         {
             if (insureeNumber.Length != 9)
-                return new ValidationResult("Invalid CHF ID");
+                return new ValidationResult("1:Wrong format of insurance number");
             String Chfid;
             int Part1, Part2;
             Part1 = int.Parse(insureeNumber.ToString()) / 10;
@@ -24,7 +24,7 @@ namespace ImisRestApi.Logic
 
             }
             else{
-                return new ValidationResult("Invalid CHF ID");
+                return new ValidationResult("1:Wrong format of insurance number");
             }
         }
     }

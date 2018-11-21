@@ -15,7 +15,7 @@ namespace ImisRestApi.Logic
                 if (insureeNumber.Length < 12 && insureeNumber.Length > 0)
                     return ValidationResult.Success;
                 else
-                    return new ValidationResult("001:Wrong format of insurance number ");
+                    return new ValidationResult("1:Wrong format of insurance number ");
             }
 
             return ValidationResult.Success;
@@ -28,7 +28,7 @@ namespace ImisRestApi.Logic
                 if (value.ToString().Length < 8)
                     return ValidationResult.Success;
                 else
-                    return new ValidationResult("003:Not valid enrolment officer code");
+                    return new ValidationResult("3:Not valid enrolment officer code");
             }
             return ValidationResult.Success;
         }

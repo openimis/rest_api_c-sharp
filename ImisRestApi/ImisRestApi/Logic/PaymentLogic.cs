@@ -47,6 +47,7 @@ namespace ImisRestApi.Logic
                     {
                         if (!return_message.ErrorOccured && !controlNumberExists)
                         {
+                            return_message.Data = response.ControlNumber;
                             ControlNumberAssignedSms(payment);
                         }
                         else
@@ -72,7 +73,6 @@ namespace ImisRestApi.Logic
             }
             else
             {
-                var response = payment.PostReqControlNumber(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails,null,false,true);
                 return_message = intentResponse;
             }
             

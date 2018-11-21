@@ -8,9 +8,9 @@ namespace ImisRestApi.Models
     {
         [InsureeNumber]
         public string InsureeNumber { get; set; }
-        [Required(ErrorMessage = "002:Not valid insurance or missing product code")]
+        [Required(ErrorMessage = "2:Not valid insurance or missing product code")]
         public string ProductCode { get; set; }
-        [Required(ErrorMessage = "010:EnrolmentType was not provided")]
+        [Required(ErrorMessage = "10:EnrolmentType was not provided")]
         public EnrolmentType? PaymentType { get; set; }
         public int IsRenewal()
         {

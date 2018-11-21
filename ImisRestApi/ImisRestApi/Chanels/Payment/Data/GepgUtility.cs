@@ -347,9 +347,9 @@ namespace ImisRestApi.Data
                     signature = signedHashString;
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw new Exception();
+                throw e;
             }
 
             return signature;
