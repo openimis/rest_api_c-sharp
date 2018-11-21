@@ -10,10 +10,11 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
     public class FamilyLogicForChf: FamilyLogic
 	{
 
-		public FamilyLogicForChf()
+		public FamilyLogicForChf(IImisModules imisModules)
 		{
-			_familyRepository = new FamilyRepository();
-			_insureeNumberValidator = new ChfInsureeNumberValidator(null);
+			this.familyRepository = new FamilyRepository();
+			this.insureeNumberValidator = new ChfInsureeNumberValidator(null);
+			this.imisModules = imisModules;
 		}
 
 	}

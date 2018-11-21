@@ -12,6 +12,22 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
     public class InsureeRepository: IInsureeRepository
     {
 
+		public InsureeModel GetInsureeByCHFID(string chfId)
+		{
+			InsureeModel insuree;
+
+			using (var imisContext = new ImisDB())
+			{
+				insuree = (from i in imisContext.TblInsuree
+									 where i.Chfid == chfId
+									 && i.ValidityTo == null
+									 select InsureeModel.FromTblInsuree(i))
+									 .FirstOrDefault();
+			}
+
+			return insuree;
+		}
+
 		public async Task<InsureeModel> GetInsureeByCHFIDAsync(string chfId)
 		{
 			InsureeModel insuree;
@@ -19,9 +35,9 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 			using (var imisContext = new ImisDB())
 			{
 				insuree = await (from i in imisContext.TblInsuree
-									 where i.Chfid == chfId
-									 && i.ValidityTo == null
-									 select InsureeModel.FromTblInsuree(i))
+								 where i.Chfid == chfId
+								 && i.ValidityTo == null
+								 select InsureeModel.FromTblInsuree(i))
 									 .FirstOrDefaultAsync();
 			}
 

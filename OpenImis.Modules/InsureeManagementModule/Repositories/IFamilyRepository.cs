@@ -14,7 +14,9 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 
 		Task<FamilyModel> GetFamilyByInsureeId(string insureeId);
 
-		Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 20);
+		Task<FamilyModel[]> GetFamilies(int page = 1, int resultsPerPage = 20);
+
+		Task<int> GetFamiliesCount();
 
 		Task AddNewFamily(FamilyModel family);
 

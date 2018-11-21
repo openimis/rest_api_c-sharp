@@ -1,4 +1,5 @@
 ﻿using OpenImis.Modules.InsureeManagementModule.Models;
+using OpenImis.Modules.InsureeManagementModule.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 
 		Task<FamilyModel> GetFamilyByInsureeId(string insureeId);
 
-		Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 20);
+		Task<GetFamiliesResponse> GetFamilies(int page = 1, int resultsPerPage = 20);
 
 		Task AddFamily(FamilyModel family);
 	}

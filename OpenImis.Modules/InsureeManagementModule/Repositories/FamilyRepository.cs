@@ -56,7 +56,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 		/// </summary>
 		/// <returns></returns>
 		/// TODO: add location constraint
-		public async Task<FamilyModel[]> GetAllFamilies(int page = 1, int numberPerPage = 20)
+		public async Task<FamilyModel[]> GetFamilies(int page = 1, int resultsPerPage = 20)
 		{
 			FamilyModel[] families;
 
@@ -65,7 +65,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 				families = await imisContext.TblFamilies
 								  .Where(f => f.ValidityTo == null)
 								  .Include(f => f.TblInsuree)
-								  .Page(numberPerPage <= 0 ? 20 : numberPerPage, page <= 1 ? 1 : page)
+								  .Page(resultsPerPage <= 0 ? 20 : resultsPerPage, page <= 1 ? 1 : page) /// TODO: remove this as validation in Logic?
 								  .Select(f => FamilyModel.FromTblFamilies(f))
 								  .ToArrayAsync();
 
@@ -79,40 +79,76 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 			return families;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		/// TODO: add location constraint
+		public async Task<int> GetFamiliesCount()
+		{
+			int familiesCount = 0;
+
+			using (var imisContext = new ImisDB())
+			{
+				familiesCount = await imisContext.TblFamilies
+								  .CountAsync(f => f.ValidityTo == null);
+
+			}
+
+			return familiesCount;
+		}
+
+		/// <summary>
+		/// Adds a new Family and the associated Insurees into the database
+		/// </summary>
+		/// <param name="family">The Family to be added</param>
+		/// <returns></returns>
 		public async Task AddNewFamily(FamilyModel family)
 		{
 			using (var imisContext = new ImisDB())
 			{
 				var tblFamily = family.ToTblFamilies();
-				//	new TblFamilies()
-				//{
-				//	LocationId = family.LocationId,
-				//	Poverty = family.Poverty,
-				//	FamilyType = family.FamilyType.ToString(),
-				//	FamilyAddress = family.FamilyAddress,
-				//	Ethnicity = family.Ethnicity,
-				//	ConfirmationNo = family.ConfirmationNo,
-				//	ConfirmationType = family.ConfirmationType,
-				//	IsOffline = family.IsOffline,
-				//	TblInsuree = new List<TblInsuree>()
-				//};
-				//// add first all insurees
-				//foreach (InsureeModel insuree in family.Insurees)
-				//{
-				//	var tblInsuree = insuree.ToTblInsuree();
-				//	if (insuree.IsHead)
-				//	{
-				//		tblFamily.Insuree = tblInsuree;
-				//	}
-				//	tblFamily.TblInsuree.Add(tblInsuree);
-				//}
-
+				
 				imisContext.Add(tblFamily);
+				await imisContext.SaveChangesAsync();
+
+				foreach (TblInsuree tblInsuree in tblFamily.TblInsuree)
+				{
+					if (tblInsuree.IsHead)
+					{
+						tblFamily.InsureeId = tblInsuree.InsureeId;
+						break;
+					}
+				}
+
 				await imisContext.SaveChangesAsync();
 
 			}
 
 		}
 
+		public async Task UpdateNewFamilyAsync(FamilyModel family)
+		{
+			using (var imisContext = new ImisDB())
+			{
+				var tblFamily = family.ToTblFamilies();
+
+				imisContext.Add(tblFamily);
+				await imisContext.SaveChangesAsync();
+
+				foreach (TblInsuree tblInsuree in tblFamily.TblInsuree)
+				{
+					if (tblInsuree.IsHead)
+					{
+						tblFamily.InsureeId = tblInsuree.InsureeId;
+						break;
+					}
+				}
+
+				await imisContext.SaveChangesAsync();
+
+			}
+
+		}
 	}
 }

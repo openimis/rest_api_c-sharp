@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.InsureeManagementModule.Models;
+using OpenImis.Modules.InsureeManagementModule.Protocol;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -29,7 +30,7 @@ namespace OpenImis.RestApi.Controllers
 		/// Get the list of the Families
 		/// </summary>
 		/// <param name="page">Number of the page</param>
-		/// <param name="numberPerPage">Number of families per request/page</param>
+		/// <param name="resultsPerPage">Number of families per request/page</param>
 		/// <returns>The list of families</returns>
 		/// <remarks>
 		/// ### REMARKS ###
@@ -42,13 +43,13 @@ namespace OpenImis.RestApi.Controllers
 		/// <response code="400">If the request is incomplete</response>      
 		/// <response code="401">If the token is missing, is wrong or expired</response>      
 		[HttpGet]
-		[ProducesResponseType(typeof(FamilyModel[]), 200)]
+		[ProducesResponseType(typeof(GetFamiliesResponse), 200)]
 		[ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-		public async Task<IActionResult> GetAllFamilies([FromQuery]int page = 1, [FromQuery]int numberPerPage = 20)
+		public async Task<IActionResult> GetFamilies([FromQuery]int page = 1, [FromQuery]int resultsPerPage = 20)
         {
-			FamilyModel[] families;
-			families = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().GetAllFamilies(page, numberPerPage);
+			GetFamiliesResponse families;
+			families = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().GetFamilies(page, resultsPerPage);
 
 			return Ok(families);
         }
@@ -87,6 +88,10 @@ namespace OpenImis.RestApi.Controllers
 			catch (ValidationException e)
 			{
 				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+			}
+			catch (Exception e)
+			{
+				return BadRequest(new { error = new { message = e.Message, source = e.Source, trace = e.StackTrace } });
 			}
 
 			return Ok();

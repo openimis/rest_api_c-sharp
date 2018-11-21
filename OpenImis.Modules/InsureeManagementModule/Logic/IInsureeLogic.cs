@@ -1,4 +1,5 @@
 ﻿using OpenImis.Modules.InsureeManagementModule.Models;
+using OpenImis.Modules.InsureeManagementModule.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 		/// </summary>
 		/// <param name="insureeId"></param>
 		/// <returns>InsureeModel</returns>
-		Task<InsureeModel> GetInsureeById(string insureeId);
+		Task<InsureeModel> GetInsureeByInsureeIdAsync(string insureeId);
 				
 	}
 }

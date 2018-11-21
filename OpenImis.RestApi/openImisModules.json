@@ -3,9 +3,18 @@
 		"UserModule": {
 			"UserController": "OpenImis.Modules.UserModule.Controllers.UserController"
 		},
-			"InsureeManagementModule": {
-				"FamilyLogic": "OpenImis.Modules.InsureeManagementModule.Logic.FamilyLogic",
-				"InsureeLogic": "OpenImis.Modules.InsureeManagementModule.Logic.InsureeLogic"
+		"InsureeManagementModule": {
+			"FamilyLogic": "OpenImis.Modules.InsureeManagementModule.Logic.FamilyLogic",
+			"InsureeLogic": "OpenImis.Modules.InsureeManagementModule.Logic.InsureeLogic"
+		},
+			"MasterDataManagementModule": {
+				"LocationLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.LocationLogic",
+				"FamilyTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.FamilyTypeLogic",
+				"ConfirmationTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.ConfirmationTypeLogic",
+				"EducationLevelLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.EducationLevelLogic",
+				"GenderTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.GenderTypeLogic",
+				"ProfessionTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.ProfessionTypeLogic",
+				"IdentificationTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.IdentificationTypeLogic"
 			}
 	}
 }

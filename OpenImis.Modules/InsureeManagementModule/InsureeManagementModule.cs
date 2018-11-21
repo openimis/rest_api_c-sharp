@@ -6,21 +6,22 @@ using System.Threading.Tasks;
 
 namespace OpenImis.Modules.InsureeManagementModule
 {
-    public class WSModule:IInsureeManagementModule
+    public class InsureeManagementModule : IInsureeManagementModule
     {
 		private IInsureeLogic _insureeLogic;
 		private IFamilyLogic _familyLogic;
+		protected readonly IImisModules imisModules;
 
-		public WSModule()
+		public InsureeManagementModule(IImisModules imisModules)
 		{
-
+			this.imisModules = imisModules;
 		}
 
 		public IInsureeLogic GetInsureeLogic()
 		{
 			if (_insureeLogic == null)
 			{
-				_insureeLogic = new InsureeLogic();
+				_insureeLogic = new InsureeLogic(this.imisModules);
 			}
 			return _insureeLogic;
 		}
@@ -35,7 +36,7 @@ namespace OpenImis.Modules.InsureeManagementModule
 		{
 			if (_familyLogic == null)
 			{
-				_familyLogic = new FamilyLogic();
+				_familyLogic = new FamilyLogic(this.imisModules);
 			}
 			return _familyLogic;
 		}

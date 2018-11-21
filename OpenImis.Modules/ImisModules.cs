@@ -6,6 +6,8 @@ using OpenImis.Modules.InsureeManagementModule.Logic;
 using System;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using OpenImis.Modules.MasterDataManagementModule;
+using OpenImis.Modules.MasterDataManagementModule.Logic;
 
 namespace OpenImis.Modules
 {
@@ -30,8 +32,9 @@ namespace OpenImis.Modules
 	public class ImisModules: IImisModules
     {
 
-		private IUserModule _userModule;
-        private IInsureeManagementModule _wsModule;
+		private IUserModule userModule;
+        private IInsureeManagementModule insureeManagementModule;
+        private IMasterDataManagementModule masterDataManagementModule;
 
 		private readonly IConfiguration _configuration;
 		private readonly ILogger logger;
@@ -50,14 +53,14 @@ namespace OpenImis.Modules
         /// </returns>
         public IUserModule GetUserModule()
         {
-			if (_userModule == null)
+			if (userModule == null)
 			{
-				_userModule = new UserModule.UserModule();
+				userModule = new UserModule.UserModule();
 				Type userControllerType = CreateTypeFromConfiguration("UserModule", "UserController", "OpenImis.Modules.UserModule.Controllers.UserController");
 				
-				_userModule.SetUserController((IUserController)Activator.CreateInstance(userControllerType));
+				userModule.SetUserController((IUserController)Activator.CreateInstance(userControllerType));
 			} 
-			return _userModule;
+			return userModule;
         }
 
 		/// <summary>
@@ -68,18 +71,55 @@ namespace OpenImis.Modules
 		/// </returns>
 		public IInsureeManagementModule GetInsureeManagementModule()
 		{
-			if (_wsModule == null)
+			if (insureeManagementModule == null)
 			{
-				_wsModule = new InsureeManagementModule.WSModule();
+				insureeManagementModule = new InsureeManagementModule.InsureeManagementModule(this);
 
-				Type insureeControllerType = CreateTypeFromConfiguration("InsureeManagementModule", "InsureeLogic", "OpenImis.Modules.WSModule.Logic.InsureeLogic");
-				_wsModule.SetInsureeLogic((IInsureeLogic)Activator.CreateInstance(insureeControllerType));
+				Type insureeLogicType = CreateTypeFromConfiguration("InsureeManagementModule", "InsureeLogic", "OpenImis.Modules.InsureeManagementModule.Logic.InsureeLogic");
+				insureeManagementModule.SetInsureeLogic((IInsureeLogic)Activator.CreateInstance(insureeLogicType, this));
 
-				Type familyControllerType = CreateTypeFromConfiguration("InsureeManagementModule", "FamilyLogic", "OpenImis.Modules.WSModule.Logic.FamilyLogic");
-				_wsModule.SetFamilyLogic((IFamilyLogic)Activator.CreateInstance(familyControllerType));
+				Type familyLogicType = CreateTypeFromConfiguration("InsureeManagementModule", "FamilyLogic", "OpenImis.Modules.InsureeManagementModule.Logic.FamilyLogic");
+				insureeManagementModule.SetFamilyLogic((IFamilyLogic)Activator.CreateInstance(familyLogicType, this));
 
 			}
-			return _wsModule;
+			return insureeManagementModule;
+		}
+
+		/// <summary>
+		/// Creates and returns the Web Services integration module.
+		/// </summary>
+		/// <returns>
+		/// The Web Services integration module.
+		/// </returns>
+		public IMasterDataManagementModule GetMasterDataManagementModule()
+		{
+			if (masterDataManagementModule == null)
+			{
+				masterDataManagementModule = new MasterDataManagementModule.MasterDataManagementModule(this);
+
+				Type locationLogicType = CreateTypeFromConfiguration("MasterDataManagementModule", "LocationLogic", "OpenImis.Modules.MasterDataManagementModule.Logic.LocationLogic");
+				masterDataManagementModule.SetLocationLogic((ILocationLogic)Activator.CreateInstance(locationLogicType, this));
+
+				Type familyTypeLogicType = CreateTypeFromConfiguration("MasterDataManagementModule", "FamilyTypeLogic", "OpenImis.Modules.MasterDataManagementModule.Logic.FamilyTypeLogic");
+				masterDataManagementModule.SetFamilyTypeLogic((IFamilyTypeLogic)Activator.CreateInstance(familyTypeLogicType, this));
+
+				Type confirmationTypeLogicType = CreateTypeFromConfiguration("MasterDataManagementModule", "ConfirmationTypeLogic", "OpenImis.Modules.MasterDataManagementModule.Logic.ConfirmationTypeLogic");
+				masterDataManagementModule.SetConfirmationTypeLogic((IConfirmationTypeLogic)Activator.CreateInstance(confirmationTypeLogicType, this));
+
+				Type educationLevelLogicType = CreateTypeFromConfiguration("MasterDataManagementModule", "EducationLevelLogic", "OpenImis.Modules.MasterDataManagementModule.Logic.EducationLevelLogic");
+				masterDataManagementModule.SetEducationLevelLogic((IEducationLevelLogic)Activator.CreateInstance(educationLevelLogicType, this));
+
+				Type genderTypeLogicType = CreateTypeFromConfiguration("MasterDataManagementModule", "GenderTypeLogic", "OpenImis.Modules.MasterDataManagementModule.Logic.GenderTypeLogic");
+				masterDataManagementModule.SetGenderTypeLogic((IGenderTypeLogic)Activator.CreateInstance(genderTypeLogicType, this));
+
+				Type professionTypeLogicType = CreateTypeFromConfiguration("MasterDataManagementModule", "ProfessionTypeLogic", "OpenImis.Modules.MasterDataManagementModule.Logic.ProfessionTypeLogic");
+				masterDataManagementModule.SetProfessionTypeLogic((IProfessionTypeLogic)Activator.CreateInstance(professionTypeLogicType, this));
+
+				Type identificationTypeLogicType = CreateTypeFromConfiguration("MasterDataManagementModule", "IdentificationTypeLogic", "OpenImis.Modules.MasterDataManagementModule.Logic.IdentificationTypeLogic");
+				masterDataManagementModule.SetIdentificationTypeLogic((IIdentificationTypeLogic)Activator.CreateInstance(identificationTypeLogicType, this));
+
+			}
+			return masterDataManagementModule;
 		}
 
 		/// <summary>

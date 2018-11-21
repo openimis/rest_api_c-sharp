@@ -10,11 +10,13 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 	public class InsureeLogic: IInsureeLogic
     {
 
-		private readonly IInsureeRepository _insureeRepository;
+		protected readonly IInsureeRepository insureeRepository;
+		protected readonly IImisModules imisModules;
 
-        public InsureeLogic()
+        public InsureeLogic(IImisModules imisModules)
         {
-			_insureeRepository = new InsureeRepository();
+			insureeRepository = new InsureeRepository();
+			this.imisModules = imisModules;
         }
 
 		/// <summary>
@@ -22,13 +24,13 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 		/// </summary>
 		/// <param name="insureeId"></param>
 		/// <returns>InsureeModel</returns>
-		public async Task<InsureeModel> GetInsureeById(string insureeId)
+		public async Task<InsureeModel> GetInsureeByInsureeIdAsync(string insureeId)
 		{
 			// Validate input
 			
 			// Execute business behaviour
 			InsureeModel insuree;
-			insuree = await _insureeRepository.GetInsureeByCHFIDAsync(insureeId);
+			insuree = await insureeRepository.GetInsureeByCHFIDAsync(insureeId);
 
 			// Validate results
 

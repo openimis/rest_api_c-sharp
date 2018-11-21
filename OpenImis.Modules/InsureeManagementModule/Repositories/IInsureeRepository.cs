@@ -9,6 +9,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
     public interface IInsureeRepository
     {
 
+		InsureeModel GetInsureeByCHFID(string chfId);
 		Task<InsureeModel> GetInsureeByCHFIDAsync(string chfId);
 		Task<IEnumerable<InsureeModel>> GetInsureeByFamilyIdAsync(int familyId);
 

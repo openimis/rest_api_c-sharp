@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="InsureeManagementModule\Validators\" />
+    <Folder Include="MasterDataManagementModule\Validators\" />
+    <Folder Include="MasterDataManagementModule\Protocol\" />
     <Folder Include="PaymentModule\" />
   </ItemGroup>
 
