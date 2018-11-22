@@ -30,8 +30,12 @@ namespace ImisRestApi.Controllers
         [Route("api/GetControlNumber/Single")]
         public async Task<IActionResult> Index([FromBody]IntentOfSinglePay payment)
         {
+            payment.PhoneNumber = payment.Msisdn;
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             payment.SetDetails();
 
@@ -45,8 +49,10 @@ namespace ImisRestApi.Controllers
         public IActionResult GetReconciliation([FromBody]GepgReconcMessage model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
             //System.IO.File.WriteAllText(ReconciliationFolder, JsonConvert.SerializeObject(model));
             return Ok(p.ReconciliationResp());
         }
@@ -74,7 +80,10 @@ namespace ImisRestApi.Controllers
         public IActionResult GetPaymentChf([FromBody]GepgPaymentMessage model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
             List<PymtTrxInf> payments = model.PymtTrxInf;
             foreach (var payment in payments)
@@ -104,6 +113,12 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReqControlNumber")]
         public IActionResult ReceiveControlNumberChf([FromBody] GepgBillResponse model)
          {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
             foreach (var bill in model.BillTrxRespInf)
             {
                 ControlNumberResp ControlNumberResponse = new ControlNumberResp()

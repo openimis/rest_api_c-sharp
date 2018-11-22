@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ImisRestApi.ImisAttributes;
 using ImisRestApi.Models;
@@ -8,8 +9,10 @@ namespace ImisRestApi.Chanels
 {
     public class IntentOfSinglePay:IntentOfPay
     {
+       
         [Required]
-        public override string PhoneNumber { get; set; }
+        public string Msisdn { get; set; }
+        public override string PhoneNumber { get; set; } = "+255";
         [Required]
         [InsureeNumber]
         public string InsureeNumber { get; set; }
@@ -22,8 +25,9 @@ namespace ImisRestApi.Chanels
 
         public void SetDetails()
         {
+            
             List<PaymentDetail> details = new List<PaymentDetail>();
-            PaymentDetail detail = new PaymentDetail() { InsureeNumber = this.InsureeNumber, ProductCode = this.ProductCode, PaymentType = this.EnrolmentType };
+            PaymentDetail detail = new PaymentDetail() { InsureeNumber = this.InsureeNumber, ProductCode = this.ProductCode, PaymentType = this.EnrolmentType - 1 };
             details.Add(detail);
             PaymentDetails = details;
         }
