@@ -80,16 +80,18 @@ namespace OpenImis.RestApi.Docs
 
         public static void ConfigureSwagger(SwaggerOptions swaggerOptions)
         {
-            swaggerOptions.RouteTemplate = "api-docs/{documentName}/swagger.json";
-        }
+            swaggerOptions.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+			swaggerOptions.RouteTemplate = "api-docs/{documentName}/swagger.json";
+			
+		}
 
-        public static void ConfigureSwaggerUI(SwaggerUIOptions swaggerUIOptions)
+		public static void ConfigureSwaggerUI(SwaggerUIOptions swaggerUIOptions)
         {
             var webApiAssembly = Assembly.GetEntryAssembly();
             var apiVersions = GetApiVersions(webApiAssembly);
             foreach (var apiVersion in apiVersions)
             {
-                swaggerUIOptions.SwaggerEndpoint($"/api-docs/v{apiVersion}/swagger.json", $"V{apiVersion} Docs");
+                swaggerUIOptions.SwaggerEndpoint($"/RestApi/api-docs/v{apiVersion}/swagger.json", $"V{apiVersion} Docs");
             }
             swaggerUIOptions.RoutePrefix = "api-docs";
             swaggerUIOptions.InjectStylesheet("theme-feeling-blue-v2.css");

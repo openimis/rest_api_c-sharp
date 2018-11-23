@@ -39,9 +39,13 @@ namespace OpenImis.RestApi
                 .UseContentRoot(appRootPath)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    var secretsMode = GetSecretsMode(hostingContext.HostingEnvironment);
-                    config.AddOpenImisConfig(secretsMode, "REGISTRY_CONFIG_FILE");
-                })
+                    //var secretsMode = GetSecretsMode(hostingContext.HostingEnvironment);
+                    //config.AddOpenImisConfig(secretsMode, "REGISTRY_CONFIG_FILE");
+					//config.AddOpenImisConfig(SecretsMode.LocalFile, $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
+					config.AddJsonFile($"appsettings.json", optional: false, reloadOnChange: true);
+					config.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: false, reloadOnChange: true);
+					config.AddJsonFile("openImisModules.json", optional: true, reloadOnChange: true);
+				})
                 .UseStartup<Startup>();
 
             return webHostBuilder;

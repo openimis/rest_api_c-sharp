@@ -17,17 +17,36 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ControllersForChf\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="OpenImis.Modules\**" />
+    <Content Remove="ControllersForChf\**" />
+    <Content Remove="Models\**" />
+    <Content Remove="OpenImis.Modules\**" />
+    <EmbeddedResource Remove="ControllersForChf\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="OpenImis.Modules\**" />
+    <None Remove="ControllersForChf\**" />
+    <None Remove="Models\**" />
+    <None Remove="OpenImis.Modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controllers\AccountController.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="appsettings.Development.json.dist" />
     <None Remove="appsettings.Production.json.dist" />
+    <None Remove="NuGet.Config.old" />
+    <None Remove="openImisModules.json.dist" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="appsettings.Development.json.dist" />
     <Content Include="appsettings.Production.json.dist" />
+    <Content Include="NuGet.Config.old" />
+    <Content Include="openImisModules.json.dist" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,15 +55,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="2.5.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Examples" Version="2.9.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,6 +71,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenImis.Extensions.Configuration\OpenImis.Extensions.Configuration.csproj" />
+    <ProjectReference Include="..\OpenImis.Modules\OpenImis.Modules.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,17 +8,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using OpenImis.RestApi.Models.Entities;
-using Microsoft.EntityFrameworkCore;
+using OpenImis.Modules;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OpenImis.RestApi.Security;
-using OpenImis.RestApi.Models.Interfaces;
-using OpenImis.RestApi.Models.Repository;
-
 using Swashbuckle.AspNetCore.SwaggerGen;
 using OpenImis.RestApi.Docs;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.RestApi
 {
@@ -33,11 +30,13 @@ namespace OpenImis.RestApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add the DbContext 
-            services.AddDbContext<IMISContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IMISDatabase")));
+			// Add the DbContext 
+			//services.AddDbContext<IMISContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IMISDatabase")));
 
-            // Add the authentication scheme with the custom validator
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+			services.AddSingleton<IImisModules, ImisModules>();
+
+			// Add the authentication scheme with the custom validator
+			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -51,7 +50,7 @@ namespace OpenImis.RestApi
 
                     options.SecurityTokenValidators.Clear();
                     //below line adds the custom validator class
-                    options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(services));
+                    options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(services.BuildServiceProvider().GetService<IImisModules>()));
                 });
 
             services.AddMvc()
@@ -64,18 +63,19 @@ namespace OpenImis.RestApi
 				o.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader(), new HeaderApiVersionReader("api-version"));
 			});
 
-			services.AddSingleton<ICoreRepository, CoreRepository>();
-
+			
             services.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
 
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
+				loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+				loggerFactory.AddDebug();
+			}
             if (!env.EnvironmentName.Equals("Test"))
             {
                 app.UseStaticFiles();
