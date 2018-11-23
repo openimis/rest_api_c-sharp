@@ -17,12 +17,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ControllersForChf\**" />
     <Compile Remove="Models\**" />
     <Compile Remove="OpenImis.Modules\**" />
+    <Content Remove="ControllersForChf\**" />
     <Content Remove="Models\**" />
     <Content Remove="OpenImis.Modules\**" />
+    <EmbeddedResource Remove="ControllersForChf\**" />
     <EmbeddedResource Remove="Models\**" />
     <EmbeddedResource Remove="OpenImis.Modules\**" />
+    <None Remove="ControllersForChf\**" />
     <None Remove="Models\**" />
     <None Remove="OpenImis.Modules\**" />
   </ItemGroup>
@@ -35,12 +39,14 @@
     <None Remove="appsettings.Development.json.dist" />
     <None Remove="appsettings.Production.json.dist" />
     <None Remove="NuGet.Config.old" />
+    <None Remove="openImisModules.json.dist" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="appsettings.Development.json.dist" />
     <Content Include="appsettings.Production.json.dist" />
     <Content Include="NuGet.Config.old" />
+    <Content Include="openImisModules.json.dist" />
   </ItemGroup>
 
   <ItemGroup>

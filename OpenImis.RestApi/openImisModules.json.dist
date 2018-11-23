@@ -1,0 +1,11 @@
+﻿{
+	"ImisModules": {
+		"UserModule": {
+			"UserController": "OpenImis.Modules.UserModule.Controllers.UserController"
+		},
+		"InsureeManagementModule": {
+			"FamilyLogic": "OpenImis.Modules.InsureeManagementModule.Logic.FamilyLogic",
+			"InsureeLogic": "OpenImis.Modules.InsureeManagementModule.Logic.InsureeLogic"
+		}
+	}
+}

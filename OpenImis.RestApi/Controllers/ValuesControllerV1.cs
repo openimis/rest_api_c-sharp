@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace OpenImis.RestApi.Controllers
 {
     [ApiVersion("1")]
-    [Authorize(Roles = "IMISAdmin")]
     [Route("api/values")]
 	[ApiController]
 	public class ValuesControllerV1 : Controller
@@ -26,28 +25,28 @@ namespace OpenImis.RestApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            return Ok("value");
+            return Ok(id);
         }
 
         // POST api/values
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody]string value)
-        {
-			return Ok();
-        }
+   //     [HttpPost]
+   //     public async Task<IActionResult> Post([FromBody]string value)
+   //     {
+			//return Ok();
+   //     }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody]string value)
-        {
-			return Ok();
-        }
+   //     // PUT api/values/5
+   //     [HttpPut("{id}")]
+   //     public async Task<IActionResult> Put(int id, [FromBody]string value)
+   //     {
+			//return Ok();
+   //     }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-			return Ok();
-        }
+   //     // DELETE api/values/5
+   //     [HttpDelete("{id}")]
+   //     public async Task<IActionResult> Delete(int id)
+   //     {
+			//return Ok();
+   //     }
     }
 }

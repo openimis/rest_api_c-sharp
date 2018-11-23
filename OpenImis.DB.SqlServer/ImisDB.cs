@@ -13,7 +13,8 @@ namespace OpenImis.DB.SqlServer
 		{
 			IConfigurationRoot configuration = new ConfigurationBuilder()
 			.SetBasePath(Directory.GetCurrentDirectory())
-			.AddJsonFile(Environment.GetEnvironmentVariable("REGISTRY_CONFIG_FILE"))
+			.AddJsonFile($"appsettings.json")
+			//.AddJsonFile(Environment.GetEnvironmentVariable("REGISTRY_CONFIG_FILE"))
 			//.AddJsonFile("appsettings.json")
 			.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
 			.Build();

@@ -5,11 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="PaymentModule\CHF\**" />
+    <EmbeddedResource Remove="PaymentModule\CHF\**" />
+    <None Remove="PaymentModule\CHF\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OpenImis.DB.SqlServer\OpenImis.DB.SqlServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="WSModule\Entities\" />
+    <Folder Include="MasterDataManagementModule\Validators\" />
+    <Folder Include="MasterDataManagementModule\Protocol\" />
+    <Folder Include="PaymentModule\" />
   </ItemGroup>
 
   <ItemGroup>
