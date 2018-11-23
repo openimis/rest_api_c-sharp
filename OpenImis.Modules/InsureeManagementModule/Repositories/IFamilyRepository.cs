@@ -12,13 +12,19 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
     public interface IFamilyRepository
     {
 
-		Task<FamilyModel> GetFamilyByInsureeId(string insureeId);
+		Task<FamilyModel> GetFamilyByInsureeId(string insureeNumber);
+
+		Task<FamilyModel> GetFamilyByFamilyId(int familyId);
 
 		Task<FamilyModel[]> GetFamilies(int page = 1, int resultsPerPage = 20);
 
 		Task<int> GetFamiliesCount();
 
-		Task AddNewFamily(FamilyModel family);
+		Task<FamilyModel> AddNewFamilyAsync(FamilyModel family);
+
+		Task<FamilyModel> UpdateFamilyAsync(int familyId, FamilyModel family);
+
+		Task DeleteFamilyAsync(int familyId);
 
 	}
 }

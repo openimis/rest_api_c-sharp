@@ -55,7 +55,7 @@ namespace OpenImis.RestApi.Controllers
         }
 
 		// GET api/ws/family/00001
-		[HttpGet("{insureeId}")]
+		[HttpGet("insuree/{insureeId}", Name = "GetFamilyByInsureeId")]
         public async Task<IActionResult> GetFamilyByInsureeId(string insureeId)
         {
 			FamilyModel familyModel;
@@ -77,13 +77,38 @@ namespace OpenImis.RestApi.Controllers
 			return Ok(familyModel);
         }
 
-        // POST api/values
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody]FamilyModel family)
-        {
+
+		[HttpGet("{familyId}", Name = "GetFamilyByFamilyId")]
+		public async Task<IActionResult> GetFamilyByFamilyId(int familyId)
+		{
+			FamilyModel familyModel;
+
 			try
 			{
-				await _imisModules.GetInsureeManagementModule().GetFamilyLogic().AddFamily(family);
+				familyModel = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().GetFamilyByFamilyId(familyId);
+			}
+			catch (ValidationException e)
+			{
+				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+			}
+
+			if (familyModel == null)
+			{
+				return NotFound();
+			}
+
+			return Ok(familyModel);
+		}
+
+
+		// POST api/values
+		[HttpPost]
+        public async Task<IActionResult> AddNewFamily([FromBody]FamilyModel family)
+        {
+			FamilyModel newFamily;
+			try
+			{
+				newFamily = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().AddFamily(family);
 			}
 			catch (ValidationException e)
 			{
@@ -94,21 +119,49 @@ namespace OpenImis.RestApi.Controllers
 				return BadRequest(new { error = new { message = e.Message, source = e.Source, trace = e.StackTrace } });
 			}
 
-			return Ok();
+			return Created(new Uri(Url.Link("GetFamilyByFamilyId", new { familyId = newFamily.FamilyId})), newFamily);
         }
 
         // PUT api/values/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody]string value)
+        [HttpPut("{familyId}")]
+        public async Task<IActionResult> UpdateFamily(int familyId, [FromBody]FamilyModel family)
         {
-			return Ok();
-        }
+			FamilyModel updatedFamily;
+			try
+			{
+				updatedFamily = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().UpdateFamilyAsync(familyId, family);
+			}
+			catch (ValidationException e)
+			{
+				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+			}
+			catch (Exception e)
+			{
+				return BadRequest(new { error = new { message = e.Message, source = e.Source, trace = e.StackTrace } });
+			}
+
+			return Ok(updatedFamily);
+		}
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{familyId}")]
+        public async Task<IActionResult> Delete(int familyId)
         {
-			return Ok();
+
+			try
+			{
+				await _imisModules.GetInsureeManagementModule().GetFamilyLogic().DeleteFamilyAsync(familyId);
+			}
+			catch (ValidationException e)
+			{
+				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+			}
+			catch (Exception e)
+			{
+				return BadRequest(new { error = new { message = e.Message, source = e.Source, trace = e.StackTrace } });
+			}
+
+			return Accepted();
         }
     }
 }

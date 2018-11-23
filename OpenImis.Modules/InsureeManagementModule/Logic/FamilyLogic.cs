@@ -48,6 +48,24 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 			return familyModel;
 		}
 
+		public async Task<FamilyModel> GetFamilyByFamilyId(int familyId)
+		{
+			// Authorize user
+
+			// Validate input
+			
+			// Execute business behaviour
+			FamilyModel familyModel;
+			familyModel = await familyRepository.GetFamilyByFamilyId(familyId);
+
+			// Validate results
+
+			// Validate data access rights
+
+			// Return results 
+			return familyModel;
+		}
+
 		public async Task<GetFamiliesResponse> GetFamilies(int page = 1, int resultsPerPage = 20)
 		{
 			// Authorize user
@@ -86,7 +104,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 			return getFamiliesResponse;
 		}
 
-		public async Task AddFamily(FamilyModel family)
+		public async Task<FamilyModel> AddFamily(FamilyModel family)
 		{
 			// Authorize user
 
@@ -108,19 +126,64 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 			foreach (InsureeModel insuree in family.Insurees) {
 				await uniqueInsureeNumberValidator.ValidateAsync(insuree.CHFID);
 			}
-			
+
 			#endregion
 
 			// Execute business behaviour
-			await familyRepository.AddNewFamily(family);
+			FamilyModel newFamily = await familyRepository.AddNewFamilyAsync(family);
 
 			// Validate results
 
 			// Validate data access rights
 
 			// Return results 
+			return newFamily;
 		}
 
+		public async Task<FamilyModel> UpdateFamilyAsync(int familyId, FamilyModel family)
+		{
+			// Authorize user
 
+			// Validate input
+			#region Validate input
+
+			/// TODO: think of a strategy for validation => one solution to have one validation class that creates only
+			/// one SQL call to check different validations => only one SQL access for validation 
+
+			#endregion
+
+			// Execute business behaviour
+			FamilyModel updatedFamily = await familyRepository.UpdateFamilyAsync(familyId, family);
+
+			// Validate results
+
+			// Validate data access rights
+
+			// Return results 
+			return updatedFamily;
+		}
+
+		public async Task DeleteFamilyAsync(int familyId)
+		{
+			// Authorize user
+
+			// Validate input
+			#region Validate input
+
+			/// TODO: think of a strategy for validation => one solution to have one validation class that creates only
+			/// one SQL call to check different validations => only one SQL access for validation 
+
+			#endregion
+
+			// Execute business behaviour
+			await familyRepository.DeleteFamilyAsync(familyId);
+
+			// Validate results
+
+			// Validate data access rights
+
+			// Return results 
+			
+		}
 	}
 }

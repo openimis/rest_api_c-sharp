@@ -1,9 +1,6 @@
 ﻿using OpenImis.Modules.Utils;
 using OpenImis.DB.SqlServer;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using OpenImis.Modules.MasterDataManagementModule.Models;
 
 namespace OpenImis.Modules.InsureeManagementModule.Models
@@ -29,7 +26,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Models
 		public int? HFID { get; set; }
 		public string CurrentAddress { get; set; }
 		public string GeoLocation { get; set; }
-		public LocationModel CurrentVillage { get; set; } // addded to make the difference between the Location Id and the Location Name
+		public LocationModel CurrentVillage { get; set; }
 		public PhotoModel Photo { get; set; }
 		public string IdentificationTypes { get; set; }
 		public bool IsOffline { get; set; }

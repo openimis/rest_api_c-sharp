@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OpenImis.Modules.Utils;
 using OpenImis.Modules.InsureeManagementModule.Models;
+using System.ComponentModel.DataAnnotations;
+using OpenImis.Modules.InsureeManagementModule.Models.Constants;
 
 namespace OpenImis.Modules.InsureeManagementModule.Repositories
 {
@@ -21,7 +23,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 		{
 		}
 
-		public async Task<FamilyModel> GetFamilyByInsureeId(string insureeId)
+		public async Task<FamilyModel> GetFamilyByInsureeId(string insureeNumber)
 		{
 			FamilyModel familyModel;
 
@@ -33,9 +35,32 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 									 //				 where i.ValidityTo == null && i.Chfid == insureeId && f.ValidityTo == null
 									 //				 select FamilyModel.FromTblFamilies(f))
 									 imisContext.TblInsuree
-										.Where(i => i.ValidityTo == null && i.Chfid == insureeId)
+										.Where(i => i.ValidityTo == null && i.Chfid == insureeNumber)
 										.Join(imisContext.TblFamilies, i => i.FamilyId, f => f.FamilyId, (i, f) => f)
 										.Where(f => f.ValidityTo == null)
+										.Include(f => f.TblInsuree)
+										.Select(f => FamilyModel.FromTblFamilies(f))
+										.FirstOrDefaultAsync();
+
+
+				if (familyModel == null)
+				{
+					return null;
+				}
+
+			}
+
+			return familyModel;
+		}
+
+		public async Task<FamilyModel> GetFamilyByFamilyId(int familyId)
+		{
+			FamilyModel familyModel;
+
+			using (var imisContext = new ImisDB())
+			{
+				familyModel = await imisContext.TblFamilies
+										.Where(f => f.ValidityTo == null && f.FamilyId == familyId)
 										.Include(f => f.TblInsuree)
 										.Select(f => FamilyModel.FromTblFamilies(f))
 										.FirstOrDefaultAsync();
@@ -103,7 +128,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 		/// </summary>
 		/// <param name="family">The Family to be added</param>
 		/// <returns></returns>
-		public async Task AddNewFamily(FamilyModel family)
+		public async Task<FamilyModel> AddNewFamilyAsync(FamilyModel family)
 		{
 			using (var imisContext = new ImisDB())
 			{
@@ -123,30 +148,88 @@ namespace OpenImis.Modules.InsureeManagementModule.Repositories
 
 				await imisContext.SaveChangesAsync();
 
+				return FamilyModel.FromTblFamilies(tblFamily);
+
 			}
 
 		}
 
-		public async Task UpdateNewFamilyAsync(FamilyModel family)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="familyId"></param>
+		/// <param name="family"></param>
+		/// <returns></returns>
+		/// TODO: make a copy of the record before updating it 
+		/// TODO: check if there are any insuree in the family to be updated
+		public async Task<FamilyModel> UpdateFamilyAsync(int familyId, FamilyModel family)
 		{
 			using (var imisContext = new ImisDB())
 			{
-				var tblFamily = family.ToTblFamilies();
+				TblFamilies familyToUpdate = await imisContext.TblFamilies
+										.Where(f => f.ValidityTo == null && f.FamilyId == familyId)
+										//.Include(f => f.TblInsuree)
+										.Select(f => f)
+										.FirstOrDefaultAsync();
 
-				imisContext.Add(tblFamily);
+				if (familyToUpdate == null)
+				{
+					throw new ValidationException(FamilyErrors.FAMILY_NOT_FOUND_ERROR);
+				}
+
+				familyToUpdate.FamilyType = family.FamilyType;
+				familyToUpdate.LocationId = family.LocationId;
+				familyToUpdate.Poverty = family.Poverty;
+				familyToUpdate.FamilyAddress = family.FamilyAddress;
+				familyToUpdate.Ethnicity = family.Ethnicity;
+				familyToUpdate.ConfirmationNo = family.ConfirmationNo;
+				familyToUpdate.ConfirmationType = family.ConfirmationType;
+				familyToUpdate.IsOffline = family.IsOffline;
+
+				//await imisContext.SaveChangesAsync();
+
+				//foreach (TblInsuree tblInsuree in tblFamily.TblInsuree)
+				//{
+				//	if (tblInsuree.IsHead)
+				//	{
+				//		tblFamily.InsureeId = tblInsuree.InsureeId;
+				//		break;
+				//	}
+				//}
+
 				await imisContext.SaveChangesAsync();
 
-				foreach (TblInsuree tblInsuree in tblFamily.TblInsuree)
+				return FamilyModel.FromTblFamilies(familyToUpdate);
+
+			}
+
+		}
+
+		public async Task DeleteFamilyAsync(int familyId)
+		{
+			using (var imisContext = new ImisDB())
+			{
+				TblFamilies familyToDelete = await imisContext.TblFamilies
+										.Where(f => f.ValidityTo == null && f.FamilyId == familyId)
+										.Include(f => f.TblInsuree)
+										.Select(f => f)
+										.FirstOrDefaultAsync();
+
+				if (familyToDelete == null)
 				{
-					if (tblInsuree.IsHead)
-					{
-						tblFamily.InsureeId = tblInsuree.InsureeId;
-						break;
-					}
+					throw new ValidationException(FamilyErrors.FAMILY_NOT_FOUND_ERROR);
+				}
+
+				familyToDelete.ValidityTo = DateTime.Now;
+				
+				foreach (TblInsuree tblInsuree in familyToDelete.TblInsuree)
+				{
+
+					tblInsuree.ValidityTo = DateTime.Now;
+					
 				}
 
 				await imisContext.SaveChangesAsync();
-
 			}
 
 		}
