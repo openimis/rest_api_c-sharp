@@ -16,13 +16,16 @@ using Microsoft.Extensions.Configuration;
 using OpenImis.Modules;
 using System.ComponentModel.DataAnnotations;
 using OpenImis.Modules.UserModule.Entities;
+using Microsoft.AspNetCore.Cors;
 
 namespace OpenImis.RestApi.Controllers
 {
     [ApiVersion("1")]
     [Route("api/login")]
     [ApiController]
-    public class LoginControllerV1 : ControllerBase
+	[EnableCors("AllowSpecificOrigin")]
+
+	public class LoginControllerV1 : ControllerBase
     {
         private readonly IConfiguration _configuration;
         private readonly IImisModules _imisModules;

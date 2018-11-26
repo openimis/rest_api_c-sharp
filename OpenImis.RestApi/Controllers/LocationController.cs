@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
@@ -16,6 +17,7 @@ namespace OpenImis.RestApi.Controllers
 	[Authorize(Roles = "IMISAdmin, EnrollmentOfficer")]
 	[Route("api/location")]
 	[ApiController]
+	[EnableCors("AllowSpecificOrigin")]
 	public class LocationController : Controller
 	{
 		private readonly IImisModules _imisModules;
