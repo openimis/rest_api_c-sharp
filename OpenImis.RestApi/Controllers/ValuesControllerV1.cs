@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace OpenImis.RestApi.Controllers
@@ -10,6 +11,7 @@ namespace OpenImis.RestApi.Controllers
     [ApiVersion("1")]
     [Route("api/values")]
 	[ApiController]
+	[EnableCors("AllowSpecificOrigin")]
 	public class ValuesControllerV1 : Controller
     {
         // GET api/values

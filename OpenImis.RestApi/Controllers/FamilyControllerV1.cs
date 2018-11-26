@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
@@ -16,6 +17,7 @@ namespace OpenImis.RestApi.Controllers
     [Authorize(Roles = "IMISAdmin, EnrollmentOfficer")]
     [Route("api/family")]
 	[ApiController]
+	[EnableCors("AllowSpecificOrigin")]
 	public class FamilyControllerV1 : Controller
     {
 		private readonly IImisModules _imisModules;
