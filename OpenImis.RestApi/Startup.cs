@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,6 +67,11 @@ namespace OpenImis.RestApi
 			
             services.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
 
+			services.AddCors(options =>
+			{
+				options.AddPolicy("AllowSpecificOrigin",
+					builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+			});
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -85,6 +91,8 @@ namespace OpenImis.RestApi
 
             app.UseAuthentication();
             app.UseMvc();
+
+			app.UseCors("AllowSpecificOrigin");
 
             
             // ===== Create tables ======
