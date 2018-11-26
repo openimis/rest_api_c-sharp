@@ -354,7 +354,7 @@ namespace ImisRestApi.Data
 
         }
 
-        public DataMessage Match(MatchModel model)
+        public DataMessage MatchPayment(MatchModel model)
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", model.PaymentId),
