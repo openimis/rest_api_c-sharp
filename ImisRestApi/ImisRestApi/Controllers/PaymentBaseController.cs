@@ -36,12 +36,12 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/MatchPayment")]
-        public virtual async Task<IActionResult> Match([FromBody]MatchModel model)
+        public virtual async Task<IActionResult> MatchPayment([FromBody]MatchModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = true, error_message = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage });
 
-            var response = await _payment.Match(model);           
+            var response = await _payment.MatchPayment(model);           
            
             return Ok(response);
         }
@@ -49,7 +49,7 @@ namespace ImisRestApi.Controllers
         //Recieve Payment from Operator/
         [HttpPost]
         [Route("api/GetControlNumber")]
-        public virtual async Task<IActionResult> ControlNumber([FromBody]IntentOfPay intent)
+        public virtual async Task<IActionResult> GetControlNumber([FromBody]IntentOfPay intent)
         {
             if (!ModelState.IsValid)
             {           
@@ -64,23 +64,23 @@ namespace ImisRestApi.Controllers
         }
 
         [HttpPost]
-        [Route("api/GetControlNumberAck")]
-        public virtual IActionResult ControlNumberAck([FromBody]Acknowledgement model)
+        [Route("api/PostReqControlNumberAck")]
+        public virtual IActionResult PostReqControlNumberAck([FromBody]Acknowledgement model)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error});
+                return BadRequest(new { error_occured = true, error_message = error });
             }
 
             var response = _payment.SaveAcknowledgement(model);
 
-            return Ok(new { code = response.Code,error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
         }
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public virtual IActionResult ReceiveControlNumber([FromBody]ControlNumberResp model)
+        public virtual IActionResult GetReqControlNumber([FromBody]ControlNumberResp model)
         {
             if (!ModelState.IsValid)
             {
@@ -94,7 +94,7 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetPaymentData")]
-        public virtual IActionResult GetPayment([FromBody]PaymentData model)
+        public virtual IActionResult GetPaymentData([FromBody]PaymentData model)
         {
             if (!ModelState.IsValid)
             {
@@ -106,21 +106,7 @@ namespace ImisRestApi.Controllers
             return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue});
         }
 
-        //[HttpPost]
-        //[Route("api/SendSms")]
-        //public virtual IActionResult SendSms([FromBody]List<SmsContainer> model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-        //        return BadRequest(new { error_occured = true, error_message = error });
-        //    }
-
-        //    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
-        //    var response = sms.PushSMS(model,"");
-
-        //    return Ok();
-        //}
+       
 
 
     }
