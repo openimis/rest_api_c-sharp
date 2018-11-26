@@ -28,9 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Escape\Payment\Models\" />
     <Folder Include="Escape\Payment\Response\" />
-    <Folder Include="Chanels\Payment\Response\" />
   </ItemGroup>
 
 </Project>

@@ -49,7 +49,7 @@ namespace ImisRestApi.Chanels.Sms
             //configuredHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(headers);
         }
 
-        public override async Task<string> PushSMS(List<SmsContainer> containers,string filename = null)
+        public override async Task<string> SendSMS(List<SmsContainer> containers,string filename = null)
         {
             string response_message = string.Empty;
 

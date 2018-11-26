@@ -47,21 +47,21 @@ namespace ImisRestApi.Controllers
         }
 
         [NonAction]
-        public override IActionResult ReceiveControlNumber([FromBody] ControlNumberResp model)
+        public override IActionResult GetReqControlNumber([FromBody] ControlNumberResp model)
         {
-            return base.ReceiveControlNumber(model);
+            return base.GetReqControlNumber(model);
         }
 
         [NonAction]
-        public override IActionResult GetPayment([FromBody] PaymentData model)
+        public override IActionResult GetPaymentData([FromBody] PaymentData model)
         {
-            return base.GetPayment(model);
+            return base.GetPaymentData(model);
         }
 
         [NonAction]
-        public override IActionResult ControlNumberAck([FromBody] Acknowledgement model)
+        public override IActionResult PostReqControlNumberAck([FromBody] Acknowledgement model)
         {
-            return base.ControlNumberAck(model);
+            return base.PostReqControlNumberAck(model);
         }
 
         [HttpPost]
@@ -88,7 +88,7 @@ namespace ImisRestApi.Controllers
                     PhoneNumber = payment.PyrCellNum.ToString()
                 };
 
-                base.GetPayment(pay);
+                base.GetPaymentData(pay);
 
             }
 
@@ -97,7 +97,7 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public IActionResult ReceiveControlNumberChf([FromBody] GepgBillResponse model)
+        public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
          {
             foreach (var bill in model.BillTrxRespInf)
             {
@@ -111,7 +111,7 @@ namespace ImisRestApi.Controllers
 
                 try
                 {
-                    var response = base.ReceiveControlNumber(ControlNumberResponse);
+                    var response = base.GetReqControlNumber(ControlNumberResponse);
                 }
                 catch (Exception e)
                 {

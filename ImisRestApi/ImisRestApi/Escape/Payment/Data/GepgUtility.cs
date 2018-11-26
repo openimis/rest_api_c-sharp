@@ -401,7 +401,7 @@ namespace ImisRestApi.Data
                 // Set the ContentLength property of the WebRequest. 
                 request.ContentLength = byteArray.Length;
                 //Set Custom Headers
-                request.Headers.Add("Gepg-Code", "SP108");
+                request.Headers.Add("Gepg-Code", "SP257");
                 request.Headers.Add("Gepg-Com", "default.sp.in");
                 // Get the request stream.  
                 Stream dataStream = request.GetRequestStream();
