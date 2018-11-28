@@ -26,14 +26,26 @@ namespace ImisRestApi.Controllers
         [Route("api/GetControlNumber/Single")]
         public async Task<IActionResult> Index([FromBody]IntentOfSinglePay payment)
         {
+            payment.PhoneNumber = payment.Msisdn;
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { success = false, error_occured = true, error_message = error });
+            }
 
-            payment.SetDetails();
+            try
+            {
+                payment.SetDetails();
 
-            var response = await _payment.SaveIntent(payment);
+                var response = await _payment.SaveIntent(payment);
 
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+                return Ok(new { success = !response.ErrorOccured, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+
+            }
+            catch (Exception e)
+            {
+                return Ok(new { success = false, error_occured = true, error_message = e.Message });
+            }
         }
 
         [HttpPost]

@@ -9,7 +9,8 @@ namespace ImisRestApi.Chanels
     public class IntentOfSinglePay:IntentOfPay
     {
         [Required]
-        public override string PhoneNumber { get; set; }
+        public string Msisdn { get; set; }
+        public override string PhoneNumber { get; set; } = "0000";
         [Required]
         [InsureeNumber]
         public string InsureeNumber { get; set; }

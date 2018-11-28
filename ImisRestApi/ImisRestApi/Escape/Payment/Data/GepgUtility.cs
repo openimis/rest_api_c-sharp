@@ -30,9 +30,9 @@ namespace ImisRestApi.Data
 
         public GepgUtility(IHostingEnvironment hostingEnvironment)
         {
-            PrivateStorePath = hostingEnvironment.ContentRootPath + @"\Chanels\Payment\Certificates\gepgclientprivatekey.pfx";
-            PublicStorePath = hostingEnvironment.ContentRootPath + @"\Chanels\Payment\Certificates\gepgclientpubliccertificate.pfx";
-            GepgPublicCertStorePath = hostingEnvironment.ContentRootPath + @"\Chanels\Payment\Certificates\gepgpubliccertificate.pfx";
+            PrivateStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgclientprivatekey.pfx";
+            PublicStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgclientpubliccertificate.pfx";
+            GepgPublicCertStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgpubliccertificate.pfx";
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode, string BillId, decimal ExpectedAmount, List<PaymentDetail> products)
