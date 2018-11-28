@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Chanels\Payment\Controllers\Tanzania\**" />
-    <Content Remove="Chanels\Payment\Controllers\Tanzania\**" />
-    <EmbeddedResource Remove="Chanels\Payment\Controllers\Tanzania\**" />
-    <None Remove="Chanels\Payment\Controllers\Tanzania\**" />
+    <Compile Remove="Escape\Payment\Controllers\Tanzania\**" />
+    <Content Remove="Escape\Payment\Controllers\Tanzania\**" />
+    <EmbeddedResource Remove="Escape\Payment\Controllers\Tanzania\**" />
+    <None Remove="Escape\Payment\Controllers\Tanzania\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Chanels\Payment\Reconciliation\" />
-    <Folder Include="Chanels\Payment\Response\" />
+    <Folder Include="Escape\Payment\Certificates\" />
+    <Folder Include="Escape\Payment\Response\" />
   </ItemGroup>
 
 </Project>

@@ -79,10 +79,10 @@ namespace ImisRestApi.Logic
             return return_message;
         }
 
-        public async Task<DataMessage> Match(MatchModel model)
+        public async Task<DataMessage> MatchPayment(MatchModel model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var response = payment.Match(model);
+            var response = payment.MatchPayment(model);
 
             if (model.PaymentId == null) {
                 List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
@@ -116,7 +116,7 @@ namespace ImisRestApi.Logic
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId,payment.ControlNum);
 
                 MatchModel matchModel = new MatchModel() { PaymentId = Convert.ToInt32(model.PaymentId), AuditUserId = -3 };
-                var matchresponse = Match(matchModel);
+                var matchresponse = MatchPayment(matchModel);
                 SendPaymentSms(payment);
             }
 

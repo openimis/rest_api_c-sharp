@@ -11,18 +11,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
     public class PaymentController : PaymentBaseController
     {
         private ImisPayment p;
-        public string ReconciliationFolder;
-
         public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment) :base(configuration, hostingEnvironment)
         {
-            ReconciliationFolder = hostingEnvironment.ContentRootPath + @"\Chanels\Payment\Reconciliation";
             p = new ImisPayment(configuration, hostingEnvironment);
         }
 
@@ -34,14 +30,22 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
+                return BadRequest(new { success = false, error_occured = true, error_message = error });
             }
 
-            payment.SetDetails();
+            try
+            {
+                payment.SetDetails();
 
-            var response = await _payment.SaveIntent(payment);
+                var response = await _payment.SaveIntent(payment);
 
-            return Ok(new { error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+                return Ok(new { success = !response.ErrorOccured, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+
+            }
+            catch (Exception e)
+            {
+                return Ok(new { success = false, error_occured = true, error_message = e.Message });
+            }
         }
 
         [HttpPost]
@@ -49,30 +53,27 @@ namespace ImisRestApi.Controllers
         public IActionResult GetReconciliation([FromBody]GepgReconcMessage model)
         {
             if (!ModelState.IsValid)
-            {
-                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
-            }
-            //System.IO.File.WriteAllText(ReconciliationFolder, JsonConvert.SerializeObject(model));
+                return BadRequest(ModelState);
+
             return Ok(p.ReconciliationResp());
         }
 
         [NonAction]
-        public override IActionResult ReceiveControlNumber([FromBody] ControlNumberResp model)
+        public override IActionResult GetReqControlNumber([FromBody] ControlNumberResp model)
         {
-            return base.ReceiveControlNumber(model);
+            return base.GetReqControlNumber(model);
         }
 
         [NonAction]
-        public override IActionResult GetPayment([FromBody] PaymentData model)
+        public override IActionResult GetPaymentData([FromBody] PaymentData model)
         {
-            return base.GetPayment(model);
+            return base.GetPaymentData(model);
         }
 
         [NonAction]
-        public override IActionResult ControlNumberAck([FromBody] Acknowledgement model)
+        public override IActionResult PostReqControlNumberAck([FromBody] Acknowledgement model)
         {
-            return base.ControlNumberAck(model);
+            return base.PostReqControlNumberAck(model);
         }
 
         [HttpPost]
@@ -80,10 +81,7 @@ namespace ImisRestApi.Controllers
         public IActionResult GetPaymentChf([FromBody]GepgPaymentMessage model)
         {
             if (!ModelState.IsValid)
-            {
-                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
-            }
+                return BadRequest(ModelState);
 
             List<PymtTrxInf> payments = model.PymtTrxInf;
             foreach (var payment in payments)
@@ -102,7 +100,7 @@ namespace ImisRestApi.Controllers
                     PhoneNumber = payment.PyrCellNum.ToString()
                 };
 
-                base.GetPayment(pay);
+                base.GetPaymentData(pay);
 
             }
 
@@ -111,14 +109,8 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public IActionResult ReceiveControlNumberChf([FromBody] GepgBillResponse model)
+        public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
          {
-            if (!ModelState.IsValid)
-            {
-                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
-            }
-
             foreach (var bill in model.BillTrxRespInf)
             {
                 ControlNumberResp ControlNumberResponse = new ControlNumberResp()
@@ -131,7 +123,7 @@ namespace ImisRestApi.Controllers
 
                 try
                 {
-                    var response = base.ReceiveControlNumber(ControlNumberResponse);
+                    var response = base.GetReqControlNumber(ControlNumberResponse);
                 }
                 catch (Exception e)
                 {
