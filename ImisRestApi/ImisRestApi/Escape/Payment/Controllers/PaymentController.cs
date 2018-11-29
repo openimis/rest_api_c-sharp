@@ -16,10 +16,10 @@ namespace ImisRestApi.Controllers
 {
     public class PaymentController : PaymentBaseController
     {
-        private ImisPayment p;
+        private ImisPayment imisPayment;
         public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment) :base(configuration, hostingEnvironment)
         {
-            p = new ImisPayment(configuration, hostingEnvironment);
+            imisPayment = new ImisPayment(configuration, hostingEnvironment);
         }
 
         [HttpPost]
@@ -55,7 +55,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(p.ReconciliationResp());
+            return Ok(imisPayment.ReconciliationResp());
         }
 
         [NonAction]
@@ -104,7 +104,7 @@ namespace ImisRestApi.Controllers
 
             }
 
-            return Ok(p.PaymentResp());
+            return Ok(imisPayment.PaymentResp());
         }
 
         [HttpPost]
@@ -132,7 +132,7 @@ namespace ImisRestApi.Controllers
                 }
             }
 
-            return Ok(p.ControlNumberResp());
+            return Ok(imisPayment.ControlNumberResp());
         }
     }
 }
