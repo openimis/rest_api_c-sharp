@@ -41,9 +41,16 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = true, error_message = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage });
 
-            var response = await _payment.MatchPayment(model);           
-           
-            return Ok(response);
+            try
+            {
+                var response = await _payment.MatchPayment(model);
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured"});
+            }
+            
         }
 
         //Recieve Payment from Operator/
@@ -58,9 +65,17 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error, control_number = resp.Data });
             }
 
-            var response = await _payment.SaveIntent(intent);
+            try
+            {
+                var response = await _payment.SaveIntent(intent);
 
-            return Ok(new { code = response.Code, error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+            }
         }
 
         [HttpPost]
@@ -73,9 +88,17 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            var response = _payment.SaveAcknowledgement(model);
+            try
+            {
+                var response = _payment.SaveAcknowledgement(model);
 
-            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+            }
         }
 
         [HttpPost]
@@ -88,8 +111,17 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            var response = _payment.SaveControlNumber(model);
-            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue });
+            try
+            {
+                var response = _payment.SaveControlNumber(model);
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue });
+
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+            }
+
         }
 
         [HttpPost]
@@ -102,8 +134,17 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            var response = _payment.SavePayment(model);
-            return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue});
+            try
+            {
+                var response = _payment.SavePayment(model);
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue });
+
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+            }
+
         }
 
        

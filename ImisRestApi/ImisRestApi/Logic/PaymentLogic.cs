@@ -31,8 +31,6 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var intentResponse = payment.SaveIntent(intent,errorNumber,errorMessage);
 
-            string url = _configuration["PaymentGateWay:Url"] + _configuration["PaymentGateWay:CNRequest"];
-
             DataMessage return_message = new DataMessage();
 
             if (intentResponse.Code == 0)
