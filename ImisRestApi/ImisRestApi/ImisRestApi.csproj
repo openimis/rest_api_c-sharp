@@ -31,6 +31,7 @@
     <Folder Include="Escape\Payment\Certificates\" />
     <Folder Include="Escape\Payment\Models\" />
     <Folder Include="Escape\Payment\Response\" />
+    <Folder Include="wwwroot\SentMessages\" />
   </ItemGroup>
 
 </Project>

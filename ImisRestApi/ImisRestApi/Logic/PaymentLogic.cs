@@ -45,6 +45,7 @@ namespace ImisRestApi.Logic
                     {
                         if (!return_message.ErrorOccured && !controlNumberExists)
                         {
+                            return_message.Data = response.ControlNumber;
                             ControlNumberAssignedSms(payment);
                         }
                         else
