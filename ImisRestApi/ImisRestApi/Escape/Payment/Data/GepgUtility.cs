@@ -95,10 +95,13 @@ namespace ImisRestApi.Data
                 BillGenDt = DateTime.UtcNow,
                 BillEqvAmt = ExpectedAmount,
                 RemFlag = true,
-                BillExpDt = DateTime.UtcNow.AddMonths(1),
+                BillExprDt = DateTime.UtcNow.AddMonths(1),
                 BillAmt = ExpectedAmount,
                 MiscAmt = 0,
-                BillItems = items
+                BillItems = items,
+                BillDesc = "Bill",
+                BillApprBy = "Imis",
+                BillGenBy = "Imis"
             };
 
             if (OfficerCode == null)
@@ -119,16 +122,20 @@ namespace ImisRestApi.Data
                 if (dt.Rows.Count > 0)
                 {
                     var row = dt.Rows[0];                  
-                    billTrxInf.PyrName = Convert.ToString(row["LastName"]) + Convert.ToString(row["OtherNames"]);
+                    billTrxInf.PyrName = Convert.ToString(row["LastName"]) +" "+ Convert.ToString(row["OtherNames"]);
+                    billTrxInf.PyrEmail = Convert.ToString(row["Email"]).Length == 0 ? " " : Convert.ToString(row["Email"]);
+                    billTrxInf.PyrCellNum = Convert.ToString(row["Phone"]).Length == 0 ? " " : Convert.ToString(row["Phone"]);
                 }
                 else
                 {
                     billTrxInf.PyrName = InsureeNumber;
+                    billTrxInf.PyrEmail = "imis";
+                    billTrxInf.PyrCellNum = "09";
                 }
             }
             else
             {
-                var sSQL = @"SELECT Code,LastName,OtherNames,DOB,Phone,VEOCode,VEOLastName,VEOOtherNames,VEODOB,VEOPhone
+                var sSQL = @"SELECT Code,LastName,OtherNames,DOB,Phone,VEOCode,VEOLastName,VEOOtherNames,VEODOB,VEOPhone,EmailId
                             FROM tblOfficer WHERE Code = @OfficerCode";
                 SqlParameter[] parameters = {
                         new SqlParameter("@OfficerCode", OfficerCode),
@@ -136,10 +143,17 @@ namespace ImisRestApi.Data
 
                 var data = new DataHelper(Configuration);
                 DataTable dt = data.GetDataTable(sSQL, parameters, CommandType.Text);
-                var row = dt.Rows[0];
 
-                billTrxInf.PyrId = OfficerCode;
-                billTrxInf.PyrName = Convert.ToString(row["LastName"]) + Convert.ToString(row["OtherNames"]);
+                if (dt.Rows.Count > 0)
+                {
+                    var row = dt.Rows[0];
+
+                    billTrxInf.PyrId = OfficerCode;
+                    billTrxInf.PyrName = Convert.ToString(row["LastName"]) + " " + Convert.ToString(row["OtherNames"]);
+                    billTrxInf.PyrEmail = Convert.ToString(row["EmailId"]).Length == 0? "imis" : Convert.ToString(row["EmailId"]);
+                    billTrxInf.PyrCellNum = Convert.ToString(row["VEOPhone"]).Length == 0 ? "09" : Convert.ToString(row["VEOPhone"]);
+                }
+                
                
             }
 
