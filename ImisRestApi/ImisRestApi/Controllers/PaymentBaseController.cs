@@ -58,9 +58,18 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { code = resp.Code,error_occured = true, error_message = error, control_number = resp.Data });
             }
 
-            var response = await _payment.SaveIntent(intent);
+            try
+            {
+                var response = await _payment.SaveIntent(intent);
 
-            return Ok(new { code = response.Code, error_occured = response.ErrorOccured,error_message = response.MessageValue,control_number = response.Data});
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+            }
+            catch (Exception e)
+            {
+
+                return BadRequest(new { code = -1, error_occured = true, error_message = e.Message });
+            }
+           
         }
 
         [HttpPost]
