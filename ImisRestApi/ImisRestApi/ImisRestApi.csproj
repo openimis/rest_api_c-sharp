@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Escape\Payment\Certificates\" />
     <Folder Include="Escape\Payment\Response\" />
   </ItemGroup>
 
