@@ -375,15 +375,15 @@ namespace ImisRestApi.Data
                 byte[] str = Encoding.UTF8.GetBytes(strContent);
                 byte[] signature = Convert.FromBase64String(strSignature);
 
-                X509Certificate2 certificate = new X509Certificate2();
-                certificate.Import(PublicStorePath, CertPass, X509KeyStorageFlags.PersistKeySet);
-                rsaCrypto = (RSACryptoServiceProvider)certificate.PublicKey.Key;
+                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(PublicStorePath), CertPass);
+                //certificate.Import(PublicStorePath, CertPass, X509KeyStorageFlags.PersistKeySet);
+                rsaCrypto = (RSA)certificate.PublicKey.Key;
 
                 SHA1Managed sha1hash = new SHA1Managed();
                 byte[] hashdata = sha1hash.ComputeHash(str);
 
                // if (rsaCrypto.VerifyHash(hashdata, "SHA1", signature))
-               if (rsaCrypto.VerifyHash(hashdata,signature, HashAlgorithmName.SHA1,RSASignaturePadding.Pss))
+               if (rsaCrypto.VerifyHash(hashdata,signature, HashAlgorithmName.SHA1,RSASignaturePadding.Pkcs1))
                {
                   return true;
                }
@@ -453,26 +453,13 @@ namespace ImisRestApi.Data
 
         internal bool VerifyGePGData(string gepgResponse, int responseNo)
         {
-            string dataTag = string.Empty;
-
-            switch (responseNo)
-            {
-                case 0:
-                    dataTag = "gepgBillSubReqAck";
-                    break;
-                case 1:
-                    dataTag = "gepgBillSubReqAck";
-                    break;
-            }
-            
+            string dataTag = "gepgBillSubReqAck";
 
             string sigTag = "gepgSignature";
 
             string data = getContent(gepgResponse, dataTag);
             string signature = getSig(gepgResponse, sigTag);
 
-           // MessageBox.Show(data, "Received Content");
-           // MessageBox.Show(signature, "Received Signature");
 
             try
             {
@@ -480,9 +467,8 @@ namespace ImisRestApi.Data
                 byte[] sig = Convert.FromBase64String(signature);
 
                 // read the public key 
-                X509Certificate2 certificate = new X509Certificate2();
-                certificate.Import(GepgPublicCertStorePath, CertPass, X509KeyStorageFlags.PersistKeySet);
-                rsaCrypto = (RSACryptoServiceProvider)certificate.PublicKey.Key;
+                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(GepgPublicCertStorePath), CertPass);
+                rsaCrypto = (RSA)certificate.PublicKey.Key;
 
                 // compute the hash again, also we can pass it as a parameter
                 SHA1Managed sha1hash = new SHA1Managed();
@@ -499,19 +485,18 @@ namespace ImisRestApi.Data
             }
             catch (Exception ex)
             {
-               // MessageBox.Show(ex.Message);
                 return false;
             }
 
         }
 
-        private string getContent(string rawData, string dataTag)
+        public string getContent(string rawData, string dataTag)
         {
             string content = rawData.Substring(rawData.IndexOf(dataTag) - 1, rawData.LastIndexOf(dataTag) + dataTag.Length + 2 - rawData.IndexOf(dataTag));
             return content;
         }
 
-        private string getSig(string rawData, string sigTag)
+        public string getSig(string rawData, string sigTag)
         {
             string content = rawData.Substring(rawData.IndexOf(sigTag) + sigTag.Length + 1, rawData.LastIndexOf(sigTag) - rawData.IndexOf(sigTag) - sigTag.Length - 3);
             return content;

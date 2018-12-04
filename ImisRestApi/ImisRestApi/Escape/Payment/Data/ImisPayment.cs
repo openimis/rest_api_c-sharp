@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace ImisRestApi.Data
 {
@@ -95,10 +98,56 @@ namespace ImisRestApi.Data
             return signedReconcAck;
         }
 
-        public bool IsValidCall(string content, string signature) {
+        public bool IsValidCall(object Reqbody,int callNo) {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
 
+            var body = GetXmlStringFromObject(Reqbody);
+
+            var content = string.Empty;
+            var signature = string.Empty;
+            switch (callNo)
+            {
+                case 0:
+                    content = gepg.getContent(body, "gepgBillSubResp");
+                    signature = gepg.getSig(body, "gepgSignature");
+                    break;
+                case 1:
+                    content = gepg.getContent(body, "gepgPmtSpInfo");
+                    signature = gepg.getSig(body, "gepgSignature");
+                    break;
+                case 2:
+                    content = gepg.getContent(body, "gepgSpReconcResp");
+                    signature = gepg.getSig(body, "gepgSignature");
+                    break;
+                default:
+                    break;
+            }
             return gepg.VerifyData(content, signature);
+        }
+
+        private string GetXmlStringFromObject(object obj)
+        {
+            StringWriter sw = new StringWriter();
+            XmlTextWriter tw = null;
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(obj.GetType());
+                tw = new XmlTextWriter(sw);
+                serializer.Serialize(tw, obj);
+            }
+            catch (Exception ex)
+            {
+                //Handle Exception Code
+            }
+            finally
+            {
+                sw.Close();
+                if (tw != null)
+                {
+                    tw.Close();
+                }
+            }
+            return sw.ToString();
         }
 
     }

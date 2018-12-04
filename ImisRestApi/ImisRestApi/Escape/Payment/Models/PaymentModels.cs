@@ -33,22 +33,19 @@ namespace ImisRestApi.Models
         public string SpCode { get; set; }
         public string PayRefId { get; set; }
         public string BillId { get; set; }
-        public int PayCtrNum { get; set; }
+        public string PayCtrNum { get; set; }
         public decimal BillAmt { get; set; }
         public decimal PaidAmt { get; set; }
         public int BillPayOpt { get; set; }
-        public string Ccy { get; set; }
-        public DateTime TrxDtTm { get; set; }
-        public string UsdPayChn { get; set; }
+        public string CCy { get; set; }
+        public string TrxDtTm { get; set; }
+        public string UsdPayChnl { get; set; }
         public string PyrCellNum { get; set; }
         public string PyrName { get; set; }
         public string PyrEmail { get; set; }
         public string PspReceiptNumber { get; set; }
         public string PspName { get; set; }
         public string CtrAccNum { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public string PaymentOrigin { get; set; }
-        public string InsureeNumber { get; set; }
     }
 
     public class gepgPmtSpInfoAck

@@ -55,7 +55,14 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(imisPayment.ReconciliationResp());
+            if (imisPayment.IsValidCall(model,2))
+            {
+                return Ok(imisPayment.ReconciliationResp());
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [NonAction]
@@ -83,56 +90,73 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            List<PymtTrxInf> payments = model.PymtTrxInf;
-            foreach (var payment in payments)
+            if (imisPayment.IsValidCall(model, 1))
             {
-                PaymentData pay = new PaymentData() {
-                    PaymentId = payment.BillId,
-                    ControlNumber = payment.PayCtrNum.ToString(),
-                    ProductCode = payment.PayRefId,
-                    EnrolmentOfficerCode = payment.PyrName,
-                    TransactionId = payment.TrxId,
-                    ReceivedAmount = Convert.ToDouble(payment.BillAmt),
-                    ReceivedDate = payment.PaymentDate,
-                    PaymentDate = payment.PaymentDate,
-                    PaymentOrigin = payment.PaymentOrigin,
-                    ReceiptNumber = payment.PspReceiptNumber,
-                    PhoneNumber = payment.PyrCellNum.ToString()
-                };
+                List<PymtTrxInf> payments = model.PymtTrxInf;
+                foreach (var payment in payments)
+                {
+                    PaymentData pay = new PaymentData()
+                    {
+                        PaymentId = payment.BillId,
+                        ControlNumber = payment.PayCtrNum,
+                        ProductCode = payment.PayRefId,
+                        EnrolmentOfficerCode = payment.PyrName,
+                        TransactionId = payment.TrxId,
+                        ReceivedAmount = Convert.ToDouble(payment.BillAmt),
+                        ReceivedDate = DateTime.UtcNow,
+                        PaymentDate = Convert.ToDateTime(payment.TrxDtTm),
+                        PaymentOrigin = "GePG",
+                        ReceiptNumber = payment.PspReceiptNumber,
+                        PhoneNumber = payment.PyrCellNum.ToString()
+                    };
 
-                base.GetPaymentData(pay);
+                    base.GetPaymentData(pay);
 
+                }
+
+                return Ok(imisPayment.PaymentResp());
             }
-
-            return Ok(imisPayment.PaymentResp());
+            else
+            {
+                return BadRequest();
+            }
+            
         }
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
          {
-            foreach (var bill in model.BillTrxRespInf)
+            if (imisPayment.IsValidCall(model, 0))
             {
-                ControlNumberResp ControlNumberResponse = new ControlNumberResp()
+                foreach (var bill in model.BillTrxRespInf)
                 {
-                    PaymentId = bill.BillId,
-                    ControlNumber = bill.PayCntrNum.ToString(),
-                    ErrorOccured = false,
-                    ErrorMessage = bill.TrxStsCode
-                };
+                    ControlNumberResp ControlNumberResponse = new ControlNumberResp()
+                    {
+                        PaymentId = bill.BillId,
+                        ControlNumber = bill.PayCntrNum.ToString(),
+                        ErrorOccured = false,
+                        ErrorMessage = bill.TrxStsCode
+                    };
 
-                try
-                {
-                    var response = base.GetReqControlNumber(ControlNumberResponse);
-                }
-                catch (Exception e)
-                {
+                    try
+                    {
+                        var response = base.GetReqControlNumber(ControlNumberResponse);
+                    }
+                    catch (Exception e)
+                    {
 
-                    throw e;
+                        throw e;
+                    }
                 }
+
+                return Ok(imisPayment.ControlNumberResp());
             }
-
-            return Ok(imisPayment.ControlNumberResp());
+            else
+            {
+                return BadRequest();
+            }
+            
         }
     }
 }
