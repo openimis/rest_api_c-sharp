@@ -355,8 +355,7 @@ namespace ImisRestApi.Data
 
                     hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(strUnsignedContent));
 
-                    // byte[] signedHash = rsaCrypto.SignHash(hash, CryptoConfig.MapNameToOID("SHA1"));
-                    byte[] signedHash = rsaCrypto.SignHash(hash, HashAlgorithmName.SHA1, RSASignaturePadding.Pss);
+                    byte[] signedHash = rsaCrypto.SignHash(hash, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
                     string signedHashString = Convert.ToBase64String(signedHash);
                     signature = signedHashString;
                 }
@@ -452,9 +451,21 @@ namespace ImisRestApi.Data
 
         }
 
-        internal bool VerifyGePGData(string gepgResponse)
+        internal bool VerifyGePGData(string gepgResponse, int responseNo)
         {
-            string dataTag = "gepgBillSubReqAck";
+            string dataTag = string.Empty;
+
+            switch (responseNo)
+            {
+                case 0:
+                    dataTag = "gepgBillSubReqAck";
+                    break;
+                case 1:
+                    dataTag = "gepgBillSubReqAck";
+                    break;
+            }
+            
+
             string sigTag = "gepgSignature";
 
             string data = getContent(gepgResponse, dataTag);
