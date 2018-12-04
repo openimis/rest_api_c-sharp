@@ -20,7 +20,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Xml" Version="2.0.4" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="runtime.native.System.Security.Cryptography" Version="4.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
   </ItemGroup>
 
@@ -29,7 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Escape\Payment\Certificates\" />
+    <Folder Include="Escape\Payment\Models\" />
     <Folder Include="Escape\Payment\Response\" />
+    <Folder Include="wwwroot\SentMessages\" />
   </ItemGroup>
 
 </Project>

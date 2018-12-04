@@ -15,9 +15,11 @@ namespace ImisRestApi.Data
     public class ImisBaseSms
     {
         private string SmsTampletes = string.Empty;
+        private IHostingEnvironment env;
 
         public ImisBaseSms(IConfiguration config,IHostingEnvironment environment)
         {
+            env = environment;
             SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\Strings\";
         }
 
@@ -51,7 +53,8 @@ namespace ImisRestApi.Data
 
         public virtual void SaveMessage(string message,string name)
         {
-            string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            //string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string mydocpath = System.IO.Path.Combine(env.WebRootPath,"SentMessages");
             string namepart = new Random().Next(100000, 999999).ToString();
 
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, name +namepart+".json")))
