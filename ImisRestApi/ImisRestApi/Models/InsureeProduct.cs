@@ -11,5 +11,6 @@ namespace ImisRestApi.Models
         public DateTime? EffectiveDate { get; set; }
         public DateTime? ExpiryDate { get; set; }
         public bool PolicyActivated { get; set; }
+        public decimal ExpectedProductAmount { get;set; }
     }
 }

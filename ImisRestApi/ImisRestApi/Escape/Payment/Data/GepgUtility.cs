@@ -35,7 +35,7 @@ namespace ImisRestApi.Data
             GepgPublicCertStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgpubliccertificate.pfx";
         }
 
-        public String CreateBill(IConfiguration Configuration, string OfficerCode, string BillId, decimal ExpectedAmount, List<PaymentDetail> products)
+        public String CreateBill(IConfiguration Configuration, string OfficerCode,string PhoneNumber, string BillId, decimal ExpectedAmount, List<InsureeProduct> products)
         {
             DataHelper dh = new DataHelper(Configuration);
 
@@ -44,39 +44,11 @@ namespace ImisRestApi.Data
             foreach (var product in products)
             {
 
-                var policyStage = (product.PaymentType == 0) ? "r" : "n";
-
-                SqlParameter[] _params = {
-                    new SqlParameter("@ProductCode", product.ProductCode),
-                    new SqlParameter("@InsureeNumber", product.InsureeNumber),
-                    new SqlParameter("@PolicyStage", policyStage)
-                };
-
-                var query =@"DECLARE @ProductId INT
-                             DECLARE @FamilyId INT
-                             SET @ProductId =(SELECT ISNULL(ProdID,0) FROM tblProduct WHERE ProductCode = @ProductCode AND ValidityTo IS NULL)
-                             SET @FamilyId =(SELECT ISNULL(FamilyID,0) FROM tblInsuree WHERE CHFID=@InsureeNumber AND ValidityTo IS NULL)
-                             EXEC uspPolicyValue @familyid = @FamilyId, @prodid =@ProductId , @policystage= @PolicyStage";
-
-                var _data = new DataHelper(Configuration);
-                DataTable _dt = new DataTable();
-                
-                try
-                {
-                    _dt = _data.GetDataTable(query, _params, CommandType.Text);                 
-                }
-                catch (Exception e)
-                {
-                    throw new Exception();
-                }
-
-                var _row = _dt.Rows[0];
-
                 BillItem item = new BillItem()
                 {
                     BillItemRef = product.ProductCode,
-                    BillItemAmt = Convert.ToDouble(_row["PolicyValue"]),
-                    BillItemEqvAmt = Convert.ToDouble(_row["PolicyValue"]),
+                    BillItemAmt = Convert.ToDouble(product.ExpectedProductAmount),
+                    BillItemEqvAmt = Convert.ToDouble(product.ExpectedProductAmount),
                     BillItemMiscAmt = 0,
                     UseItemRefOnPay = "N",
                     GfsCode = Configuration["PaymentGateWay:GePG:GfsCode:0"]
@@ -92,10 +64,10 @@ namespace ImisRestApi.Data
                 SpSysId = Configuration["PaymentGateWay:GePG:SystemId"],
                 Ccy = "TZS",
                 BillPayOpt = 1,
-                BillGenDt = DateTime.UtcNow,
+                BillGenDt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
                 BillEqvAmt = ExpectedAmount,
                 RemFlag = true,
-                BillExprDt = DateTime.UtcNow.AddMonths(1),
+                BillExprDt = DateTime.Now.AddMonths(1).ToString("yyyy-MM-ddTHH:mm:ss"),
                 BillAmt = ExpectedAmount,
                 MiscAmt = 0,
                 BillItems = items,
@@ -123,14 +95,14 @@ namespace ImisRestApi.Data
                 {
                     var row = dt.Rows[0];                  
                     billTrxInf.PyrName = Convert.ToString(row["LastName"]) +" "+ Convert.ToString(row["OtherNames"]);
-                    billTrxInf.PyrEmail = Convert.ToString(row["Email"]).Length == 0 ? " " : Convert.ToString(row["Email"]);
-                    billTrxInf.PyrCellNum = Convert.ToString(row["Phone"]).Length == 0 ? " " : Convert.ToString(row["Phone"]);
+                    billTrxInf.PyrEmail = Convert.ToString(row["Email"]).Length == 0 ? "info@imis.co.tz" : Convert.ToString(row["Email"]);
+                    billTrxInf.PyrCellNum = Convert.ToString(row["Phone"]).Length == 0 ? PhoneNumber : Convert.ToString(row["Phone"]);
                 }
                 else
                 {
                     billTrxInf.PyrName = InsureeNumber;
-                    billTrxInf.PyrEmail = "imis";
-                    billTrxInf.PyrCellNum = "09";
+                    billTrxInf.PyrEmail = "info@imis.co.tz";
+                    billTrxInf.PyrCellNum = PhoneNumber;
                 }
             }
             else
@@ -150,11 +122,10 @@ namespace ImisRestApi.Data
 
                     billTrxInf.PyrId = OfficerCode;
                     billTrxInf.PyrName = Convert.ToString(row["LastName"]) + " " + Convert.ToString(row["OtherNames"]);
-                    billTrxInf.PyrEmail = Convert.ToString(row["EmailId"]).Length == 0? "imis" : Convert.ToString(row["EmailId"]);
-                    billTrxInf.PyrCellNum = Convert.ToString(row["VEOPhone"]).Length == 0 ? "09" : Convert.ToString(row["VEOPhone"]);
+                    billTrxInf.PyrEmail = Convert.ToString(row["EmailId"]).Length == 0? "info@imis.co.tz" : Convert.ToString(row["EmailId"]);
+                    billTrxInf.PyrCellNum = Convert.ToString(row["VEOPhone"]).Length == 0 ? PhoneNumber : Convert.ToString(row["VEOPhone"]);
                 }
-                
-               
+  
             }
 
             newBill = new gepgBillSubReq()
@@ -340,6 +311,40 @@ namespace ImisRestApi.Data
             {
 
                 X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(PrivateStorePath), CertPass);
+
+                rsaCrypto = (RSA)certificate.PrivateKey;
+
+                if (rsaCrypto == null)
+                {
+
+                }
+                else
+                {
+                    SHA1Managed sha1 = new SHA1Managed();
+                    byte[] hash;
+
+                    hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(strUnsignedContent));
+
+                    byte[] signedHash = rsaCrypto.SignHash(hash, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
+                    string signedHashString = Convert.ToBase64String(signedHash);
+                    signature = signedHashString;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return signature;
+        }
+
+        public string GePGSignature(string strUnsignedContent)
+        {
+            string signature = string.Empty;
+            try
+            {
+
+                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(PrivateStorePath), CertPass);
                 //certificate.Import(PrivateStorePath, CertPass, X509KeyStorageFlags.PersistKeySet);
 
                 rsaCrypto = (RSA)certificate.PrivateKey;
@@ -376,13 +381,11 @@ namespace ImisRestApi.Data
                 byte[] signature = Convert.FromBase64String(strSignature);
 
                 X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(PublicStorePath), CertPass);
-                //certificate.Import(PublicStorePath, CertPass, X509KeyStorageFlags.PersistKeySet);
                 rsaCrypto = (RSA)certificate.PublicKey.Key;
 
                 SHA1Managed sha1hash = new SHA1Managed();
                 byte[] hashdata = sha1hash.ComputeHash(str);
 
-               // if (rsaCrypto.VerifyHash(hashdata, "SHA1", signature))
                if (rsaCrypto.VerifyHash(hashdata,signature, HashAlgorithmName.SHA1,RSASignaturePadding.Pkcs1))
                {
                   return true;
@@ -391,6 +394,36 @@ namespace ImisRestApi.Data
                {
                   return false;
                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public bool VerifyIMISData(string strContent, string strSignature)
+        {
+            try
+            {
+                byte[] str = Encoding.UTF8.GetBytes(strContent);
+                byte[] signature = Convert.FromBase64String(strSignature);
+
+                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(PrivateStorePath), CertPass);
+                //certificate.Import(PublicStorePath, CertPass, X509KeyStorageFlags.PersistKeySet);
+                rsaCrypto = (RSA)certificate.PublicKey.Key;
+
+                SHA1Managed sha1hash = new SHA1Managed();
+                byte[] hashdata = sha1hash.ComputeHash(str);
+
+                // if (rsaCrypto.VerifyHash(hashdata, "SHA1", signature))
+                if (rsaCrypto.VerifyHash(hashdata, signature, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -492,14 +525,32 @@ namespace ImisRestApi.Data
 
         public string getContent(string rawData, string dataTag)
         {
-            string content = rawData.Substring(rawData.IndexOf(dataTag) - 1, rawData.LastIndexOf(dataTag) + dataTag.Length + 2 - rawData.IndexOf(dataTag));
-            return content;
+            try
+            {
+                string content = rawData.Substring(rawData.IndexOf(dataTag) - 1, rawData.LastIndexOf(dataTag) + dataTag.Length + 2 - rawData.IndexOf(dataTag));
+                return content;
+            }
+            catch (Exception)
+            {
+
+                return string.Empty;
+            }
+            
         }
 
         public string getSig(string rawData, string sigTag)
         {
-            string content = rawData.Substring(rawData.IndexOf(sigTag) + sigTag.Length + 1, rawData.LastIndexOf(sigTag) - rawData.IndexOf(sigTag) - sigTag.Length - 3);
-            return content;
+            try
+            {
+                string content = rawData.Substring(rawData.IndexOf(sigTag) + sigTag.Length + 1, rawData.LastIndexOf(sigTag) - rawData.IndexOf(sigTag) - sigTag.Length - 3);
+                return content;
+            }
+            catch (Exception)
+            {
+
+                return string.Empty;
+            }
+            
         }
 
     }

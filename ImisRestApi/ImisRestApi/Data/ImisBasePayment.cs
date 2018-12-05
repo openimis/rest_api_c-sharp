@@ -65,7 +65,7 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual ControlNumberResp PostReqControlNumber(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
+        public virtual ControlNumberResp PostReqControlNumber(string OfficerCode, string PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
             bool result = SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
@@ -470,8 +470,9 @@ namespace ImisRestApi.Data
                                     ProductCode = rw["ProductCode"] != System.DBNull.Value ? Convert.ToString(rw["ProductCode"]):null,
                                     ExpiryDate = (DateTime?)(rw["ExpiryDate"] != System.DBNull.Value?rw["ExpiryDate"] :null),
                                     EffectiveDate = (DateTime?)(rw["EffectiveDate"] != System.DBNull.Value ? rw["EffectiveDate"] : null),
-                                    PolicyActivated = active
-                                }
+                                    PolicyActivated = active,
+                                    ExpectedProductAmount = rw["ExpectedDetailAmount"] != System.DBNull.Value ? Convert.ToDecimal(rw["ExpectedDetailAmount"]) : 0
+                    }
                             );
                         
                     }

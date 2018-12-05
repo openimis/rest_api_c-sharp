@@ -44,24 +44,24 @@ namespace ImisRestApi.Data
 
         }
 
-        public override ControlNumberResp PostReqControlNumber(string OfficerCode, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
+        public override ControlNumberResp PostReqControlNumber(string OfficerCode,string PhoneNumber, string PaymentId, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
-            var bill = gepg.CreateBill(Configuration, OfficerCode, PaymentId, ExpectedAmount, products);
+            var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, ExpectedAmount, InsureeProducts);
             var signature = gepg.GenerateSignature(bill);
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
             var billAck = gepg.SendHttpRequest(signedMesg);
 
-            return base.PostReqControlNumber(OfficerCode, PaymentId, ExpectedAmount, products, null, true, false);
+            return base.PostReqControlNumber(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
         }
 
-        public string ControlNumberResp()
+        public string ControlNumberResp(int code)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
 
             gepgBillSubRespAck CnAck = new gepgBillSubRespAck();
-            CnAck.TrxStsCode = 7101;
+            CnAck.TrxStsCode = code;
 
             var CnAckString = gepg.SerializeClean(CnAck, typeof(gepgBillSubRespAck));
             string signature = gepg.GenerateSignature(CnAckString);
@@ -70,12 +70,12 @@ namespace ImisRestApi.Data
             return signedCnAck;
         }
 
-        public string PaymentResp()
+        public string PaymentResp(int code)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
 
             gepgPmtSpInfoAck PayAck = new gepgPmtSpInfoAck();
-            PayAck.TrxStsCode = 7101;
+            PayAck.TrxStsCode = code;
 
             var PayAckString = gepg.SerializeClean(PayAck, typeof(gepgPmtSpInfoAck));
             string signature = gepg.GenerateSignature(PayAckString);
@@ -84,12 +84,12 @@ namespace ImisRestApi.Data
             return signedPayAck;
         }
 
-        public string ReconciliationResp()
+        public string ReconciliationResp(int code)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment);
 
             gepgSpReconcReqAck ReconcAck = new gepgSpReconcReqAck();
-            ReconcAck.ReconcStsCode = 7101;
+            ReconcAck.ReconcStsCode = code;
 
             var ReconcAckString = gepg.SerializeClean(ReconcAck, typeof(gepgSpReconcReqAck));
             string signature = gepg.GenerateSignature(ReconcAckString);

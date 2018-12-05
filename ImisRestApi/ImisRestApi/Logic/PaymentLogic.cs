@@ -35,7 +35,7 @@ namespace ImisRestApi.Logic
 
             if (intentResponse.Code == 0)
             {
-                var response = payment.PostReqControlNumber(intent.OfficerCode, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails);
+                var response = payment.PostReqControlNumber(intent.OfficerCode,intent.PhoneNumber, payment.PaymentId, payment.ExpectedAmount, intent.PaymentDetails);
               
                 if (response.ControlNumber != null)
                 {

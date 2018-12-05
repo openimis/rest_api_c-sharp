@@ -52,16 +52,17 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReconciliationData")]
         public IActionResult GetReconciliation([FromBody]GepgReconcMessage model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             if (imisPayment.IsValidCall(model,2))
             {
-                return Ok(imisPayment.ReconciliationResp());
+                if (!ModelState.IsValid)
+                    return BadRequest(imisPayment.ReconciliationResp(7242));
+
+                return Ok(imisPayment.ReconciliationResp(7101));
             }
             else
             {
-                return BadRequest();
+                return BadRequest(imisPayment.ReconciliationResp(7303));
             }
         }
 
@@ -87,11 +88,12 @@ namespace ImisRestApi.Controllers
         [Route("api/GetPaymentData")]
         public IActionResult GetPaymentChf([FromBody]GepgPaymentMessage model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
+           
             if (imisPayment.IsValidCall(model, 1))
             {
+                if (!ModelState.IsValid)
+                    return BadRequest(imisPayment.PaymentResp(7242));
+
                 List<PymtTrxInf> payments = model.PymtTrxInf;
                 foreach (var payment in payments)
                 {
@@ -114,11 +116,11 @@ namespace ImisRestApi.Controllers
 
                 }
 
-                return Ok(imisPayment.PaymentResp());
+                return Ok(imisPayment.PaymentResp(7101));
             }
             else
             {
-                return BadRequest();
+                return BadRequest(imisPayment.PaymentResp(7303));
             }
             
         }
@@ -127,14 +129,18 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReqControlNumber")]
         public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
          {
+            
             if (imisPayment.IsValidCall(model, 0))
             {
-                foreach (var bill in model.BillTrxRespInf)
+                if (!ModelState.IsValid)
+                    return BadRequest(imisPayment.ControlNumberResp(7242));
+
+                foreach (var bill in model.BillTrxInf)
                 {
                     ControlNumberResp ControlNumberResponse = new ControlNumberResp()
                     {
                         PaymentId = bill.BillId,
-                        ControlNumber = bill.PayCntrNum.ToString(),
+                        ControlNumber = bill.PayCntrNum,
                         ErrorOccured = false,
                         ErrorMessage = bill.TrxStsCode
                     };
@@ -150,13 +156,14 @@ namespace ImisRestApi.Controllers
                     }
                 }
 
-                return Ok(imisPayment.ControlNumberResp());
+                return Ok(imisPayment.ControlNumberResp(7101));
             }
             else
             {
-                return BadRequest();
+                return BadRequest(imisPayment.ControlNumberResp(7303));
             }
-            
+
         }
+
     }
 }

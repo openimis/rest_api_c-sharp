@@ -16,10 +16,10 @@ namespace ImisRestApi.Chanels.Payment.Models
 
     [XmlRoot("Gepg")]
     public class GepgBillResponse
-    {
-
+    {     
         [XmlArray("gepgBillSubResp")]
-        public List<BillTrxRespInf> BillTrxRespInf { get; set; }
+        [XmlArrayItem("BillTrxInf")]
+        public BillTrxRespInf[] BillTrxInf { get; set; }
         public string gepgSignature { get; set; }
     }
 
@@ -48,11 +48,11 @@ namespace ImisRestApi.Chanels.Payment.Models
         public string SpSysId { get; set; }
         public decimal BillAmt { get; set; }
         public double MiscAmt { get; set; }
-        public DateTime BillExprDt { get; set; }
+        public string BillExprDt { get; set; }
         public string PyrId { get; set; }
         public string PyrName { get; set; }
         public string BillDesc { get; set; }
-        public DateTime BillGenDt { get; set; }
+        public string BillGenDt { get; set; }
         public string BillGenBy { get; set; }
         public string BillApprBy { get; set; }
         public string PyrCellNum { get; set; }
@@ -82,16 +82,15 @@ namespace ImisRestApi.Chanels.Payment.Models
    
     public class gepgBillSubResp
     {
-        [XmlArrayItem]
-        public List<BillTrxRespInf> BillTrxInf { get; set; }
+        [XmlArrayItem("BillTrxInf")]
+        public BillTrxRespInf[] BillTrxInf { get; set; }
     }
 
-    [XmlRoot("BillTrxInf")]
     public class BillTrxRespInf
     {
         public string BillId { get; set; }
         public string TrxSts { get; set; }
-        public int PayCntrNum { get; set; }
+        public string PayCntrNum { get; set; }
         public string TrxStsCode { get; set; }
     }
 
