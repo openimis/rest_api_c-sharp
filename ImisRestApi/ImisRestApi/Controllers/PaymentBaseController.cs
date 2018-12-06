@@ -72,9 +72,9 @@ namespace ImisRestApi.Controllers
                 return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+                return BadRequest(new { error_occured = true, error_message = e.Message });
             }
         }
 

@@ -10,7 +10,7 @@ namespace ImisRestApi.Models
 {
     public class IntentOfPay
     {
-        [Required(ErrorMessage = "009: Phone number not provided")]
+        [Required(ErrorMessage = "9: Phone number not provided")]
         public virtual string PhoneNumber { get; set; }
         public DateTime RequestDate { get; set; }
         [OfficerCode]
