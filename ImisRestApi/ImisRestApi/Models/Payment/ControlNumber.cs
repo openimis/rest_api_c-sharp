@@ -19,7 +19,7 @@ namespace ImisRestApi.Chanels.Payment.Models
         public int AuditedUserID { get; set; }
         public int RequestID { get; set; }
         [Required]
-        public int PaymentID { get; set; }
+        public int InternalIdentifier { get; set; }
         public string Value { get; set; }
         public DateTime IssuedDate { get; set; }
     }

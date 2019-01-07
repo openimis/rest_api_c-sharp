@@ -80,7 +80,7 @@ namespace ImisRestApi.Data
             //END Temporary 
 
             ControlNumberResp response = new ControlNumberResp() {
-                PaymentId = PaymentId,
+                InternalIdentifier = PaymentId,
                 ControlNumber = ctrlNumber,
                 RequestAcknowledged = acknowledge,
                 ErrorMessage = "",
@@ -155,9 +155,19 @@ namespace ImisRestApi.Data
                     error = false;
                 }
 
-                PaymentId = data[0].Value.ToString();
+                DataTable dt = new DataTable();
+                dt.Clear();
+                dt.Columns.Add("PaymentId");
+                dt.Columns.Add("ControlNumber");
+
+                DataRow rw = dt.NewRow();
+                var PaymentId = data[0].Value.ToString();
+                rw["PaymentId"] = PaymentId;
+                
+                dt.Rows.Add(rw);
+
                 ExpectedAmount = decimal.Parse(data[1].Value.ToString());
-                message = new SaveIntentResponse(rv, error).Message;
+                message = new SaveIntentResponse(rv, error,dt).Message;
                 GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
@@ -181,6 +191,7 @@ namespace ImisRestApi.Data
 
             try
             {
+                
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
                 GetPaymentInfo(PaymentId);
@@ -198,7 +209,7 @@ namespace ImisRestApi.Data
         public DataMessage SaveControlNumber(ControlNumberResp model,bool failed)
         {
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@PaymentID", model.PaymentId),
+                new SqlParameter("@PaymentID", model.InternalIdentifier),
                 new SqlParameter("@ControlNumber", model.ControlNumber),
                 new SqlParameter("@Failed", failed)
              };
@@ -209,7 +220,7 @@ namespace ImisRestApi.Data
             {
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
-                GetPaymentInfo(model.PaymentId);
+                GetPaymentInfo(model.InternalIdentifier);
             }
             catch (Exception e)
             {
@@ -309,13 +320,13 @@ namespace ImisRestApi.Data
         {
             int? isRenewal = null;
 
-            if((payment.PaymentType != null))
+            if((payment.Renewal != null))
             {
-                isRenewal = (int)payment.PaymentType;
+                isRenewal = (int)payment.Renewal;
             }
             
             XElement PaymentIntent = new XElement("PaymentData",
-                new XElement("PaymentID", payment.PaymentId),
+                new XElement("PaymentID", payment.InternalIdentifier),
                 new XElement("PaymentDate", payment.PaymentDate),
                 new XElement("ControlNumber", payment.ControlNumber),
                 new XElement("Amount", payment.ReceivedAmount),
@@ -357,7 +368,7 @@ namespace ImisRestApi.Data
         public DataMessage MatchPayment(MatchModel model)
         {
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@PaymentID", model.PaymentId),
+                new SqlParameter("@PaymentID", model.InternalIdentifier),
                 new SqlParameter("@AuditUserId", model.AuditUserId)
              };
 
@@ -393,9 +404,9 @@ namespace ImisRestApi.Data
                 }
                 
                 message = new MatchPayResponse(dh.ReturnValue,false,dt).Message;
-                if(model.PaymentId != null && !message.ErrorOccured)
+                if(model.InternalIdentifier != null && !message.ErrorOccured)
                 {
-                    GetPaymentInfo(model.PaymentId.ToString());
+                    GetPaymentInfo(model.InternalIdentifier.ToString());
                 }
             }
             catch (Exception e)
@@ -404,6 +415,31 @@ namespace ImisRestApi.Data
             }
 
             return message;
+        }
+
+
+        public async Task<DataMessage> GetControlNumbers(string PaymentIds)
+        {
+            
+            var sSQL = String.Format(@"SELECT PaymentID,ControlNumber
+                         FROM tblControlNumber WHERE PaymentID IN({0})", PaymentIds);
+
+            SqlParameter[] sqlParameters = {
+               
+             };
+
+            DataMessage dt = new DataMessage();
+            try
+            {
+                DataTable data = dh.GetDataTable(sSQL, sqlParameters, CommandType.Text);
+                dt = new RequestedCNResponse(0, false, data).Message;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return dt;
         }
 
         public void GetPaymentInfo(string Id)

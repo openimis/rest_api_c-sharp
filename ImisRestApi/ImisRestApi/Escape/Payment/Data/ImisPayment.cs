@@ -19,6 +19,7 @@ namespace ImisRestApi.Data
         public ImisPayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment) : base(configuration, hostingEnvironment)
         {
 
-        }       
+        }
+
     }
 }

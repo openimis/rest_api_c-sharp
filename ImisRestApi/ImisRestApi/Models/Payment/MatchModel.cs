@@ -8,7 +8,7 @@ namespace ImisRestApi.Models.Payment
 {
     public class MatchModel
     {
-        public int? PaymentId { get; set; }
+        public int? InternalIdentifier { get; set; }
         [Required]
         public int AuditUserId { get; set; }
     }

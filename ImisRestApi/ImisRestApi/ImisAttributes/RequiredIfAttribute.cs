@@ -20,7 +20,7 @@ namespace ImisRestApi.ImisAttributes
         {
             PaymentData payment = (PaymentData)validationContext.ObjectInstance;
 
-            if (payment.PaymentId == null && value == null)
+            if (payment.InternalIdentifier == null && value == null)
             {
                 return new ValidationResult(_fieldName + " is required if PaymentId is not provided");
             }

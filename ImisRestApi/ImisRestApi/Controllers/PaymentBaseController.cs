@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using ImisRestApi.Response;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -69,7 +71,9 @@ namespace ImisRestApi.Controllers
             {
                 var response = await _payment.SaveIntent(intent);
 
-                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+                PaymentData data = (PaymentData)response.Data;
+              
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue,internal_Identifier = data.InternalIdentifier, control_number = data.ControlNumber });
 
             }
             catch (Exception e)
@@ -147,8 +151,26 @@ namespace ImisRestApi.Controllers
 
         }
 
-       
+        [HttpGet]
+        [Route("api/GetAssignedControlNumbers")]
+        public virtual async Task<IActionResult> GetAssignedControlNumbers([FromBody]PaymentRequest requests)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
+            try
+            {
+                var response = await _payment.GetControlNumbers(requests);
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, Data = response.Data });
 
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+            }
+        }
     }
 }

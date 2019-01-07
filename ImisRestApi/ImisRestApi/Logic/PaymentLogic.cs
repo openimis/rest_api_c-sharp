@@ -10,6 +10,7 @@ using ImisRestApi.Models.Payment;
 using ImisRestApi.Responses;
 using ImisRestApi.Models.Sms;
 using ImisRestApi.Chanels.Sms;
+using Newtonsoft.Json;
 
 namespace ImisRestApi.Logic
 {
@@ -35,8 +36,12 @@ namespace ImisRestApi.Logic
 
             if (intentResponse.Code == 0)
             {
-                var response = payment.PostReqControlNumber(intent.OfficerCode, payment.PaymentId, intent.PhoneNumber, payment.ExpectedAmount, intent.PaymentDetails);
-              
+                var objstring = intentResponse.Data.ToString();
+                List<PaymentData> data = JsonConvert.DeserializeObject<List<PaymentData>>(objstring);
+                var ret_data = data.FirstOrDefault();
+
+                
+                var response = payment.PostReqControlNumber(intent.OfficerCode, payment.PaymentId, intent.PhoneNumber, payment.ExpectedAmount, intent.PaymentDetails);             
                 if (response.ControlNumber != null)
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
@@ -45,7 +50,7 @@ namespace ImisRestApi.Logic
                     {
                         if (!return_message.ErrorOccured && !controlNumberExists)
                         {
-                            return_message.Data = response.ControlNumber;
+                            ret_data.ControlNumber = response.ControlNumber;
                             ControlNumberAssignedSms(payment);
                         }
                         else
@@ -64,10 +69,9 @@ namespace ImisRestApi.Logic
                     ControlNumberNotassignedSms(payment,response.ErrorMessage);
                    
                 }
-                else
-                {
 
-                }
+                return_message.Data = ret_data;
+
             }
             else
             {
@@ -82,7 +86,7 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.MatchPayment(model);
 
-            if (model.PaymentId == null) {
+            if (model.InternalIdentifier == null) {
                 List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
 
                 if(PaymentIds != null)
@@ -96,7 +100,7 @@ namespace ImisRestApi.Logic
 
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.PaymentId.ToString()};
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.InternalIdentifier.ToString()};
             var response = payment.SaveControlNumberAkn(model.Success, model.Description);
 
             return response;
@@ -106,14 +110,14 @@ namespace ImisRestApi.Logic
         {
             
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
+            var controlNumberExists = payment.CheckControlNumber(model.InternalIdentifier, model.ControlNumber);
             var response = payment.SavePayment(model,controlNumberExists);
 
             if(payment.PaymentId != null && model.EnrolmentOfficerCode == null && !response.ErrorOccured)
             {
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId,payment.ControlNum);
 
-                MatchModel matchModel = new MatchModel() { PaymentId = Convert.ToInt32(model.PaymentId), AuditUserId = -3 };
+                MatchModel matchModel = new MatchModel() { InternalIdentifier = Convert.ToInt32(model.InternalIdentifier), AuditUserId = -3 };
                 var matchresponse = MatchPayment(matchModel);
                 SendPaymentSms(payment);
             }
@@ -124,7 +128,7 @@ namespace ImisRestApi.Logic
         public DataMessage SaveControlNumber(ControlNumberResp model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var controlNumberExists = payment.CheckControlNumber(model.PaymentId, model.ControlNumber);
+            var controlNumberExists = payment.CheckControlNumber(model.InternalIdentifier, model.ControlNumber);
             var response = payment.SaveControlNumber(model,controlNumberExists);
 
             if (payment.PaymentId != null)
@@ -178,6 +182,18 @@ namespace ImisRestApi.Logic
             var fileName = "CnAssigned_" + payment.PhoneNumber;
 
             string test = await sms.SendSMS(message,fileName);
+        }
+
+        public async Task<DataMessage> GetControlNumbers(PaymentRequest requests)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var PaymentIds = requests.Requests.Select(x => x.InternalIdentifier).ToArray();
+
+            var PaymentIds_string = string.Join(",", PaymentIds);
+
+            var response = await payment.GetControlNumbers(PaymentIds_string);
+
+            return response;
         }
 
         public async void ControlNumberNotassignedSms(ImisPayment payment,string error)

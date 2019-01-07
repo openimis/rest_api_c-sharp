@@ -9,7 +9,7 @@ namespace ImisRestApi.Models.Payment
     public class ControlNumberResp
     {
         [Required]
-        public string PaymentId { get; set; }
+        public string InternalIdentifier { get; set; }
         public string ControlNumber { get; set; }
         public bool RequestAcknowledged { get; set; }
         [Required]
