@@ -157,12 +157,12 @@ namespace ImisRestApi.Data
 
                 DataTable dt = new DataTable();
                 dt.Clear();
-                dt.Columns.Add("PaymentId");
+                dt.Columns.Add("InternalIdentifier");
                 dt.Columns.Add("ControlNumber");
 
                 DataRow rw = dt.NewRow();
                 var PaymentId = data[0].Value.ToString();
-                rw["PaymentId"] = PaymentId;
+                rw["InternalIdentifier"] = PaymentId;
                 
                 dt.Rows.Add(rw);
 
