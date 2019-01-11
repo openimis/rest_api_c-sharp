@@ -33,6 +33,8 @@ namespace ImisRestApi.Logic
             var intentResponse = payment.SaveIntent(intent,errorNumber,errorMessage);
 
             DataMessage return_message = new DataMessage();
+            return_message.Code = intentResponse.Code;
+            return_message.MessageValue = intentResponse.MessageValue;
 
             if (intentResponse.Code == 0)
             {
@@ -76,6 +78,7 @@ namespace ImisRestApi.Logic
             else
             {
                 return_message = intentResponse;
+                return_message.Data = new PaymentData();
             }
             
             return return_message;
@@ -145,7 +148,6 @@ namespace ImisRestApi.Logic
                 }
             }
            
-
             return response;
         }
 

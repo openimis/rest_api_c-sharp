@@ -96,7 +96,7 @@ namespace ImisRestApi.Controllers
             {
                 var response = _payment.SaveAcknowledgement(model);
 
-                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue, control_number = response.Data });
+                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue });
 
             }
             catch (Exception)
