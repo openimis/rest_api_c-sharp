@@ -7,15 +7,15 @@ namespace ImisRestApi.Models
     public class PaymentDetail
     {
         [InsureeNumber]
-        public string InsureeNumber { get; set; }
+        public string insuree_number { get; set; }
         [Required(ErrorMessage = "2:Not valid insurance or missing product code")]
-        public string ProductCode { get; set; }
+        public string insuree_product_code { get; set; }
         [Required(ErrorMessage = "10:EnrolmentType was not provided")]
         [Range(0,2)]
-        public EnrolmentType? Renewal { get; set; }
+        public EnrolmentType? renewal { get; set; }
         public int IsRenewal()
         {
-            switch (Renewal)
+            switch (renewal)
             {
                 case EnrolmentType.Renewal:
                     return 1;

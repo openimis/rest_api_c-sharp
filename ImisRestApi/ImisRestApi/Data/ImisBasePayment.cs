@@ -3,6 +3,7 @@ using ImisRestApi.Data;
 using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
+using ImisRestApi.Models.Payment.Response;
 using ImisRestApi.Responses;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -65,26 +66,26 @@ namespace ImisRestApi.Data
             return true;
         }
 
-        public virtual ControlNumberResp PostReqControlNumber(string OfficerCode, string PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
+        public virtual PostReqCNResponse PostReqControlNumber(string OfficerCode, string PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
             bool result = SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
 
             //BEGIN Temporary Control Number Generator(Simulation For Testing Only)
             // var randomNumber = new Random().Next(100000, 999999);
-            
+
             //if(randomNumber%2 == 0)
             //{
             //   ctrlNumber = randomNumber.ToString();
             //}
             //END Temporary 
 
-            ControlNumberResp response = new ControlNumberResp() {
-                InternalIdentifier = PaymentId,
+            PostReqCNResponse response = new PostReqCNResponse() {
+               
                 ControlNumber = ctrlNumber,
-                RequestAcknowledged = acknowledge,
-                ErrorMessage = "",
-                ErrorOccured = error
+                Posted = acknowledge,
+                ErrorCode = 0,
+                Assigned = error
             };
 
             return response;
@@ -106,17 +107,17 @@ namespace ImisRestApi.Data
 
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
-                        new XElement("OfficerCode", _intent.OfficerCode),
-                        new XElement("RequestDate",_intent.RequestDate),
-                        new XElement("PhoneNumber", _intent.PhoneNumber),
+                        new XElement("OfficerCode", _intent.enrolment_officer_code),
+                        new XElement("RequestDate",_intent.request_date),
+                        new XElement("PhoneNumber", _intent.phone_number),
                         new XElement("AuditUserId", -1)
                     ),
                       new XElement("Details",
-                    _intent.PaymentDetails.Select(x =>
+                    _intent.policies.Select(x =>
 
                                new XElement("Detail",
-                                  new XElement("InsuranceNumber", x.InsureeNumber),
-                                  new XElement("ProductCode", x.ProductCode),
+                                  new XElement("InsuranceNumber", x.insuree_number),
+                                  new XElement("ProductCode", x.insuree_product_code),
                                   new XElement("EnrollmentDate", DateTime.UtcNow),
                                   new XElement("IsRenewal", x.IsRenewal())
                                   )
@@ -138,7 +139,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@ErrorMsg",errorMessage),
                 new SqlParameter("@PaymentID", SqlDbType.Int){Direction = ParameterDirection.Output },
                 new SqlParameter("@ExpectedAmount", SqlDbType.Decimal){Direction = ParameterDirection.Output },
-                new SqlParameter("@ProvidedAmount",_intent.Amount),
+                new SqlParameter("@ProvidedAmount",_intent.amount_to_be_paid),
                 new SqlParameter("@PriorEnrollment",LocalDefault.PriorEnrolmentRequired(Configuration))
              };
 
@@ -210,8 +211,8 @@ namespace ImisRestApi.Data
         public DataMessage SaveControlNumber(ControlNumberResp model,bool failed)
         {
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@PaymentID", model.InternalIdentifier),
-                new SqlParameter("@ControlNumber", model.ControlNumber),
+                new SqlParameter("@PaymentID", model.internal_identifier),
+                new SqlParameter("@ControlNumber", model.control_number),
                 new SqlParameter("@Failed", failed)
              };
 
@@ -221,7 +222,7 @@ namespace ImisRestApi.Data
             {
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
-                GetPaymentInfo(model.InternalIdentifier);
+                GetPaymentInfo(model.internal_identifier);
             }
             catch (Exception e)
             {

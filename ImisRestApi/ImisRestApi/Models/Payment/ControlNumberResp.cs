@@ -9,11 +9,10 @@ namespace ImisRestApi.Models.Payment
     public class ControlNumberResp
     {
         [Required]
-        public string InternalIdentifier { get; set; }
-        public string ControlNumber { get; set; }
-        public bool RequestAcknowledged { get; set; }
+        public string internal_identifier { get; set; }
+        public string control_number { get; set; }
         [Required]
-        public bool ErrorOccured { get; set; }
-        public string ErrorMessage { get; set; }
+        public bool error_occured { get; set; }
+        public string error_message { get; set; }
     }
 }

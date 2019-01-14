@@ -5,8 +5,8 @@ namespace ImisRestApi.Models
     public class Acknowledgement
     {
         [Required]
-        public string InternalIdentifier { get; set; }
-        public string Description { get; set; }
-        public bool Success { get; set; }
+        public string internal_identifier { get; set; }
+        public string error_message { get; set; }
+        public bool error_occured { get; set; }
     }
 }

@@ -43,11 +43,11 @@ namespace ImisRestApi.Logic
                 var ret_data = data.FirstOrDefault();
 
                 
-                var response = payment.PostReqControlNumber(intent.OfficerCode, payment.PaymentId, intent.PhoneNumber, payment.ExpectedAmount, intent.PaymentDetails);             
+                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, payment.ExpectedAmount, intent.policies);             
                 if (response.ControlNumber != null)
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
-                    return_message = payment.SaveControlNumber(response.ControlNumber,controlNumberExists);
+                    return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
                     if (payment.PaymentId != null)
                     {
                         if (!return_message.ErrorOccured && !controlNumberExists)
@@ -61,13 +61,13 @@ namespace ImisRestApi.Logic
                         }
                     }                    
                 }
-                else if (response.RequestAcknowledged == true)
+                else if (response.Posted == true)
                 {
                     return_message = payment.SaveControlNumberAkn(!response.ErrorOccured,response.ErrorMessage);
                 }
                 else if (response.ErrorOccured == true)
                 {
-                    return_message = payment.SaveControlNumberAkn(!response.ErrorOccured,response.ErrorMessage);
+                    return_message = payment.SaveControlNumberAkn(!response.ErrorOccured, response.ErrorMessage);
                     ControlNumberNotassignedSms(payment,response.ErrorMessage);
                    
                 }
@@ -103,8 +103,8 @@ namespace ImisRestApi.Logic
 
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.InternalIdentifier};
-            var response = payment.SaveControlNumberAkn(model.Success, model.Description);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.internal_identifier};
+            var response = payment.SaveControlNumberAkn(model.error_occured, model.error_message);
 
             return response;
         }
@@ -131,7 +131,7 @@ namespace ImisRestApi.Logic
         public DataMessage SaveControlNumber(ControlNumberResp model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var controlNumberExists = payment.CheckControlNumber(model.InternalIdentifier, model.ControlNumber);
+            var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
             var response = payment.SaveControlNumber(model,controlNumberExists);
 
             if (payment.PaymentId != null)

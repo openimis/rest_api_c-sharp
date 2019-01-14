@@ -21,8 +21,8 @@ namespace ImisRestApi.ImisAttributes
             XElement xmlPayments = new XElement("Payments",
                                                 from d in details select
                                                 new XElement("Payment",
-                                                    new XElement("InsureeNumber",d.InsureeNumber),
-                                                    new XElement("ProductCode",d.ProductCode)
+                                                    new XElement("InsureeNumber",d.insuree_number),
+                                                    new XElement("ProductCode",d.insuree_product_code)
                                                 ));
            //    PaymentRepo paymentCheck = new PaymentRepo();
 
