@@ -103,7 +103,7 @@ namespace ImisRestApi.Logic
 
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.InternalIdentifier.ToString()};
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.InternalIdentifier};
             var response = payment.SaveControlNumberAkn(model.Success, model.Description);
 
             return response;

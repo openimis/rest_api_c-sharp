@@ -99,6 +99,7 @@ namespace ImisRestApi.Data
         {
             return 0;
         }
+
         public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
             var Proxyfamily = LocalDefault.FamilyMembers(Configuration);
