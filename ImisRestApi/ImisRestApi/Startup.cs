@@ -90,7 +90,7 @@ namespace ImisRestApi
             });
 
             app.UseSwaggerUI(x => {
-                x.SwaggerEndpoint("/swagger/v1/swagger.json", "IMIS REST");
+                x.SwaggerEndpoint("/restapi/swagger/v1/swagger.json", "IMIS REST");
             });
         }
     }

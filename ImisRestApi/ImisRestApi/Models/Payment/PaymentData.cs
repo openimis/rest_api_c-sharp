@@ -1,4 +1,5 @@
 ﻿using ImisRestApi.ImisAttributes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,24 +10,27 @@ namespace ImisRestApi.Models.Payment
 {
     public class PaymentData
     {
-        public string InternalIdentifier { get; set; }
-        public string ControlNumber { get; set; }
-        [RequiredIf("Product Code")]
-        public string ProductCode { get; set; }
-        public string EnrolmentOfficerCode { get; set; }
-        public string TransactionId { get; set; }
-        public double ReceivedAmount { get; set; }
-        [Required(ErrorMessage = "1-Wrong or missing receiving date")]
-        public DateTime ReceivedDate { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public string PaymentOrigin { get; set; }
-        public string ReceiptNumber { get; set; }
-        public string PhoneNumber { get; set; }
+        
+        public string control_number { get; set; }
         [InsureeNumber]
-        [RequiredIf("Insuree number")]
-        public string InsureeNumber { get; set; }
-        [RequiredIf("PaymentType")]
-        public EnrolmentType? Renewal { get; set; }
+        [RequiredIf("Insuree number", 5)] //this attributes validates if control number is not provided
+        public string insurance_number { get; set; }
+        [RequiredIf("Insurance Product Code")]
+        public string insurance_product_code { get; set; }     
+        [RequiredIf("Renewal")]
+        public EnrolmentType? renewal { get; set; }
+        [RequiredIf("Enrolment Officer Code")]
+        public string enrolment_officer_code { get; set; }
+        public string transaction_identification { get; set; }
+        public double received_amount { get; set; }
+        [Required(ErrorMessage = "1-Wrong or missing receiving date")]
+        [ValidDate(ErrorMessage = "1-Wrong or missing receiving date")]
+        public string received_date { get; set; }
+        [ValidDate(ErrorMessage = "5-Invalid Payment Date")]
+        public string payment_date { get; set; }
+        public string payment_origin { get; set; }
+
+       
 
     }
 }

@@ -83,7 +83,7 @@ namespace ImisRestApi.Data
             PostReqCNResponse response = new PostReqCNResponse() {
                
                 ControlNumber = ctrlNumber,
-                Posted = acknowledge,
+                Posted = true,
                 ErrorCode = 0,
                 Assigned = error
             };
@@ -116,8 +116,8 @@ namespace ImisRestApi.Data
                     _intent.policies.Select(x =>
 
                                new XElement("Detail",
-                                  new XElement("InsuranceNumber", x.insuree_number),
-                                  new XElement("ProductCode", x.insuree_product_code),
+                                  new XElement("InsuranceNumber", x.insurance_number),
+                                  new XElement("ProductCode", x.insurance_product_code),
                                   new XElement("EnrollmentDate", DateTime.UtcNow),
                                   new XElement("IsRenewal", x.IsRenewal())
                                   )
@@ -159,12 +159,12 @@ namespace ImisRestApi.Data
 
                 DataTable dt = new DataTable();
                 dt.Clear();
-                dt.Columns.Add("InternalIdentifier");
-                dt.Columns.Add("ControlNumber");
+                dt.Columns.Add("internal_identifier");
+                dt.Columns.Add("control_number");
 
                 DataRow rw = dt.NewRow();
                 var PaymentId = data[0].Value.ToString();
-                rw["InternalIdentifier"] = PaymentId;
+                rw["internal_identifier"] = PaymentId;
                 
                 dt.Rows.Add(rw);
 
@@ -322,24 +322,24 @@ namespace ImisRestApi.Data
         {
             int? isRenewal = null;
 
-            if((payment.Renewal != null))
+            if((payment.renewal != null))
             {
-                isRenewal = (int)payment.Renewal;
+                isRenewal = (int)payment.renewal;
             }
             
             XElement PaymentIntent = new XElement("PaymentData",
-                new XElement("PaymentID", payment.InternalIdentifier),
-                new XElement("PaymentDate", payment.PaymentDate),
-                new XElement("ControlNumber", payment.ControlNumber),
-                new XElement("Amount", payment.ReceivedAmount),
-                new XElement("ReceiptNo", payment.ReceiptNumber),
-                new XElement("TransactionNo", payment.TransactionId),
-                new XElement("PhoneNumber", payment.PhoneNumber),
-                new XElement("PaymentOrigin", payment.PaymentOrigin),
-                new XElement("OfficerCode", payment.EnrolmentOfficerCode),
+                new XElement("PaymentID", null),
+                new XElement("PaymentDate", payment.payment_date),
+                new XElement("ControlNumber", payment.control_number),
+                new XElement("Amount", payment.received_amount),
+                new XElement("ReceiptNo", payment.transaction_identification),
+                new XElement("TransactionNo", payment.transaction_identification),
+                new XElement("PhoneNumber", payment.payment_origin),
+                new XElement("PaymentOrigin", payment.payment_origin),
+                new XElement("OfficerCode", payment.enrolment_officer_code),
                 new XElement("Detail",
-                    new XElement("InsureeNumber", payment.InsureeNumber),
-                    new XElement("ProductCode", payment.ProductCode),
+                    new XElement("InsureeNumber", payment.insurance_number),
+                    new XElement("ProductCode", payment.insurance_product_code),
                     new XElement("IsRenewal", isRenewal)
                             )
                );
@@ -434,7 +434,39 @@ namespace ImisRestApi.Data
             try
             {
                 DataTable data = dh.GetDataTable(sSQL, sqlParameters, CommandType.Text);
-                dt = new RequestedCNResponse(0, false, data).Message;
+                data.Columns["PaymentID"].ColumnName = "internal_identifier";
+                data.Columns["ControlNumber"].ColumnName = "control_number";
+
+                var ids = PaymentIds.Split(",");
+
+                if (ids.Count() == data.Rows.Count)
+                {
+                    dt = new RequestedCNResponse(0, false, data).Message;
+                }
+                else
+                {
+                    var _datastring = JsonConvert.SerializeObject(data);
+                    var _data = JsonConvert.DeserializeObject<List<AssignedControlNumber>>(_datastring);
+                    var _ids = _data.Select(x => x.internal_identifier).ToArray();
+
+                    DataTable invalid = new DataTable();
+                    invalid.Clear();
+                    invalid.Columns.Add("internal_identifier");
+                    invalid.Columns.Add("control_number");
+
+                    foreach (var id in ids.Except(_ids))
+                    {
+                        DataRow rw = invalid.NewRow();
+
+                        rw["internal_identifier"] = id;
+
+                        invalid.Rows.Add(rw);
+                    }
+                   
+
+                    dt = new RequestedCNResponse(2, true, invalid).Message;
+                }
+                
             }
             catch (Exception e)
             {

@@ -61,7 +61,7 @@ namespace ImisRestApi.Controllers
         [HttpPost]
         [Route("api/GetControlNumber")]
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]
-        [ProducesResponseType(typeof(GetControlNumberBadReq), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public virtual async Task<IActionResult> GetControlNumber([FromBody]IntentOfPay intent)
         {
@@ -69,68 +69,81 @@ namespace ImisRestApi.Controllers
             {           
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
-                return BadRequest(new GetControlNumberBadReq(){ error_occured = true, error_message = error});
+                return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = error});
             }
 
             try
             {
                 var response = await _payment.SaveIntent(intent);
 
-                PaymentData data = (PaymentData)response.Data;
+                AssignedControlNumber data = (AssignedControlNumber)response.Data;
               
-                return Ok(new GetControlNumberResp(){ error_occured = response.ErrorOccured, error_message = response.MessageValue,internal_identifier = data.InternalIdentifier, control_number = data.ControlNumber });
+                return Ok(new GetControlNumberResp(){ error_occured = response.ErrorOccured, error_message = response.MessageValue,internal_identifier = data.internal_identifier, control_number = data.control_number });
 
             }
             catch (Exception e)
             {
-                return BadRequest(new GetControlNumberBadReq (){ error_occured = true, error_message = e.Message });
+                return BadRequest(new ErrorResponseV2 (){ error_occured = true, error_message = e.Message });
             }
         }
 
         [HttpPost]
         [Route("api/PostReqControlNumberAck")]
         [ProducesResponseType(typeof(void), 200)]
-        [ProducesResponseType(typeof(ControlNumberAckBadResp), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public virtual IActionResult PostReqControlNumberAck([FromBody]Acknowledgement model)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new ControlNumberAckBadResp(){ error_message = error });
+                return BadRequest(new ErrorResponse(){ error_message = error });
             }
 
             try
             {
                 var response = _payment.SaveAcknowledgement(model);
-
-                return Ok();
-
+                if (response.Code == 0)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(new ErrorResponse() { error_message = response.MessageValue });
+                }
+             
             }
             catch (Exception)
             {
-                return BadRequest(new ControlNumberAckBadResp() { error_message = "Unknown Error Occured" });
+                return BadRequest(new ErrorResponse() { error_message = "Unknown Error Occured" });
             }
         }
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         [ProducesResponseType(typeof(void), 200)]
-        [ProducesResponseType(typeof(ControlNumberAckBadResp), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public virtual IActionResult GetReqControlNumber([FromBody]ControlNumberResp model)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
+                return BadRequest(new ErrorResponse (){ error_message = error });
             }
 
             try
             {
                 var response = _payment.SaveControlNumber(model);
-                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue });
-
+                if (response.Code == 0)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(new ErrorResponse() { error_message = response.MessageValue });
+                }
+               
             }
             catch (Exception)
             {
@@ -141,46 +154,69 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetPaymentData")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(PaymentDataBadResp), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public virtual IActionResult GetPaymentData([FromBody]PaymentData model)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
+                return BadRequest(new PaymentDataBadResp(){ error_message = error });
             }
 
             try
             {
                 var response = _payment.SavePayment(model);
-                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, error_message = response.MessageValue });
+
+                if (response.Code == 0) {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(new PaymentDataBadResp() { error_message = response.MessageValue });
+                }
 
             }
             catch (Exception)
             {
-                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+                return BadRequest(new PaymentDataBadResp() { error_message = "Unknown Error Occured" });
             }
 
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("api/GetAssignedControlNumbers")]
+        [ProducesResponseType(typeof(AsignedControlNumbersResponse), 200)]
+        [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public virtual async Task<IActionResult> GetAssignedControlNumbers([FromBody]PaymentRequest requests)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
+                return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = error });
             }
 
             try
             {
                 var response = await _payment.GetControlNumbers(requests);
-                return Ok(new { code = response.Code, error_occured = response.ErrorOccured, Data = response.Data });
+
+                if (response.Code == 0)
+                {
+                    var controlNumbers = (List<AssignedControlNumber>)response.Data;
+                    return Ok(new AsignedControlNumbersResponse() { error_occured = response.ErrorOccured, assigned_control_numbers = controlNumbers });
+                }
+                else
+                {
+                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = response.MessageValue });
+                }
+                
 
             }
             catch (Exception)
             {
-                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+                return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = "Unknown Error Occured" });
             }
         }
     }

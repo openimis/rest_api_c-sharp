@@ -1,4 +1,5 @@
 ﻿using ImisRestApi.Models.Payment;
+using ImisRestApi.Models.Payment.Response;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -23,8 +24,8 @@ namespace ImisRestApi.Responses
         public RequestedCNResponse(int value, bool error, DataTable data) : base(value, error, data)
         {
             var jsonString = JsonConvert.SerializeObject(data);
-            var reqs = JsonConvert.DeserializeObject<List<PaymentData>>(jsonString);
-            msg.Data = reqs.Select(x => new { x.InternalIdentifier, x.ControlNumber });
+            var reqs = JsonConvert.DeserializeObject<List<AssignedControlNumber>>(jsonString);
+            msg.Data = reqs;
 
             SetMessage(value);
         }
@@ -38,7 +39,22 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "Success.";
                     Message = msg;
                     break;
-           
+                case 1:
+                    msg.Code = value;
+                    msg.MessageValue = "1-Wrong format of internal identifier";
+                    Message = msg;
+                    break;
+                case 2:
+
+                    var jsonString = JsonConvert.SerializeObject(msg.Data);
+                    var reqs = JsonConvert.DeserializeObject<List<AssignedControlNumber>>(jsonString).Select(x => x.internal_identifier).ToArray();
+                    var Ids_string = string.Join(",", reqs);
+
+                    msg.Code = value;
+                    msg.MessageValue = "2-Not valid internal identifier "+Ids_string;
+                    Message = msg;
+                    break;
+
             }
         }
     }

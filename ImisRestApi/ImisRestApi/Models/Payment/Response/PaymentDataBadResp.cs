@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ImisRestApi.Models.Payment.Response
 {
-    public class ControlNumberAckBadResp
+    public class PaymentDataBadResp
     {
         public string error_message { get; set; }
     }
