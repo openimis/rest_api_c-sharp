@@ -13,11 +13,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="appsettings.json" />
     <None Remove="appsettings.Test.json" />
     <None Remove="appsettings.Test.json.dist" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="appsettings.Test.json.dist">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

@@ -16,7 +16,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 
 		Task<GetFamiliesResponse> GetFamilies(int page = 1, int resultsPerPage = 20);
 
-		Task<FamilyModel> AddFamily(FamilyModel family);
+		Task<FamilyModel> AddFamilyAsync(FamilyModel family);
 
 		Task<FamilyModel> UpdateFamilyAsync(int familyId, FamilyModel family);
 
