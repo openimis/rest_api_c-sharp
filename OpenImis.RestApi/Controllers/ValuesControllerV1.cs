@@ -23,8 +23,10 @@ namespace OpenImis.RestApi.Controllers
 			return Ok(result);
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
+		// GET api/values/5
+		//[Authorize("read:messages")]
+		[Authorize("MedicalOfficer")]
+		[HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(id);

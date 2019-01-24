@@ -20,5 +20,6 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 		/// <returns>InsureeModel</returns>
 		Task<InsureeModel> GetInsureeByInsureeIdAsync(string insureeId);
 				
+
 	}
 }

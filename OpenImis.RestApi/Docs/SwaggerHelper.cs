@@ -91,7 +91,7 @@ namespace OpenImis.RestApi.Docs
             var apiVersions = GetApiVersions(webApiAssembly);
             foreach (var apiVersion in apiVersions)
             {
-                swaggerUIOptions.SwaggerEndpoint($"/RestApi/api-docs/v{apiVersion}/swagger.json", $"V{apiVersion} Docs");
+                swaggerUIOptions.SwaggerEndpoint($"/api-docs/v{apiVersion}/swagger.json", $"V{apiVersion} Docs");
             }
             swaggerUIOptions.RoutePrefix = "api-docs";
             swaggerUIOptions.InjectStylesheet("theme-feeling-blue-v2.css");
