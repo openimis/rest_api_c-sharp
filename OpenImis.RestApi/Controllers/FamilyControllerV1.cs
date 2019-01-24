@@ -14,7 +14,6 @@ using OpenImis.Modules.InsureeManagementModule.Protocol;
 namespace OpenImis.RestApi.Controllers
 {
     [ApiVersion("1")]
-    [Authorize(Roles = "IMISAdmin, EnrollmentOfficer")]
     [Route("api/family")]
 	[ApiController]
 	[EnableCors("AllowSpecificOrigin")]
@@ -44,6 +43,7 @@ namespace OpenImis.RestApi.Controllers
 		/// <response code="200">Returns the list of families</response>
 		/// <response code="400">If the request is incomplete</response>      
 		/// <response code="401">If the token is missing, is wrong or expired</response>      
+		[Authorize("EnrollmentOfficer")]
 		[HttpGet]
 		[ProducesResponseType(typeof(GetFamiliesResponse), 200)]
 		[ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
@@ -57,6 +57,7 @@ namespace OpenImis.RestApi.Controllers
         }
 
 		// GET api/ws/family/00001
+		[Authorize("IMISAdmin")]
 		[HttpGet("insuree/{insureeId}", Name = "GetFamilyByInsureeId")]
         public async Task<IActionResult> GetFamilyByInsureeId(string insureeId)
         {
@@ -110,7 +111,7 @@ namespace OpenImis.RestApi.Controllers
 			FamilyModel newFamily;
 			try
 			{
-				newFamily = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().AddFamily(family);
+				newFamily = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().AddFamilyAsync(family);
 			}
 			catch (ValidationException e)
 			{

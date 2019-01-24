@@ -104,7 +104,7 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 			return getFamiliesResponse;
 		}
 
-		public async Task<FamilyModel> AddFamily(FamilyModel family)
+		public async Task<FamilyModel> AddFamilyAsync(FamilyModel family)
 		{
 			// Authorize user
 

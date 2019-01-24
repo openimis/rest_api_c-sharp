@@ -77,14 +77,17 @@ namespace OpenImis.RestApi.Controllers
                     new Claim(ClaimTypes.Name, request.Username)
                 };
 
-                var roles = user.GetRolesStringArray();
+                /*var roles = user.GetRolesStringArray();
 
                 foreach (var role in roles)
                 {
                     claims = claims.Append(new Claim(ClaimTypes.Role, role));
-                }
+                }*/
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.PrivateKey));
+				//claims = claims.Append(new Claim("scope", "read:messages"));
+
+
+				var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.PrivateKey));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                 var token = new JwtSecurityToken(

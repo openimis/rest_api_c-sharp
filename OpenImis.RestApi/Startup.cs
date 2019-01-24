@@ -17,6 +17,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using OpenImis.RestApi.Docs;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OpenImis.RestApi
 {
@@ -54,7 +55,18 @@ namespace OpenImis.RestApi
                     options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(services.BuildServiceProvider().GetService<IImisModules>()));
                 });
 
-            services.AddMvc()
+			services.AddAuthorization();
+			//(options =>
+			//{
+			//	options.AddPolicy("MedicalOfficer", policy => policy.Requirements.Add(new HasAuthorityRequirement("MedicalOfficer", Configuration["JwtIssuer"])));
+			//	options.AddPolicy("EnrollmentOfficer", policy => policy.Requirements.Add(new HasAuthorityRequirement("EnrollmentOfficer", Configuration["JwtIssuer"])));
+			//});
+
+			// register the scope authorization handler
+			services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+			services.AddSingleton<IAuthorizationHandler, HasAuthorityHandler>();
+
+			services.AddMvc()
 				.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			services.AddApiVersioning(o => {
@@ -89,7 +101,7 @@ namespace OpenImis.RestApi
                 app.UseSwaggerUI(SwaggerHelper.ConfigureSwaggerUI);
             }
 
-            app.UseAuthentication();
+            app.UseAuthentication(); 
             app.UseMvc();
 
 			app.UseCors("AllowSpecificOrigin");
