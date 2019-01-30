@@ -25,7 +25,7 @@ namespace ImisRestApi.ImisAttributes
 
             if (payment.control_number == null && value == null)
             {
-                        if (_fieldNumber == 5 && payment.enrolment_officer_code != null) {
+                        if (_fieldNumber == 2 && payment.insurance_number != null) {
                             return ValidationResult.Success;
                         }
                         else

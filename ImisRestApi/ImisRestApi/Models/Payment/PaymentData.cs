@@ -13,15 +13,16 @@ namespace ImisRestApi.Models.Payment
         
         public string control_number { get; set; }
         [InsureeNumber]
-        [RequiredIf("Insuree number", 5)] //this attributes validates if control number is not provided
+        [RequiredIf("Insuree number")] //this attributes validates if control number is not provided
         public string insurance_number { get; set; }
         [RequiredIf("Insurance Product Code")]
         public string insurance_product_code { get; set; }     
         [RequiredIf("Renewal")]
         public EnrolmentType? renewal { get; set; }
-        [RequiredIf("Enrolment Officer Code")]
+        [RequiredIf("Enrolment Officer Code",2)]
         public string enrolment_officer_code { get; set; }
         public string transaction_identification { get; set; }
+        public string receipt_identification { get; set; }
         public double received_amount { get; set; }
         [Required(ErrorMessage = "1-Wrong or missing receiving date")]
         [ValidDate(ErrorMessage = "1-Wrong or missing receiving date")]

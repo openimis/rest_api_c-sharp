@@ -57,6 +57,21 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "5-Duplicate Payment Amount";
                     Message = msg;
                     break;
+                case 6:
+                    msg.Code = value;
+                    msg.MessageValue = "6-Enrolment Officer Code does not exist";
+                    Message = msg;
+                    break;
+                case 7:
+                    msg.Code = value;
+                    msg.MessageValue = "7-Product Code Does not Exist";
+                    Message = msg;
+                    break;
+                case 8:
+                    msg.Code = value;
+                    msg.MessageValue = "8-Beneficiary has no policy of specified insurance product for renewal";
+                    Message = msg;
+                    break;
             }
         }
     }

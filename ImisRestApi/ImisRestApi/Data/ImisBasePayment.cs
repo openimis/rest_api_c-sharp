@@ -287,11 +287,11 @@ namespace ImisRestApi.Data
             }
         }
       
-        public DataMessage SaveControlNumberAkn(bool Success, string Comment)
+        public DataMessage SaveControlNumberAkn(bool error_occured, string Comment)
         {
             XElement CNAcknowledgement = new XElement("ControlNumberAcknowledge",
                   new XElement("PaymentID", PaymentId),
-                  new XElement("Success", Convert.ToInt32(Success)),
+                  new XElement("Success", Convert.ToInt32(!error_occured)),
                   new XElement("Comment", Comment)
                   );
 
@@ -326,13 +326,15 @@ namespace ImisRestApi.Data
             {
                 isRenewal = (int)payment.renewal;
             }
-            
+
+            var paymentId = GetPaymentId(payment.control_number);
+
             XElement PaymentIntent = new XElement("PaymentData",
-                new XElement("PaymentID", null),
+                new XElement("PaymentID", paymentId),
                 new XElement("PaymentDate", payment.payment_date),
                 new XElement("ControlNumber", payment.control_number),
                 new XElement("Amount", payment.received_amount),
-                new XElement("ReceiptNo", payment.transaction_identification),
+                new XElement("ReceiptNo", payment.receipt_identification),
                 new XElement("TransactionNo", payment.transaction_identification),
                 new XElement("PhoneNumber", payment.payment_origin),
                 new XElement("PaymentOrigin", payment.payment_origin),
@@ -354,9 +356,17 @@ namespace ImisRestApi.Data
 
             try
             {
-                var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
-                message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
-                GetPaymentInfo(data[0].Value.ToString());
+                if (paymentId != string.Empty)
+                {
+                    var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
+                    message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
+                    GetPaymentInfo(data[0].Value.ToString());
+                }
+                else
+                {
+                    message = new SavePayResponse(3,true).Message;
+                }
+               
             }
             catch (Exception e)
             {
@@ -370,8 +380,8 @@ namespace ImisRestApi.Data
         public DataMessage MatchPayment(MatchModel model)
         {
             SqlParameter[] sqlParameters = {
-                new SqlParameter("@PaymentID", model.InternalIdentifier),
-                new SqlParameter("@AuditUserId", model.AuditUserId)
+                new SqlParameter("@PaymentID", model.internal_identifier),
+                new SqlParameter("@AuditUserId", model.audit_user_id)
              };
 
             DataMessage message;
@@ -406,9 +416,9 @@ namespace ImisRestApi.Data
                 }
                 
                 message = new MatchPayResponse(dh.ReturnValue,false,dt).Message;
-                if(model.InternalIdentifier != null && !message.ErrorOccured)
+                if(model.internal_identifier != null && !message.ErrorOccured)
                 {
-                    GetPaymentInfo(model.InternalIdentifier.ToString());
+                    GetPaymentInfo(model.internal_identifier.ToString());
                 }
             }
             catch (Exception e)
@@ -644,6 +654,33 @@ namespace ImisRestApi.Data
 
                 throw;
             }
+        }
+
+        public string GetPaymentId(string ControlNumber)
+        {
+            var sSQL = @"SELECT PaymentID FROM tblControlNumber WHERE ControlNumber = @ControlNumber";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@ControlNumber", ControlNumber)
+            };
+            string paymentId = string.Empty;
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    var row = data.Rows[0];
+                    paymentId = row["PaymentID"].ToString();
+                }
+                //GetPaymentInfo(PaymentID);
+            }
+            catch (Exception e)
+            {
+                return string.Empty;
+            }
+
+            return paymentId;
         }
     }
 }

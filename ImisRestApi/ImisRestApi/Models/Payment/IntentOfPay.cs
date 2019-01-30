@@ -17,6 +17,7 @@ namespace ImisRestApi.Models
         [OfficerCode]
         public string enrolment_officer_code { get; set; }
         public virtual List<PaymentDetail> policies { get; set; }
+        [RequiredIfEo("amunt to be paid")]
         public decimal amount_to_be_paid { get; set; }
     }
 }

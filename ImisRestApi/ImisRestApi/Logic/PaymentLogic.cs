@@ -90,7 +90,7 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.MatchPayment(model);
 
-            if (model.InternalIdentifier == null) {
+            if (model.internal_identifier == null) {
                 List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
 
                 if(PaymentIds != null)
@@ -121,7 +121,7 @@ namespace ImisRestApi.Logic
             {
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId,payment.ControlNum);
 
-                MatchModel matchModel = new MatchModel() { InternalIdentifier = Convert.ToInt32(payment.PaymentId), AuditUserId = -3 };
+                MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
                 var matchresponse = MatchPayment(matchModel);
                 SendPaymentSms(payment);
             }
