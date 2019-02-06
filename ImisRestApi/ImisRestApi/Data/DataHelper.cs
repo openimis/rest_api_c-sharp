@@ -47,6 +47,37 @@ namespace ImisRestApi.Data
             return ds;
         }
 
+        public List<string> GetUserRights(string userId)
+        {
+            var rights = new List<string>();
+
+            var sSQL = @"SELECT tblRoleRight.RightID
+                         FROM   tblRole INNER JOIN
+                         tblRoleRight ON tblRole.RoleID = tblRoleRight.RoleID INNER JOIN
+                         tblUserRole ON tblRole.RoleID = tblUserRole.RoleID INNER JOIN
+                         tblUsers ON tblUserRole.UserID = tblUsers.UserID
+                         WHERE tblUsers.UserID = 17 AND tblUsers.ValidityTo IS NULL";
+
+            SqlParameter[] paramets = {
+                new SqlParameter("@UserId", userId)
+            };
+
+            var dt = GetDataTable(sSQL, paramets, CommandType.Text);
+
+            if (dt.Rows.Count > 0)
+            {
+                for (int i = 0; i < dt.Rows.Count; i++) {
+                    var row = dt.Rows[i];
+                    var rightId = Convert.ToInt32(row["RightID"]);
+                    var rightName = Enum.GetName(typeof(Models.Rights), rightId);
+
+                    rights.Add(rightName);
+                }
+            }
+
+            return rights;
+        }
+
         public DataTable GetDataTable(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
             DataTable dt = new DataTable();

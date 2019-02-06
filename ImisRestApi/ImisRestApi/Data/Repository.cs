@@ -27,8 +27,8 @@ namespace ImisRestApi.Data
             if (users.Count == 1)
             {
                 UserData user = users.FirstOrDefault();
-
-                
+                List<string> userRights = dh.GetUserRights(user.UserID);
+                user.Rights = userRights;
                 return user;
             }
             else

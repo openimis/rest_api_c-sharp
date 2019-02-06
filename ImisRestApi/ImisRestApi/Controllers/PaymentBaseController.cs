@@ -14,6 +14,7 @@ using ImisRestApi.Models.Payment.Response;
 using ImisRestApi.Models.Sms;
 using ImisRestApi.Repo;
 using ImisRestApi.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,7 @@ using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
+    
     public abstract class PaymentBaseController : Controller
     {
         public PaymentLogic _payment;
@@ -36,8 +38,8 @@ namespace ImisRestApi.Controllers
             _hostingEnvironment = hostingEnvironment;
             _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
-
-
+ 
+        [Authorize(Roles = "AddPayment")]
         [HttpPost]
         [Route("api/MatchPayment")]
         public virtual async Task<IActionResult> MatchPayment([FromBody]MatchModel model)
@@ -58,6 +60,7 @@ namespace ImisRestApi.Controllers
         }
 
         //Recieve Payment from Operator/
+        [Authorize(Roles = "AddPayment")]
         [HttpPost]
         [Route("api/GetControlNumber")]
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]
@@ -87,6 +90,7 @@ namespace ImisRestApi.Controllers
             }
         }
 
+        [Authorize(Roles = "AddPayment")]
         [HttpPost]
         [Route("api/PostReqControlNumberAck")]
         [ProducesResponseType(typeof(void), 200)]
@@ -119,6 +123,7 @@ namespace ImisRestApi.Controllers
             }
         }
 
+        [Authorize(Roles = "AddPayment")]
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         [ProducesResponseType(typeof(void), 200)]
@@ -152,6 +157,7 @@ namespace ImisRestApi.Controllers
 
         }
 
+        [Authorize(Roles = "AddPayment")]
         [HttpPost]
         [Route("api/GetPaymentData")]
         [ProducesResponseType(typeof(void), 200)]
@@ -185,6 +191,7 @@ namespace ImisRestApi.Controllers
 
         }
 
+        [Authorize(Roles = "FindPayment")]
         [HttpPost]
         [Route("api/GetAssignedControlNumbers")]
         [ProducesResponseType(typeof(AsignedControlNumbersResponse), 200)]

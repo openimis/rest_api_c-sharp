@@ -105,6 +105,13 @@ namespace ImisRestApi.Data
         {
             var Proxyfamily = LocalDefault.FamilyMembers(Configuration);
 
+            List<PaymentDetail> policies = new List<PaymentDetail>();
+
+            if (_intent.policies != null)
+            {
+                policies = _intent.policies;
+            }
+
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
                         new XElement("OfficerCode", _intent.enrolment_officer_code),
@@ -113,7 +120,7 @@ namespace ImisRestApi.Data
                         new XElement("AuditUserId", -1)
                     ),
                       new XElement("Details",
-                    _intent.policies.Select(x =>
+                         policies.Select(x =>
 
                                new XElement("Detail",
                                   new XElement("InsuranceNumber", x.insurance_number),

@@ -10,5 +10,6 @@ namespace ImisRestApi.Models
         public string UserID { get; set; }
         public string LoginName { get; set; }
         public string PrivateKey { get; set; }
+        public List<string> Rights { get; set; }
     }
 }
