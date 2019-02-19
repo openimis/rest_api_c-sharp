@@ -64,11 +64,11 @@ namespace ImisRestApi.Logic
                 }
                 else if (response.Posted == true)
                 {
-                    return_message = payment.SaveControlNumberAkn(!response.ErrorOccured,response.ErrorMessage);
+                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured,response.ErrorMessage);
                 }
                 else if (response.ErrorOccured == true)
                 {
-                    return_message = payment.SaveControlNumberAkn(!response.ErrorOccured, response.ErrorMessage);
+                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
                     ControlNumberNotassignedSms(payment,response.ErrorMessage);
                    
                 }

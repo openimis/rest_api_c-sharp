@@ -60,7 +60,7 @@ namespace ImisRestApi.Controllers
         }
 
         //Recieve Payment from Operator/
-       // [Authorize(Roles = "AddPayment")]
+        [Authorize(Roles = "AddPayment")]
         [HttpPost]
         [Route("api/GetControlNumber")]
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]

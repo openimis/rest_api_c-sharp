@@ -339,6 +339,7 @@ namespace ImisRestApi.Data
             XElement PaymentIntent = new XElement("PaymentData",
                 new XElement("PaymentID", paymentId),
                 new XElement("PaymentDate", payment.payment_date),
+                new XElement("ReceiveDate", payment.received_date),
                 new XElement("ControlNumber", payment.control_number),
                 new XElement("Amount", payment.received_amount),
                 new XElement("ReceiptNo", payment.receipt_identification),

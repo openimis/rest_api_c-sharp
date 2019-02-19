@@ -15,8 +15,6 @@ namespace ImisRestApi.Extensions
             }
             else
             {
-            
-               
                 try
                 {
                     var error = str.Split(":");
@@ -25,7 +23,6 @@ namespace ImisRestApi.Extensions
                 }
                 catch (Exception)
                 {
-
                     return null;
                 }
             }
@@ -38,9 +35,7 @@ namespace ImisRestApi.Extensions
                 return str;
             }
             else
-            {
-
-               
+            {              
                 try
                 {
                     var error = str.Split(":");
