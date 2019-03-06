@@ -600,7 +600,7 @@ namespace ImisRestApi.Data
                 }
                 else
                 {
-                    throw new DataException("There was a data error.");
+                    throw new DataException("3-Wrong Control Number");
                 }
             }
             catch (Exception e)
