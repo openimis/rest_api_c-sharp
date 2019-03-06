@@ -32,9 +32,17 @@ namespace ImisRestApi.Controllers
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 return BadRequest(new { error_occured = true, error_message = error });
             }
-            var response = new DiagnosesServicesItems();
-           // var response = imisClaims.GetDsi(model);
-            return Json(response);
+
+            try
+            {
+                var response = imisClaims.GetDsi(model);
+                return Json(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
+            }
+            
         }
 
         [HttpPost]
@@ -49,9 +57,16 @@ namespace ImisRestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            var response = new PaymentLists();
-           // var response = imisClaims.GetPaymentLists(model);
+            try
+            {
+               var response = imisClaims.GetPaymentLists(model);
             return Json(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
+            }
+            
         }
     }
 }

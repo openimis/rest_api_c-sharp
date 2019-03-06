@@ -43,38 +43,48 @@ namespace ImisRestApi.Logic
                 List<AssignedControlNumber> data = JsonConvert.DeserializeObject<List<AssignedControlNumber>>(objstring);
                 var ret_data = data.FirstOrDefault();
 
-                
-                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, payment.ExpectedAmount, intent.policies);             
-                if (response.ControlNumber != null)
-                {
-                    var controlNumberExists = payment.CheckControlNumber(payment.PaymentId,response.ControlNumber);
-                    return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
-                    if (payment.PaymentId != null)
+                //Get the transfer Fee
+                var transferFee = payment.determineTransferFee(payment.ExpectedAmount,(TypeOfPayment)intent.type_of_payment);
+
+                var success = payment.UpdatePaymentTransferFee(payment.PaymentId,transferFee, (TypeOfPayment)intent.type_of_payment);
+
+                if (success) {
+                    var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, payment.ExpectedAmount, intent.policies);
+
+                    if (response.ControlNumber != null)
                     {
-                        if (!return_message.ErrorOccured && !controlNumberExists)
+                        var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
+                        return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
+                        if (payment.PaymentId != null)
                         {
-                            ret_data.control_number = response.ControlNumber;
-                            ControlNumberAssignedSms(payment);
+                            if (!return_message.ErrorOccured && !controlNumberExists)
+                            {
+                                ret_data.control_number = response.ControlNumber;
+                                ControlNumberAssignedSms(payment);
+                            }
+                            else
+                            {
+                                ControlNumberNotassignedSms(payment, return_message.MessageValue);
+                            }
                         }
-                        else
-                        {
-                            ControlNumberNotassignedSms(payment, return_message.MessageValue);
-                        }
-                    }                    
-                }
-                else if (response.Posted == true)
-                {
-                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured,response.ErrorMessage);
-                }
-                else if (response.ErrorOccured == true)
-                {
-                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
-                    ControlNumberNotassignedSms(payment,response.ErrorMessage);
-                   
-                }
+                    }
+                    else if (response.Posted == true)
+                    {
+                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
+                    }
+                    else if (response.ErrorOccured == true)
+                    {
+                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
+                        ControlNumberNotassignedSms(payment, response.ErrorMessage);
 
-                return_message.Data = ret_data;
+                    }
 
+                    return_message.Data = ret_data;
+                }
+                else
+                {
+                    return_message.Data = new { error_occured = true, error_code = 11, errorMessage = "Could not update the transfer fee."};
+                }
             }
             else
             {
@@ -100,8 +110,6 @@ namespace ImisRestApi.Logic
             return response;
         }
 
-        
-
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.internal_identifier};
@@ -117,12 +125,20 @@ namespace ImisRestApi.Logic
             //var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
             var response = payment.SavePayment(model);
 
-            if(payment.PaymentId != null && model.enrolment_officer_code == null && !response.ErrorOccured)
+            if (model.type_of_payment != null) {
+                var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount),(TypeOfPayment)model.type_of_payment);
+                var success = payment.UpdatePaymentTransferFee(payment.PaymentId,transferFee, (TypeOfPayment)model.type_of_payment);
+            }
+
+            if(payment.PaymentId != null && !response.ErrorOccured)
             {
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId,payment.ControlNum);
 
-                MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
-                var matchresponse = MatchPayment(matchModel);
+                if ( model.enrolment_officer_code == null) {
+                    MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
+                    var matchresponse = MatchPayment(matchModel);
+                }
+                
                 SendPaymentSms(payment);
             }
 
@@ -154,8 +170,8 @@ namespace ImisRestApi.Logic
 
         public async void ControlNumberAssignedSms(ImisPayment payment)
         {
-
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, lang);
             var txtmsgTemplate = string.Empty;
             string othersCount = string.Empty;
 
@@ -201,7 +217,8 @@ namespace ImisRestApi.Logic
 
         public async void ControlNumberNotassignedSms(ImisPayment payment,string error)
         {
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, lang);
             var txtmsgTemplate = string.Empty;
             string othersCount = string.Empty;
 
@@ -234,7 +251,8 @@ namespace ImisRestApi.Logic
 
         public async void SendPaymentSms(ImisPayment payment)
         {
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment,lang);
             List<SmsContainer> message = new List<SmsContainer>();
             var familyproduct = payment.InsureeProducts.FirstOrDefault();
 
@@ -282,7 +300,8 @@ namespace ImisRestApi.Logic
 
         public async void SendMatchSms(ImisPayment payment)
         {
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment,lang);
             List<SmsContainer> message = new List<SmsContainer>();
 
             var txtmsgTemplate = string.Empty;
@@ -318,7 +337,7 @@ namespace ImisRestApi.Logic
 
         public async void SendMatchSms(List<MatchSms> Ids)
         {
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment);
+            
             List<SmsContainer> message = new List<SmsContainer>();
 
             foreach (var m in Ids)
@@ -332,6 +351,9 @@ namespace ImisRestApi.Logic
 
                     ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment);
                     _pay.GetPaymentInfo(m.PaymentId.ToString());
+
+                    Language lang = _pay.Language.ToLower() == "en" || _pay.Language.ToLower() == "english" || _pay.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, lang);
 
                     if (_pay.PaymentId != null)
                     {
@@ -363,12 +385,13 @@ namespace ImisRestApi.Logic
                     {
                         throw new Exception();
                     }
+
+                    var fileName = "PayNotMatched_";
+                    string test = await sms.SendSMS(message, fileName);
                 }
                 
             }
-            var fileName = "PayNotMatched_";
-
-            string test = await sms.SendSMS(message, fileName);
+            
         }
     }
 }

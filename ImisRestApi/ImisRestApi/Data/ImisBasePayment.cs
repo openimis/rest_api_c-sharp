@@ -28,6 +28,7 @@ namespace ImisRestApi.Data
         public decimal ExpectedAmount { get; set; }
         public string ControlNum { get; set; }
         public string PhoneNumber { get; set; }
+        public string Language { get; set; }
 
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
@@ -91,6 +92,39 @@ namespace ImisRestApi.Data
             return response;
         }
 
+        public virtual bool UpdatePaymentTransferFee(string paymentId, decimal TransferFee, TypeOfPayment typeOfPayment) {
+
+            var sSQL = @"UPDATE tblPayment SET TypeOfPayment = @TypeOfPayment,TransferFee = @TransferFee WHERE PaymentID = @paymentId";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@paymentId", paymentId),
+                new SqlParameter("@TransferFee", TransferFee),
+                new SqlParameter("@TypeOfPayment", Enum.GetName(typeof(TypeOfPayment),typeOfPayment))
+            };
+             
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+               
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+        }
+
+        public virtual decimal determineTransferFee(decimal expectedAmount, TypeOfPayment typeOfPayment)
+        {
+            return 0;
+        }
+
+        public virtual decimal determineTransferFeeReverse(decimal expectedAmount, TypeOfPayment typeOfPayment)
+        {
+            return 0;
+        }
+
         public virtual int GetReqControlNumberAck(string paymentId)
         {
             return 0;
@@ -117,6 +151,7 @@ namespace ImisRestApi.Data
                         new XElement("OfficerCode", _intent.enrolment_officer_code),
                         new XElement("RequestDate",_intent.request_date),
                         new XElement("PhoneNumber", _intent.phone_number),
+                        new XElement("LanguageName",_intent.language),
                         new XElement("AuditUserId", -1)
                     ),
                       new XElement("Details",
@@ -347,6 +382,7 @@ namespace ImisRestApi.Data
                 new XElement("PhoneNumber", payment.payment_origin),
                 new XElement("PaymentOrigin", payment.payment_origin),
                 new XElement("OfficerCode", payment.enrolment_officer_code),
+                new XElement("LanguageName",payment.language),
                 new XElement("Detail",
                     new XElement("InsureeNumber", payment.insurance_number),
                     new XElement("ProductCode", payment.insurance_product_code),
@@ -364,17 +400,10 @@ namespace ImisRestApi.Data
 
             try
             {
-                if (paymentId != string.Empty)
-                {
-                    var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
-                    message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
-                    GetPaymentInfo(data[0].Value.ToString());
-                }
-                else
-                {
-                    message = new SavePayResponse(3,true).Message;
-                }
-               
+                var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
+                message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
+                GetPaymentInfo(data[0].Value.ToString());
+
             }
             catch (Exception e)
             {
@@ -496,7 +525,7 @@ namespace ImisRestApi.Data
 
         public void GetPaymentInfo(string Id)
         {
-            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
+            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount,tblPayment.LanguageName, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
                         tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
                         tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus, tblPolicy.PolicyValue - ISNULL(mp.PrPaid,0) Outstanding
                         FROM tblControlNumber 
@@ -531,6 +560,9 @@ namespace ImisRestApi.Data
                     PaymentId = Id;
                     ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]):null;
                     ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]):0;
+
+                    Language = row1["LanguageName"] != System.DBNull.Value ? Convert.ToString(row1["LanguageName"]) : "en";
+                    
                     PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]):null;
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
                     PaidAmount = (decimal?)(row1["ReceivedAmount"] != System.DBNull.Value ? row1["ReceivedAmount"] : null);

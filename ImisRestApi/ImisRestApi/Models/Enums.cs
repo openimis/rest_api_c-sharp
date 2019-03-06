@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace ImisRestApi.Models
 {
+    public enum Language
+    {
+        Primary,
+        Secondary
+    }
     public enum Rights
     {
         FindPayment = 101401,
@@ -22,20 +27,18 @@ namespace ImisRestApi.Models
         AddInsuree = 101102,
         EditInsuree = 101103,
         DeleteInsuree = 101104,
-        ViewInsuree = 101101,
+        MoveInsuree = 101105,
 
         FindPolicy = 101201,
         AddPolicy = 101202,
         EditPolicy = 101203,
         DeletePolicy = 101204,
         RenewPolicy = 101205,
-        ViewPolicy = 101201,
 
         FindContribution = 101301,
         AddContribution = 101302,
         EditContribution = 101303,
         DeleteContribution = 101304,
-        ViewContribution = 101301,
 
         FindClaim = 111001,
         EnterClaim = 111002,
@@ -58,7 +61,6 @@ namespace ImisRestApi.Models
         EditProduct = 121003,
         DeleteProduct = 121004,
         DuplicateProduct = 121005,
-        ViewProduct = 121001,
 
         FindHealthFacility = 121101,
         AddHealthFacility = 121102,
@@ -119,73 +121,60 @@ namespace ImisRestApi.Models
         DeleteUserProfile = 122004,
         EditUserProfile = 122003,
 
-        DiagnosesUpload = 141001,
-        DiagnosesDownload = 141002,
+        Tools = 130000,
+        Registers = 131000,
+        DiagnosesUpload = 131001, 
+        DiagnosesDownload = 131002,
 
-        HealthFacilitiesUpload = 1411001,
-        HealthFacilitiesDownload = 141102,
+        HealthFacilitiesUpload = 131003,
+        HealthFacilitiesDownload = 131004,
 
-        LocationUpload = 141201,
-        LocationDonwload = 141202,
+        LocationUpload = 131005,
+        LocationDonwload = 131006,
 
-        MasterDataDownload = 151001,
-        PhoneExtractsCreate = 151101,
-        OfflineExtractCreate = 151201,
-        ClaimXMLUpload = 151301,
-        EnrolmentsUpload = 151401,
-        FeedbackUpload = 151501,
+        Extracts = 131100,
+        MasterDataDownload = 131101,
 
-        PrimaryOperationalIndicatorPolicies = 160001,
-        PrimaryOperationalIndicatorsClaims = 160002,
-        DerivedOperationalIndicators = 160003,
-        ContributionCollection = 160004,
-        ProductSales = 160005,
-        ContributionDistribution = 160006,
-        UserActivity = 160007,
-        EnrolmentPerformanceIndicators = 160008,
-        StatusOfRegister = 160009,
-        InsureeWithoutPhotos = 160010,
-        PaymentCategoryOverview = 160011,
-        MatchingFunds = 160012,
-        ClaimOverviewReport = 160013,
-        PercentageReferrals = 160014,
-        FamiliesInsureesOverview = 160015,
-        PendingInsurees = 160016,
-        Renewals = 160017,
-        CapitationPayment = 160018,
-        RejectedPhoto = 160019,
-        ContributionPayment = 160020,
-        ControlNumberAssignment = 160021,
+        PhoneExtractsCreate = 131102,
 
-       
-        DatabaseBackup = 170001,
-        DatabaseRestore = 170002,
-        ExecuteScripts = 170003,
-        EmailSettings = 170004,
-        Utilities = 170005,
+        OfflineExtractCreate = 131103,
 
-       
-        AddFund = 181001,
+        ClaimXMLUpload = 131104,
 
-      
-        SelectClaimForReview = 111016,
-        EnterFeedback = 111009,
-        ValuateClaim = 111017,
-        PremiumCollection = 160022,
-        Reports = 160021,
-        Indicators = 160023,
-        PremiumDistribution = 160024,
-        SelectClaimForFeedback = 111009,
-        OverviewFamily = 101005,
-        MovingInsuree = 101006,
-      
-        AddWard = 121902 ,
-        EditWard = 121903,
-        DeleteWard = 121904,
+        EnrolmentsUpload = 131105,
+        FeedbackUpload = 131106,
 
-        AddVillage = 121902,
-        EditVillage = 121903,
-        DeleteVillage = 121904, 
+        Reports = 131200,
+        PrimaryOperationalIndicatorPolicies = 131201,
+        PrimaryOperationalIndicatorsClaims = 131202,
+        DerivedOperationalIndicators = 131203,
+        ContributionCollection = 131204,
+        ProductSales = 131205,
+        ContributionDistribution = 131206,
+        UserActivity = 131207,
+        EnrolmentPerformanceIndicators = 131208,
+        StatusOfRegister = 131209,
+        InsureeWithoutPhotos = 131210,
+        PaymentCategoryOverview = 131211,
+        MatchingFunds = 131212,
+        ClaimOverviewReport = 131213,
+        PercentageReferrals = 131214,
+        FamiliesInsureesOverview = 131215,
+        PendingInsurees = 131216,
+        Renewals = 131217,
+        CapitationPayment = 131218,
+        RejectedPhoto = 131219,
+        ContributionPayment = 131220,
+        ControlNumberAssignment = 131221, 
+        OverviewOfCommissions = 131222,
+        ClaimHistoryReport = 131223,
+        Utilities = 131300,
+        DatabaseBackup = 131301,
+        DatabaseRestore = 131302,
+        ExecuteScripts = 131303,
+        EmailSettings = 131304,
+        AddFund = 131401,
+
 
     }
 }

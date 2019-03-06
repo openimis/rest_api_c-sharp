@@ -77,7 +77,11 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "9-Control number cannot be assigned";
                     Message = msg;
                     break;
-
+                case 10:
+                    msg.Code = value;
+                    msg.MessageValue = "10-Uknown type of payment";
+                    Message = msg;
+                    break;
 
             }
         }

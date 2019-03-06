@@ -56,7 +56,7 @@ namespace ImisRestApi.Data
                          tblRoleRight ON tblRole.RoleID = tblRoleRight.RoleID INNER JOIN
                          tblUserRole ON tblRole.RoleID = tblUserRole.RoleID INNER JOIN
                          tblUsers ON tblUserRole.UserID = tblUsers.UserID
-                         WHERE tblUsers.UserID = 17 AND tblUsers.ValidityTo IS NULL";
+                         WHERE tblUsers.UserID = @UserId AND tblUsers.ValidityTo IS NULL";
 
             SqlParameter[] paramets = {
                 new SqlParameter("@UserId", userId)
@@ -71,7 +71,10 @@ namespace ImisRestApi.Data
                     var rightId = Convert.ToInt32(row["RightID"]);
                     var rightName = Enum.GetName(typeof(Models.Rights), rightId);
 
-                    rights.Add(rightName);
+                    if (rightName != null) {
+                        rights.Add(rightName);
+                    }
+                    
                 }
             }
 
@@ -140,6 +143,7 @@ namespace ImisRestApi.Data
             command.CommandType = CommandType.StoredProcedure;
             command.Connection = sqlConnection;
             command.Parameters.Add(returnParameter);
+
             if (parameters.Length > 0)
                 command.Parameters.AddRange(parameters);
 
@@ -183,19 +187,17 @@ namespace ImisRestApi.Data
             return rv;
         }
 
-        public DataTable Login(string UserName, string Password)
+        public DataTable FindUserByName(string UserName)
         {
-            var sSQL = @"OPEN SYMMETRIC KEY EncryptionKey DECRYPTION BY Certificate EncryptData
-                        SELECT UserID,LoginName, LanguageID, RoleID
+            var sSQL = @"
+                        SELECT UserID,LoginName, LanguageID, RoleID,StoredPassword,PrivateKey
                         FROM tblUsers
-                        WHERE LoginName = @LoginName
-                        AND  CONVERT(NVARCHAR(25), DECRYPTBYKEY(Password)) COLLATE LATIN1_GENERAL_CS_AS = @Password
+                        WHERE LoginName = @LoginName                        
                         AND ValidityTo is null
-                        CLOSE SYMMETRIC KEY EncryptionKey";
+                        ";
 
             SqlParameter[] paramets = {
-                new SqlParameter("@LoginName", UserName),
-                new SqlParameter("@Password", Password)
+                new SqlParameter("@LoginName", UserName)
             };
 
             //var data = new DataHelper(Configuration);

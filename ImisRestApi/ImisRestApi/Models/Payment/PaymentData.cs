@@ -10,7 +10,6 @@ namespace ImisRestApi.Models.Payment
 {
     public class PaymentData
     {
-        
         public string control_number { get; set; }
         [InsureeNumber]
         [RequiredIf("Insuree number")] //this attributes validates if control number is not provided
@@ -30,8 +29,8 @@ namespace ImisRestApi.Models.Payment
         [ValidDate(ErrorMessage = "5-Invalid Payment Date")]
         public string payment_date { get; set; }
         public string payment_origin { get; set; }
-
-       
-
+        public string language { get; set; }
+        [Range(0, 2, ErrorMessage = "10-Uknown type of payment")]
+        public TypeOfPayment? type_of_payment { get; set; }
     }
 }

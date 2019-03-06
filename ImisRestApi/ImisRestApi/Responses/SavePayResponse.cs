@@ -72,6 +72,11 @@ namespace ImisRestApi.Responses
                     msg.MessageValue = "8-Beneficiary has no policy of specified insurance product for renewal";
                     Message = msg;
                     break;
+                case 9:
+                    msg.Code = value;
+                    msg.MessageValue = "9-Uknown type of payment";
+                    Message = msg;
+                    break;
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using ImisRestApi.Data;
+using ImisRestApi.Models;
 using ImisRestApi.Models.Sms;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +16,7 @@ namespace ImisRestApi.Chanels.Sms
 {
     public class ImisSms:ImisBaseSms
     {    
-        public ImisSms(IConfiguration config, IHostingEnvironment env) :base(config,env)
+        public ImisSms(IConfiguration config, IHostingEnvironment env,Language language = Language.Primary) :base(config,env,language)
         {
           
         }

@@ -1,4 +1,5 @@
-﻿using ImisRestApi.Models.Sms;
+﻿using ImisRestApi.Models;
+using ImisRestApi.Models.Sms;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -17,10 +18,14 @@ namespace ImisRestApi.Data
         private string SmsTampletes = string.Empty;
         private IHostingEnvironment env;
 
-        public ImisBaseSms(IConfiguration config,IHostingEnvironment environment)
+        public ImisBaseSms(IConfiguration config,IHostingEnvironment environment,Language language = Language.Primary)
         {
             env = environment;
-            SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\Strings\";
+
+            if(language == Language.Primary)
+                SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\Strings\";
+            else
+                SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\StringsSecondaryLanguage\";
         }
 
         public virtual async Task<string> SendSMS(List<SmsContainer> containers,string filename)
