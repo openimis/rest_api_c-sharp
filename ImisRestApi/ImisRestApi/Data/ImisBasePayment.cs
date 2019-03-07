@@ -28,7 +28,7 @@ namespace ImisRestApi.Data
         public decimal ExpectedAmount { get; set; }
         public string ControlNum { get; set; }
         public string PhoneNumber { get; set; }
-        public string Language { get; set; }
+        public Language Language { get; set; }
 
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
@@ -561,8 +561,18 @@ namespace ImisRestApi.Data
                     ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]):null;
                     ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]):0;
 
-                    Language = row1["LanguageName"] != System.DBNull.Value ? Convert.ToString(row1["LanguageName"]) : "en";
-                    
+                    var language = row1["LanguageName"] != System.DBNull.Value ? Convert.ToString(row1["LanguageName"]) : "en";
+                    var languages = LocalDefault.PrimaryLangReprisantations(Configuration);
+
+                    if (languages.Contains(language.ToLower()))
+                    {
+                        Language = Language.Primary;
+                    }
+                    else
+                    {
+                        Language = Language.Secondary;
+                    }
+
                     PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]):null;
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
                     PaidAmount = (decimal?)(row1["ReceivedAmount"] != System.DBNull.Value ? row1["ReceivedAmount"] : null);

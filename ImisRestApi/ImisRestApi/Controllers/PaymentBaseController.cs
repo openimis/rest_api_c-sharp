@@ -39,7 +39,7 @@ namespace ImisRestApi.Controllers
             _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
  
-        [Authorize(Roles = "AddPayment")]
+        [Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/MatchPayment")]
         public virtual async Task<IActionResult> MatchPayment([FromBody]MatchModel model)
@@ -60,7 +60,7 @@ namespace ImisRestApi.Controllers
         }
 
         //Recieve Payment from Operator/
-        //[Authorize(Roles = "AddPayment")]
+        [Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/GetControlNumber")]
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]
@@ -71,7 +71,12 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
             {           
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
+
+                if(intent != null)
+                {
+                    var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
+                }
+                
                 return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = error});
             }
 
@@ -90,7 +95,7 @@ namespace ImisRestApi.Controllers
             }
         }
 
-        [Authorize(Roles = "AddPayment")]
+        [Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/PostReqControlNumberAck")]
         [ProducesResponseType(typeof(void), 200)]
@@ -123,7 +128,7 @@ namespace ImisRestApi.Controllers
             }
         }
 
-        [Authorize(Roles = "AddPayment")]
+        [Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         [ProducesResponseType(typeof(void), 200)]
@@ -157,7 +162,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        //[Authorize(Roles = "AddPayment")]
+        [Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/GetPaymentData")]
         [ProducesResponseType(typeof(void), 200)]
@@ -191,7 +196,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [Authorize(Roles = "FindPayment")]
+        [Authorize(Roles = "PaymentSearch")]
         [HttpPost]
         [Route("api/GetAssignedControlNumbers")]
         [ProducesResponseType(typeof(AsignedControlNumbersResponse), 200)]

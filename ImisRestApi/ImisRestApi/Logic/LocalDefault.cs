@@ -108,5 +108,31 @@ namespace ImisRestApi.Logic
                 throw new Exception("This property is not properly defined in config file");
             }
         }
+
+        public static string[] PrimaryLangReprisantations(IConfiguration config)
+        {
+            List<string> langs = new List<string>();
+            try
+            {
+                 var def_langs = config["Language:Primary"].Split(',');
+
+                foreach (var def_lang in def_langs) {
+                    try
+                    {
+                        langs.Add(def_lang.ToLower());
+                    }
+                    catch (Exception) {
+                        langs.Add(def_lang);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                langs.Add("en");
+            }
+
+            return langs.ToArray();
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace ImisRestApi.Controllers
         {
             IActionResult response = Unauthorized();
 
-            Repository repo = new Repository(Configuration);
+            ImisValidate repo = new ImisValidate(Configuration);
 
             var user = repo.FindUser(model.UserName, model.Password);
 

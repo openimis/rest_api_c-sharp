@@ -37,10 +37,11 @@ namespace ImisRestApi.Controllers
 
             try
             {
-                var data = validate.Credentials(userlogin);
 
-                if (data.Rows.Count > 0)
-                {
+                var user = validate.FindUser(userlogin.UserID, userlogin.Password);
+
+                if (user != null)
+                {            
                     response.success = true;
                     response.ErrorOccured = false;
                 }

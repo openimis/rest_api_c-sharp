@@ -170,8 +170,8 @@ namespace ImisRestApi.Logic
 
         public async void ControlNumberAssignedSms(ImisPayment payment)
         {
-            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, lang);
+            //Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
             var txtmsgTemplate = string.Empty;
             string othersCount = string.Empty;
 
@@ -217,8 +217,8 @@ namespace ImisRestApi.Logic
 
         public async void ControlNumberNotassignedSms(ImisPayment payment,string error)
         {
-            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, lang);
+            //Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
             var txtmsgTemplate = string.Empty;
             string othersCount = string.Empty;
 
@@ -251,8 +251,8 @@ namespace ImisRestApi.Logic
 
         public async void SendPaymentSms(ImisPayment payment)
         {
-            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment,lang);
+           // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
             List<SmsContainer> message = new List<SmsContainer>();
             var familyproduct = payment.InsureeProducts.FirstOrDefault();
 
@@ -300,8 +300,8 @@ namespace ImisRestApi.Logic
 
         public async void SendMatchSms(ImisPayment payment)
         {
-            Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment,lang);
+           // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
             List<SmsContainer> message = new List<SmsContainer>();
 
             var txtmsgTemplate = string.Empty;
@@ -352,8 +352,8 @@ namespace ImisRestApi.Logic
                     ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment);
                     _pay.GetPaymentInfo(m.PaymentId.ToString());
 
-                    Language lang = _pay.Language.ToLower() == "en" || _pay.Language.ToLower() == "english" || _pay.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, lang);
+                    //Language lang = _pay.Language.ToLower() == "en" || _pay.Language.ToLower() == "english" || _pay.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+                    ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, _pay.Language);
 
                     if (_pay.PaymentId != null)
                     {
