@@ -44,47 +44,46 @@ namespace ImisRestApi.Logic
                 var ret_data = data.FirstOrDefault();
 
                 //Get the transfer Fee
-                var transferFee = payment.determineTransferFee(payment.ExpectedAmount,(TypeOfPayment)intent.type_of_payment);
+                if (intent.type_of_payment != null) {
+                    var transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)intent.type_of_payment);
 
-                var success = payment.UpdatePaymentTransferFee(payment.PaymentId,transferFee, (TypeOfPayment)intent.type_of_payment);
+                    var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)intent.type_of_payment);
 
-                if (success) {
-                    var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, payment.ExpectedAmount, intent.policies);
+                }
 
-                    if (response.ControlNumber != null)
+             
+                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, payment.ExpectedAmount, intent.policies);
+
+                if (response.ControlNumber != null)
+                {
+                    var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
+                    return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
+                    if (payment.PaymentId != null)
                     {
-                        var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
-                        return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
-                        if (payment.PaymentId != null)
+                        if (!return_message.ErrorOccured && !controlNumberExists)
                         {
-                            if (!return_message.ErrorOccured && !controlNumberExists)
-                            {
-                                ret_data.control_number = response.ControlNumber;
-                                ControlNumberAssignedSms(payment);
-                            }
-                            else
-                            {
-                                ControlNumberNotassignedSms(payment, return_message.MessageValue);
-                            }
+                            ret_data.control_number = response.ControlNumber;
+                            ControlNumberAssignedSms(payment);
+                        }
+                        else
+                        {
+                            ControlNumberNotassignedSms(payment, return_message.MessageValue);
                         }
                     }
-                    else if (response.Posted == true)
-                    {
-                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
-                    }
-                    else if (response.ErrorOccured == true)
-                    {
-                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
-                        ControlNumberNotassignedSms(payment, response.ErrorMessage);
-
-                    }
-
-                    return_message.Data = ret_data;
                 }
-                else
+                else if (response.Posted == true)
                 {
-                    return_message.Data = new { error_occured = true, error_code = 11, errorMessage = "Could not update the transfer fee."};
+                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
                 }
+                else if (response.ErrorOccured == true)
+                {
+                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
+                    ControlNumberNotassignedSms(payment, response.ErrorMessage);
+
+                }
+
+                return_message.Data = ret_data;
+              
             }
             else
             {

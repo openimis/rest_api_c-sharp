@@ -17,5 +17,14 @@ namespace ImisRestApi.Models
         PaymentEdit = 101403,
         PaymentDelete = 101404,
 
+        InsureeSearch = 101101,
+        InsureeAdd = 101102,
+        InsureeEdit = 101103,
+        InsureeDelete = 101104,
+        InsureeEnquire = 101105,
+
+        FindClaim = 111001,
+        ClaimAdd = 111002,
+
     }
 }

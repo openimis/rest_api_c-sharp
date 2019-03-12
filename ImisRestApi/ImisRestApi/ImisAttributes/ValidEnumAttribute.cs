@@ -9,14 +9,10 @@ namespace ImisRestApi.ImisAttributes
     [AttributeUsage(AttributeTargets.Property, Inherited = false)]
     public class ValidEnumAttribute : ValidationAttribute
     {
-        public Type _type;
-
-        public ValidEnumAttribute(Type type)
-        {
-            _type = type;
-        }
+     
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            Type _type = value.GetType();
             try
             {
                 Convert.ChangeType(value,_type);

@@ -75,9 +75,13 @@ namespace ImisRestApi.Controllers
                 if(intent != null)
                 {
                     var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
+                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = error });
+                }
+                else
+                {           
+                   return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "10-Uknown type of payment" });
                 }
                 
-                return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = error});
             }
 
             try

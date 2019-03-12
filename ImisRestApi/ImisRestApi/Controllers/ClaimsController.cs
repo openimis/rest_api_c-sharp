@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
 using ImisRestApi.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,7 @@ namespace ImisRestApi.Controllers
             imisClaims = new ImisClaims(configuration);
         }
 
+        
         [HttpPost]
         [Route("api/GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
@@ -45,6 +47,7 @@ namespace ImisRestApi.Controllers
             
         }
 
+        [Authorize(Roles = "ClaimAdd")]
         [HttpPost]
         [Route("api/GetPaymentLists")]
         [ProducesResponseType(typeof(void), 200)]
