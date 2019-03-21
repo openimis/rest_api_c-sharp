@@ -126,6 +126,8 @@ namespace ImisRestApi.Logic
 
             if (model.control_number != null)
             {
+                model.type_of_payment = null;
+
                 var paymentId = payment.GetPaymentId(model.control_number);
 
                 if (paymentId != null && paymentId != string.Empty)
