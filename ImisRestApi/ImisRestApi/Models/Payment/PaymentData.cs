@@ -25,8 +25,10 @@ namespace ImisRestApi.Models.Payment
         public double received_amount { get; set; }
         [Required(ErrorMessage = "1-Wrong or missing receiving date")]
         [ValidDate(ErrorMessage = "1-Wrong or missing receiving date")]
+        [DataType(DataType.DateTime)]
         public string received_date { get; set; }
         [ValidDate(ErrorMessage = "5-Invalid Payment Date")]
+        [DataType(DataType.DateTime)]
         public string payment_date { get; set; }
         public string payment_origin { get; set; }
         public string language { get; set; }

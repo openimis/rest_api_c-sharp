@@ -14,6 +14,7 @@ namespace ImisRestApi.Models
         [Required(ErrorMessage = "9: Phone number not provided")]
         public virtual string phone_number { get; set; }
         [ValidDate(ErrorMessage ="10: Request Date not valid")]
+        [DataType(DataType.DateTime)]
         public string request_date { get; set; }
         [OfficerCode]
         public string enrolment_officer_code { get; set; }

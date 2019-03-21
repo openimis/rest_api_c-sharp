@@ -43,16 +43,17 @@ namespace ImisRestApi.Logic
                 List<AssignedControlNumber> data = JsonConvert.DeserializeObject<List<AssignedControlNumber>>(objstring);
                 var ret_data = data.FirstOrDefault();
 
+                decimal transferFee = 0;
                 //Get the transfer Fee
                 if (intent.type_of_payment != null) {
-                    var transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)intent.type_of_payment);
+                    transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)intent.type_of_payment);
 
                     var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)intent.type_of_payment);
 
                 }
 
-             
-                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, payment.ExpectedAmount, intent.policies);
+                var amountToBePaid = payment.ExpectedAmount - transferFee;
+                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid , intent.policies);
 
                 if (response.ControlNumber != null)
                 {
@@ -122,14 +123,48 @@ namespace ImisRestApi.Logic
             
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             //var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
-            var response = payment.SavePayment(model);
 
-            if (model.type_of_payment != null) {
-                var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount),(TypeOfPayment)model.type_of_payment);
-                var success = payment.UpdatePaymentTransferFee(payment.PaymentId,transferFee, (TypeOfPayment)model.type_of_payment);
+            if (model.control_number != null)
+            {
+                var paymentId = payment.GetPaymentId(model.control_number);
+
+                if (paymentId != null && paymentId != string.Empty)
+                {
+                    payment.GetPaymentInfo(paymentId);
+                }
+                else
+                {
+                    DataMessage dm = new DataMessage
+                    {
+                        Code = 3,
+                        ErrorOccured = true,
+                        MessageValue = "3-Wrong control_number",
+
+                    };
+
+                    return dm;
+                }
+            }
+            
+            
+            if (model.type_of_payment == null && payment.typeOfPayment != null)
+            {
+                var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount), (TypeOfPayment)payment.typeOfPayment);
+                var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)payment.typeOfPayment);
+                model.received_amount = model.received_amount + Convert.ToDouble(transferFee);
+            }
+            else if (model.type_of_payment != null && payment.typeOfPayment == null)
+            {
+                var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount), (TypeOfPayment)model.type_of_payment);
+                var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)model.type_of_payment);
+                model.received_amount = model.received_amount + Convert.ToDouble(transferFee);
             }
 
-            if(payment.PaymentId != null && !response.ErrorOccured)
+            var response = payment.SavePayment(model);
+
+          
+
+            if (payment.PaymentId != null && !response.ErrorOccured)
             {
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId,payment.ControlNum);
 

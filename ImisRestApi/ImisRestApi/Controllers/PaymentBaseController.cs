@@ -177,7 +177,7 @@ namespace ImisRestApi.Controllers
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new PaymentDataBadResp(){ error_message = error });
+                return BadRequest(new PaymentDataBadResp() { error_message = error });
             }
 
             try

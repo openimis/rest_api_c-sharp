@@ -64,7 +64,7 @@ namespace ImisRestApi.Responses
                     break;
                 case 7:
                     msg.Code = value;
-                    msg.MessageValue = "7-Insuree not enrolled while prior enrollment mandatory.";
+                    msg.MessageValue = "7-Insuree not enrolled while prior enrolment mandatory.";
                     Message = msg;
                     break;
                 case 8:

@@ -29,6 +29,7 @@ namespace ImisRestApi.Data
         public string ControlNum { get; set; }
         public string PhoneNumber { get; set; }
         public Language Language { get; set; }
+        public TypeOfPayment? typeOfPayment { get; set; }
 
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
@@ -486,7 +487,7 @@ namespace ImisRestApi.Data
 
                 var ids = PaymentIds.Split(",");
 
-                if (ids.Count() == data.Rows.Count)
+                if (ids.Distinct().Count() == data.Rows.Count)
                 {
                     dt = new RequestedCNResponse(0, false, data).Message;
                 }
@@ -525,7 +526,7 @@ namespace ImisRestApi.Data
 
         public void GetPaymentInfo(string Id)
         {
-            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount,tblPayment.LanguageName, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
+            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount,tblPayment.LanguageName,tblPayment.TypeOfPayment, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
                         tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
                         tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus, tblPolicy.PolicyValue - ISNULL(mp.PrPaid,0) Outstanding
                         FROM tblControlNumber 
@@ -572,6 +573,7 @@ namespace ImisRestApi.Data
                     {
                         Language = Language.Secondary;
                     }
+                    typeOfPayment = row1["TypeOfPayment"] != System.DBNull.Value ? (TypeOfPayment?)Enum.Parse(typeof(TypeOfPayment),Convert.ToString(row1["PhoneNumber"]),true) : null;
 
                     PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]):null;
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,16 +25,25 @@ namespace ImisRestApi.ImisAttributes
             try
             {
                 DateTime date = Convert.ToDateTime(value.ToString());
+                DateTime Odate;
 
-                if(date.Year > 1753)
+                if (date.Year > 1753)
                 {
-                    return ValidationResult.Success;
+                    if (DateTime.TryParseExact(value.ToString(), "yyyy/MM/dd", CultureInfo.InvariantCulture,DateTimeStyles.None, out Odate))
+                    {
+                        return ValidationResult.Success;
+                    }
+                    else
+                    {
+                        return new ValidationResult(null);
+                    }
+
                 }
                 else
                 {
-                    return new ValidationResult(null);
+                return new ValidationResult(null);
                 }
-               
+
             }
             catch (Exception)
             {

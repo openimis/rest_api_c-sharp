@@ -71,24 +71,22 @@ namespace ImisRestApi.Data
 
         public PaymentLists GetPaymentLists(PaymentListsInputModel model)
         {
-            var sSQL = @"SELECT tblHF.HFCode, tblHF.HFName
-                         FROM tblClaimAdmin INNER JOIN
-                         tblHF ON tblClaimAdmin.HFId = tblHF.HfID
-                         WHERE tblHF.ValidityFrom >= @LastUpdated AND tblHF.ValidityTo IS NULL AND tblClaimAdmin.ValidityTo IS NULL AND tblClaimAdmin.ClaimAdminCode = @ClaimAdminCode
+            var sSQL = @"DECLARE @HFID INT, @PLServiceID INT, @PLItemID INT
+                SELECT @HFID = HFId FROM tblClaimAdmin WHERE ClaimAdminCode = @ClaimAdminCode AND ValidityTo IS NULL 
+                SELECT @PLServiceID = PLServiceID FROM tblHF Where HFid = @HFID 
+                SELECT @PLItemID = PLItemID FROM tblHF Where HFid = @HFID
 
-                         SELECT tblItems.ItemCode AS code, tblItems.ItemName AS name, tblItems.ItemPrice AS price
-                         FROM tblClaim INNER JOIN
-                         tblClaimItems ON tblClaim.ClaimID = tblClaimItems.ClaimID INNER JOIN
-                         tblClaimAdmin ON tblClaim.ClaimAdminId = tblClaimAdmin.ClaimAdminId INNER JOIN
-                         tblItems ON tblClaimItems.ItemID = tblItems.ItemID
-                         WHERE tblClaimItems.ValidityFrom >= @LastUpdated AND tblClaimItems.ValidityTo IS NULL AND tblClaimAdmin.ValidityTo IS NULL AND tblClaimAdmin.ClaimAdminCode = @ClaimAdminCode
 
-                         SELECT tblServices.ServCode AS code, tblServices.ServName AS name, tblServices.ServPrice AS price
-                         FROM tblClaim INNER JOIN
-                         tblClaimAdmin ON tblClaim.ClaimAdminId = tblClaimAdmin.ClaimAdminId INNER JOIN
-                         tblClaimServices ON tblClaim.ClaimID = tblClaimServices.ClaimID INNER JOIN
-                         tblServices ON tblClaimServices.ServiceID = tblServices.ServiceID
-                         WHERE tblClaimServices.ValidityFrom >= @LastUpdated AND tblClaimServices.ValidityTo IS NULL AND tblClaimAdmin.ValidityTo IS NULL AND tblClaimAdmin.ClaimAdminCode = @ClaimAdminCode";
+                SELECT tblHF.HFCode, tblHF.HFName FROM tblHF WHERE HfID = @HFID
+
+                SELECT Items.ItemCode AS code, Items.ItemName AS name, ISNULL(PLID.PriceOverule,Items.ItemPrice) AS price from tblPLItemsDetail PLID
+                INNER JOIN tblItems Items ON PLID.ItemID = Items.ItemID AND Items.ValidityTo IS NULL
+                WHERE PLItemID = @PLItemID AND PLID.ValidityTo IS NULL AND (PLID.ValidityFrom >= @LastUpdated OR @LastUpdated IS NULL)                        
+
+                Select SE.ServCode AS code, SE.ServName AS name, ISNULL(PLSD.PriceOverule,SE.ServPrice) AS price 
+                FROM tblPLServicesDetail PLSD
+                INNER JOIN tblServices SE ON PLSD.ServiceID = SE.ServiceID AND SE.ValidityTo IS NULL
+                WHERE PLServiceID = @PLServiceID AND PLSD.ValidityTo IS NULL AND (PLSD.ValidityFrom >= @LastUpdated OR @LastUpdated IS NULL)    ";
 
             DataHelper helper = new DataHelper(Configuration);
             SqlParameter date;
