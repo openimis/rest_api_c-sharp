@@ -573,7 +573,7 @@ namespace ImisRestApi.Data
                     {
                         Language = Language.Secondary;
                     }
-                    typeOfPayment = row1["TypeOfPayment"] != System.DBNull.Value ? (TypeOfPayment?)Enum.Parse(typeof(TypeOfPayment),Convert.ToString(row1["PhoneNumber"]),true) : null;
+                    typeOfPayment = row1["TypeOfPayment"] != System.DBNull.Value ? (TypeOfPayment?)Enum.Parse(typeof(TypeOfPayment),Convert.ToString(row1["TypeOfPayment"]),true) : null;
 
                     PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]):null;
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
