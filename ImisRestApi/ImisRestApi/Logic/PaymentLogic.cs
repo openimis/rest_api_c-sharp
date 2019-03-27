@@ -25,13 +25,13 @@ namespace ImisRestApi.Logic
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
-           
+
         }
-        public async Task<DataMessage> SaveIntent(IntentOfPay intent,int? errorNumber = 0,string errorMessage = null)
+        public async Task<DataMessage> SaveIntent(IntentOfPay intent, int? errorNumber = 0, string errorMessage = null)
         {
 
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var intentResponse = payment.SaveIntent(intent,errorNumber,errorMessage);
+            var intentResponse = payment.SaveIntent(intent, errorNumber, errorMessage);
 
             DataMessage return_message = new DataMessage();
             return_message.Code = intentResponse.Code;
@@ -45,7 +45,8 @@ namespace ImisRestApi.Logic
 
                 decimal transferFee = 0;
                 //Get the transfer Fee
-                if (intent.type_of_payment != null) {
+                if (intent.type_of_payment != null)
+                {
                     transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)intent.type_of_payment);
 
                     var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)intent.type_of_payment);
@@ -53,7 +54,7 @@ namespace ImisRestApi.Logic
                 }
 
                 var amountToBePaid = payment.ExpectedAmount - transferFee;
-                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid , intent.policies);
+                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid, intent.policies);
 
                 if (response.ControlNumber != null)
                 {
@@ -84,14 +85,14 @@ namespace ImisRestApi.Logic
                 }
 
                 return_message.Data = ret_data;
-              
+
             }
             else
             {
                 return_message = intentResponse;
                 return_message.Data = new AssignedControlNumber();
             }
-            
+
             return return_message;
         }
 
@@ -100,19 +101,20 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.MatchPayment(model);
 
-            if (model.internal_identifier == null) {
+            if (model.internal_identifier == null)
+            {
                 List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
 
-                if(PaymentIds != null)
+                if (PaymentIds != null)
                     SendMatchSms(PaymentIds);
-            }         
+            }
 
             return response;
         }
 
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.internal_identifier};
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.internal_identifier };
             var response = payment.SaveControlNumberAkn(model.error_occured, model.error_message);
 
             return response;
@@ -120,7 +122,7 @@ namespace ImisRestApi.Logic
 
         public DataMessage SavePayment(PaymentData model)
         {
-            
+
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             //var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
 
@@ -141,14 +143,13 @@ namespace ImisRestApi.Logic
                         Code = 3,
                         ErrorOccured = true,
                         MessageValue = "3-Wrong control_number",
-
                     };
 
                     return dm;
                 }
             }
-            
-            
+
+
             if (model.type_of_payment == null && payment.typeOfPayment != null)
             {
                 var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount), (TypeOfPayment)payment.typeOfPayment);
@@ -164,28 +165,29 @@ namespace ImisRestApi.Logic
 
             var response = payment.SavePayment(model);
 
-          
+
 
             if (payment.PaymentId != null && !response.ErrorOccured)
             {
-                var ackResponse = payment.GetPaymentDataAck(payment.PaymentId,payment.ControlNum);
+                var ackResponse = payment.GetPaymentDataAck(payment.PaymentId, payment.ControlNum);
 
-                if ( model.enrolment_officer_code == null) {
+                if (model.enrolment_officer_code == null)
+                {
                     MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
                     var matchresponse = MatchPayment(matchModel);
                 }
-                
+
                 SendPaymentSms(payment);
             }
 
             return response;
-        }      
+        }
 
         public DataMessage SaveControlNumber(ControlNumberResp model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
-            var response = payment.SaveControlNumber(model,controlNumberExists);
+            var response = payment.SaveControlNumber(model, controlNumberExists);
 
             if (payment.PaymentId != null)
             {
@@ -200,7 +202,7 @@ namespace ImisRestApi.Logic
                     ControlNumberNotassignedSms(payment, response.MessageValue);
                 }
             }
-           
+
             return response;
         }
 
@@ -220,6 +222,15 @@ namespace ImisRestApi.Logic
             {
                 txtmsgTemplate = sms.GetMessage("ControlNumberAssigned");
             }
+
+            decimal transferFee = 0;
+
+            if (payment.typeOfPayment != null)
+            {
+                transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)payment.typeOfPayment);
+
+            }
+
             var txtmsg = string.Format(txtmsgTemplate,
                 payment.ControlNum,
                 DateTime.UtcNow.ToLongDateString(),
@@ -228,7 +239,7 @@ namespace ImisRestApi.Logic
                 payment.InsureeProducts.FirstOrDefault().InsureeName,
                 payment.InsureeProducts.FirstOrDefault().ProductCode,
                 payment.InsureeProducts.FirstOrDefault().ProductName,
-                payment.ExpectedAmount,
+                payment.GetToBePaidAmount(payment.ExpectedAmount, transferFee),
                 othersCount);
 
             List<SmsContainer> message = new List<SmsContainer>();
@@ -236,7 +247,7 @@ namespace ImisRestApi.Logic
 
             var fileName = "CnAssigned_" + payment.PhoneNumber;
 
-            string test = await sms.SendSMS(message,fileName);
+            string test = await sms.SendSMS(message, fileName);
         }
 
         public async Task<DataMessage> GetControlNumbers(PaymentRequest requests)
@@ -251,7 +262,7 @@ namespace ImisRestApi.Logic
             return response;
         }
 
-        public async void ControlNumberNotassignedSms(ImisPayment payment,string error)
+        public async void ControlNumberNotassignedSms(ImisPayment payment, string error)
         {
             //Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
             ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
@@ -282,19 +293,19 @@ namespace ImisRestApi.Logic
 
             var fileName = "CnError_" + payment.PhoneNumber;
 
-            string test = await sms.SendSMS(message,fileName);
+            string test = await sms.SendSMS(message, fileName);
         }
 
         public async void SendPaymentSms(ImisPayment payment)
         {
-           // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
             ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
             List<SmsContainer> message = new List<SmsContainer>();
             var familyproduct = payment.InsureeProducts.FirstOrDefault();
 
             if (familyproduct.PolicyActivated)
             {
-                
+
                 var txtmsg = string.Format(sms.GetMessage("PaidAndActivated"),
                     payment.PaidAmount,
                     DateTime.UtcNow.ToLongDateString(),
@@ -307,12 +318,19 @@ namespace ImisRestApi.Logic
                     familyproduct.ExpiryDate.Value.ToShortDateString(),
                     payment.PaidAmount);
 
-                
+
                 message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
 
             }
             else
             {
+
+                decimal transferFee = 0;
+
+                if (payment.typeOfPayment != null)
+                {
+                    transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)payment.typeOfPayment);
+                }
 
                 var txtmsg = string.Format(sms.GetMessage("PaidAndNotActivated"),
                     payment.PaidAmount,
@@ -322,7 +340,7 @@ namespace ImisRestApi.Logic
                     familyproduct.InsureeName,
                     familyproduct.ProductCode,
                     familyproduct.ProductName,
-                    payment.ExpectedAmount,
+                    payment.GetToBePaidAmount(payment.ExpectedAmount,transferFee),
                     payment.OutStAmount);
 
                 message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
@@ -330,13 +348,13 @@ namespace ImisRestApi.Logic
             }
             var fileName = "PayStatSms_" + payment.PhoneNumber;
 
-            string test = await sms.SendSMS(message,fileName);
+            string test = await sms.SendSMS(message, fileName);
             payment.MatchedSmsSent();
         }
 
         public async void SendMatchSms(ImisPayment payment)
         {
-           // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
             ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
             List<SmsContainer> message = new List<SmsContainer>();
 
@@ -373,7 +391,7 @@ namespace ImisRestApi.Logic
 
         public async void SendMatchSms(List<MatchSms> Ids)
         {
-            
+
             List<SmsContainer> message = new List<SmsContainer>();
 
             foreach (var m in Ids)
@@ -425,9 +443,9 @@ namespace ImisRestApi.Logic
                     var fileName = "PayNotMatched_";
                     string test = await sms.SendSMS(message, fileName);
                 }
-                
+
             }
-            
+
         }
     }
 }

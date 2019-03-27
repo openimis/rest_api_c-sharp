@@ -136,6 +136,12 @@ namespace ImisRestApi.Data
             return 0;
         }
 
+        public virtual decimal GetToBePaidAmount(decimal ExpectedAmount, decimal TransferFee)
+        {
+            decimal amount = ExpectedAmount - TransferFee;
+            return Math.Round(amount,2);
+        }
+
         public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
             var Proxyfamily = LocalDefault.FamilyMembers(Configuration);

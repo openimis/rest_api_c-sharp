@@ -21,32 +21,7 @@ namespace ImisRestApi.Data
 
         }
 
-        public override decimal determineTransferFee(decimal expectedAmount, TypeOfPayment typeOfPayment)
-        {
-            if (typeOfPayment == TypeOfPayment.BankTransfer || typeOfPayment == TypeOfPayment.Cash)
-            {
-                return 0;
-            }
-            else
-            {
-                var fee = expectedAmount - (expectedAmount / Convert.ToDecimal(1.011));
-
-                return fee;
-            }
-        }
-
-        public override decimal determineTransferFeeReverse(decimal expectedAmount, TypeOfPayment typeOfPayment)
-        {
-            if (typeOfPayment == TypeOfPayment.BankTransfer || typeOfPayment == TypeOfPayment.Cash)
-            {
-                return 0;
-            }
-            else
-            {
-                var fee = expectedAmount * Convert.ToDecimal(0.011);
-                return fee;
-            }
-        }
+       
 
     }
 }

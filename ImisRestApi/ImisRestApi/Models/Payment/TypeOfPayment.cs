@@ -7,8 +7,8 @@ namespace ImisRestApi.Models.Payment
 {
     public enum TypeOfPayment
     {
-        BankTransfer,
+        Cash,
         MobilePhone,
-        Cash
+        BankTransfer
     }
 }
