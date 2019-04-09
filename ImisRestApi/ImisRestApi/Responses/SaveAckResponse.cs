@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.Responses.Messages;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public SaveAckResponse(int value, bool error) : base(value, error)
+        public SaveAckResponse(int value, bool error, int lang) : base(value, error,lang)
         {
             SetMessage(value);
 
         }
 
-        public SaveAckResponse(int value, bool error, DataTable data) : base(value, error, data)
+        public SaveAckResponse(int value, bool error, DataTable data, int lang) : base(value, error, data,lang)
         {
             SetMessage(value);
         }
@@ -29,12 +30,12 @@ namespace ImisRestApi.Responses
             {
                 case 0:
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success"); ;
                     Message = msg;
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "1-Request for control number cannot be posted in the  external payment gateway";
+                    msg.MessageValue = new Language().GetMessage(language, "CantPostReq");
                     Message = msg;
                     break;
             }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ImisRestApi.Responses.Messages;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,13 +14,13 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public MatchPayResponse(int value, bool error) : base(value, error)
+        public MatchPayResponse(int value, bool error, int lang) : base(value, error,lang)
         {
             SetMessage(value);
 
         }
 
-        public MatchPayResponse(int value, bool error, DataTable data) : base(value, error, data)
+        public MatchPayResponse(int value, bool error, DataTable data, int lang) : base(value, error, data,lang)
         {
             var jsonString = JsonConvert.SerializeObject(data);
             var matched_payments = JsonConvert.DeserializeObject<List<MatchedPayment>>(jsonString);
@@ -35,12 +36,12 @@ namespace ImisRestApi.Responses
             {
                 case 0:
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "1-The paymentId does not exist";
+                    msg.MessageValue = new Language().GetMessage(language, "PayIdDoesntExist");
                     Message = msg;
                     break;
             }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ImisRestApi.Responses.Messages;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,11 +14,11 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public GetMemberFamilyResponse(int value,bool error):base(value,error)
+        public GetMemberFamilyResponse(int value,bool error, int lang) :base(value,error,lang)
         {
             SetMessage(value);
         }
-        public GetMemberFamilyResponse(int value, bool error,DataTable data) : base(value, error,data)
+        public GetMemberFamilyResponse(int value, bool error,DataTable data, int lang) : base(value, error,data,lang)
         {
             if(data.Rows.Count > 0)
             {
@@ -36,23 +37,23 @@ namespace ImisRestApi.Responses
             {
                 case 0:              
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
 
                     msg.Code = value;
-                    msg.MessageValue = "Wrong Format or Missing Insurance Number of head";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongOrMissingHeadIN");
                     Message = msg;
                     break;
                 case 2:
                     msg.Code = value;
-                    msg.MessageValue = "Insurance number of head not found";
+                    msg.MessageValue = new Language().GetMessage(language, "HeadINNotFound");
                     Message = msg;
                     break;
                 case 3:                 
                     msg.Code = value;
-                    msg.MessageValue = "No member of the specified order number in the family/group";
+                    msg.MessageValue = new Language().GetMessage(language, "NoMemberOfOrder");
                     Message = msg;
                     break;
             }

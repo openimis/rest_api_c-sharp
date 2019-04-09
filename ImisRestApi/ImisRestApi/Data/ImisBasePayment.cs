@@ -218,7 +218,19 @@ namespace ImisRestApi.Data
                 dt.Rows.Add(rw);
 
                 ExpectedAmount = decimal.Parse(data[1].Value.ToString());
-                message = new SaveIntentResponse(rv, error,dt).Message;
+
+                var languages = LocalDefault.PrimaryLangReprisantations(Configuration);
+
+                if (languages.Contains(_intent.language.ToLower()))
+                {
+                    Language = Language.Primary;
+                }
+                else
+                {
+                    Language = Language.Secondary;
+                }
+
+                message = new SaveIntentResponse(rv, error,dt,(int)Language).Message;
                 GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
@@ -244,7 +256,7 @@ namespace ImisRestApi.Data
             {
                 
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
-                message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
@@ -270,7 +282,7 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
-                message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(model.internal_identifier);
             }
             catch (Exception e)
@@ -354,7 +366,7 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspAcknowledgeControlNumberRequest", sqlParameters);
-                message = new SaveAckResponse(int.Parse(data[0].Value.ToString()), false).Message;
+                message = new SaveAckResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
@@ -408,7 +420,7 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
-                message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false).Message;
+                message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(data[0].Value.ToString());
 
             }
@@ -459,7 +471,7 @@ namespace ImisRestApi.Data
                 //    }
                 }
                 
-                message = new MatchPayResponse(dh.ReturnValue,false,dt).Message;
+                message = new MatchPayResponse(dh.ReturnValue,false,dt , (int)Language).Message;
                 if(model.internal_identifier != null && !message.ErrorOccured)
                 {
                     GetPaymentInfo(model.internal_identifier.ToString());
@@ -495,7 +507,7 @@ namespace ImisRestApi.Data
 
                 if (ids.Distinct().Count() == data.Rows.Count)
                 {
-                    dt = new RequestedCNResponse(0, false, data).Message;
+                    dt = new RequestedCNResponse(0, false, data, (int)Language).Message;
                 }
                 else
                 {
@@ -518,7 +530,7 @@ namespace ImisRestApi.Data
                     }
                    
 
-                    dt = new RequestedCNResponse(2, true, invalid).Message;
+                    dt = new RequestedCNResponse(2, true, invalid, (int)Language).Message;
                 }
                 
             }

@@ -46,17 +46,17 @@ namespace ImisRestApi.Controllers
 
                     if (data.Rows.Count > 0)
                     {
-                        response = new GetFamilyResponse(0, false, data).Message;
+                        response = new GetFamilyResponse(0, false, data,0).Message;
 
                     }
                     else
                     {
-                        response = new GetFamilyResponse(2, false).Message;
+                        response = new GetFamilyResponse(2, false,0).Message;
                     }
                 }
                 else
                 {
-                    response = new GetFamilyResponse(1, true).Message;
+                    response = new GetFamilyResponse(1, true,0).Message;
                 }
                 
             }
@@ -86,17 +86,17 @@ namespace ImisRestApi.Controllers
 
                     if (data.Rows.Count > 0)
                     {
-                        response = new GetMemberFamilyResponse(0, false, data).Message;
+                        response = new GetMemberFamilyResponse(0, false, data,0).Message;
 
                     }
                     else
                     {
-                        response = new GetMemberFamilyResponse(2, true).Message;
+                        response = new GetMemberFamilyResponse(2, true,0).Message;
                     }
                 }
                 else
                 {
-                    response = new GetMemberFamilyResponse(1, true).Message;
+                    response = new GetMemberFamilyResponse(1, true,0).Message;
                 }
 
             }

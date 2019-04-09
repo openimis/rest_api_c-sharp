@@ -163,7 +163,7 @@ namespace ImisRestApi.Data
             try
             {
                 var response = data.Procedure("uspAPIDeleteMemberFamily", parameters);
-                message = new DeleteMamberFamilyResponse(response, false).Message;
+                message = new DeleteMamberFamilyResponse(response, false,0).Message;
             }
             catch (Exception e)
             {
@@ -212,7 +212,7 @@ namespace ImisRestApi.Data
             try
             {
                 var response = helper.Procedure("uspAPIEnterFamily", sqlParameters);
-                message = new EnterFamilyResponse(response, false).Message;
+                message = new EnterFamilyResponse(response, false,0).Message;
 
             }
             catch (Exception e)
@@ -260,7 +260,7 @@ namespace ImisRestApi.Data
             try
             {
                 var response = helper.Procedure("uspAPIEditFamily", sqlParameters);
-                message = new EditFamilyResponse(response, false).Message;
+                message = new EditFamilyResponse(response, false,0).Message;
             }
             catch (Exception e)
             {
@@ -304,7 +304,7 @@ namespace ImisRestApi.Data
             try
             {
                 var response = helper.Procedure("uspAPIEnterMemberFamily", sqlParameters);
-                message = new EnterMemberFamilyResponse(response,false).Message;
+                message = new EnterMemberFamilyResponse(response,false,0).Message;
             }
             catch (Exception e)
             {
@@ -345,7 +345,7 @@ namespace ImisRestApi.Data
             try
             {
                 var response = helper.Procedure("uspAPIEditMemberFamily", sqlParameters);
-                message = new EditMemberFamilyResponse(response, false).Message;
+                message = new EditMemberFamilyResponse(response, false,0).Message;
             }
             catch (Exception e)
             {

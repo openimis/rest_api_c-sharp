@@ -45,17 +45,17 @@ namespace ImisRestApi.Controllers
                     if (data.Rows.Count > 0)
                     {
                         
-                        response = new GetCoverageResponse(0, false, data).Message;
+                        response = new GetCoverageResponse(0, false, data,0).Message;
 
                     }
                     else
                     {
-                        response = new GetCoverageResponse(2, true).Message;
+                        response = new GetCoverageResponse(2, true,0).Message;
                     }
                 }
                 else
                 {
-                    response = new GetCoverageResponse(1, true).Message;
+                    response = new GetCoverageResponse(1, true,0).Message;
                 }
 
               

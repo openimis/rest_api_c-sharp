@@ -42,7 +42,7 @@ namespace ImisRestApi.Data
             try
             {
                 var response = helper.Procedure("uspAPIEnterContribution", sqlParameters);
-                message = new EnterContibutionResponse(response,false).Message;
+                message = new EnterContibutionResponse(response,false,0).Message;
 
             }
             catch (Exception e)

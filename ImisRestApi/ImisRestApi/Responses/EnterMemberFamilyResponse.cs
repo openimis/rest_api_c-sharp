@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.Responses.Messages;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,11 +13,11 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public EnterMemberFamilyResponse(int value,bool error): base(value,error)
+        public EnterMemberFamilyResponse(int value,bool error, int lang) : base(value,error,lang)
         {
             SetMessage(value);
         }
-        public EnterMemberFamilyResponse(int value,bool error,DataTable data):base(value,error,data)
+        public EnterMemberFamilyResponse(int value,bool error,DataTable data, int lang) :base(value,error,data,lang)
         {
            
             SetMessage(value);
@@ -28,82 +29,82 @@ namespace ImisRestApi.Responses
             {
                 case 0:                   
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong Format or Missing Insurance Number of head.";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongOrMissingHeadIN");
                     Message = msg;
                     break;
                 case 2:
                     msg.Code = value;
-                    msg.MessageValue = "Insurance number of head not found";
+                    msg.MessageValue = new Language().GetMessage(language, "HeadINNotFound");
                     Message = msg;
                     break;
                 case 3:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong format or missing insurance number of member";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongINMember");
                     Message = msg;
                     break;
                 case 4:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong or missing gender.";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongOrMissingGender");
                     Message = msg;
                     break;
                 case 5:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong format or missing birth date.";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongFrOrMissingBd");
                     Message = msg;
                     break;
                 case 6:
                     msg.Code = value;
-                    msg.MessageValue = "Missing last name.";
+                    msg.MessageValue = new Language().GetMessage(language, "MissingLastName");
                     Message = msg;
                     break;
                 case 7:
                     msg.Code = value;
-                    msg.MessageValue = "Missing other name";
+                    msg.MessageValue = new Language().GetMessage(language, "MissingOtherName");
                     Message = msg;
                     break;
                 case 8:
                     msg.Code = value;
-                    msg.MessageValue = "Insurance number of member duplicated ";
+                    msg.MessageValue = new Language().GetMessage(language, "DuplicatedMemberIN");
                     Message = msg;
                     break;
                 case 9:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong current village code";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongVillageCode");
                     Message = msg;
                     break;
                 case 10:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong marital status";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongMaritalStatus");
                     Message = msg;
                     break;
                 case 11:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong education";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongEducation");
                     Message = msg;
                     break;
                 case 12:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong profession.";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongProfession");
                     Message = msg;
                     break;
                 case 13:
                     msg.Code = value;
-                    msg.MessageValue = "FSP code not found";
+                    msg.MessageValue = new Language().GetMessage(language, "FSPCodeNotFound");
                     Message = msg;
                     break;
                 case 14:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong Relationship";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongRelationship");
                     Message = msg;
                     break;
                 case 15:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong Identification Type";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongIdentificationType");
                     Message = msg;
                     break;
             }

@@ -1,5 +1,6 @@
 ﻿using ImisRestApi.Models.Payment;
 using ImisRestApi.Models.Payment.Response;
+using ImisRestApi.Responses.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,13 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public RequestedCNResponse(int value, bool error) : base(value, error)
+        public RequestedCNResponse(int value, bool error, int lang) : base(value, error,lang)
         {
             SetMessage(value);
 
         }
 
-        public RequestedCNResponse(int value, bool error, DataTable data) : base(value, error, data)
+        public RequestedCNResponse(int value, bool error, DataTable data, int lang) : base(value, error, data,lang)
         {
             var jsonString = JsonConvert.SerializeObject(data);
             var reqs = JsonConvert.DeserializeObject<List<AssignedControlNumber>>(jsonString);
@@ -36,12 +37,12 @@ namespace ImisRestApi.Responses
             {
                 case 0:
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "1-Wrong format of internal identifier";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongInternalIdFormat");
                     Message = msg;
                     break;
                 case 2:
@@ -51,7 +52,7 @@ namespace ImisRestApi.Responses
                     var Ids_string = string.Join(",", reqs);
 
                     msg.Code = value;
-                    msg.MessageValue = "2-Not valid internal identifier "+Ids_string;
+                    msg.MessageValue = new Language().GetMessage(language, "InvalidInternalId") +Ids_string; 
                     Message = msg;
                     break;
 

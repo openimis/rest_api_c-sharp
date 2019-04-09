@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ImisRestApi.Responses.Messages;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,11 +14,11 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public GetCoverageResponse(int value,bool error):base(value,error)
+        public GetCoverageResponse(int value,bool error,int lang) :base(value,error,lang)
         {
             SetMessage(value);
         }
-        public GetCoverageResponse(int value,bool error,DataTable data) : base(value,error,data)
+        public GetCoverageResponse(int value,bool error,DataTable data, int lang) : base(value,error,data,lang)
         {
             var firstRow = data.Rows[0];
             var jsonString = JsonConvert.SerializeObject(data);
@@ -33,18 +34,18 @@ namespace ImisRestApi.Responses
             {
                 case 0:
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
 
                     msg.Code = value;
-                    msg.MessageValue = "Wrong Format or Missing Insurance Number of insuree";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongFormatMissingIN"); 
                     Message = msg;
                     break;
                 case 2:
                     msg.Code = value;
-                    msg.MessageValue = "Insurance number of Insuree not found";
+                    msg.MessageValue = new Language().GetMessage(language, "INNotFount");
                     Message = msg;
                     break;
             }

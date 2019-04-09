@@ -134,5 +134,52 @@ namespace ImisRestApi.Data
 
             return message;
         }
+
+        public DataTable GetClaimAdministrators()
+        {
+            var sSQL = @"SELECT LastName,OtherNames,ClaimAdminCode FROM tblClaimAdmin WHERE ValidityTo IS NULL";
+
+            DataHelper helper = new DataHelper(Configuration);
+           
+            SqlParameter[] sqlParameters = {
+               
+            };
+
+            try
+            {
+                var response = helper.GetDataTable(sSQL, sqlParameters, CommandType.Text);
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            
+        }
+
+        public DataTable GetControls()
+        {
+            var sSQL = @"SELECT * FROM tblControls";
+
+            DataHelper helper = new DataHelper(Configuration);
+
+            SqlParameter[] sqlParameters = {
+              
+            };
+
+
+            try
+            {
+                var response = helper.GetDataTable(sSQL, sqlParameters, CommandType.Text);
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+        }
     }
 }

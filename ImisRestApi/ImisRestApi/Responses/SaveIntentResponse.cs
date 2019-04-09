@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.Responses.Messages;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public SaveIntentResponse(int value, bool error) : base(value, error)
+        public SaveIntentResponse(int value, bool error, int lang) : base(value, error,lang)
         {
             SetMessage(value);
 
         }
 
-        public SaveIntentResponse(int value, bool error, DataTable data) : base(value, error, data)
+        public SaveIntentResponse(int value, bool error, DataTable data, int lang) : base(value, error, data,lang)
         {
             SetMessage(value);
         }
@@ -29,57 +30,57 @@ namespace ImisRestApi.Responses
             {
                 case 0:
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "1-Wrong format of insurance number";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongFormatInsureeNo");
                     Message = msg;
                     break;
                 case 2:
                     msg.Code = value;
-                    msg.MessageValue = "2-Not valid insurance or missing product code";
+                    msg.MessageValue = new Language().GetMessage(language, "InValidINmissingPC");
                     Message = msg;
                     break;
                 case 3:
                     msg.Code = value;
-                    msg.MessageValue = "3-Not valid enrolment officer code";
+                    msg.MessageValue = new Language().GetMessage(language, "InValidEOC");
                     Message = msg;
                     break;
                 case 4:
                     msg.Code = value;
-                    msg.MessageValue = "4-Enrolment officer code and insurance product code are not compatible";
+                    msg.MessageValue = new Language().GetMessage(language, "IncompatibleEO_PC");
                     Message = msg;
                     break;
                 case 5:
                     msg.Code = value;
-                    msg.MessageValue = "5-Beneficiary has no policy of specified insurance product for renewal";
+                    msg.MessageValue = new Language().GetMessage(language, "NoRenewalProduct");
                     Message = msg;
                     break;
                 case 6:
                     msg.Code = value;
-                    msg.MessageValue = "6-Missing insurance number";
+                    msg.MessageValue = new Language().GetMessage(language, "InsureeNoMissing");
                     Message = msg;
                     break;
                 case 7:
                     msg.Code = value;
-                    msg.MessageValue = "7-Insuree not enrolled while prior enrolment mandatory.";
+                    msg.MessageValue = new Language().GetMessage(language, "InsureeNotEnrolled");
                     Message = msg;
                     break;
                 case 8:
                     msg.Code = value;
-                    msg.MessageValue = "8-Duplicated control number assigned";
+                    msg.MessageValue = new Language().GetMessage(language, "DuplicateCNAssigned");
                     Message = msg;
                     break;
                 case 9:
                     msg.Code = value;
-                    msg.MessageValue = "9-Control number cannot be assigned";
+                    msg.MessageValue = new Language().GetMessage(language, "CantAssignCn2");
                     Message = msg;
                     break;
                 case 10:
                     msg.Code = value;
-                    msg.MessageValue = "10-Uknown type of payment";
+                    msg.MessageValue = new Language().GetMessage(language, "UnknownPaymentType");
                     Message = msg;
                     break;
 

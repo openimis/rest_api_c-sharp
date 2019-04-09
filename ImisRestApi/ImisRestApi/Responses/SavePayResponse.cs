@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.Responses.Messages;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace ImisRestApi.Responses
         {
 
         }
-        public SavePayResponse(int value, bool error) : base(value, error)
+        public SavePayResponse(int value, bool error, int lang) : base(value, error,lang)
         {
             SetMessage(value);
 
         }
 
-        public SavePayResponse(int value, bool error, DataTable data) : base(value, error, data)
+        public SavePayResponse(int value, bool error, DataTable data, int lang) : base(value, error, data,lang)
         {
             SetMessage(value);
         }
@@ -29,52 +30,52 @@ namespace ImisRestApi.Responses
             {
                 case 0:
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "1-Wrong or missing receiving date";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongOrMissingRecDate");
                     Message = msg;
                     break;
                 case 2:
                     msg.Code = value;
-                    msg.MessageValue = "2-Wrong format of input data";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongFormatInputData");
                     Message = msg;
                     break;
                 case 3:
                     msg.Code = value;
-                    msg.MessageValue = "3-Wrong control_number";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongControlNumber"); 
                     Message = msg;
                     break;
                 case 4:
                     msg.Code = value;
-                    msg.MessageValue = "4-Wrong Amount";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongAmount");
                     Message = msg;
                     break;
                 case 5:
                     msg.Code = value;
-                    msg.MessageValue = "5-Duplicate Payment Amount";
+                    msg.MessageValue = new Language().GetMessage(language, "DuplicatePayAmount");
                     Message = msg;
                     break;
                 case 6:
                     msg.Code = value;
-                    msg.MessageValue = "6-Enrolment Officer Code does not exist";
+                    msg.MessageValue = new Language().GetMessage(language, "DoesntExistEO");
                     Message = msg;
                     break;
                 case 7:
                     msg.Code = value;
-                    msg.MessageValue = "7-Product Code Does not Exist";
+                    msg.MessageValue = new Language().GetMessage(language, "DoesntExistPC");
                     Message = msg;
                     break;
                 case 8:
                     msg.Code = value;
-                    msg.MessageValue = "8-Beneficiary has no policy of specified insurance product for renewal";
+                    msg.MessageValue = new Language().GetMessage(language, "NoPolicyForRenewal");
                     Message = msg;
                     break;
                 case 9:
                     msg.Code = value;
-                    msg.MessageValue = "9-Uknown type of payment";
+                    msg.MessageValue = new Language().GetMessage(language, "UnknownTypeOfPay");
                     Message = msg;
                     break;
             }

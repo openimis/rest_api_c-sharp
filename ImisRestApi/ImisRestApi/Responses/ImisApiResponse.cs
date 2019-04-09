@@ -10,6 +10,7 @@ namespace ImisRestApi.Responses
     public class ImisApiResponse
     {
         public DataMessage msg = new DataMessage();
+        public int language { get; set; }
 
         public ImisApiResponse(Exception e)
         {
@@ -19,10 +20,12 @@ namespace ImisRestApi.Responses
             Message = msg;
         }
 
-        public ImisApiResponse(int value,bool error)
+        public ImisApiResponse(int value,bool error, int lang)
         {
             if (value != 0)
                 error = true;
+
+            language = lang;
 
             msg.Code = value;
             msg.ErrorOccured = error;
@@ -30,10 +33,12 @@ namespace ImisRestApi.Responses
 
         }
 
-        public ImisApiResponse(int value, bool error, DataTable data)
+        public ImisApiResponse(int value, bool error, DataTable data,int lang)
         {
             if (value != 0)
                 error = true;
+
+            language = lang;
 
             msg.Code = value;
             msg.ErrorOccured = error;

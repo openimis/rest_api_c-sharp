@@ -71,5 +71,45 @@ namespace ImisRestApi.Controllers
             }
             
         }
+
+        [HttpGet]
+        [Route("api/Claims/GetClaimAdmins")]
+        public IActionResult ValidateClaimAdmin()
+        {
+
+            try
+            {
+
+                var data = imisClaims.GetClaimAdministrators();
+                return Ok(new { error_occured = false, claim_admins = data });
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
+            }
+     
+        }
+
+        [HttpGet]
+        [Route("api/Claims/Controls")]
+        public IActionResult GetControls()
+        {
+
+            try
+            {
+
+                var data = imisClaims.GetControls();
+
+                return Ok(new { error_occured = false, controls = data });
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
+
+            }
+
+        }
     }
 }

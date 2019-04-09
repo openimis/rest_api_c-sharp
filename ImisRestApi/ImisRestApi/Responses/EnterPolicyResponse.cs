@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImisRestApi.Responses.Messages;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,11 +14,11 @@ namespace ImisRestApi.Responses
 
         }
 
-        public EnterPolicyResponse(int value, bool error):base(value,error)
+        public EnterPolicyResponse(int value, bool error, int lang) :base(value,error,lang)
         {
             SetMessage(value);
         }
-        public EnterPolicyResponse(int value,bool error,DataTable data):base(value,error,data)
+        public EnterPolicyResponse(int value,bool error,DataTable data, int lang) :base(value,error,data,lang)
         {
             SetMessage(value);
         }
@@ -28,32 +29,32 @@ namespace ImisRestApi.Responses
             {
                 case 0:                   
                     msg.Code = value;
-                    msg.MessageValue = "Success.";
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
                     Message = msg;
                     break;
                 case 1:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong Format or Missing Insurance Number";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongINMember");
                     Message = msg;
                     break;
                 case 2:
                     msg.Code = value;
-                    msg.MessageValue = "Insurance number not found";
+                    msg.MessageValue = new Language().GetMessage(language, "NotFountINMember");
                     Message = msg;
                     break;
                 case 3:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong or missing product code (not existing or not applicable to the family/group)";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongOrMissingPC");
                     Message = msg;
                     break;
                 case 4:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong or missing enrolment date";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongOrMissingEnrolDate");
                     Message = msg;
                     break;
                 case 5:
                     msg.Code = value;
-                    msg.MessageValue = "Wrong or missing enrolment officer code (not existing or not applicable to the family/group)";
+                    msg.MessageValue = new Language().GetMessage(language, "WrongOrMissingEOcode"); 
                     Message = msg;
                     break;
 
