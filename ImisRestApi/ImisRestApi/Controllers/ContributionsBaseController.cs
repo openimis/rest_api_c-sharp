@@ -13,11 +13,11 @@ using System.Security.Claims;
 namespace ImisRestApi.Controllers
 {
     [Authorize]
-    public class ContributionsController : Controller
+    public abstract class ContributionsBaseController : Controller
     {
         private ImisContribution contribution;
 
-        public ContributionsController(IConfiguration configuration)
+        public ContributionsBaseController(IConfiguration configuration)
         {
             contribution = new ImisContribution(configuration);
         }
