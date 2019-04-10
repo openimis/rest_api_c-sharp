@@ -24,7 +24,7 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/Contributions/Enter_Contribution")]
-        public IActionResult Enter_Contribution([FromBody]Contribution model)
+        public virtual IActionResult Enter_Contribution([FromBody]Contribution model)
         {
             if (!ModelState.IsValid)
             {
