@@ -13,11 +13,11 @@ using System.Net.Http;
 namespace ImisRestApi.Controllers
 {
     [Authorize]
-    public class ValidateController : Controller
+    public abstract class ValidateBaseController : Controller
     {
         private ImisValidate validate;
 
-        public ValidateController(IConfiguration configuration)
+        public ValidateBaseController(IConfiguration configuration)
         {
             validate = new ImisValidate(configuration);
         }
@@ -25,7 +25,7 @@ namespace ImisRestApi.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("api/Validate/Credentials")]
-        public IActionResult Validate_Credentials([FromBody]UserLogin userlogin)
+        public virtual IActionResult Validate_Credentials([FromBody]UserLogin userlogin)
         {
             if (!ModelState.IsValid)
             {

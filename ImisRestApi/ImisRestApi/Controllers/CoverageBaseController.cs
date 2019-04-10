@@ -16,18 +16,18 @@ using System.Net.Http;
 namespace ImisRestApi.Controllers
 {
     [Authorize]
-    public class CoverageController : Controller
+    public abstract class CoverageBaseController : Controller
     {
         private ImisCoverage coverage;
 
-        public CoverageController(IConfiguration configuration)
+        public CoverageBaseController(IConfiguration configuration)
         {
             coverage = new ImisCoverage(configuration);
         }
         // GET api/Coverage
         [HttpGet]
         [Route("api/Coverage/Get_Coverage")]
-        public IActionResult Get(string InsureeNumber)
+        public virtual IActionResult Get(string InsureeNumber)
         {
             if (new ValidationBase().InsureeNumber(InsureeNumber) != ValidationResult.Success)
             {
