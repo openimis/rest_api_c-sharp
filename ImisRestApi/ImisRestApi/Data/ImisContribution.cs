@@ -1,5 +1,8 @@
-﻿using ImisRestApi.Models;
+﻿using ImisRestApi.Chanels.Sms;
+using ImisRestApi.Models;
+using ImisRestApi.Models.Sms;
 using ImisRestApi.Responses;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -12,11 +15,13 @@ namespace ImisRestApi.Data
     public class ImisContribution
     {
         private IConfiguration Configuration;
+        private readonly IHostingEnvironment HostingEnvironment;
         public int UserId { get; set; }
 
-        public ImisContribution(IConfiguration configuration)
+        public ImisContribution(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
         }
 
         public DataMessage Enter(Contribution model)
@@ -43,7 +48,7 @@ namespace ImisRestApi.Data
             {
                 var response = helper.Procedure("uspAPIEnterContribution", sqlParameters);
                 message = new EnterContibutionResponse(response,false,0).Message;
-
+                ImisSms sms = new ImisSms(Configuration, HostingEnvironment, language);
             }
             catch (Exception e)
             {
@@ -54,5 +59,7 @@ namespace ImisRestApi.Data
             return message;
 
         }
+
+        
     }
 }

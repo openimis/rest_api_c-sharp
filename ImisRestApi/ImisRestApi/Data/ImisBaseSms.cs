@@ -73,5 +73,20 @@ namespace ImisRestApi.Data
             string text = File.ReadAllText(SmsTampletes + filename +".txt", Encoding.UTF8);
             return text;
         }
+
+        public virtual async void QuickSms(string txtmsg, string phoneNumber, Language language = Language.Primary)
+        {
+
+
+            var txtmsgTemplate = string.Empty;
+            string othersCount = string.Empty;
+
+            List<SmsContainer> message = new List<SmsContainer>();
+            message.Add(new SmsContainer() { Message = txtmsg, Recipient = phoneNumber });
+
+            var fileName = "QuickSms_" + phoneNumber;
+
+            string test = await SendSMS(message, fileName);
+        }
     }
 }
