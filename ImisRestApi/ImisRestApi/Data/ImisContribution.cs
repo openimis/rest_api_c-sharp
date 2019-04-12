@@ -44,7 +44,7 @@ namespace ImisRestApi.Data
 
             try
             {
-                var response = helper.Procedure("uspAPIEnterContribution", sqlParameters);
+                var response = helper.Procedure("uspAPIEnterContribution", sqlParameters,1);
                 message = new EnterContibutionResponse(response.Code,false, response.Data, 0).Message;
                 
             }

@@ -99,9 +99,9 @@ namespace ImisRestApi.Data
             }
         }
 
-        public ProcedureOutPut Procedure(string StoredProcedure, SqlParameter[] parameters)
+        public ProcedureOutPut Procedure(string StoredProcedure, SqlParameter[] parameters,int tableIndex = 0)
         {
-            DataTable dt = new DataTable();
+            DataSet dt = new DataSet();
 
             SqlConnection sqlConnection = new SqlConnection(ConnectionString);
             SqlCommand command = new SqlCommand();
@@ -128,11 +128,17 @@ namespace ImisRestApi.Data
 
 
             int rv = int.Parse(returnParameter.Value.ToString());
+            DataTable dat = new DataTable();
+            if (rv == 0)
+            {
+                dat = dt.Tables[tableIndex];
+            }
+
 
             var output = new ProcedureOutPut
             {
                 Code = rv,
-                Data = dt
+                Data = dat
             };
 
             return output;
