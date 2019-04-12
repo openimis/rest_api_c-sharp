@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using ImisRestApi.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -98,8 +99,10 @@ namespace ImisRestApi.Data
             }
         }
 
-        public int Procedure(string StoredProcedure, SqlParameter[] parameters)
+        public ProcedureOutPut Procedure(string StoredProcedure, SqlParameter[] parameters)
         {
+            DataTable dt = new DataTable();
+
             SqlConnection sqlConnection = new SqlConnection(ConnectionString);
             SqlCommand command = new SqlCommand();
             SqlDataReader reader;
@@ -115,16 +118,24 @@ namespace ImisRestApi.Data
             if (parameters.Length > 0)
                 command.Parameters.AddRange(parameters);
 
-            sqlConnection.Open();
+            var adapter = new SqlDataAdapter(command);
 
-            command.ExecuteNonQuery();
+            using (command)
+            {
+
+                adapter.Fill(dt);
+            }
+
 
             int rv = int.Parse(returnParameter.Value.ToString());
-            // var message = new ResponseMessage(rv).Message;
 
-            sqlConnection.Close();
+            var output = new ProcedureOutPut
+            {
+                Code = rv,
+                Data = dt
+            };
 
-            return rv;
+            return output;
         }
 
         public IList<SqlParameter> ExecProcedure(string StoredProcedure, SqlParameter[] parameters)

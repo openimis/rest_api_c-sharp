@@ -17,14 +17,14 @@ namespace ImisRestApi.Responses.Messages
             {
                 
                 case 0:
-                    fieldInfos = typeof(PrimaryLanguage).GetField("Success");
+                    fieldInfos = typeof(PrimaryLanguage).GetField(name);
                     break;
                 case 1:
-                    fieldInfos = typeof(SecondaryLanguage).GetField("Success");
+                    fieldInfos = typeof(SecondaryLanguage).GetField(name);
                    
                     break;
                 default:
-                    fieldInfos = typeof(PrimaryLanguage).GetField("Success");
+                    fieldInfos = typeof(PrimaryLanguage).GetField(name);
                     
                     break;
             }

@@ -15,13 +15,12 @@ namespace ImisRestApi.Data
     public class ImisContribution
     {
         private IConfiguration Configuration;
-        private readonly IHostingEnvironment HostingEnvironment;
         public int UserId { get; set; }
 
-        public ImisContribution(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public ImisContribution(IConfiguration configuration)
         {
             Configuration = configuration;
-            HostingEnvironment = hostingEnvironment;
+           
         }
 
         public DataMessage Enter(Contribution model)
@@ -40,15 +39,14 @@ namespace ImisRestApi.Data
                 new SqlParameter("@ContributionAmount", model.Amount),
                 new SqlParameter("@PaymentType", model.PaymentType)
             };
-
-            
+           
             DataMessage message;
 
             try
             {
                 var response = helper.Procedure("uspAPIEnterContribution", sqlParameters);
-                message = new EnterContibutionResponse(response,false,0).Message;
-                ImisSms sms = new ImisSms(Configuration, HostingEnvironment, language);
+                message = new EnterContibutionResponse(response.Code,false, response.Data, 0).Message;
+                
             }
             catch (Exception e)
             {
