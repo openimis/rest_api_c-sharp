@@ -583,7 +583,7 @@ namespace ImisRestApi.Data
                     var language = row1["LanguageName"] != System.DBNull.Value ? Convert.ToString(row1["LanguageName"]) : "en";
                     var languages = LocalDefault.PrimaryLangReprisantations(Configuration);
 
-                    if (languages.Contains(language.ToLower()))
+                    if (language == null || languages.Contains(language.ToLower()))
                     {
                         Language = Language.Primary;
                     }
