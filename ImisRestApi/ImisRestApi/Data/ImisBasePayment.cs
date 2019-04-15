@@ -221,7 +221,7 @@ namespace ImisRestApi.Data
 
                 var languages = LocalDefault.PrimaryLangReprisantations(Configuration);
 
-                if (languages.Contains(_intent.language.ToLower()))
+                if (_intent.language == null || languages.Contains(_intent.language.ToLower()))
                 {
                     Language = Language.Primary;
                 }
