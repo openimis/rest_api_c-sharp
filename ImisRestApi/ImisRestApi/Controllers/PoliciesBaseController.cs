@@ -51,7 +51,16 @@ namespace ImisRestApi.Controllers
             }
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            policies.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
+            var iden = identity.FindFirst("UserId");
+
+            try
+            {
+                policies.UserId = Convert.ToInt32(iden.Value);
+            }
+            catch (Exception e)
+            {
+                policies.UserId = -1;
+            }
 
             var response = policies.Renew(model);
 
