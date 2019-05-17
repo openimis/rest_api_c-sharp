@@ -67,5 +67,33 @@ namespace ImisRestApi.Controllers
             return Json(response);
 
         }
+
+        [HttpPost]
+        [Route("api/Policies/Get_Commissions")]
+        public virtual IActionResult Get_Commissions([FromBody]GetCommissionInputs model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var iden = identity.FindFirst("UserId");
+
+            try
+            {
+                policies.UserId = Convert.ToInt32(iden.Value);
+            }
+            catch (Exception e)
+            {
+                policies.UserId = -1;
+            }
+
+            var response = policies.GetCommissions(model);
+
+            return Json(response);
+
+        }
     }
 }
