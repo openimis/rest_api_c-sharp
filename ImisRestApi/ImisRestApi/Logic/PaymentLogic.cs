@@ -101,13 +101,12 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.MatchPayment(model);
 
-            if (model.internal_identifier == null)
-            {
-                List<MatchSms> PaymentIds = payment.GetPaymentIdsForSms();
+            List<MatchSms> PaymentIds = new List<MatchSms>();
 
-                if (PaymentIds != null)
-                    SendMatchSms(PaymentIds);
-            }
+            PaymentIds = payment.GetPaymentIdsForSms();
+
+            if (PaymentIds != null)
+                SendMatchSms(PaymentIds);
 
             return response;
         }
@@ -120,7 +119,7 @@ namespace ImisRestApi.Logic
             return response;
         }
 
-        public DataMessage SavePayment(PaymentData model)
+        public async Task<DataMessage> SavePayment(PaymentData model)
         {
 
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
@@ -171,13 +170,18 @@ namespace ImisRestApi.Logic
             {
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId, payment.ControlNum);
 
-                if (model.enrolment_officer_code == null)
+                MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
+
+                var matchresponse = await MatchPayment(matchModel);
+               
+                var matchdata = JsonConvert.SerializeObject(matchresponse.Data);
+                var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
+
+                if (matchedPayments.FirstOrDefault().PaymentMatched > 0)
                 {
-                    MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
-                    var matchresponse = MatchPayment(matchModel);
+                    SendPaymentSms(payment);
                 }
 
-                SendPaymentSms(payment);
             }
 
             return response;

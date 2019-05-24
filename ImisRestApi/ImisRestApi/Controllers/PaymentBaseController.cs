@@ -172,7 +172,7 @@ namespace ImisRestApi.Controllers
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(PaymentDataBadResp), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult GetPaymentData([FromBody]PaymentData model)
+        public virtual async Task<IActionResult> GetPaymentData([FromBody]PaymentData model)
         {
             if (!ModelState.IsValid)
             {
@@ -182,7 +182,7 @@ namespace ImisRestApi.Controllers
 
             try
             {
-                var response = _payment.SavePayment(model);
+                var response = await _payment.SavePayment(model);
 
                 if (response.Code == 0) {
                     return Ok();

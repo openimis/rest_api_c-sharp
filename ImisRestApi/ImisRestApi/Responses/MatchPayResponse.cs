@@ -53,5 +53,6 @@ namespace ImisRestApi.Responses
         public string ProductCode { get; set; }
         public string InsuranceNumber { get; set; }
         public string isActivated { get; set; }
+        public int PaymentMatched { get; set; }
     }
 }
