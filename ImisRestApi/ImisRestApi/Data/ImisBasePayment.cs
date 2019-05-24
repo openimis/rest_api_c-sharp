@@ -659,7 +659,7 @@ namespace ImisRestApi.Data
                         ON tblPremium.PolicyID = tblPolicy.PolicyID 
                         ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
                         WHERE (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)
-						AND tblPayment.PaymentStatus = 4";
+						AND tblPayment.PaymentStatus >= 4";
 
             SqlParameter[] parameters = {};
 

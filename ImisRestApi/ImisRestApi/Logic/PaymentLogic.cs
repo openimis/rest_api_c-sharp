@@ -177,7 +177,7 @@ namespace ImisRestApi.Logic
                 var matchdata = JsonConvert.SerializeObject(matchresponse.Data);
                 var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
 
-                if (matchedPayments.FirstOrDefault().PaymentMatched > 0)
+                if (matchedPayments.Select(x => x.PaymentId).Contains(payment.PaymentId))
                 {
                     SendPaymentSms(payment);
                 }
