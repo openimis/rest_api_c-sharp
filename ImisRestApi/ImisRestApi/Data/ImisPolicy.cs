@@ -115,9 +115,9 @@ namespace ImisRestApi.Data
                 new SqlParameter("@MaxDate", maxDate),
                 new SqlParameter("@MinDate", minDate),
                 new SqlParameter("@Mode", model.mode),
-                new SqlParameter("@EnrollmentOfficerCode", model.enrolment_officer_code),
-                new SqlParameter("@Payer", model.payer),
-               // new SqlParameter("@ProductCode", model.insrance_product_code)
+                new SqlParameter("@EnrollmentOfficerCode", (model.enrolment_officer_code != null)?model.enrolment_officer_code:(object)DBNull.Value),
+                new SqlParameter("@Payer",(model.payer != null)? model.payer:(object)DBNull.Value),
+                new SqlParameter("@ProductCode", (model.insrance_product_code != null)? model.insrance_product_code:(object)DBNull.Value)
             };
 
            
