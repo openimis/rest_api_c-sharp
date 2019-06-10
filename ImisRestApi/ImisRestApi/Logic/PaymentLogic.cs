@@ -194,6 +194,12 @@ namespace ImisRestApi.Logic
             var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
             var response = payment.SaveControlNumber(model, controlNumberExists);
 
+            if (model.error_occured)
+            {
+                response.ErrorOccured = true;
+                response.MessageValue = model.error_message;
+            }
+
             if (payment.PaymentId != null)
             {
                 var ackResponse = payment.GetReqControlNumberAck(payment.PaymentId);
