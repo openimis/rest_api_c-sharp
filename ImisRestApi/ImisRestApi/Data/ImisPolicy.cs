@@ -85,7 +85,7 @@ namespace ImisRestApi.Data
         public DataMessage GetCommissions(GetCommissionInputs model)
         {
 
-            var sSQL = @"SELECT SUM(ISNULL(R.CammissionRate, 0.00) * PR.Amount) AS Commission, SUM(PR.Amount) AS Amount
+            var sSQL = @"SELECT ISNULL(SUM(ISNULL(R.CammissionRate, 0.00) * PR.Amount),0.00) AS Commission, ISNULL(SUM(ISNULL(PR.Amount,0.00)),0.00) AS Amount
                         FROM tblPremium AS PR INNER JOIN
                              tblPolicy AS P ON P.PolicyID = PR.PolicyID AND P.ValidityTo IS NULL INNER JOIN
                              tblReporting AS R ON R.ReportingId = PR.ReportingCommissionID INNER JOIN
