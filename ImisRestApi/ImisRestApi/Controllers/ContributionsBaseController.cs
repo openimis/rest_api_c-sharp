@@ -33,8 +33,17 @@ namespace ImisRestApi.Controllers
             }
 
             var identity = HttpContext.User.Identity as ClaimsIdentity;
-            contribution.UserId = Convert.ToInt32(identity.FindFirst("UserId").Value);
+            var iden = identity.FindFirst("UserId");
 
+            try
+            {
+                contribution.UserId = Convert.ToInt32(iden.Value);
+            }
+            catch (Exception e)
+            {
+                contribution.UserId = -1;
+            }
+            
             var response = contribution.Enter(model);
 
             return Json(response);

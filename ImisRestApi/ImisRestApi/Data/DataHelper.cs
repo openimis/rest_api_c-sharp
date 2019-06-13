@@ -131,7 +131,10 @@ namespace ImisRestApi.Data
             DataTable dat = new DataTable();
             if (rv == 0)
             {
-                dat = dt.Tables[tableIndex];
+                if(dt.Tables.Count > tableIndex)
+                {
+                    dat = dt.Tables[tableIndex];
+                }               
             }
 
 

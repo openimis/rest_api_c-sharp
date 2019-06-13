@@ -12,7 +12,6 @@ namespace ImisRestApi.Models
         [Required]
         [InsureeNumber(ErrorMessage ="1:Wrong format or missing insurance number ")]
         public string InsuranceNumber { get; set; }
-        [Required(ErrorMessage = "7-Wrong or missing payer")]
         public string Payer { get; set; }
         [Required(ErrorMessage = "4:Wrong or missing payment date")]
         [ValidDate(ErrorMessage = "4:Wrong or missing payment date")]
