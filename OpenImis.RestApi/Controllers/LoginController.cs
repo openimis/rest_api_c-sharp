@@ -69,5 +69,41 @@ namespace OpenImis.RestApi.Controllers
 
             return Unauthorized();
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("api/Validate/Credentials")]
+        public virtual IActionResult Validate_Credentials([FromBody]UserLogin userlogin)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
+            ValidateCredentialsResponse response = new ValidateCredentialsResponse();
+
+            try
+            {
+                var user = _imisModules.GetLoginModule().GetLoginLogic().FindUser(userlogin.UserID, userlogin.Password);
+
+                if (user != null)
+                {
+                    response.success = true;
+                    response.ErrorOccured = false;
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception)
+            {
+                response.success = false;
+                response.ErrorOccured = true;
+            }
+
+            return Json(response);
+        }
     }
 }
