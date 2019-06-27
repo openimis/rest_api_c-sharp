@@ -8,6 +8,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using OpenImis.Modules.MasterDataManagementModule;
 using OpenImis.Modules.MasterDataManagementModule.Logic;
+using OpenImis.Modules.InsureeModule;
 
 namespace OpenImis.Modules
 {
@@ -36,7 +37,9 @@ namespace OpenImis.Modules
         private IInsureeManagementModule insureeManagementModule;
         private IMasterDataManagementModule masterDataManagementModule;
 
-		private readonly IConfiguration _configuration;
+        private IInsureeModule insureeModule;
+
+        private readonly IConfiguration _configuration;
 		private readonly ILogger logger;
 
 		public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory)
@@ -45,7 +48,16 @@ namespace OpenImis.Modules
 			logger = loggerFactory.CreateLogger("LoggerCategory"); 
 		}
 
-		/// <summary>
+        public IInsureeModule GetInsureeModule()
+        {
+            if (insureeModule == null)
+            {
+                insureeModule = new InsureeModule.InsureeModule(_configuration);
+            }
+            return insureeModule;
+        }
+
+        /// <summary>
         /// Creates and returns the user management module.
         /// </summary>
         /// <returns>

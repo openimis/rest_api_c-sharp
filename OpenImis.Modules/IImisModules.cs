@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenImis.Modules.MasterDataManagementModule;
+using OpenImis.Modules.InsureeModule;
 
 namespace OpenImis.Modules
 {
@@ -13,13 +14,15 @@ namespace OpenImis.Modules
     /// </summary>
     public interface IImisModules
     {
-		/// <summary>
-		/// Creates and returns the user management module.
-		/// </summary>
-		/// <returns>
-		/// The User module.
-		/// </returns>
-		IUserModule GetUserModule();
+        IInsureeModule GetInsureeModule();
+
+        /// <summary>
+        /// Creates and returns the user management module.
+        /// </summary>
+        /// <returns>
+        /// The User module.
+        /// </returns>
+        IUserModule GetUserModule();
 
         IInsureeManagementModule GetInsureeManagementModule();
 
