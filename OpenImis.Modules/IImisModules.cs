@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenImis.Modules.MasterDataManagementModule;
+using OpenImis.Modules.LoginModule;
 using OpenImis.Modules.CoverageModule;
 
 namespace OpenImis.Modules
@@ -14,6 +15,8 @@ namespace OpenImis.Modules
     /// </summary>
     public interface IImisModules
     {
+        ILoginModule GetLoginModule();
+
 		/// <summary>
 		/// Creates and returns the user management module.
 		/// </summary>
