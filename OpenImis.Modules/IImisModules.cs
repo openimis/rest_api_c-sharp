@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenImis.Modules.MasterDataManagementModule;
 using OpenImis.Modules.ClaimModule;
+using OpenImis.Modules.CoverageModule;
 
 namespace OpenImis.Modules
 {
@@ -28,5 +29,7 @@ namespace OpenImis.Modules
 
 		IMasterDataManagementModule GetMasterDataManagementModule();
 
-	}
+        ICoverageModule GetCoverageModule();
+
+    }
 }
