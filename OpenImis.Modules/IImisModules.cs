@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenImis.Modules.MasterDataManagementModule;
 using OpenImis.Modules.InsureeModule;
+using OpenImis.Modules.LoginModule;
 using OpenImis.Modules.CoverageModule;
 
 namespace OpenImis.Modules
@@ -16,6 +17,8 @@ namespace OpenImis.Modules
     public interface IImisModules
     {
         IInsureeModule GetInsureeModule();
+        ILoginModule GetLoginModule();
+        ICoverageModule GetCoverageModule();
 
         /// <summary>
         /// Creates and returns the user management module.
@@ -28,8 +31,6 @@ namespace OpenImis.Modules
         IInsureeManagementModule GetInsureeManagementModule();
 
 		IMasterDataManagementModule GetMasterDataManagementModule();
-
-        ICoverageModule GetCoverageModule();
 
     }
 }
