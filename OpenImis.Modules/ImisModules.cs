@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using OpenImis.Modules.MasterDataManagementModule;
 using OpenImis.Modules.MasterDataManagementModule.Logic;
 using OpenImis.Modules.LoginModule;
+using OpenImis.Modules.CoverageModule;
 
 namespace OpenImis.Modules
 {
@@ -38,6 +39,7 @@ namespace OpenImis.Modules
         private IMasterDataManagementModule masterDataManagementModule;
 
         private ILoginModule loginModule;
+        private ICoverageModule coverageModule;
 
         private readonly IConfiguration _configuration;
 		private readonly ILogger logger;
@@ -55,6 +57,14 @@ namespace OpenImis.Modules
                 loginModule = new LoginModule.LoginModule(_configuration);
             }
             return loginModule;
+
+        public ICoverageModule GetCoverageModule()
+        {
+            if (coverageModule == null)
+            {
+                coverageModule = new CoverageModule.CoverageModule(_configuration);
+            }
+            return coverageModule;
         }
 
         /// <summary>
