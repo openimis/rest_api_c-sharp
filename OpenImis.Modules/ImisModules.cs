@@ -57,6 +57,7 @@ namespace OpenImis.Modules
                 loginModule = new LoginModule.LoginModule(_configuration);
             }
             return loginModule;
+        }
 
         public ICoverageModule GetCoverageModule()
         {
