@@ -1,0 +1,13 @@
+﻿using OpenImis.Modules.InsureeModule.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace OpenImis.Modules.InsureeModule.Logic
+{
+    public interface IContributionLogic
+    {
+        DataMessage Enter(Contribution model);
+        void SetUserId(int userId);
+    }
+}
