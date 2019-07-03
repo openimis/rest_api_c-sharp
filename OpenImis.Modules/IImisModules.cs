@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenImis.Modules.MasterDataManagementModule;
+using OpenImis.Modules.ClaimModule;
 using OpenImis.Modules.InsureeModule;
 using OpenImis.Modules.LoginModule;
 using OpenImis.Modules.CoverageModule;
@@ -16,8 +17,12 @@ namespace OpenImis.Modules
     /// </summary>
     public interface IImisModules
     {
+        IClaimModule GetClaimModule();
+
         IInsureeModule GetInsureeModule();
+
         ILoginModule GetLoginModule();
+
         ICoverageModule GetCoverageModule();
 
         /// <summary>

@@ -8,6 +8,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using OpenImis.Modules.MasterDataManagementModule;
 using OpenImis.Modules.MasterDataManagementModule.Logic;
+using OpenImis.Modules.ClaimModule;
 using OpenImis.Modules.InsureeModule;
 using OpenImis.Modules.LoginModule;
 using OpenImis.Modules.CoverageModule;
@@ -39,6 +40,7 @@ namespace OpenImis.Modules
         private IInsureeManagementModule insureeManagementModule;
         private IMasterDataManagementModule masterDataManagementModule;
 
+        private IClaimModule claimModule;
         private IInsureeModule insureeModule;
         private ILoginModule loginModule;
         private ICoverageModule coverageModule;
@@ -51,6 +53,15 @@ namespace OpenImis.Modules
 			_configuration = configuration;
 			logger = loggerFactory.CreateLogger("LoggerCategory"); 
 		}
+
+        public IClaimModule GetClaimModule()
+        {
+            if (claimModule == null)
+            {
+                claimModule = new ClaimModule.ClaimModule();
+            }
+            return claimModule;
+        }
 
         public IInsureeModule GetInsureeModule()
         {
