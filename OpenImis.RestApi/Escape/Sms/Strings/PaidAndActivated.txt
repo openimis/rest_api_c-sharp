@@ -1,0 +1,1 @@
+﻿The payment {0} performed on {1} for the control number {2} received  and the policy for the family/group {3} - {4} with the insurance product {5} - {6} activated from the date {7} until the expiry date {8}. The allocated payment for the policy is {0}.

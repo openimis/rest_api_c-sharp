@@ -9,6 +9,7 @@ using OpenImis.Modules.ClaimModule;
 using OpenImis.Modules.InsureeModule;
 using OpenImis.Modules.LoginModule;
 using OpenImis.Modules.CoverageModule;
+using OpenImis.Modules.PaymentModule;
 
 namespace OpenImis.Modules
 {
@@ -24,6 +25,8 @@ namespace OpenImis.Modules
         ILoginModule GetLoginModule();
 
         ICoverageModule GetCoverageModule();
+
+        IPaymentModule GetPaymentModule();
 
         /// <summary>
         /// Creates and returns the user management module.
