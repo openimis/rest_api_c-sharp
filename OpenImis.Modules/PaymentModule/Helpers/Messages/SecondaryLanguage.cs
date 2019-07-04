@@ -6,83 +6,102 @@ namespace OpenImis.Modules.PaymentModule.Helpers.Messages
 {
     public static class SecondaryLanguage
     {
-        public static string Success = "Imefanikiwa";
+        public static string Success = "Succès";
 
-        public static string CantAssignCN = "1-Na. ya ankara imeshindikana kutotelewa na mfumo wa malipo";
-        public static string DuplicateCN = "2-Na. ya ankara imejirudia";
+        //CtrlNumberResponse
+        public static string CantAssignCN = "1-Le numéro de contrôle ne peut pas être attribué par la passerelle de paiement externe";
+        public static string DuplicateCN = "2-Numéro de contrôle en double";
 
-        public static string WrongFormatMissingIN = "Umekosea namba ya mwanachama au namba haipo";
-        public static string INNotFount = "Namba ya mwanachama haipo";
-        public static string MemberNotHead = "Mwanachama ni mkuu wa kaya";
+        //DeleteMemberFamilyResponse
+        public static string WrongFormatMissingIN = "Mauvais format ou numéro d'assurance manquant";
+        public static string INNotFount = "Numéro d'assurance du membre non trouvé";
+        public static string MemberNotHead = "Le membre est chef de famille";
 
-        public static string WrongOrMissingHeadIN = "Umekosea namba ya mkuu wa kaya au namba haipo";
-        public static string HeadINNotFound = "Namba ya mkuu wa kaya haipo";
-        public static string WrongPVillageCode = "Umekosea namba ya kijiji";
-        public static string WrongCVillageCode = "Umekosea namba ya kijiji";
-        public static string WrongGender = "Umekosea jinsia";
-        public static string WrongConfirmationType = "Wrong confirmation type";
-        public static string WrongGroupType = "Umekosea aina ya kundi";
-        public static string WrongMaritalStatus = "Umekosea hali ya ndoa";
-        public static string WrongEducation = "Umekosea elimu";
-        public static string WrongProfession = "Umekosea elimu";
-        public static string FSPCodeNotFound = "Na. ya FSP haipo";
-        public static string WrongIdentificationType = "Umekosea aina ya kitambulisho";
+        //EditFamilyResponse
+        public static string WrongOrMissingHeadIN = "Mauvais format ou numéro d'assurance manquant";
+        public static string HeadINNotFound = "Numéro d'assurance du chef de famille non trouvé";
+        public static string WrongPVillageCode = "Mauvais code de village permanent";
+        public static string WrongCVillageCode = "Code du village actuel incorrect";
+        public static string WrongGender = "Mauvais genre";
+        public static string WrongConfirmationType = "Mauvais type de confirmation";
+        public static string WrongGroupType = "Mauvais type de groupe";
+        public static string WrongMaritalStatus = "Mauvais type d'état matrimonial";
+        public static string WrongEducation = "Mauvais type d'éducation";
+        public static string WrongProfession = "Mauvais type de profession";
+        public static string FSPCodeNotFound = "Code FSP non trouvé";
+        public static string WrongIdentificationType = "Mauvais type d'identification";
 
-        public static string WrongINMember = "Umekosea namba ya mwanachama";
-        public static string NotFountINMember = "Namba ya mwanachama haipo kwenye kompuyta kuu";
-        public static string WrongVillageCode = "Umekosea namba ya kijiji";
-        public static string WrongRelationship = "Umekosea uhusiano";
+        //EditMemberFamilyResponse
+        public static string WrongINMember = "Mauvais format du numéro d'assurance du membre";
+        public static string NotFountINMember = "Numéro d'assurance du membre non trouvé";
+        public static string WrongVillageCode = "Code du village actuel incorrect";
+        public static string WrongRelationship = "Mauvais type de relation";
 
-        public static string WrongOrMissingPC = "Umekosea namba ya bidhaa au haitumiki kwenye familia husika";
-        public static string WrongOrMissingPayDate = "Umekosea tarehe ya malipo";
-        public static string WrongContributionCat = "Umekosea kundi la malipo";
-        public static string WrongOrMissingPayType = "Umekosea aina ya malipo";
-        public static string WrongOrMissingPayer = "Umekosea mlipaji";
-        public static string MissingReceiptNumber = "Jaza namba ya risiti";
-        public static string DuplicateReceiptNumber = "Namba ya risiti imejirudia";
+        //EnterContributionResponse
+        public static string WrongOrMissingPC = "Code de produit incorrect ou manquant (non existant ou non applicable à la famille / groupe)";
+        public static string WrongOrMissingPayDate = "Date de paiement erronée ou manquante";
+        public static string WrongContributionCat = "Mauvaise catégorie de contribution";
+        public static string WrongOrMissingPayType = "Type de paiement incorrect ou manquant";
+        public static string WrongOrMissingPayer = "Mauvais payeur ou manquant";
+        public static string MissingReceiptNumber = "Numéro de reçu manquant";
+        public static string DuplicateReceiptNumber = "Numéro de reçu dupliqué";
 
-        public static string DuplicateINHead = "Namba ya mwachama imejirudia";
-        public static string WrongOrMissingPVC = "Umekosea/Jaza namba ya kijiji";
-        public static string WrongOrMissingGender = "Umekosea/Jaza Jinsia";
-        public static string WrongFrOrMissingBd = "Jaza/Umekosea tarehe";
-        public static string MissingLastName = "Jaza jina la ukoo";
-        public static string MissingOtherName = "Jaza majina mengine";
+        //EnterFamilyResponse
+        public static string DuplicateINHead = "Numéro d'assurance du chef de famille dupliqué";
+        public static string WrongOrMissingPVC = "Code de village permanent incorrect ou manquant";
+        public static string WrongOrMissingGender = "Genre incorrect ou manquant";
+        public static string WrongFrOrMissingBd = "Mauvais format ou date de naissance manquante.";
+        public static string MissingLastName = "Absence du nom de famille";
+        public static string MissingOtherName = "Absence des prénoms";
 
-        public static string DuplicatedMemberIN = "Namba ya mwanachama imejirudia";
+        //EnterMemberFamilyResponse
+        public static string DuplicatedMemberIN = "Numéro d'assurance du membre dupliqué";
 
-        public static string WrongOrMissingEnrolDate = "Jaza/Umekosea tarehe ya kujiunga";
-        public static string WrongOrMissingEOcode = "Jaza/Umekosea namba ya msimbo ya afisa mwandikishaji";
+        //EnterPolicyResponse
+        public static string WrongOrMissingEnrolDate = "Date d'inscription incorrecte ou manquante";
+        public static string WrongOrMissingEOcode = "Code du responsable d'inscription incorrect ou manquant (non existant ou non applicable à la famille / groupe)";
 
-        public static string NoMemberOfOrder = "Na ya mwanchama kwenye familia haipo";
-        public static string PayIdDoesntExist = "1-Namba ya malipo haipo";
+        //GetCoverageResponse
 
-        public static string WrongOrMissingRenDate = "Jaza/Umekosea tarehe ya kuhuisha";
+        //GetFamilyResponse
 
-        public static string WrongInternalIdFormat = "1-Wrong format of internal identifier";
-        public static string InvalidInternalId = "2-Not valid internal identifier ";
+        //GetMemberFamilyResponse
+        public static string NoMemberOfOrder = "Aucun membre du numéro de commande spécifié dans la famille / groupe";
 
-        public static string CantPostReq = "1-Maombi ya Na. ya ankara yameshindikana, jaribu tena";
+        //MatchPayResponse
+        public static string PayIdDoesntExist = "Le paymentId n'existe pas";
 
-        public static string WrongFormatInsureeNo = "1-Namba ya mwanachama imekosewa";
-        public static string InValidINmissingPC = "2-Umekosea namba ya mwanachama au namba ya bidhaa";
-        public static string InValidEOC = "3-Umekosea namba ya msimbo ya afisa mwandikishaji";
-        public static string IncompatibleEO_PC = "4-Namba ya mwanachama na namba ya bidhaa haviendani";
-        public static string NoRenewalProduct = "5-Mwanachama hajajiunga na bidhaa husika";
+        //RenewPolicyResponse
+        public static string WrongOrMissingRenDate = "Date de renouvellement incorrecte ou manquante";
 
-        public static string InsureeNoMissing = "6-Jaza namba ya mwanachama";
-        public static string InsureeNotEnrolled = "7-Insuree not enrolled while prior enrolment mandatory.";
-        public static string DuplicateCNAssigned = "8-Umepatiwa namba ya ankara iliyojirudia, jaribu tena";
-        public static string CantAssignCn2 = "9-Na. ya ankara imeshishindikana kutolewa, jaribu tena";
-        public static string UnknownPaymentType = "10-Aina ya malipo uliyochagua hayapo";
+        //RequestedCNResponse
+        public static string WrongInternalIdFormat = "Mauvais format de l'identifiant interne";
+        public static string InvalidInternalId = "Identifiant interne non valide";
 
-        public static string WrongOrMissingRecDate = "1-Umekosea tarehe ya kupokea";
-        public static string WrongFormatInputData = "2-Umekosea taarifa uliyojaza";
-        public static string WrongControlNumber = "3-Umekosea Na. ya ankara";
-        public static string WrongAmount = "4-Umekosea kiasi";
-        public static string DuplicatePayAmount = "5-Umerudia malipo";
-        public static string DoesntExistEO = "6-Namba ya msimbo ya afisa mwandikishaji haipo";
-        public static string DoesntExistPC = "7-Namba ya bidhaa haipo";
-        public static string NoPolicyForRenewal = "8-Mwanachama hajajiunga na bidhaa husika";
-        public static string UnknownTypeOfPay = "9-Aina ya malipo uliyochagua haipo";
+        //SaveAckResponse
+        public static string CantPostReq = "La demande de numéro de contrôle ne peut pas être envoyée dans le service de paiement externe";
+
+        //SaveIntentResponse
+        public static string WrongFormatInsureeNo = "1-Mauvais format du numéro d'assurance";
+        public static string InValidINmissingPC = "2-Assurance non valide ou code de produit manquant";
+        public static string InValidEOC = "3-Code du responsable d'inscription non valide";
+        public static string IncompatibleEO_PC = "4-Le code du responsable d'inscription et le code de produit d'assurance ne sont pas compatibles";
+        public static string NoRenewalProduct = "5-Le bénéficiaire n’a pas de police d’assurance spécifique pour le renouvellement";
+        public static string InsureeNoMissing = "6-Numéro d'assurance manquant";
+        public static string InsureeNotEnrolled = "7-Assuré non inscrit (inscription préalable obligatoire)";
+        public static string DuplicateCNAssigned = "8-Numéro de contrôle dupliqué attribué";
+        public static string CantAssignCn2 = "9-Le numéro de contrôle ne peut pas être attribué";
+        public static string UnknownPaymentType = "10-Type de paiement inconnu";
+
+        //SavePayResponse
+        public static string WrongOrMissingRecDate = "1-Date de réception erronée ou manquante";
+        public static string WrongFormatInputData = "2-Mauvais format des données d'entrée";
+        public static string WrongControlNumber = "3-Mauvais numéro de contrôle";
+        public static string WrongAmount = "4-Mauvais montant";
+        public static string DuplicatePayAmount = "5-Montant du paiement dupliqué";
+        public static string DoesntExistEO = "6-Le code du responsable d'inscription n'existe pas";
+        public static string DoesntExistPC = "7-Le code produit n'existe pas";
+        public static string NoPolicyForRenewal = "8-Le bénéficiaire n’a pas de police d’assurance spécifique pour le renouvellement";
+        public static string UnknownTypeOfPay = "9-Type de paiement inconnu";
     }
 }
