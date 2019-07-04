@@ -1,0 +1,1 @@
+﻿fr The payment {0} performed on {1} for the control number {2} received  but the policy for the family/group {3} - {4} with the insurance product {5} - {6} has not been activated.The allocated payment for the policy is {0} but still {8} should be paid for activation of the policy.

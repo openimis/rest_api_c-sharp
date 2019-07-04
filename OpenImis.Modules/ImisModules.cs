@@ -12,6 +12,8 @@ using OpenImis.Modules.ClaimModule;
 using OpenImis.Modules.InsureeModule;
 using OpenImis.Modules.LoginModule;
 using OpenImis.Modules.CoverageModule;
+using OpenImis.Modules.PaymentModule;
+using Microsoft.AspNetCore.Hosting;
 
 namespace OpenImis.Modules
 {
@@ -44,14 +46,17 @@ namespace OpenImis.Modules
         private IInsureeModule insureeModule;
         private ILoginModule loginModule;
         private ICoverageModule coverageModule;
+        private IPaymentModule paymentModule;
 
         private readonly IConfiguration _configuration;
-		private readonly ILogger logger;
+        public readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILogger logger;
 
-		public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory)
+		public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory, IHostingEnvironment hostingEnvironment)
         {
 			_configuration = configuration;
-			logger = loggerFactory.CreateLogger("LoggerCategory"); 
+            _hostingEnvironment = hostingEnvironment;
+            logger = loggerFactory.CreateLogger("LoggerCategory"); 
 		}
 
         public IClaimModule GetClaimModule()
@@ -88,6 +93,15 @@ namespace OpenImis.Modules
                 coverageModule = new CoverageModule.CoverageModule(_configuration);
             }
             return coverageModule;
+        }
+
+        public IPaymentModule GetPaymentModule()
+        {
+            if (paymentModule == null)
+            {
+                paymentModule = new PaymentModule.PaymentModule(_configuration, _hostingEnvironment);
+            }
+            return paymentModule;
         }
 
         /// <summary>
