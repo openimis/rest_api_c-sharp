@@ -15,7 +15,7 @@ namespace OpenImis.Modules.PaymentModule.Helpers.Messages
         //DeleteMemberFamilyResponse
         public static string WrongFormatMissingIN = "Wrong Format or Missing Insurance Number of Member";
         public static string INNotFount = "Insurance number of member not found";
-        public static string MemberNotHead = "Mamber is head of family";
+        public static string MemberNotHead = "Member is head of family";
 
         //EditFamilyResponse
         public static string WrongOrMissingHeadIN = "Wrong Format or Missing Insurance Number of head.";
@@ -91,7 +91,7 @@ namespace OpenImis.Modules.PaymentModule.Helpers.Messages
         public static string InsureeNotEnrolled = "7-Insuree not enrolled while prior enrolment mandatory.";
         public static string DuplicateCNAssigned = "8-Duplicated control number assigned";
         public static string CantAssignCn2 = "9-Control number cannot be assigned";
-        public static string UnknownPaymentType = "10-Uknown type of payment";
+        public static string UnknownPaymentType = "10-Unknown type of payment";
 
         //SavePayResponse
         public static string WrongOrMissingRecDate = "1-Wrong or missing receiving date";
@@ -102,6 +102,6 @@ namespace OpenImis.Modules.PaymentModule.Helpers.Messages
         public static string DoesntExistEO = "6-Enrolment Officer Code does not exist";
         public static string DoesntExistPC = "7-Product Code Does not Exist";
         public static string NoPolicyForRenewal = "8-Beneficiary has no policy of specified insurance product for renewal";
-        public static string UnknownTypeOfPay = "9-Uknown type of payment";
+        public static string UnknownTypeOfPay = "9-Unknown type of payment";
     }
 }
