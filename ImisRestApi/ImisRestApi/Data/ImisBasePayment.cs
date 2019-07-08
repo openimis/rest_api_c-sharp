@@ -34,6 +34,7 @@ namespace ImisRestApi.Data
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
         public decimal? OutStAmount { get; set; }
+        public bool SmsRequired { get; set; }
         public List<InsureeProduct> InsureeProducts { get; set; }
 
         protected IConfiguration Configuration;
@@ -159,6 +160,7 @@ namespace ImisRestApi.Data
                         new XElement("RequestDate",_intent.request_date),
                         new XElement("PhoneNumber", _intent.phone_number),
                         new XElement("LanguageName",_intent.language),
+                        new XElement("SmsRequired", Convert.ToInt32(_intent.SmsRequired)),
                         new XElement("AuditUserId", -1)
                     ),
                       new XElement("Details",
@@ -544,7 +546,7 @@ namespace ImisRestApi.Data
 
         public void GetPaymentInfo(string Id)
         {
-            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount,tblPayment.LanguageName,tblPayment.TypeOfPayment, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
+            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount,tblPayment.LanguageName,tblPayment.TypeOfPayment,tblPayment.SmsRequired, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
                         tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
                         tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus, tblPolicy.PolicyValue - ISNULL(mp.PrPaid,0) Outstanding
                         FROM tblControlNumber 
@@ -579,6 +581,7 @@ namespace ImisRestApi.Data
                     PaymentId = Id;
                     ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]):null;
                     ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]):0;
+                    SmsRequired = row1["SmsRequired"] != System.DBNull.Value ? Convert.ToBoolean(row1["SmsRequired"]) : false;
 
                     var language = row1["LanguageName"] != System.DBNull.Value ? Convert.ToString(row1["LanguageName"]) : "en";
                     var languages = LocalDefault.PrimaryLangReprisantations(Configuration);

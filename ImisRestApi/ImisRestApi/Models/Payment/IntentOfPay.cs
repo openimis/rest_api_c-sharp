@@ -24,5 +24,6 @@ namespace ImisRestApi.Models
         public string language { get; set; }
         [Range(0, 2,ErrorMessage = "10-Uknown type of payment")]
         public TypeOfPayment? type_of_payment { get; set; }
+        public bool SmsRequired { get; set; }
     }
 }

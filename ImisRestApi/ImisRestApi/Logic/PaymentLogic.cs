@@ -60,7 +60,7 @@ namespace ImisRestApi.Logic
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
                     return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
-                    if (payment.PaymentId != null)
+                    if (payment.PaymentId != null && intent.SmsRequired)
                     {
                         if (!return_message.ErrorOccured && !controlNumberExists)
                         {
@@ -200,7 +200,7 @@ namespace ImisRestApi.Logic
                 response.MessageValue = model.error_message;
             }
 
-            if (payment.PaymentId != null)
+            if (payment.PaymentId != null && payment.SmsRequired)
             {
                 var ackResponse = payment.GetReqControlNumberAck(payment.PaymentId);
 
