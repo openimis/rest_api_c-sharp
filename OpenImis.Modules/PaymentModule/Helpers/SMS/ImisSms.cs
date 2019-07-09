@@ -9,7 +9,7 @@ namespace OpenImis.Modules.PaymentModule.Helpers.SMS
 {
     public class ImisSms : ImisBaseSms
     {
-        public ImisSms(IConfiguration config, IHostingEnvironment env, Language language = Language.Primary) : base(config, env, language)
+        public ImisSms(IConfiguration config, string webRootPath, string contentRootPath, Language language = Language.Primary) : base(config, webRootPath, contentRootPath, language)
         {
 
         }

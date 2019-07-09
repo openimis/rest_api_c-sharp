@@ -10,20 +10,18 @@ namespace OpenImis.Modules.PaymentModule
     public class PaymentModule : IPaymentModule
     {
         private IConfiguration Configuration;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private IPaymentLogic _paymentLogic;
 
-        public PaymentModule(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PaymentModule(IConfiguration configuration)
         {
             Configuration = configuration;
-            _hostingEnvironment = hostingEnvironment;
         }
 
         public IPaymentLogic GetPaymentLogic()
         {
             if (_paymentLogic == null)
             {
-                _paymentLogic = new PaymentLogic(Configuration, _hostingEnvironment);
+                _paymentLogic = new PaymentLogic(Configuration);
             }
             return _paymentLogic;
         }

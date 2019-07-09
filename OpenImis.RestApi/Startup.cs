@@ -32,13 +32,13 @@ namespace OpenImis.RestApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-			// Add the DbContext 
-			//services.AddDbContext<IMISContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IMISDatabase")));
+            // Add the DbContext 
+            //services.AddDbContext<IMISContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IMISDatabase")));
 
-			services.AddSingleton<IImisModules, ImisModules>();
+            services.AddSingleton<IImisModules, ImisModules>();
 
-			// Add the authentication scheme with the custom validator
-			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            // Add the authentication scheme with the custom validator
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -55,35 +55,39 @@ namespace OpenImis.RestApi
                     options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(services.BuildServiceProvider().GetService<IImisModules>()));
                 });
 
-			services.AddAuthorization();
-			//(options =>
-			//{
-			//	options.AddPolicy("MedicalOfficer", policy => policy.Requirements.Add(new HasAuthorityRequirement("MedicalOfficer", Configuration["JwtIssuer"])));
-			//	options.AddPolicy("EnrollmentOfficer", policy => policy.Requirements.Add(new HasAuthorityRequirement("EnrollmentOfficer", Configuration["JwtIssuer"])));
-			//});
+            services.AddAuthorization();
+            //(options =>
+            //{
+            //	options.AddPolicy("MedicalOfficer", policy => policy.Requirements.Add(new HasAuthorityRequirement("MedicalOfficer", Configuration["JwtIssuer"])));
+            //	options.AddPolicy("EnrollmentOfficer", policy => policy.Requirements.Add(new HasAuthorityRequirement("EnrollmentOfficer", Configuration["JwtIssuer"])));
+            //});
 
-			// register the scope authorization handler
-			services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
-			services.AddSingleton<IAuthorizationHandler, HasAuthorityHandler>();
+            // register the scope authorization handler
+            services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+            services.AddSingleton<IAuthorizationHandler, HasAuthorityHandler>();
 
-			services.AddMvc()
-				.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc(options =>
+            {
+                options.AllowCombiningAuthorizeFilters = false;
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-			services.AddApiVersioning(o => {
-				o.ReportApiVersions = true;
-				o.AssumeDefaultVersionWhenUnspecified = true;
-				o.DefaultApiVersion = new ApiVersion(1, 0);
-				o.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader(), new HeaderApiVersionReader("api-version"));
-			});
+            services.AddApiVersioning(o =>
+            {
+                o.ReportApiVersions = true;
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader(), new HeaderApiVersionReader("api-version"));
+            });
 
-			
+
             services.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
 
-			services.AddCors(options =>
-			{
-				options.AddPolicy("AllowSpecificOrigin",
-					builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowCredentials().AllowAnyHeader());
-			});
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+            });
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -96,9 +100,9 @@ namespace OpenImis.RestApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-				loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-				loggerFactory.AddDebug();
-			}
+                loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+                loggerFactory.AddDebug();
+            }
             if (!env.EnvironmentName.Equals("Test"))
             {
                 app.UseStaticFiles();
@@ -106,12 +110,12 @@ namespace OpenImis.RestApi
                 app.UseSwaggerUI(SwaggerHelper.ConfigureSwaggerUI);
             }
 
-            app.UseAuthentication(); 
+            app.UseAuthentication();
             app.UseMvc();
 
-			app.UseCors("AllowSpecificOrigin");
+            app.UseCors("AllowSpecificOrigin");
 
-            
+
             // ===== Create tables ======
             //imisContext.Database.EnsureCreated();
         }

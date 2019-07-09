@@ -9,11 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.ClaimModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
-    //[ApiVersion("1")]
-    //[Authorize(Roles = "IMISAdmin, EnrollmentOfficer")]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
@@ -25,6 +24,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
+        [HasRights(Rights.DiagnosesDownload)]
         [HttpPost]
         [Route("GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
@@ -48,7 +48,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
-        //[Authorize(Roles = "ClaimAdd")]
+        [HasRights(Rights.ClaimAdd)]
         [HttpPost]
         [Route("GetPaymentLists")]
         [ProducesResponseType(typeof(void), 200)]
@@ -72,6 +72,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
+        [HasRights(Rights.FindClaimAdministrator)]
         [HttpGet]
         [Route("Claims/GetClaimAdmins")]
         public IActionResult ValidateClaimAdmin()
@@ -87,6 +88,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
+        [HasRights(Rights.ClaimSearch)]
         [HttpGet]
         [Route("Claims/Controls")]
         public IActionResult GetControls()

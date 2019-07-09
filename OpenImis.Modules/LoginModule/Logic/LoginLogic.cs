@@ -23,6 +23,11 @@ namespace OpenImis.Modules.LoginModule.Logic
             loginRepository = new LoginRepository(Configuration);
         }
 
+        public UserData GetById(int userId)
+        {
+            return loginRepository.GetById(userId);
+        }
+
         public UserData FindUser(string UserName, string Password)
         {
             var users = loginRepository.FindUserByName(UserName);

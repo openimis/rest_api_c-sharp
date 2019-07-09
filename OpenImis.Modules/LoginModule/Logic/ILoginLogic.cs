@@ -7,6 +7,7 @@ namespace OpenImis.Modules.LoginModule.Logic
 {
     public interface ILoginLogic
     {
+        UserData GetById(int userId);
         UserData FindUser(string UserName, string Password);
     }
 }

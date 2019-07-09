@@ -15,16 +15,16 @@ namespace OpenImis.Modules.PaymentModule.Helpers.SMS
     public class ImisBaseSms
     {
         private string SmsTampletes = string.Empty;
-        private IHostingEnvironment env;
+        private string webRootPath;
 
-        public ImisBaseSms(IConfiguration config, IHostingEnvironment environment, Language language = Language.Primary)
+        public ImisBaseSms(IConfiguration config, string webRootPath, string contentRootPath, Language language = Language.Primary)
         {
-            env = environment;
+            this.webRootPath = webRootPath;
 
             if (language == Language.Primary)
-                SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\Strings\";
+                SmsTampletes = contentRootPath + @"\Escape\Sms\Strings\";
             else
-                SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\StringsSecondaryLanguage\";
+                SmsTampletes = contentRootPath + @"\Escape\Sms\StringsSecondaryLanguage\";
         }
 
         public virtual async Task<string> SendSMS(List<SmsContainer> containers, string filename)
@@ -58,7 +58,7 @@ namespace OpenImis.Modules.PaymentModule.Helpers.SMS
         public virtual void SaveMessage(string message, string name)
         {
             //string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string mydocpath = System.IO.Path.Combine(env.WebRootPath, "SentMessages");
+            string mydocpath = System.IO.Path.Combine(webRootPath, "SentMessages");
             string namepart = new Random().Next(100000, 999999).ToString();
 
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, name + namepart + ".json")))

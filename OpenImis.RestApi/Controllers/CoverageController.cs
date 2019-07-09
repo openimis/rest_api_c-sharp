@@ -4,14 +4,17 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.CoverageModule.Helpers;
 using OpenImis.Modules.CoverageModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
+    [Authorize]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
@@ -23,6 +26,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
+        [HasRights(Rights.InsureeSearch)]
         [HttpGet]
         [Route("Coverage/Get_Coverage")]
         public virtual IActionResult Get(string InsureeNumber)
