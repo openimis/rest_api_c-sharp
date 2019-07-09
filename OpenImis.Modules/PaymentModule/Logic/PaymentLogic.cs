@@ -18,20 +18,21 @@ namespace OpenImis.Modules.PaymentModule.Logic
     public class PaymentLogic : IPaymentLogic
     {
         private IConfiguration Configuration;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
         protected IPaymentRepository paymentRepository;
 
-        public PaymentLogic(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public string WebRootPath { get; set; }
+        public string ContentRootPath { get; set; }
+
+        public PaymentLogic(IConfiguration configuration)
         {
             Configuration = configuration;
-            _hostingEnvironment = hostingEnvironment;
-            paymentRepository = new PaymentRepository(Configuration, _hostingEnvironment);
+            paymentRepository = new PaymentRepository(Configuration);
         }
 
         public async Task<DataMessage> SaveIntent(IntentOfPay intent, int? errorNumber = 0, string errorMessage = null)
         {
-            IPaymentRepository payment = new PaymentRepository(Configuration, _hostingEnvironment);
+            IPaymentRepository payment = new PaymentRepository(Configuration);
             var intentResponse = payment.SaveIntent(intent, errorNumber, errorMessage);
 
             DataMessage return_message = new DataMessage();
@@ -98,7 +99,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
 
         public async Task<DataMessage> MatchPayment(MatchModel model)
         {
-            PaymentRepository payment = new PaymentRepository(Configuration, _hostingEnvironment);
+            PaymentRepository payment = new PaymentRepository(Configuration);
             var response = payment.MatchPayment(model);
 
             List<MatchSms> PaymentIds = new List<MatchSms>();
@@ -113,7 +114,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
 
         public DataMessage SaveAcknowledgement(Acknowledgement model)
         {
-            PaymentRepository payment = new PaymentRepository(Configuration, _hostingEnvironment) { PaymentId = model.internal_identifier };
+            PaymentRepository payment = new PaymentRepository(Configuration) { PaymentId = model.internal_identifier };
             var response = payment.SaveControlNumberAkn(model.error_occured, model.error_message);
 
             return response;
@@ -122,7 +123,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
         public async Task<DataMessage> SavePayment(PaymentData model)
         {
 
-            PaymentRepository payment = new PaymentRepository(Configuration, _hostingEnvironment);
+            PaymentRepository payment = new PaymentRepository(Configuration);
             //var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
 
             if (model.control_number != null)
@@ -190,7 +191,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
         public DataMessage SaveControlNumber(ControlNumberResp model)
         {
 
-            PaymentRepository payment = new PaymentRepository(Configuration, _hostingEnvironment);
+            PaymentRepository payment = new PaymentRepository(Configuration);
             var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
             var response = payment.SaveControlNumber(model, controlNumberExists);
 
@@ -214,7 +215,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
         public async void ControlNumberAssignedSms(IPaymentRepository payment)
         {
             //Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(Configuration, _hostingEnvironment, payment.Language);
+            ImisSms sms = new ImisSms(Configuration, WebRootPath, ContentRootPath, payment.Language);
             var txtmsgTemplate = string.Empty;
             string othersCount = string.Empty;
 
@@ -257,7 +258,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
 
         public async Task<DataMessage> GetControlNumbers(PaymentRequest requests)
         {
-            PaymentRepository payment = new PaymentRepository(Configuration, _hostingEnvironment);
+            PaymentRepository payment = new PaymentRepository(Configuration);
             var PaymentIds = requests.requests.Select(x => x.internal_identifier).ToArray();
 
             var PaymentIds_string = string.Join(",", PaymentIds);
@@ -270,7 +271,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
         public async void ControlNumberNotassignedSms(IPaymentRepository payment, string error)
         {
             //Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(Configuration, _hostingEnvironment, payment.Language);
+            ImisSms sms = new ImisSms(Configuration, WebRootPath, ContentRootPath, payment.Language);
             var txtmsgTemplate = string.Empty;
             string othersCount = string.Empty;
 
@@ -304,7 +305,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
         public async void SendPaymentSms(PaymentRepository payment)
         {
             // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(Configuration, _hostingEnvironment, payment.Language);
+            ImisSms sms = new ImisSms(Configuration, WebRootPath, ContentRootPath, payment.Language);
             List<SmsContainer> message = new List<SmsContainer>();
             var familyproduct = payment.InsureeProducts.FirstOrDefault();
 
@@ -360,7 +361,7 @@ namespace OpenImis.Modules.PaymentModule.Logic
         public async void SendMatchSms(PaymentRepository payment)
         {
             // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-            ImisSms sms = new ImisSms(Configuration, _hostingEnvironment, payment.Language);
+            ImisSms sms = new ImisSms(Configuration, WebRootPath, ContentRootPath, payment.Language);
             List<SmsContainer> message = new List<SmsContainer>();
 
             var txtmsgTemplate = string.Empty;
@@ -408,11 +409,11 @@ namespace OpenImis.Modules.PaymentModule.Logic
                     var txtmsgTemplate = string.Empty;
                     string othersCount = string.Empty;
 
-                    PaymentRepository _pay = new PaymentRepository(Configuration, _hostingEnvironment);
+                    PaymentRepository _pay = new PaymentRepository(Configuration);
                     _pay.GetPaymentInfo(m.PaymentId.ToString());
 
                     //Language lang = _pay.Language.ToLower() == "en" || _pay.Language.ToLower() == "english" || _pay.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
-                    ImisSms sms = new ImisSms(Configuration, _hostingEnvironment, _pay.Language);
+                    ImisSms sms = new ImisSms(Configuration, WebRootPath, ContentRootPath, _pay.Language);
 
                     if (_pay.PaymentId != null)
                     {

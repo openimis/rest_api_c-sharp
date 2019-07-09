@@ -9,6 +9,9 @@ namespace OpenImis.Modules.PaymentModule.Logic
 {
     public interface IPaymentLogic
     {
+        string WebRootPath { get; set; }
+        string ContentRootPath { get; set; }
+
         Task<DataMessage> SaveIntent(IntentOfPay intent, int? errorNumber = 0, string errorMessage = null);
         Task<DataMessage> MatchPayment(MatchModel model);
         DataMessage SaveAcknowledgement(Acknowledgement model);

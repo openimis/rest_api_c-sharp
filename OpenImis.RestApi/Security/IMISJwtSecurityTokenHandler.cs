@@ -8,6 +8,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using OpenImis.Modules.UserModule.Entities;
+using OpenImis.Modules.LoginModule.Models;
+using System.Diagnostics;
 
 namespace OpenImis.RestApi.Security
 {
@@ -65,13 +67,9 @@ namespace OpenImis.RestApi.Security
 
             var handler = new JwtSecurityTokenHandler();
             var tokenS = handler.ReadToken(securityToken) as JwtSecurityToken;
-            var username = tokenS.Claims.First(claim => claim.Type == ClaimTypes.Name).Value;
+            int userId = Convert.ToInt32(tokenS.Claims.Where(w => w.Type == "UserId").Select(x => x.Value).FirstOrDefault());
 
-            //var serviceCollection = new ServiceCollection();
-
-            //IUserSQL userRepository = _imisRepository.getUserRepository();
-
-            User user = _imisModules.GetUserModule().GetUserController().GetByUsername(username);
+            UserData user = _imisModules.GetLoginModule().GetLoginLogic().GetById(userId);
 
             if (user != null)
             {

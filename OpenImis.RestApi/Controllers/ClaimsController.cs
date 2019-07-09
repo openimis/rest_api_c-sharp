@@ -9,11 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.ClaimModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
-    //[ApiVersion("1")]
-    //[Authorize(Roles = "IMISAdmin, EnrollmentOfficer")]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
@@ -48,7 +47,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
-        //[Authorize(Roles = "ClaimAdd")]
+        [HasRights(Rights.ClaimAdd)]
         [HttpPost]
         [Route("GetPaymentLists")]
         [ProducesResponseType(typeof(void), 200)]

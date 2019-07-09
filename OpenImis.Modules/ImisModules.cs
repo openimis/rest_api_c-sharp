@@ -49,13 +49,11 @@ namespace OpenImis.Modules
         private IPaymentModule paymentModule;
 
         private readonly IConfiguration _configuration;
-        public readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger logger;
 
-		public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory, IHostingEnvironment hostingEnvironment)
+		public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
 			_configuration = configuration;
-            _hostingEnvironment = hostingEnvironment;
             logger = loggerFactory.CreateLogger("LoggerCategory"); 
 		}
 
@@ -99,7 +97,7 @@ namespace OpenImis.Modules
         {
             if (paymentModule == null)
             {
-                paymentModule = new PaymentModule.PaymentModule(_configuration, _hostingEnvironment);
+                paymentModule = new PaymentModule.PaymentModule(_configuration);
             }
             return paymentModule;
         }

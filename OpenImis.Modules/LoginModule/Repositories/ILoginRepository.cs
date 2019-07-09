@@ -8,6 +8,7 @@ namespace OpenImis.Modules.LoginModule.Repositories
 {
     public interface ILoginRepository
     {
+        UserData GetById(int userId);
         List<UserData> FindUserByName(string UserName);
         List<string> GetUserRights(string userId);
     }

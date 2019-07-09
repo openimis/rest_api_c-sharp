@@ -20,6 +20,24 @@ namespace OpenImis.Modules.LoginModule.Repositories
             Configuration = configuration;
         }
 
+        public UserData GetById(int userId)
+        {
+            UserData user;
+            using (var imisContext = new ImisDB())
+            {
+                user = imisContext.TblUsers.Where(u => u.UserId == userId).Select(x => new UserData()
+                {
+                    UserID = x.UserId.ToString(),
+                    LoginName = x.LoginName,
+                    PrivateKey = x.PrivateKey,
+                    StoredPassword = x.StoredPassword
+                })
+                .FirstOrDefault();
+            }
+
+            return user;
+        }
+
         public List<UserData> FindUserByName(string UserName)
         {
             List<UserData> response = new List<UserData>();

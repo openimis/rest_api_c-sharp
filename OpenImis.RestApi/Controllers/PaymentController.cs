@@ -11,6 +11,8 @@ using OpenImis.Modules;
 using OpenImis.Modules.PaymentModule.Helpers.Extensions;
 using OpenImis.Modules.PaymentModule.Models;
 using OpenImis.Modules.PaymentModule.Models.Response;
+using OpenImis.RestApi.Security;
+using Rights = OpenImis.RestApi.Security.Rights;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -28,9 +30,12 @@ namespace OpenImis.RestApi.Controllers
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
             _imisModules = imisModules;
+
+            _imisModules.GetPaymentModule().GetPaymentLogic().WebRootPath = _hostingEnvironment.WebRootPath;
+            _imisModules.GetPaymentModule().GetPaymentLogic().ContentRootPath = _hostingEnvironment.ContentRootPath;
         }
 
-        //[Authorize(Roles = "PaymentAdd")]
+        [HasRights(Rights.PaymentAdd)]
         [HttpPost]
         [Route("MatchPayment")]
         public virtual IActionResult MatchPayment([FromBody]MatchModel model)
@@ -50,7 +55,7 @@ namespace OpenImis.RestApi.Controllers
         }
 
         //Recieve Payment from Operator/
-        //[Authorize(Roles = "PaymentAdd")]
+        [HasRights(Rights.PaymentAdd)]
         [HttpPost]
         [Route("GetControlNumber")]
         //[ProducesResponseType(typeof(GetControlNumberResp), 200)]
@@ -89,7 +94,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
-        //[Authorize(Roles = "PaymentAdd")]
+        [HasRights(Rights.PaymentAdd)]
         [HttpPost]
         [Route("PostReqControlNumberAck")]
         [ProducesResponseType(typeof(void), 200)]
@@ -122,7 +127,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
-        //[Authorize(Roles = "PaymentAdd")]
+        [HasRights(Rights.PaymentAdd)]
         [HttpPost]
         [Route("GetReqControlNumber")]
         [ProducesResponseType(typeof(void), 200)]
@@ -156,7 +161,7 @@ namespace OpenImis.RestApi.Controllers
 
         }
 
-        //[Authorize(Roles = "PaymentAdd")]
+        [HasRights(Rights.PaymentAdd)]
         [HttpPost]
         [Route("GetPaymentData")]
         [ProducesResponseType(typeof(void), 200)]
@@ -191,7 +196,7 @@ namespace OpenImis.RestApi.Controllers
 
         }
 
-        //[Authorize(Roles = "PaymentSearch")]
+        [HasRights(Rights.PaymentSearch)]
         [HttpPost]
         [Route("GetAssignedControlNumbers")]
         [ProducesResponseType(typeof(AsignedControlNumbersResponse), 200)]

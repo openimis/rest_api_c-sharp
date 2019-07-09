@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
@@ -7,6 +9,7 @@ using OpenImis.Modules.InsureeModule.Models;
 
 namespace OpenImis.RestApi.Controllers
 {
+    [Authorize]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
@@ -28,11 +31,11 @@ namespace OpenImis.RestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            //var identity = HttpContext.User.Identity as ClaimsIdentity;
-            //_imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(Convert.ToInt32(identity.FindFirst("UserId").Value));
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
 
-            // Temporary
-            var userId = 1;
             _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
 
             var response = _imisModules.GetInsureeModule().GetPolicyLogic().Enter(model);
@@ -50,21 +53,19 @@ namespace OpenImis.RestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            //var identity = HttpContext.User.Identity as ClaimsIdentity;
-            //var iden = identity.FindFirst("UserId");
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
 
-            //try
-            //{
-            //    policies.UserId = Convert.ToInt32(iden.Value);
-            //}
-            //catch (Exception e)
-            //{
-            //    policies.UserId = -1;
-            //}
-
-            // Temporary
-            var userId = 1;
-            _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+            try
+            {
+                _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+            }
+            catch (Exception)
+            {
+                _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(-1);
+            }
 
             var response = _imisModules.GetInsureeModule().GetPolicyLogic().Renew(model);
 
@@ -81,21 +82,19 @@ namespace OpenImis.RestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            //var identity = HttpContext.User.Identity as ClaimsIdentity;
-            //var iden = identity.FindFirst("UserId");
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
 
-            //try
-            //{
-            //    policies.UserId = Convert.ToInt32(iden.Value);
-            //}
-            //catch (Exception e)
-            //{
-            //    policies.UserId = -1;
-            //}
-
-            // Temporary
-            var userId = 1;
-            _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+            try
+            {
+                _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+            }
+            catch (Exception)
+            {
+                _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(-1);
+            }
 
             var response = _imisModules.GetInsureeModule().GetPolicyLogic().GetCommissions(model);
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.Modules.PaymentModule.Helpers;
@@ -19,7 +18,6 @@ namespace OpenImis.Modules.PaymentModule.Repositories
     public class PaymentRepository : IPaymentRepository
     {
         private IConfiguration Configuration;
-        private readonly IHostingEnvironment _hostingEnvironment;
         protected DataHelper dh;
 
         public string PaymentId { get; set; }
@@ -35,10 +33,9 @@ namespace OpenImis.Modules.PaymentModule.Repositories
         public List<InsureeProduct> InsureeProducts { get; set; }
 
 
-        public PaymentRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PaymentRepository(IConfiguration configuration)
         {
             Configuration = configuration;
-            _hostingEnvironment = hostingEnvironment;
             dh = new DataHelper(configuration);
         }
 
