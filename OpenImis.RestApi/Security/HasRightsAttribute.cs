@@ -39,7 +39,7 @@ namespace OpenImis.RestApi.Security
                           ).ToHashSet();
             }
 
-            bool isAuthorized = rights.Any(x => userRights.Contains((Rights)Enum.ToObject(typeof(Rights), x)));
+            bool isAuthorized = userRights.Select(s => (int)s).All(x => rights.Contains(x));
 
             if (!isAuthorized)
             {
