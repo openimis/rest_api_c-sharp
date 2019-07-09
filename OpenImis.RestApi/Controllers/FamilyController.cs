@@ -14,6 +14,7 @@ using Newtonsoft.Json.Serialization;
 using OpenImis.Modules;
 using OpenImis.Modules.InsureeModule.Helpers;
 using OpenImis.Modules.InsureeModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -29,6 +30,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
+        [HasRights(Rights.FamilySearch)]
         [HttpGet]
         [Route("Families/Get_Family")]
         public IActionResult Get(string insureeNumber)
@@ -62,6 +64,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.FamilySearch)]
         [HttpGet]
         [Route("Families/Get_Member_Family")]
         public IActionResult Get_Member_Family(string insureeNumber, int order)
@@ -98,6 +101,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response, serializerSettings);
         }
 
+        [HasRights(Rights.FamilyAdd)]
         [HttpPost]
         [Route("Families/Enter_Family")]
         public IActionResult Enter_Family([FromBody]FamilyModelv3 model)
@@ -108,11 +112,11 @@ namespace OpenImis.RestApi.Controllers
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            //var identity = HttpContext.User.Identity as ClaimsIdentity;
-            //_imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(Convert.ToInt32(identity.FindFirst("UserId").Value));
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
 
-            // Temporary
-            var userId = 1;
             _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
 
             var response = _imisModules.GetInsureeModule().GetFamilyLogic().AddNew(model);
@@ -120,6 +124,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.FamilyEdit)]
         [HttpPost]
         [Route("Families/Edit_Family")]
         public IActionResult Edit_Family([FromBody]EditFamily model)
@@ -142,6 +147,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.FamilyAdd)]
         [HttpPost]
         [Route("Families/Enter_Member_Family")]
         public IActionResult Enter_Member_Family([FromBody]FamilyMember model)
@@ -164,6 +170,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.FamilyEdit)]
         [HttpPost]
         [Route("Families/Edit_Member_Family")]
         public IActionResult Edit_Member_Family([FromBody]EditFamilyMember model)
@@ -186,6 +193,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.FamilyDelete)]
         [HttpPost]
         [Route("Families/Delete_Member_Family")]
         public IActionResult Delete_Member_Family([FromBody]string insureeNumber)

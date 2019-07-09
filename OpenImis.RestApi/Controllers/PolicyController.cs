@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.InsureeModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -21,6 +22,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
+        [HasRights(Rights.PolicyAdd)]
         [HttpPost]
         [Route("Policies/Enter_Policy")]
         public virtual IActionResult Enter_Policy([FromBody]Policy model)
@@ -43,6 +45,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.PolicyRenew)]
         [HttpPost]
         [Route("Policies/Renew_Policy")]
         public virtual IActionResult Renew_Policy([FromBody]Policy model)
@@ -72,6 +75,7 @@ namespace OpenImis.RestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.PolicySearch)]
         [HttpPost]
         [Route("Policies/Get_Commissions")]
         public virtual IActionResult Get_Commissions([FromBody]GetCommissionInputs model)

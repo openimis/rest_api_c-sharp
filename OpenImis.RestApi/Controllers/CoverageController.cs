@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.CoverageModule.Helpers;
 using OpenImis.Modules.CoverageModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -25,6 +26,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
+        [HasRights(Rights.InsureeSearch)]
         [HttpGet]
         [Route("Coverage/Get_Coverage")]
         public virtual IActionResult Get(string InsureeNumber)

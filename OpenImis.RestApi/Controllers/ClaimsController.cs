@@ -24,6 +24,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
+        [HasRights(Rights.DiagnosesDownload)]
         [HttpPost]
         [Route("GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
@@ -71,6 +72,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
+        [HasRights(Rights.FindClaimAdministrator)]
         [HttpGet]
         [Route("Claims/GetClaimAdmins")]
         public IActionResult ValidateClaimAdmin()
@@ -86,6 +88,7 @@ namespace OpenImis.RestApi.Controllers
             }
         }
 
+        [HasRights(Rights.ClaimSearch)]
         [HttpGet]
         [Route("Claims/Controls")]
         public IActionResult GetControls()

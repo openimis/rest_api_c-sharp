@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.InsureeModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -24,6 +25,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
+        [HasRights(Rights.ContributionAdd)]
         [HttpPost]
         [Route("Contributions/Enter_Contribution")]
         public virtual IActionResult Enter_Contribution([FromBody]Contribution model)
