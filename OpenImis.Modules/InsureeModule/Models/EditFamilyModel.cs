@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenImis.Modules.Helpers.Validators;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -9,11 +10,11 @@ namespace OpenImis.Modules.InsureeModule.Models
     {
         public string VillageCode { get; set; }
         [Required(ErrorMessage = "1:Wrong format or missing insurance number of head")]
-        //[InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number of head")]
+        [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number of head")]
         public string HeadOfFamilyId { get; set; }
         public string OtherName { get; set; }
         public string LastName { get; set; }
-        //[ValidDate(ErrorMessage = "6:Wrong format or missing birth date")]
+        [ValidDate(ErrorMessage = "6:Wrong format or missing birth date")]
         public string BirthDate { get; set; }
         public string Gender { get; set; }
         public bool PovertyStatus { get; set; }

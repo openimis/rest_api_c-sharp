@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenImis.Modules.Helpers.Validators;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -9,13 +10,13 @@ namespace OpenImis.Modules.PaymentModule.Models
     {
         [Required(ErrorMessage = "9: Phone number not provided")]
         public virtual string phone_number { get; set; }
-        //[ValidDate(ErrorMessage = "10: Request Date not valid")]
+        [ValidDate(ErrorMessage = "10: Request Date not valid")]
         [DataType(DataType.DateTime)]
         public string request_date { get; set; }
-        //[OfficerCode]
+        [OfficerCode]
         public string enrolment_officer_code { get; set; }
         public virtual List<PaymentDetail> policies { get; set; }
-        //[RequiredIfEo("amunt to be paid")]
+        [RequiredIfEo("amunt to be paid")]
         public decimal amount_to_be_paid { get; set; }
         public string language { get; set; }
         [Range(0, 2, ErrorMessage = "10-Uknown type of payment")]
