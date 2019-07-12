@@ -29,7 +29,9 @@ namespace OpenImis.RestApi.Docs
             swaggerGenOptions.OperationFilter<FormatXmlCommentProperties>();
 			swaggerGenOptions.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
 			swaggerGenOptions.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
-		}
+
+            swaggerGenOptions.OperationFilter<AddRequiredHeaderParameter>();
+        }
 
         private static void AddSwaggerDocPerVersion(SwaggerGenOptions swaggerGenOptions, Assembly webApiAssembly)
         {

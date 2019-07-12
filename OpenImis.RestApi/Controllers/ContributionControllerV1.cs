@@ -13,14 +13,15 @@ using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
+    [ApiVersion("1")]
     [Authorize]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    public class ContributionController : Controller
+    public class ContributionControllerV1 : Controller
     {
         private readonly IImisModules _imisModules;
-        public ContributionController(IImisModules imisModules)
+        public ContributionControllerV1(IImisModules imisModules)
         {
             _imisModules = imisModules;
         }

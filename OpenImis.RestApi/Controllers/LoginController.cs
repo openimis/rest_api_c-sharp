@@ -16,6 +16,7 @@ using OpenImis.Modules.LoginModule.Models;
 
 namespace OpenImis.RestApi.Controllers
 {
+    [ApiVersionNeutral]
     [Authorize]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
