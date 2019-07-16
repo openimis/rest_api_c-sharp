@@ -33,8 +33,8 @@ namespace OpenImis.RestApi.Security
             using (var imisContext = new ImisDB())
             {
                 rights = (from UR in imisContext.TblUserRole
-                          join RR in imisContext.TblRoleRight on UR.RoleID equals RR.RoleID
-                          where UR.UserID == userId
+                          join RR in imisContext.TblRoleRight.Where(x => x.ValidityTo == null) on UR.RoleID equals RR.RoleID
+                          where (UR.UserID == userId && UR.ValidityTo == null)
                           select RR.RightID
                           ).ToHashSet();
             }

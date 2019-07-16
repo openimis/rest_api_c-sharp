@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OpenImis.Modules;
+using OpenImis.Modules.Helpers.Validators;
 using OpenImis.Modules.InsureeModule.Helpers;
 using OpenImis.Modules.InsureeModule.Models;
 using OpenImis.RestApi.Security;
@@ -198,10 +199,10 @@ namespace OpenImis.RestApi.Controllers
         [Route("Families/Delete_Member_Family")]
         public IActionResult Delete_Member_Family([FromBody]string insureeNumber)
         {
-            //if (new ValidationBase().InsureeNumber(insureeNumber) != ValidationResult.Success)
-            //{
-            //    return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
-            //}
+            if (new Validation().InsureeNumber(insureeNumber) != ValidationResult.Success)
+            {
+                return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
+            }
 
             int userId = Convert.ToInt32(HttpContext.User.Claims
                 .Where(w => w.Type == "UserId")

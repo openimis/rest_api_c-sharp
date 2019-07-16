@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenImis.Modules.Helpers.Validators;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -7,7 +8,7 @@ namespace OpenImis.Modules.PaymentModule.Models
 {
     public class PaymentDetail
     {
-        //[InsureeNumber]
+        [InsureeNumber]
         public string insurance_number { get; set; }
         [Required(ErrorMessage = "2:Not valid insurance or missing product code")]
         public string insurance_product_code { get; set; }

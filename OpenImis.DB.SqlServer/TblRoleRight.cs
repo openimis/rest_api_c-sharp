@@ -13,5 +13,7 @@ namespace OpenImis.DB.SqlServer
         public int RoleRightID { get; set; }
         public int RoleID { get; set; }
         public int RightID { get; set; }
+        public DateTime ValidityFrom { get; set; }
+        public DateTime? ValidityTo { get; set; }
     }
 }
