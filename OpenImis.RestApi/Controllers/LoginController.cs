@@ -47,11 +47,6 @@ namespace OpenImis.RestApi.Controllers
                     new Claim("UserId", user.UserID)
                 };
 
-                foreach (var right in user.Rights)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, right));
-                }
-
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.PrivateKey));
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

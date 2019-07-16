@@ -40,8 +40,6 @@ namespace OpenImis.Modules.LoginModule.Logic
 
                 if (validUser)
                 {
-                    List<string> userRights = loginRepository.GetUserRights(user.UserID);
-                    user.Rights = userRights;
                     return user;
                 }
                 else

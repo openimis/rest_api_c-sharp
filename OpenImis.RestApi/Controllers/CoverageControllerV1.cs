@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenImis.Modules;
 using OpenImis.Modules.CoverageModule.Helpers;
 using OpenImis.Modules.CoverageModule.Models;
+using OpenImis.Modules.Helpers.Validators;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
@@ -32,16 +34,10 @@ namespace OpenImis.RestApi.Controllers
         [Route("Coverage/Get_Coverage")]
         public virtual IActionResult Get(string InsureeNumber)
         {
-            // Temporary HTTP 400
-            if (!ModelState.IsValid)
+            if (new Validation().InsureeNumber(InsureeNumber) != ValidationResult.Success)
             {
                 return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
             }
-
-            //if (new ValidationBase().InsureeNumber(InsureeNumber) != ValidationResult.Success)
-            //{
-            //    return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
-            //}
 
             DataMessage response;
             try

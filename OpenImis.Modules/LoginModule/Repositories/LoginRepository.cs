@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -64,46 +65,6 @@ namespace OpenImis.Modules.LoginModule.Repositories
             {
                 throw e;
             }
-        }
-
-        public List<string> GetUserRights(string userId)
-        {
-            DataHelper helper = new DataHelper(Configuration);
-
-            var rights = new List<string>();
-
-            var sSQL = @"SELECT DISTINCT tblRoleRight.RightID
-					     FROM tblRole INNER JOIN
-                         tblRoleRight ON tblRole.RoleID = tblRoleRight.RoleID AnD tblRoleRight.ValidityTo IS NULL
-						 INNER JOIN
-                         tblUserRole ON tblRole.RoleID = tblUserRole.RoleID AND tblUserRole.ValidityTo IS NULL
-						 INNER JOIN
-                         tblUsers ON tblUserRole.UserID = tblUsers.UserID AND tblUsers.ValidityTo IS NULL
-                         WHERE tblUsers.UserID = @UserId AND tblRole.ValidityTo IS NULL";
-
-            SqlParameter[] paramets = {
-                new SqlParameter("@UserId", userId)
-            };
-
-            var dt = helper.GetDataTable(sSQL, paramets, CommandType.Text);
-
-            if (dt.Rows.Count > 0)
-            {
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    var row = dt.Rows[i];
-                    var rightId = Convert.ToInt32(row["RightID"]);
-                    var rightName = Enum.GetName(typeof(Models.Rights), rightId);
-
-                    if (rightName != null)
-                    {
-                        rights.Add(rightName);
-                    }
-
-                }
-            }
-
-            return rights;
         }
     }
 }

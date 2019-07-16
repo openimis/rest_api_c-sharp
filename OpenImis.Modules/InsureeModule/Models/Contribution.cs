@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using OpenImis.Modules.Helpers.Validators;
+using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace OpenImis.Modules.InsureeModule.Models
 {
     public class Contribution
     {
         [Required]
-        //[InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number ")]
+        [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number ")]
         public string InsuranceNumber { get; set; }
         [Required(ErrorMessage = "7-Wrong or missing payer")]
         public string Payer { get; set; }
         [Required(ErrorMessage = "4:Wrong or missing payment date")]
-        //[ValidDate(ErrorMessage = "4:Wrong or missing payment date")]
+        [ValidDate(ErrorMessage = "4:Wrong or missing payment date")]
         public string PaymentDate { get; set; }
         [Required(ErrorMessage = "3:Wrong or missing  product ")]
         public string ProductCode { get; set; }

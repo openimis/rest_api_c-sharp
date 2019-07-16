@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenImis.Modules.Helpers.Validators;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -9,7 +10,7 @@ namespace OpenImis.Modules.ClaimModule.Models
     {
         [Required]
         public string claim_administrator_code { get; set; }
-        //[ValidDate]
+        [ValidDate]
         public string last_update_date { get; set; }
     }
 }
