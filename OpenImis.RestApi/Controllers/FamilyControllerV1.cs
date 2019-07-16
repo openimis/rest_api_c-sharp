@@ -1,170 +1,219 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using OpenImis.Modules;
-using OpenImis.Modules.InsureeManagementModule.Models;
-using OpenImis.Modules.InsureeManagementModule.Protocol;
+using OpenImis.Modules.InsureeModule.Helpers;
+using OpenImis.Modules.InsureeModule.Models;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
     [ApiVersion("1")]
-    [Route("api/family")]
-	[ApiController]
-	[EnableCors("AllowSpecificOrigin")]
-	public class FamilyControllerV1 : Controller
+    [Authorize]
+    [Route("api/")]
+    [ApiController]
+    [EnableCors("AllowSpecificOrigin")]
+    public class FamilyControllerV1 : Controller
     {
-		private readonly IImisModules _imisModules;
-
-
-		public FamilyControllerV1(IImisModules imisModules)
-		{
-			_imisModules = imisModules;
-		}
-
-		/// <summary>
-		/// Get the list of the Families
-		/// </summary>
-		/// <param name="page">Number of the page</param>
-		/// <param name="resultsPerPage">Number of families per request/page</param>
-		/// <returns>The list of families</returns>
-		/// <remarks>
-		/// ### REMARKS ###
-		/// The following codes are returned
-		/// - 200 - The list of the families 
-		/// - 400 - The request is invalid
-		/// - 401 - The token is invalid
-		/// </remarks>
-		/// <response code="200">Returns the list of families</response>
-		/// <response code="400">If the request is incomplete</response>      
-		/// <response code="401">If the token is missing, is wrong or expired</response>      
-		[Authorize("EnrollmentOfficer")]
-		[HttpGet]
-		[ProducesResponseType(typeof(GetFamiliesResponse), 200)]
-		[ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
-		[ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-		public async Task<IActionResult> GetFamilies([FromQuery]int page = 1, [FromQuery]int resultsPerPage = 20)
+        private readonly IImisModules _imisModules;
+        public FamilyControllerV1(IImisModules imisModules)
         {
-			GetFamiliesResponse families;
-			families = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().GetFamilies(page, resultsPerPage);
-
-			return Ok(families);
+            _imisModules = imisModules;
         }
 
-		// GET api/ws/family/00001
-		[Authorize("IMISAdmin")]
-		[HttpGet("insuree/{insureeId}", Name = "GetFamilyByInsureeId")]
-        public async Task<IActionResult> GetFamilyByInsureeId(string insureeId)
+        [HasRights(Rights.FamilySearch)]
+        [HttpGet]
+        [Route("Families/Get_Family")]
+        public IActionResult Get(string insureeNumber)
         {
-			FamilyModel familyModel;
+            DataMessage response;
+            try
+            {
+                if (insureeNumber != null || insureeNumber.Length != 0)
+                {
+                    var data = _imisModules.GetInsureeModule().GetFamilyLogic().Get(insureeNumber);
 
-			try
-			{
-				familyModel = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().GetFamilyByInsureeId(insureeId);
-			}
-			catch (ValidationException e)
-			{
-				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
-			}
+                    if (data.Count > 0)
+                    {
+                        response = new GetFamilyResponse(0, false, data, 0).Message;
+                    }
+                    else
+                    {
+                        response = new GetFamilyResponse(2, false, 0).Message;
+                    }
+                }
+                else
+                {
+                    response = new GetFamilyResponse(1, true, 0).Message;
+                }
+            }
+            catch (Exception e)
+            {
+                response = new GetFamilyResponse(e).Message;
+            }
 
-			if (familyModel==null)
-			{
-				return NotFound();
-			}
-
-			return Ok(familyModel);
+            return Json(response);
         }
 
-
-		[HttpGet("{familyId}", Name = "GetFamilyByFamilyId")]
-		public async Task<IActionResult> GetFamilyByFamilyId(int familyId)
-		{
-			FamilyModel familyModel;
-
-			try
-			{
-				familyModel = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().GetFamilyByFamilyId(familyId);
-			}
-			catch (ValidationException e)
-			{
-				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
-			}
-
-			if (familyModel == null)
-			{
-				return NotFound();
-			}
-
-			return Ok(familyModel);
-		}
-
-
-		// POST api/values
-		[HttpPost]
-        public async Task<IActionResult> AddNewFamily([FromBody]FamilyModel family)
+        [HasRights(Rights.FamilySearch)]
+        [HttpGet]
+        [Route("Families/Get_Member_Family")]
+        public IActionResult Get_Member_Family(string insureeNumber, int order)
         {
-			FamilyModel newFamily;
-			try
-			{
-				newFamily = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().AddFamilyAsync(family);
-			}
-			catch (ValidationException e)
-			{
-				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
-			}
-			catch (Exception e)
-			{
-				return BadRequest(new { error = new { message = e.Message, source = e.Source, trace = e.StackTrace } });
-			}
+            DataMessage response;
+            try
+            {
+                if (insureeNumber != null || insureeNumber.Length != 0)
+                {
+                    var data = _imisModules.GetInsureeModule().GetFamilyLogic().GetMember(insureeNumber, order);
 
-			return Created(new Uri(Url.Link("GetFamilyByFamilyId", new { familyId = newFamily.FamilyId})), newFamily);
+                    if (data.Count > 0)
+                    {
+                        response = new GetMemberFamilyResponse(0, false, data, 0).Message;
+                    }
+                    else
+                    {
+                        response = new GetMemberFamilyResponse(2, true, 0).Message;
+                    }
+                }
+                else
+                {
+                    response = new GetMemberFamilyResponse(1, true, 0).Message;
+                }
+            }
+            catch (Exception e)
+            {
+                response = new GetMemberFamilyResponse(e).Message;
+            }
+
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            return Json(response, serializerSettings);
         }
 
-        // PUT api/values/5
-        [HttpPut("{familyId}")]
-        public async Task<IActionResult> UpdateFamily(int familyId, [FromBody]FamilyModel family)
+        [HasRights(Rights.FamilyAdd)]
+        [HttpPost]
+        [Route("Families/Enter_Family")]
+        public IActionResult Enter_Family([FromBody]FamilyModelv3 model)
         {
-			FamilyModel updatedFamily;
-			try
-			{
-				updatedFamily = await _imisModules.GetInsureeManagementModule().GetFamilyLogic().UpdateFamilyAsync(familyId, family);
-			}
-			catch (ValidationException e)
-			{
-				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
-			}
-			catch (Exception e)
-			{
-				return BadRequest(new { error = new { message = e.Message, source = e.Source, trace = e.StackTrace } });
-			}
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
-			return Ok(updatedFamily);
-		}
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
 
-        // DELETE api/values/5
-        [HttpDelete("{familyId}")]
-        public async Task<IActionResult> Delete(int familyId)
+            _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+
+            var response = _imisModules.GetInsureeModule().GetFamilyLogic().AddNew(model);
+
+            return Json(response);
+        }
+
+        [HasRights(Rights.FamilyEdit)]
+        [HttpPost]
+        [Route("Families/Edit_Family")]
+        public IActionResult Edit_Family([FromBody]EditFamily model)
         {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
-			try
-			{
-				await _imisModules.GetInsureeManagementModule().GetFamilyLogic().DeleteFamilyAsync(familyId);
-			}
-			catch (ValidationException e)
-			{
-				return BadRequest(new { error = new { message = e.Message, value = e.Value } });
-			}
-			catch (Exception e)
-			{
-				return BadRequest(new { error = new { message = e.Message, source = e.Source, trace = e.StackTrace } });
-			}
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
 
-			return Accepted();
+            _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+
+            var response = _imisModules.GetInsureeModule().GetFamilyLogic().Edit(model);
+
+            return Json(response);
+        }
+
+        [HasRights(Rights.FamilyAdd)]
+        [HttpPost]
+        [Route("Families/Enter_Member_Family")]
+        public IActionResult Enter_Member_Family([FromBody]FamilyMember model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
+
+            _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+
+            var response = _imisModules.GetInsureeModule().GetFamilyLogic().AddMember(model);
+
+            return Json(response);
+        }
+
+        [HasRights(Rights.FamilyEdit)]
+        [HttpPost]
+        [Route("Families/Edit_Member_Family")]
+        public IActionResult Edit_Member_Family([FromBody]EditFamilyMember model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
+
+            _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+
+            var response = _imisModules.GetInsureeModule().GetFamilyLogic().EditMember(model);
+
+            return Json(response);
+        }
+
+        [HasRights(Rights.FamilyDelete)]
+        [HttpPost]
+        [Route("Families/Delete_Member_Family")]
+        public IActionResult Delete_Member_Family([FromBody]string insureeNumber)
+        {
+            //if (new ValidationBase().InsureeNumber(insureeNumber) != ValidationResult.Success)
+            //{
+            //    return BadRequest(new { error_occured = true, error_message = "1:Wrong format or missing insurance number of insuree" });
+            //}
+
+            int userId = Convert.ToInt32(HttpContext.User.Claims
+                .Where(w => w.Type == "UserId")
+                .Select(x => x.Value)
+                .FirstOrDefault());
+
+            _imisModules.GetInsureeModule().GetFamilyLogic().SetUserId(userId);
+
+            var response = _imisModules.GetInsureeModule().GetFamilyLogic().DeleteMember(insureeNumber);
+
+            return Json(response);
         }
     }
 }

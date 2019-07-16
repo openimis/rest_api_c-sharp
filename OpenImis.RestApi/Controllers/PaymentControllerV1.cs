@@ -16,16 +16,17 @@ using Rights = OpenImis.RestApi.Security.Rights;
 
 namespace OpenImis.RestApi.Controllers
 {
+    [ApiVersion("1")]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    public class PaymentController : Controller
+    public class PaymentControllerV1 : Controller
     {
         private readonly IConfiguration _configuration;
         private readonly IImisModules _imisModules;
         public readonly IHostingEnvironment _hostingEnvironment;
 
-        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, IImisModules imisModules)
+        public PaymentControllerV1(IConfiguration configuration, IHostingEnvironment hostingEnvironment, IImisModules imisModules)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;

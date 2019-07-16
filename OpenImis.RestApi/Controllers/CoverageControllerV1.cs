@@ -16,14 +16,15 @@ using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
 {
+    [ApiVersion("1")]
     [Authorize]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    public class CoverageController : Controller
+    public class CoverageControllerV1 : Controller
     {
         private readonly IImisModules _imisModules;
-        public CoverageController(IImisModules imisModules)
+        public CoverageControllerV1(IImisModules imisModules)
         {
             _imisModules = imisModules;
         }
