@@ -276,7 +276,8 @@ namespace ImisRestApi.Data
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", model.internal_identifier),
                 new SqlParameter("@ControlNumber", model.control_number),
-                new SqlParameter("@Failed", failed)
+                new SqlParameter("@Failed", failed),
+                new SqlParameter("@Message",model.error_message)
              };
 
             DataMessage message;
