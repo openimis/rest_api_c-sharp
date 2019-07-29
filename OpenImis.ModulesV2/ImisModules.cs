@@ -18,10 +18,10 @@ namespace OpenImis.ModulesV2
     {
         private ILoginModule loginModule;
 
-        private InsureeModule.IInsureeModule insureeModule;
-        private ClaimModule.IClaimModule claimModule;
-        private CoverageModule.ICoverageModule coverageModule;
-        private PaymentModule.IPaymentModule paymentModule;
+        private IInsureeModule insureeModule;
+        private IClaimModule claimModule;
+        private ICoverageModule coverageModule;
+        private IPaymentModule paymentModule;
 
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
@@ -141,21 +141,9 @@ namespace OpenImis.ModulesV2
         {
             Type type;
 
-            string part = "";
-
             Assembly assembly = Assembly.GetCallingAssembly();
 
-            var listImisModules = _configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
-
-            if (listImisModules.Where(v => v.Version == "2").Any(x => GetPropValue(x, moduleName) != null))
-            {
-                object module = listImisModules.Where(v => v.Version == "2").Select(x => GetPropValue(x, moduleName)).FirstOrDefault();
-
-                if (GetPropValue(module, sectionName) != null)
-                {
-                    part = GetPropValue(module, sectionName).ToString();
-                }
-            }
+            string part = GetSectionName(moduleName, sectionName, "2");
 
             type = assembly.GetType(part);
 
@@ -171,6 +159,22 @@ namespace OpenImis.ModulesV2
             }
 
             return type;
+        }
+
+        public string GetSectionName(string moduleName, string sectionName, string apiVersion)
+        {
+            string part = "";
+
+            var listImisModules = _configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
+
+            var module = listImisModules.Where(m => m.Version == apiVersion).Select(x => GetPropValue(x, moduleName)).FirstOrDefault();
+
+            if (GetPropValue(module, sectionName) != null)
+            {
+                part = GetPropValue(module, sectionName).ToString();
+            }
+
+            return part;
         }
 
         public static object GetPropValue(object src, string propName)
