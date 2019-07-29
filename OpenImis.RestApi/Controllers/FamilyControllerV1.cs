@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using OpenImis.Modules;
-using OpenImis.Modules.InsureeModule.Helpers;
-using OpenImis.Modules.InsureeModule.Models;
+using OpenImis.ModulesV1;
+using OpenImis.ModulesV1.InsureeModule.Helpers;
+using OpenImis.ModulesV1.InsureeModule.Models;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
@@ -31,7 +26,7 @@ namespace OpenImis.RestApi.Controllers
             _imisModules = imisModules;
         }
 
-        [HasRights(Rights.FamilySearch)]
+        //[HasRights(Rights.FamilySearch)]
         [HttpGet]
         [Route("Families/Get_Family")]
         public IActionResult Get(string insureeNumber)

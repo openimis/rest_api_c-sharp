@@ -1,5 +1,4 @@
-﻿using OpenImis.Modules;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -7,9 +6,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using OpenImis.Modules.UserModule.Entities;
-using OpenImis.Modules.LoginModule.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
 
 namespace OpenImis.RestApi.Security
 {
@@ -20,12 +18,19 @@ namespace OpenImis.RestApi.Security
     {
         private int _maxTokenSizeInBytes = TokenValidationParameters.DefaultMaximumTokenSizeInBytes;
         private readonly JwtSecurityTokenHandler _tokenHandler;
-        private readonly IImisModules _imisModules;
-        
-        public IMISJwtSecurityTokenHandler(IImisModules imisModules)
+
+        private readonly ModulesV1.IImisModules _imisModulesV1;
+        private readonly ModulesV2.IImisModules _imisModulesV2;
+
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public IMISJwtSecurityTokenHandler(ModulesV1.IImisModules imisModulesV1, ModulesV2.IImisModules imisModulesV2, IHttpContextAccessor httpContextAccessor)
         {
             _tokenHandler = new JwtSecurityTokenHandler();
-            _imisModules = imisModules;
+            _httpContextAccessor = httpContextAccessor;
+
+            _imisModulesV1 = imisModulesV1;
+            _imisModulesV2 = imisModulesV2;
         }
 
         public bool CanValidateToken
@@ -69,11 +74,15 @@ namespace OpenImis.RestApi.Security
             var tokenS = handler.ReadToken(securityToken) as JwtSecurityToken;
             int userId = Convert.ToInt32(tokenS.Claims.Where(w => w.Type == "UserId").Select(x => x.Value).FirstOrDefault());
 
-            UserData user = _imisModules.GetLoginModule().GetLoginLogic().GetById(userId);
+            string apiVersion = _httpContextAccessor.HttpContext.Request.Headers.Where(x => x.Key == "api-version").Select(s => s.Value).FirstOrDefault();
+
+            UserData user;
+
+            if (apiVersion.StartsWith("1")) user = (UserData)_imisModulesV1.GetLoginModule().GetLoginLogic().GetById(userId);
+            else user = (UserData)_imisModulesV2.GetLoginModule().GetLoginLogic().GetById(userId);
 
             if (user != null)
             {
-
                 TokenValidationParameters tokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = validationParameters.ValidateIssuer,

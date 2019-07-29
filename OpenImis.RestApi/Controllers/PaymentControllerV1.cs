@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using OpenImis.Modules;
-using OpenImis.Modules.PaymentModule.Helpers.Extensions;
-using OpenImis.Modules.PaymentModule.Models;
-using OpenImis.Modules.PaymentModule.Models.Response;
+using OpenImis.ModulesV1;
+using OpenImis.ModulesV1.PaymentModule.Helpers.Extensions;
+using OpenImis.ModulesV1.PaymentModule.Models;
+using OpenImis.ModulesV1.PaymentModule.Models.Response;
 using OpenImis.RestApi.Security;
 using Rights = OpenImis.RestApi.Security.Rights;
 

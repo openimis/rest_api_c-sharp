@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OpenImis.Modules;
-using OpenImis.Modules.ClaimModule.Models;
+using OpenImis.ModulesV1;
+using OpenImis.ModulesV1.ClaimModule.Models;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
@@ -16,7 +11,6 @@ namespace OpenImis.RestApi.Controllers
     [ApiVersion("1")]
     [Route("api/")]
     [ApiController]
-    [EnableCors("AllowSpecificOrigin")]
     public class ClaimsControllerV1 : Controller
     {
         private readonly IImisModules _imisModules;

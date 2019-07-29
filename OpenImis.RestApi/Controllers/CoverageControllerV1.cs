@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using OpenImis.Modules;
-using OpenImis.Modules.CoverageModule.Helpers;
-using OpenImis.Modules.CoverageModule.Models;
-using OpenImis.Modules.Helpers.Validators;
+using OpenImis.ModulesV1.CoverageModule.Helpers;
+using OpenImis.ModulesV1.CoverageModule.Models;
 using OpenImis.RestApi.Security;
+using OpenImis.ModulesV1;
+using OpenImis.ModulesV1.Helpers.Validators;
 
 namespace OpenImis.RestApi.Controllers
 {
@@ -20,7 +16,6 @@ namespace OpenImis.RestApi.Controllers
     [Authorize]
     [Route("api/")]
     [ApiController]
-    [EnableCors("AllowSpecificOrigin")]
     public class CoverageControllerV1 : Controller
     {
         private readonly IImisModules _imisModules;

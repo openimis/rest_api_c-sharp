@@ -4,8 +4,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using OpenImis.Modules;
-using OpenImis.Modules.InsureeModule.Models;
+using OpenImis.ModulesV1;
+using OpenImis.ModulesV1.InsureeModule.Models;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers

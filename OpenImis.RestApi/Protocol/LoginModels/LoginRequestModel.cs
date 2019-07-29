@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.RestApi.Protocol.LoginModel
+namespace OpenImis.RestApi.Protocol.LoginModels
 {
     /// <summary>
     /// This class serves as a parameter class for the Login call 

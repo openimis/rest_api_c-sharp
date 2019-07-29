@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OpenImis.Modules;
-using OpenImis.Modules.InsureeModule.Models;
+using OpenImis.ModulesV1;
+using OpenImis.ModulesV1.InsureeModule.Models;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers
