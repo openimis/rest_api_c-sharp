@@ -14,6 +14,8 @@ using OpenImis.RestApi.Controllers;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV2;
 using Microsoft.AspNetCore.Http;
+using OpenImis.ModulesV1.Helpers;
+using System.Collections.Generic;
 
 namespace OpenImis.RestApi
 {
@@ -28,8 +30,8 @@ namespace OpenImis.RestApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add the DbContext 
-            //services.AddDbContext<IMISContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IMISDatabase")));
+            var configImisModules = Configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
+            int lastApiVersion = int.Parse(configImisModules[configImisModules.Count - 1].Version);
 
             services.AddSingleton<ModulesV1.IImisModules, ModulesV1.ImisModules>();
             services.AddSingleton<ModulesV2.IImisModules, ModulesV2.ImisModules>();
@@ -54,7 +56,8 @@ namespace OpenImis.RestApi
                     options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(
                         services.BuildServiceProvider().GetService<ModulesV1.IImisModules>(),
                         services.BuildServiceProvider().GetService<ModulesV2.IImisModules>(),
-                        services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
+                        services.BuildServiceProvider().GetService<IHttpContextAccessor>(),
+                        lastApiVersion));
                 });
 
             services.AddAuthorization();
@@ -70,7 +73,7 @@ namespace OpenImis.RestApi
             {
                 o.ReportApiVersions = true;
                 o.AssumeDefaultVersionWhenUnspecified = true;
-                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.DefaultApiVersion = new ApiVersion(lastApiVersion, 0);
                 o.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader(), new HeaderApiVersionReader("api-version"));
             });
 

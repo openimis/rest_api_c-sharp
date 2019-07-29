@@ -23,14 +23,17 @@ namespace OpenImis.RestApi.Security
         private readonly ModulesV2.IImisModules _imisModulesV2;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private int _lastApiVersion;
 
-        public IMISJwtSecurityTokenHandler(ModulesV1.IImisModules imisModulesV1, ModulesV2.IImisModules imisModulesV2, IHttpContextAccessor httpContextAccessor)
+        public IMISJwtSecurityTokenHandler(ModulesV1.IImisModules imisModulesV1, ModulesV2.IImisModules imisModulesV2, IHttpContextAccessor httpContextAccessor, int lastApiVersion)
         {
             _tokenHandler = new JwtSecurityTokenHandler();
             _httpContextAccessor = httpContextAccessor;
 
             _imisModulesV1 = imisModulesV1;
             _imisModulesV2 = imisModulesV2;
+
+            _lastApiVersion = lastApiVersion;
         }
 
         public bool CanValidateToken
@@ -77,9 +80,9 @@ namespace OpenImis.RestApi.Security
             string apiVersion = _httpContextAccessor.HttpContext.Request.Headers.Where(x => x.Key == "api-version").Select(s => s.Value).FirstOrDefault();
 
             UserData user;
-
-            if (apiVersion.StartsWith("1")) user = (UserData)_imisModulesV1.GetLoginModule().GetLoginLogic().GetById(userId);
-            else user = (UserData)_imisModulesV2.GetLoginModule().GetLoginLogic().GetById(userId);
+            
+            if (apiVersion == null || apiVersion.StartsWith(_lastApiVersion.ToString())) user = (UserData)_imisModulesV2.GetLoginModule().GetLoginLogic().GetById(userId);
+            else user = (UserData)_imisModulesV1.GetLoginModule().GetLoginLogic().GetById(userId);
 
             if (user != null)
             {
