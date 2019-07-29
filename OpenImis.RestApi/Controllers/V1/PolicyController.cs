@@ -8,17 +8,17 @@ using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.InsureeModule.Models;
 using OpenImis.RestApi.Security;
 
-namespace OpenImis.RestApi.Controllers
+namespace OpenImis.RestApi.Controllers.V1
 {
     [ApiVersion("1")]
     [Authorize]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    public class PolicyControllerV1 : Controller
+    public class PolicyController : Controller
     {
         private readonly IImisModules _imisModules;
-        public PolicyControllerV1(IImisModules imisModules)
+        public PolicyController(IImisModules imisModules)
         {
             _imisModules = imisModules;
         }

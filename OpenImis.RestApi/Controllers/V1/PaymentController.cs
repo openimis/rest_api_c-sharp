@@ -14,19 +14,19 @@ using OpenImis.ModulesV1.PaymentModule.Models.Response;
 using OpenImis.RestApi.Security;
 using Rights = OpenImis.RestApi.Security.Rights;
 
-namespace OpenImis.RestApi.Controllers
+namespace OpenImis.RestApi.Controllers.V1
 {
     [ApiVersion("1")]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    public class PaymentControllerV1 : Controller
+    public class PaymentController : Controller
     {
         private readonly IConfiguration _configuration;
         private readonly IImisModules _imisModules;
         public readonly IHostingEnvironment _hostingEnvironment;
 
-        public PaymentControllerV1(IConfiguration configuration, IHostingEnvironment hostingEnvironment, IImisModules imisModules)
+        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, IImisModules imisModules)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;

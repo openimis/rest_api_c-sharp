@@ -11,17 +11,17 @@ using OpenImis.ModulesV1.InsureeModule.Helpers;
 using OpenImis.ModulesV1.InsureeModule.Models;
 using OpenImis.RestApi.Security;
 
-namespace OpenImis.RestApi.Controllers
+namespace OpenImis.RestApi.Controllers.V1
 {
     [ApiVersion("1")]
     [Authorize]
     [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    public class FamilyControllerV1 : Controller
+    public class FamilyController : Controller
     {
         private readonly IImisModules _imisModules;
-        public FamilyControllerV1(IImisModules imisModules)
+        public FamilyController(IImisModules imisModules)
         {
             _imisModules = imisModules;
         }

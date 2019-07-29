@@ -10,16 +10,16 @@ using OpenImis.RestApi.Security;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.Helpers.Validators;
 
-namespace OpenImis.RestApi.Controllers
+namespace OpenImis.RestApi.Controllers.V1
 {
     [ApiVersion("1")]
     [Authorize]
     [Route("api/")]
     [ApiController]
-    public class CoverageControllerV1 : Controller
+    public class CoverageController : Controller
     {
         private readonly IImisModules _imisModules;
-        public CoverageControllerV1(IImisModules imisModules)
+        public CoverageController(IImisModules imisModules)
         {
             _imisModules = imisModules;
         }

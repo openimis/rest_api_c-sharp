@@ -13,18 +13,18 @@ using Microsoft.IdentityModel.Tokens;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.LoginModule.Models;
 
-namespace OpenImis.RestApi.Controllers
+namespace OpenImis.RestApi.Controllers.V1
 {
     [ApiVersion("1")]
     [Authorize]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
-    public class LoginControllerV1 : Controller
+    public class LoginController : Controller
     {
         private readonly IConfiguration _configuration;
         private readonly IImisModules _imisModules;
 
-        public LoginControllerV1(IConfiguration configuration, IImisModules imisModules)
+        public LoginController(IConfiguration configuration, IImisModules imisModules)
         {
             _configuration = configuration;
             _imisModules = imisModules;

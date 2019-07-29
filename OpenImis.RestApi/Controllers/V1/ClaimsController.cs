@@ -6,15 +6,15 @@ using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.ClaimModule.Models;
 using OpenImis.RestApi.Security;
 
-namespace OpenImis.RestApi.Controllers
+namespace OpenImis.RestApi.Controllers.V1
 {
     [ApiVersion("1")]
     [Route("api/")]
     [ApiController]
-    public class ClaimsControllerV1 : Controller
+    public class ClaimsController : Controller
     {
         private readonly IImisModules _imisModules;
-        public ClaimsControllerV1(IImisModules imisModules)
+        public ClaimsController(IImisModules imisModules)
         {
             _imisModules = imisModules;
         }
