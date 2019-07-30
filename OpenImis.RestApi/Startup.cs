@@ -16,6 +16,8 @@ using OpenImis.ModulesV2;
 using Microsoft.AspNetCore.Http;
 using OpenImis.ModulesV1.Helpers;
 using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
 
 namespace OpenImis.RestApi
 {
@@ -31,7 +33,7 @@ namespace OpenImis.RestApi
         public void ConfigureServices(IServiceCollection services)
         {
             var configImisModules = Configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
-            int lastApiVersion = int.Parse(configImisModules[configImisModules.Count - 1].Version);
+            int lastApiVersion = configImisModules.Max(c => int.Parse(c.Version));
 
             services.AddSingleton<ModulesV1.IImisModules, ModulesV1.ImisModules>();
             services.AddSingleton<ModulesV2.IImisModules, ModulesV2.ImisModules>();
@@ -56,8 +58,7 @@ namespace OpenImis.RestApi
                     options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(
                         services.BuildServiceProvider().GetService<ModulesV1.IImisModules>(),
                         services.BuildServiceProvider().GetService<ModulesV2.IImisModules>(),
-                        services.BuildServiceProvider().GetService<IHttpContextAccessor>(),
-                        lastApiVersion));
+                        services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
                 });
 
             services.AddAuthorization();
