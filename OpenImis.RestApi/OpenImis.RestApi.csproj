@@ -36,14 +36,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.Development.json.dist" />
     <None Remove="appsettings.Production.json.dist" />
     <None Remove="NuGet.Config.old" />
     <None Remove="openImisModules.json.dist" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.Development.json.dist" />
     <Content Include="appsettings.Production.json.dist" />
     <Content Include="NuGet.Config.old" />
     <Content Include="openImisModules.json.dist" />
@@ -71,7 +69,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenImis.Extensions.Configuration\OpenImis.Extensions.Configuration.csproj" />
-    <ProjectReference Include="..\OpenImis.Modules\OpenImis.Modules.csproj" />
+    <ProjectReference Include="..\OpenImis.ModulesV1\OpenImis.ModulesV1.csproj" />
+    <ProjectReference Include="..\OpenImis.ModulesV2\OpenImis.ModulesV2.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace ImisRestApi.Chanels.Sms
+namespace OpenImis.RestApi.Escape.Sms
 {
     public class Headers
     {

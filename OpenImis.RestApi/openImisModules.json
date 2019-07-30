@@ -1,20 +1,44 @@
 ﻿{
-	"ImisModules": {
-		"UserModule": {
-			"UserController": "OpenImis.Modules.UserModule.Controllers.UserController"
-		},
-		"InsureeManagementModule": {
-			"FamilyLogic": "OpenImis.Modules.InsureeManagementModule.Logic.FamilyLogic",
-			"InsureeLogic": "OpenImis.Modules.InsureeManagementModule.Logic.InsureeLogic"
-		},
-			"MasterDataManagementModule": {
-				"LocationLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.LocationLogic",
-				"FamilyTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.FamilyTypeLogic",
-				"ConfirmationTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.ConfirmationTypeLogic",
-				"EducationLevelLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.EducationLevelLogic",
-				"GenderTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.GenderTypeLogic",
-				"ProfessionTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.ProfessionTypeLogic",
-				"IdentificationTypeLogic": "OpenImis.Modules.MasterDataManagementModule.Logic.IdentificationTypeLogic"
-			}
-	}
+  "ImisModules": [
+    {
+      "Version": "1",
+      "LoginModule": {
+        "LoginLogic": "OpenImis.ModulesV1.LoginModule.Logic.LoginLogic"
+      },
+      "ClaimModule": {
+        "ClaimLogic": "OpenImis.ModulesV1.ClaimModule.Logic.ClaimLogic"
+      },
+      "CoverageModule": {
+        "CoverageLogic": "OpenImis.ModulesV1.CoverageModule.Logic.CoverageLogic"
+      },
+      "InsureeModule": {
+        "FamilyLogic": "OpenImis.ModulesV1.InsureeModule.Logic.FamilyLogic",
+        "PolicyLogic": "OpenImis.ModulesV1.InsureeModule.Logic.PolicyLogic",
+        "ContributionLogic": "OpenImis.ModulesV1.InsureeModule.Logic.ContributionLogic"
+      },
+      "PaymentModule": {
+        "PaymentLogic": "OpenImis.ModulesV1.PaymentModule.Logic.PaymentLogic"
+      }
+    },
+    {
+      "Version": "2",
+      "LoginModule": {
+        "LoginLogic": "OpenImis.ModulesV2.LoginModule.Logic.LoginLogic"
+      },
+      "ClaimModule": {
+        "ClaimLogic": "OpenImis.ModulesV2.ClaimModule.Logic.ClaimLogic"
+      },
+      "CoverageModule": {
+        "CoverageLogic": "OpenImis.ModulesV2.CoverageModule.Logic.CoverageLogic"
+      },
+      "InsureeModule": {
+        "FamilyLogic": "OpenImis.ModulesV2.InsureeModule.Logic.FamilyLogic",
+        "PolicyLogic": "OpenImis.ModulesV2.InsureeModule.Logic.PolicyLogic",
+        "ContributionLogic": "OpenImis.ModulesV2.InsureeModule.Logic.ContributionLogic"
+      },
+      "PaymentModule": {
+        "PaymentLogic": "OpenImis.ModulesV2.PaymentModule.Logic.PaymentLogic"
+      }
+    }
+  ]
 }
