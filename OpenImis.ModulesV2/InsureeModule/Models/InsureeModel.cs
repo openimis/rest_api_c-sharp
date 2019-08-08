@@ -59,8 +59,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
                 Email = tblInsuree.Email,
                 CurrentAddress = tblInsuree.CurrentAddress,
                 GeoLocation = tblInsuree.GeoLocation,
-                IdentificationTypes = tblInsuree.TypeOfId,
-                PhotoPath = "" // TODO
+                IdentificationTypes = tblInsuree.TypeOfId
             };
 
             if (tblInsuree.Relationship != null)
@@ -91,6 +90,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
             if (tblInsuree.IsOffline != null)
             {
                 insuree.IsOffline = (bool)tblInsuree.IsOffline;
+            }
+
+            if (tblInsuree.Photo != null)
+            {
+                insuree.PhotoPath = tblInsuree.Photo.PhotoFileName;
             }
 
             return insuree;
