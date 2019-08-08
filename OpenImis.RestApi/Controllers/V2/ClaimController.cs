@@ -19,7 +19,7 @@ namespace OpenImis.RestApi.Controllers.V2
             _imisModules = imisModules;
         }
 
-        //[HasRights(Rights.ClaimAdd, Rights.ClaimAdministrator)]
+        //[HasRights(Rights.ClaimAdd)]
         [HttpPost]
         public IActionResult Create([FromBody] Claim claim)
         {
