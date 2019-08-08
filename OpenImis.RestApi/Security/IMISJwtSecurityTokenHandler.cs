@@ -72,14 +72,24 @@ namespace OpenImis.RestApi.Security
 
             var handler = new JwtSecurityTokenHandler();
             var tokenS = handler.ReadToken(securityToken) as JwtSecurityToken;
-            int userId = Convert.ToInt32(tokenS.Claims.Where(w => w.Type == "UserId").Select(x => x.Value).FirstOrDefault());
-
+            
             string apiVersion = _httpContextAccessor.HttpContext.Request.Headers.Where(x => x.Key == "api-version").Select(s => s.Value).FirstOrDefault();
 
             UserData user;
-            
-            if (apiVersion == null || apiVersion.StartsWith("2")) user = (UserData)_imisModulesV2.GetLoginModule().GetLoginLogic().GetById(userId);
-            else user = (UserData)_imisModulesV1.GetLoginModule().GetLoginLogic().GetById(userId);
+
+            if (apiVersion == null || apiVersion.StartsWith("2"))
+            {
+                Guid userUUID = Guid.Parse(tokenS.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+                int userId = _imisModulesV2.GetInsureeModule().GetFamilyLogic().GetUserIdByUUID(userUUID);
+
+                user = (UserData)_imisModulesV2.GetLoginModule().GetLoginLogic().GetById(userId);
+            }
+            else
+            {
+                int userId = Convert.ToInt32(tokenS.Claims.Where(w => w.Type == "UserId").Select(x => x.Value).FirstOrDefault());
+
+                user = (UserData)_imisModulesV1.GetLoginModule().GetLoginLogic().GetById(userId);
+            }
 
             if (user != null)
             {

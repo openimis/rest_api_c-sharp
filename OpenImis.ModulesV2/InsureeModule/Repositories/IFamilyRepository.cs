@@ -2,9 +2,9 @@
 using OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels;
 using System;
 
-namespace OpenImis.ModulesV2.InsureeModule.Logic
+namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
-    public interface IFamilyLogic
+    public interface IFamilyRepository
     {
         FamilyModel GetByCHFID(string chfid);
         int Create(EnrollFamilyModel model, int userId, int officerId);

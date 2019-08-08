@@ -23,7 +23,7 @@ namespace OpenImis.ModulesV2.LoginModule.Repositories
             {
                 user = imisContext.TblUsers.Where(u => u.UserId == userId).Select(x => new UserData()
                 {
-                    UserID = x.UserId.ToString(),
+                    UserUUID = x.UserUUID,
                     LoginName = x.LoginName,
                     PrivateKey = x.PrivateKey,
                     StoredPassword = x.StoredPassword
@@ -46,7 +46,7 @@ namespace OpenImis.ModulesV2.LoginModule.Repositories
                                     .Where(u => u.LoginName == UserName && u.ValidityTo == null)
                                     .Select(x => new UserData()
                                     {
-                                        UserID = Convert.ToString(x.UserId),
+                                        UserUUID = x.UserUUID,
                                         LoginName = Convert.ToString(x.LoginName),
                                         PrivateKey = Convert.ToString(x.PrivateKey),
                                         StoredPassword = Convert.ToString(x.StoredPassword)

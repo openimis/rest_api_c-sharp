@@ -43,7 +43,7 @@ namespace OpenImis.RestApi.Controllers.V2
 
                 List<Claim> claims = new List<Claim>()
                 {
-                    new Claim("UserId", user.UserID)
+                    new Claim("UserUUID", user.UserUUID.ToString())
                 };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.PrivateKey));
