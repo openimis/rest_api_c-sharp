@@ -33,7 +33,10 @@ namespace OpenImis.RestApi.Controllers.V2
 
             try
             {
-                familyModel = _imisModules.GetInsureeModule().GetFamilyLogic().GetByCHFID(chfid);
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+                int userId = _imisModules.GetInsureeModule().GetFamilyLogic().GetUserIdByUUID(userUUID);
+
+                familyModel = _imisModules.GetInsureeModule().GetFamilyLogic().GetByCHFID(chfid, userId);
             }
             catch (ValidationException e)
             {

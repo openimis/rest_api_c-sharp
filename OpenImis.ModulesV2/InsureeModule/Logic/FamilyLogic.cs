@@ -22,11 +22,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Logic
             familyRepository = new FamilyRepository(_configuration, _hostingEnvironment);
         }
 
-        public FamilyModel GetByCHFID(string chfid)
+        public FamilyModel GetByCHFID(string chfid, int userId)
         {
             FamilyModel response;
 
-            response = familyRepository.GetByCHFID(chfid);
+            response = familyRepository.GetByCHFID(chfid, userId);
 
             return response;
         }

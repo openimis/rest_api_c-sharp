@@ -29,7 +29,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public FamilyModel GetByCHFID(string chfid)
+        public FamilyModel GetByCHFID(string chfid, int userId)
         {
             FamilyModel response = new FamilyModel();
 
@@ -37,8 +37,28 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             {
                 using (var imisContext = new ImisDB())
                 {
+                    var locationIds = imisContext.TblUsersDistricts
+                        .Where(d => d.UserId == userId && d.ValidityTo == null)
+                        .Select(x => x.LocationId).ToList();
+
+                    var familyId = (from item in locationIds
+                                    from I in imisContext.TblInsuree
+                                    join F in imisContext.TblFamilies on I.FamilyId equals F.FamilyId
+                                    join V in imisContext.TblVillages on F.LocationId equals V.VillageId
+                                    join W in imisContext.TblWards on V.WardId equals W.WardId
+                                    join D in imisContext.TblDistricts on W.DistrictId equals D.DistrictId
+                                    where (I.Chfid == chfid
+                                        && D.DistrictId == item
+                                        && F.ValidityTo == null
+                                        && I.ValidityTo == null
+                                        && V.ValidityTo == null
+                                        && W.ValidityTo == null
+                                        && D.ValidityTo == null)
+                                    select F.FamilyId)
+                                   .FirstOrDefault();
+
                     response = imisContext.TblInsuree
-                                        .Where(i => i.ValidityTo == null && i.Chfid == chfid)
+                                        .Where(i => i.ValidityTo == null && i.FamilyId == familyId)
                                         .Join(imisContext.TblFamilies, i => i.FamilyId, f => f.FamilyId, (i, f) => f)
                                         .Where(f => f.ValidityTo == null)
                                         .Include(f => f.TblInsuree)
