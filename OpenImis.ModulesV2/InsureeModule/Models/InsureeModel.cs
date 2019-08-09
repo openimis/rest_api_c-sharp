@@ -33,9 +33,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
         public string IdentificationTypes { get; set; }
         public bool IsOffline { get; set; }
 
-        public DateTime ValidFrom { get; set; }
-        public DateTime? ValidTo { get; set; }
-
         public static InsureeModel FromTblInsuree(TblInsuree tblInsuree)
         {
             if (tblInsuree == null)
