@@ -2,6 +2,7 @@
 using OpenImis.ModulesV2.Utils;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace OpenImis.ModulesV2.InsureeModule.Models
@@ -13,7 +14,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
         public string CHFID { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
-        public DateTime DOB { get; set; }
+        public string DOB { get; set; }
         public string Gender { get; set; }
         public string Marital { get; set; }
         public bool IsHead { get; set; }
@@ -49,7 +50,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
                 CHFID = tblInsuree.Chfid,
                 LastName = tblInsuree.LastName,
                 OtherNames = tblInsuree.OtherNames,
-                DOB = tblInsuree.Dob,
+                DOB = tblInsuree.Dob.ToString("yyyy-mm-dd"),
                 IsHead = tblInsuree.IsHead,
                 Phone = tblInsuree.Phone,
                 Gender = tblInsuree.Gender,
