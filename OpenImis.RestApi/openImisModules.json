@@ -38,6 +38,18 @@
       },
       "PaymentModule": {
         "PaymentLogic": "OpenImis.ModulesV2.PaymentModule.Logic.PaymentLogic"
+      },
+      "FeedbackModule": {
+        "FeedbackLogic": "OpenImis.ModulesV2.FeedbackModule.Logic.FeedbackLogic"
+      },
+      "PremiumModule": {
+        "PremiumLogic": "OpenImis.ModulesV2.PremiumModule.Logic.PremiumLogic"
+      },
+      "SystemModule": {
+        "SystemLogic": "OpenImis.ModulesV2.SystemModule.Logic.SystemLogic"
+      },
+      "MasterDataModule": {
+        "MasterDataLogic": "OpenImis.ModulesV2.MasterDataModule.Logic.MasterDataLogic"
       }
     }
   ]

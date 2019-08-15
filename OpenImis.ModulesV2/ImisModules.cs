@@ -1,5 +1,8 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using OpenImis.ModulesV2.Helpers;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,9 +11,10 @@ using OpenImis.ModulesV2.ClaimModule;
 using OpenImis.ModulesV2.InsureeModule;
 using OpenImis.ModulesV2.CoverageModule;
 using OpenImis.ModulesV2.PaymentModule;
-using OpenImis.ModulesV2.Helpers;
-using System.Collections.Generic;
-using System.Linq;
+using OpenImis.ModulesV2.FeedbackModule;
+using OpenImis.ModulesV2.MasterDataModule;
+using OpenImis.ModulesV2.PremiumModule;
+using OpenImis.ModulesV2.SystemModule;
 
 namespace OpenImis.ModulesV2
 {
@@ -22,6 +26,10 @@ namespace OpenImis.ModulesV2
         private IClaimModule claimModule;
         private ICoverageModule coverageModule;
         private IPaymentModule paymentModule;
+        private IFeedbackModule feedbackModule;
+        private IMasterDataModule masterDataModule;
+        private IPremiumModule premiumModule;
+        private ISystemModule systemModule;
 
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
@@ -128,6 +136,78 @@ namespace OpenImis.ModulesV2
                 paymentModule.SetPaymentLogic((PaymentModule.Logic.IPaymentLogic)ActivatorUtilities.CreateInstance(_serviceProvider, paymentLogicType));
             }
             return paymentModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the feedback module version 2.
+        /// </summary>
+        /// <returns>
+        /// The Feedback module V2.
+        /// </returns>
+        public IFeedbackModule GetFeedbackModule()
+        {
+            if (feedbackModule == null)
+            {
+                feedbackModule = new FeedbackModule.FeedbackModule(_configuration);
+
+                Type feedbackLogicType = CreateTypeFromConfiguration("FeedbackModule", "FeedbackLogic", "OpenImis.ModulesV2.FeedbackModule.Logic.FeedbackLogic");
+                feedbackModule.SetFeedbackLogic((FeedbackModule.Logic.IFeedbackLogic)ActivatorUtilities.CreateInstance(_serviceProvider, feedbackLogicType));
+            }
+            return feedbackModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the premium module version 2.
+        /// </summary>
+        /// <returns>
+        /// The Premium module V2.
+        /// </returns>
+        public IPremiumModule GetPremiumModule()
+        {
+            if (premiumModule == null)
+            {
+                premiumModule = new PremiumModule.PremiumModule(_configuration);
+
+                Type premiumLogicType = CreateTypeFromConfiguration("PremiumModule", "PremiumLogic", "OpenImis.ModulesV2.PremiumModule.Logic.PremiumLogic");
+                premiumModule.SetPremiumLogic((PremiumModule.Logic.IPremiumLogic)ActivatorUtilities.CreateInstance(_serviceProvider, premiumLogicType));
+            }
+            return premiumModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the system module version 2.
+        /// </summary>
+        /// <returns>
+        /// The System module V2.
+        /// </returns>
+        public ISystemModule GetSystemModule()
+        {
+            if (systemModule == null)
+            {
+                systemModule = new SystemModule.SystemModule(_configuration);
+
+                Type systemLogicType = CreateTypeFromConfiguration("SystemModule", "SystemLogic", "OpenImis.ModulesV2.SystemModule.Logic.SystemLogic");
+                systemModule.SetSystemLogic((SystemModule.Logic.ISystemLogic)ActivatorUtilities.CreateInstance(_serviceProvider, systemLogicType));
+            }
+            return systemModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the master data module version 2.
+        /// </summary>
+        /// <returns>
+        /// The MasterData module V2.
+        /// </returns>
+        public IMasterDataModule GetMasterDataModule()
+        {
+            if (masterDataModule == null)
+            {
+                masterDataModule = new MasterDataModule.MasterDataModule(_configuration);
+
+                Type masterDataLogicType = CreateTypeFromConfiguration("MasterDataModule", "MasterDataLogic", "OpenImis.ModulesV2.MasterDataModule.Logic.MasterDataLogic");
+                masterDataModule.SetMasterDataLogic((MasterDataModule.Logic.IMasterDataLogic)ActivatorUtilities.CreateInstance(_serviceProvider, masterDataLogicType));
+            }
+            return masterDataModule;
         }
 
         /// <summary>
