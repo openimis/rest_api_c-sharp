@@ -24,7 +24,7 @@ namespace OpenImis.RestApi.Controllers.V2
             _imisModules = imisModules;
         }
 
-        //[HasRights(Rights.FamilyAdd)]
+        [HasRights(Rights.FamilySearch)]
         [HttpGet]
         [Route("{chfid}")]
         public IActionResult GetByCHFID(string chfid)
@@ -51,7 +51,7 @@ namespace OpenImis.RestApi.Controllers.V2
             return Ok(familyModel);
         }
 
-        //[HasRights(Rights.FamilyAdd)]
+        [HasRights(Rights.FamilyAdd)]
         [HttpPost]
         public IActionResult Create([FromBody] EnrollFamilyModel model)
         {
