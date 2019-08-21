@@ -108,9 +108,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                 var hof = "";
 
-                if (model.Insuree.Any(x => x.isHead == "true" || x.isHead == "1"))
+                if (enrollFamily.Insurees.Any(x => x.isHead == "true" || x.isHead == "1"))
                 {
-                    hof = model.Insuree.Where(x => x.isHead == "true" || x.isHead == "1").Select(z => z.CHFID).FirstOrDefault();
+                    hof = enrollFamily.Insurees.Where(x => x.isHead == "true" || x.isHead == "1").Select(z => z.CHFID).FirstOrDefault();
                 }
                 else hof = "Unknown";
 
@@ -202,7 +202,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                             Directory.CreateDirectory(webRootPath + UpdatedFolder);
                         }
 
-                        foreach (var picture in model.Pictures)
+                        foreach (var picture in model.Family.Select(x => x.Insurees.Select(s => s.Picture)).FirstOrDefault().ToList())
                         {
                             if (picture != null)
                             {

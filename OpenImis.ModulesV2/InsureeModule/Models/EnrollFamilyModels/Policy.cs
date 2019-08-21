@@ -18,5 +18,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
         public int OfficerId { get; set; }
         public int PolicyStage { get; set; }
         public bool isOffline { get; set; }
+        public Premium Premium { get; set; }
     }
 }

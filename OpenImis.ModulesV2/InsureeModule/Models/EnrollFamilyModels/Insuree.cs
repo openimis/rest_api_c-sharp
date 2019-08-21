@@ -30,5 +30,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
         public int CurVillage { get; set; }
         public bool isOffline { get; set; }
         public DateTime EffectiveDate { get; set; }
+        public InsureeImage Picture { get; set; }
     }
 }
