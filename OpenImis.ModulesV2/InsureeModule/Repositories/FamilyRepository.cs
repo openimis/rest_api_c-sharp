@@ -15,6 +15,7 @@ using System.Data.Common;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Xml;
+using Newtonsoft.Json;
 
 namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
@@ -29,7 +30,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public FamilyModel GetByCHFID(string chfid, int userId)
+        public FamilyModel GetByCHFID(string chfid, Guid userUUID)
         {
             FamilyModel response = new FamilyModel();
 
@@ -37,9 +38,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             {
                 using (var imisContext = new ImisDB())
                 {
-                    var locationIds = imisContext.TblUsersDistricts
-                        .Where(d => d.UserId == userId && d.ValidityTo == null)
-                        .Select(x => x.LocationId).ToList();
+                    var locationIds = (from UD in imisContext.TblUsersDistricts
+                                       join U in imisContext.TblUsers on UD.UserId equals U.UserId
+                                       where U.UserUUID == userUUID && UD.ValidityTo == null
+                                       select UD.LocationId)
+                                       .ToList();
 
                     var familyId = (from item in locationIds
                                     from I in imisContext.TblInsuree
@@ -90,7 +93,13 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
 
-                var XML = model.GetEnrolmentFromModel().Serialize();
+                var enrollFamily = (Enrolment)model;
+
+                enrollFamily.FileInfo.UserId = userId;
+                enrollFamily.FileInfo.OfficerId = officerId;
+
+                var XML = enrollFamily.XMLSerialize();
+                var JSON = JsonConvert.SerializeObject(enrollFamily);
 
                 var EnrollmentDir = _configuration["AppSettings:Enrollment_Phone"];
                 var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"];
@@ -105,8 +114,8 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 }
                 else hof = "Unknown";
 
-                var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss.XML"));
-                var JsonFileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
+                var FileName = string.Format("{0}__{1}_{2}.XML.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss.XML"));
+                var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
 
 
                 var xmldoc = new XmlDocument();
@@ -120,7 +129,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                     if (!Directory.Exists(webRootPath + JsonDebugFolder)) Directory.CreateDirectory(webRootPath + JsonDebugFolder);
 
-                    File.WriteAllText(webRootPath + JsonDebugFolder + JsonFileName, XML);
+                    File.WriteAllText(webRootPath + JsonDebugFolder + JsonFileName, JSON);
                 }
                 catch (Exception e)
                 {
@@ -243,7 +252,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             }
         }
 
-        public int GetOfficerIdByUserId(int userId)
+        public int GetOfficerIdByUserUUID(Guid userUUID)
         {
             int response;
 
@@ -252,7 +261,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 using (var imisContext = new ImisDB())
                 {
                     var loginName = imisContext.TblUsers
-                        .Where(u => u.UserId == userId)
+                        .Where(u => u.UserUUID == userUUID)
                         .Select(x => x.LoginName)
                         .FirstOrDefault();
 

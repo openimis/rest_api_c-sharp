@@ -6,9 +6,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
     public interface IFamilyRepository
     {
-        FamilyModel GetByCHFID(string chfid, int userId);
+        FamilyModel GetByCHFID(string chfid, Guid userUUID);
         int Create(EnrollFamilyModel model, int userId, int officerId);
         int GetUserIdByUUID(Guid uuid);
-        int GetOfficerIdByUserId(int userId);
+        int GetOfficerIdByUserUUID(Guid userUUID);
     }
 }

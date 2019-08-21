@@ -34,9 +34,8 @@ namespace OpenImis.RestApi.Controllers.V2
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
-                int userId = _imisModules.GetInsureeModule().GetFamilyLogic().GetUserIdByUUID(userUUID);
 
-                familyModel = _imisModules.GetInsureeModule().GetFamilyLogic().GetByCHFID(chfid, userId);
+                familyModel = _imisModules.GetInsureeModule().GetFamilyLogic().GetByCHFID(chfid, userUUID);
             }
             catch (ValidationException e)
             {
@@ -62,7 +61,7 @@ namespace OpenImis.RestApi.Controllers.V2
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
 
                 int userId = _imisModules.GetInsureeModule().GetFamilyLogic().GetUserIdByUUID(userUUID);
-                int officerId = _imisModules.GetInsureeModule().GetFamilyLogic().GetOfficerIdByUserId(userId);
+                int officerId = _imisModules.GetInsureeModule().GetFamilyLogic().GetOfficerIdByUserUUID(userUUID);
 
                 response = _imisModules.GetInsureeModule().GetFamilyLogic().Create(model, userId, officerId);
             }

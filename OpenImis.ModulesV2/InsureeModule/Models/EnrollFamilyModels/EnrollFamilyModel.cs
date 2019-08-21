@@ -13,16 +13,17 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
         public List<InsureePolicy> InsureePolicy { get; set; }
         public List<InsureeImage> Pictures { get; set; }
 
-        public Enrolment GetEnrolmentFromModel()
+
+        public static explicit operator Enrolment(EnrollFamilyModel efm)
         {
             return new Enrolment()
             {
                 FileInfo = new FileInfo(),
-                Families = Family,
-                Insurees = Insuree,
-                Policies = Policy,
-                Premiums = Premium,
-                InsureePolicies = InsureePolicy
+                Families = efm.Family,
+                Insurees = efm.Insuree,
+                Policies = efm.Policy,
+                Premiums = efm.Premium,
+                InsureePolicies = efm.InsureePolicy
             };
         }
     }

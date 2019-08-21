@@ -22,11 +22,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Logic
             familyRepository = new FamilyRepository(_configuration, _hostingEnvironment);
         }
 
-        public FamilyModel GetByCHFID(string chfid, int userId)
+        public FamilyModel GetByCHFID(string chfid, Guid userUUID)
         {
             FamilyModel response;
 
-            response = familyRepository.GetByCHFID(chfid, userId);
+            response = familyRepository.GetByCHFID(chfid, userUUID);
 
             return response;
         }
@@ -49,11 +49,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Logic
             return response;
         }
 
-        public int GetOfficerIdByUserId(int userId)
+        public int GetOfficerIdByUserUUID(Guid userUUID)
         {
             int response;
 
-            response = familyRepository.GetOfficerIdByUserId(userId);
+            response = familyRepository.GetOfficerIdByUserUUID(userUUID);
 
             return response;
         }

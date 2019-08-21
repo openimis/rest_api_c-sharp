@@ -80,9 +80,8 @@ namespace OpenImis.RestApi.Security
             if (apiVersion == null || apiVersion.StartsWith("2"))
             {
                 Guid userUUID = Guid.Parse(tokenS.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
-                int userId = _imisModulesV2.GetInsureeModule().GetFamilyLogic().GetUserIdByUUID(userUUID);
 
-                user = (UserData)_imisModulesV2.GetLoginModule().GetLoginLogic().GetById(userId);
+                user = (UserData)_imisModulesV2.GetLoginModule().GetLoginLogic().GetByUUID(userUUID);
             }
             else
             {
