@@ -9,6 +9,7 @@ namespace OpenImis.RestApi.Security
     public class UserData
     {
         public string UserID { get; set; }
+        public Guid UserUUID { get; set; }
         public string LoginName { get; set; }
         public string PrivateKey { get; set; }
         public string StoredPassword { get; set; }
@@ -28,7 +29,7 @@ namespace OpenImis.RestApi.Security
         {
             return new UserData()
             {
-                UserID = v.UserID,
+                UserUUID = v.UserUUID,
                 LoginName = v.LoginName,
                 PrivateKey = v.PrivateKey
             };

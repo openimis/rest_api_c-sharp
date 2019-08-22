@@ -11,6 +11,7 @@ using OpenImis.ModulesV2.ClaimModule;
 using OpenImis.ModulesV2.InsureeModule;
 using OpenImis.ModulesV2.CoverageModule;
 using OpenImis.ModulesV2.PaymentModule;
+using Microsoft.AspNetCore.Hosting;
 using OpenImis.ModulesV2.FeedbackModule;
 using OpenImis.ModulesV2.MasterDataModule;
 using OpenImis.ModulesV2.PremiumModule;
@@ -32,12 +33,14 @@ namespace OpenImis.ModulesV2
         private ISystemModule systemModule;
 
         private readonly IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        public ImisModules(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger("LoggerCategory");
             _serviceProvider = serviceProvider;
         }
@@ -88,7 +91,7 @@ namespace OpenImis.ModulesV2
         {
             if (insureeModule == null)
             {
-                insureeModule = new InsureeModule.InsureeModule(_configuration);
+                insureeModule = new InsureeModule.InsureeModule(_configuration, _hostingEnvironment);
 
                 Type familyLogicType = CreateTypeFromConfiguration("InsureeModule", "FamilyLogic", "OpenImis.ModulesV2.InsureeModule.Logic.FamilyLogic");
                 insureeModule.SetFamilyLogic((InsureeModule.Logic.IFamilyLogic)ActivatorUtilities.CreateInstance(_serviceProvider, familyLogicType));
