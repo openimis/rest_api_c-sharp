@@ -93,7 +93,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
 
-                var enrollFamily = (Enrolment)model;
+                var enrollFamily = model.GetEnrolmentFromModel();
 
                 enrollFamily.FileInfo.UserId = userId;
                 enrollFamily.FileInfo.OfficerId = officerId;
@@ -114,7 +114,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 }
                 else hof = "Unknown";
 
-                var FileName = string.Format("{0}__{1}_{2}.XML.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss.XML"));
+                var FileName = string.Format("{0}__{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss.XML"));
                 var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
 
 

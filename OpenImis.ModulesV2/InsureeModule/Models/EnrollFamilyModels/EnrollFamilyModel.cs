@@ -9,12 +9,12 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
     {
         public List<Family> Family { get; set; }
 
-        public static explicit operator Enrolment(EnrollFamilyModel efm)
+        public Enrolment GetEnrolmentFromModel()
         {
             return new Enrolment()
             {
                 FileInfo = new FileInfo(),
-                Families = efm.Family.Select(x => new List<Family>()
+                Families = Family.Select(x => new List<Family>()
                 {
                     new Family()
                     {
@@ -31,10 +31,10 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
                         isOffline = x.isOffline
                     }
                 }).FirstOrDefault(),
-                Insurees = efm.Family.Select(x => x.Insurees).FirstOrDefault().ToList(),
-                Policies = efm.Family.Select(x => x.Policies).FirstOrDefault().ToList(),
-                Premiums = efm.Family.Select(x => x.Policies.Select(s => s.Premium)).FirstOrDefault().ToList(),
-                InsureePolicies = efm.Family.Select(x => x.InsureePolicy).FirstOrDefault().ToList(),
+                Insurees = Family.Select(x => x.Insurees).FirstOrDefault().ToList(),
+                Policies = Family.Select(x => x.Policies).FirstOrDefault().ToList(),
+                Premiums = Family.Select(x => x.Policies.Select(s => s.Premium)).FirstOrDefault().ToList(),
+                InsureePolicies = Family.Select(x => x.InsureePolicy).FirstOrDefault().ToList(),
             };
         }
     }
