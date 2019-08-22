@@ -12,6 +12,11 @@ namespace OpenImis.ModulesV2.Helpers
         public CoverageModule CoverageModule { get; set; }
         public InsureeModule InsureeModule { get; set; }
         public PaymentModule PaymentModule { get; set; }
+
+        public FeedbackModule FeedbackModule { get; set; }
+        public PremiumModule PremiumModule { get; set; }
+        public SystemModule SystemModule { get; set; }
+        public MasterDataModule MasterDataModule { get; set; }
     }
 
     public class LoginModule
@@ -39,5 +44,25 @@ namespace OpenImis.ModulesV2.Helpers
     public class PaymentModule
     {
         public string PaymentLogic { get; set; }
+    }
+
+    public class FeedbackModule
+    {
+        public string FeedbackLogic { get; set; }
+    }
+
+    public class PremiumModule
+    {
+        public string PremiumLogic { get; set; }
+    }
+
+    public class SystemModule
+    {
+        public string SystemLogic { get; set; }
+    }
+
+    public class MasterDataModule
+    {
+        public string MasterDataLogic { get; set; }
     }
 }

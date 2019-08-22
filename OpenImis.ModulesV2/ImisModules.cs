@@ -1,5 +1,8 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using OpenImis.ModulesV2.Helpers;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,9 +11,9 @@ using OpenImis.ModulesV2.ClaimModule;
 using OpenImis.ModulesV2.InsureeModule;
 using OpenImis.ModulesV2.CoverageModule;
 using OpenImis.ModulesV2.PaymentModule;
-using OpenImis.ModulesV2.Helpers;
-using System.Collections.Generic;
-using System.Linq;
+using OpenImis.ModulesV2.MasterDataModule;
+using OpenImis.ModulesV2.MasterDataModule.Logic;
+using System.Diagnostics;
 
 namespace OpenImis.ModulesV2
 {
@@ -22,6 +25,7 @@ namespace OpenImis.ModulesV2
         private IClaimModule claimModule;
         private ICoverageModule coverageModule;
         private IPaymentModule paymentModule;
+        private IMasterDataModule masterDataModule;
 
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
@@ -131,6 +135,24 @@ namespace OpenImis.ModulesV2
         }
 
         /// <summary>
+        /// Creates and returns the master data module version 2.
+        /// </summary>
+        /// <returns>
+        /// The MasterData module V2.
+        /// </returns>
+        public IMasterDataModule GetMasterDataModule()
+        {
+            if (masterDataModule == null)
+            {
+                masterDataModule = new MasterDataModule.MasterDataModule(_configuration);
+
+                Type masterDataLogicType = CreateTypeFromConfiguration("MasterDataModule", "MasterDataLogic", "OpenImis.ModulesV2.MasterDataModule.Logic.MasterDataLogic");
+                masterDataModule.SetMasterDataLogic((IMasterDataLogic)ActivatorUtilities.CreateInstance(_serviceProvider, masterDataLogicType));
+            }
+            return masterDataModule;
+        }
+
+        /// <summary>
 		/// Creates and returns the type based on the string from the configuration 
 		/// </summary>
 		/// <param name="moduleName">The module name</param>
@@ -142,15 +164,11 @@ namespace OpenImis.ModulesV2
             Type type;
 
             Assembly assembly = Assembly.GetCallingAssembly();
-
             string part = GetSectionName(moduleName, sectionName, "2");
-
             type = assembly.GetType(part);
-
             if (type == null)
             {
                 _logger.LogError(moduleName + " " + sectionName + " error: the type " + part + " was not found. Using default " + defaultValue + " configuration.");
-
                 type = assembly.GetType(defaultValue);
             }
             else
@@ -166,14 +184,13 @@ namespace OpenImis.ModulesV2
             string part = "";
 
             var listImisModules = _configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
-
+           
             var module = listImisModules.Where(m => m.Version == apiVersion).Select(x => GetPropValue(x, moduleName)).FirstOrDefault();
 
             if (GetPropValue(module, sectionName) != null)
             {
                 part = GetPropValue(module, sectionName).ToString();
             }
-
             return part;
         }
 
