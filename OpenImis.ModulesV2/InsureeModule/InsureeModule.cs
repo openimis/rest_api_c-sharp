@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using OpenImis.ModulesV2.InsureeModule.Logic;
 
 namespace OpenImis.ModulesV2.InsureeModule
@@ -6,21 +7,23 @@ namespace OpenImis.ModulesV2.InsureeModule
     public class InsureeModule : IInsureeModule
     {
         private IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private IFamilyLogic _familyLogic;
         private IContributionLogic _contributionLogic;
         private IPolicyLogic _policyLogic;
 
-        public InsureeModule(IConfiguration configuration)
+        public InsureeModule(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public IFamilyLogic GetFamilyLogic()
         {
             if (_familyLogic == null)
             {
-                _familyLogic = new FamilyLogic(_configuration);
+                _familyLogic = new FamilyLogic(_configuration, _hostingEnvironment);
             }
             return _familyLogic;
         }

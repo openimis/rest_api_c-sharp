@@ -1,5 +1,8 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using OpenImis.ModulesV2.Helpers;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,9 +11,11 @@ using OpenImis.ModulesV2.ClaimModule;
 using OpenImis.ModulesV2.InsureeModule;
 using OpenImis.ModulesV2.CoverageModule;
 using OpenImis.ModulesV2.PaymentModule;
-using OpenImis.ModulesV2.Helpers;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using OpenImis.ModulesV2.FeedbackModule;
+using OpenImis.ModulesV2.MasterDataModule;
+using OpenImis.ModulesV2.PremiumModule;
+using OpenImis.ModulesV2.SystemModule;
 
 namespace OpenImis.ModulesV2
 {
@@ -22,14 +27,20 @@ namespace OpenImis.ModulesV2
         private IClaimModule claimModule;
         private ICoverageModule coverageModule;
         private IPaymentModule paymentModule;
+        private IFeedbackModule feedbackModule;
+        private IMasterDataModule masterDataModule;
+        private IPremiumModule premiumModule;
+        private ISystemModule systemModule;
 
         private readonly IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public ImisModules(IConfiguration configuration, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        public ImisModules(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
         {
             _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger("LoggerCategory");
             _serviceProvider = serviceProvider;
         }
@@ -80,7 +91,7 @@ namespace OpenImis.ModulesV2
         {
             if (insureeModule == null)
             {
-                insureeModule = new InsureeModule.InsureeModule(_configuration);
+                insureeModule = new InsureeModule.InsureeModule(_configuration, _hostingEnvironment);
 
                 Type familyLogicType = CreateTypeFromConfiguration("InsureeModule", "FamilyLogic", "OpenImis.ModulesV2.InsureeModule.Logic.FamilyLogic");
                 insureeModule.SetFamilyLogic((InsureeModule.Logic.IFamilyLogic)ActivatorUtilities.CreateInstance(_serviceProvider, familyLogicType));
@@ -128,6 +139,78 @@ namespace OpenImis.ModulesV2
                 paymentModule.SetPaymentLogic((PaymentModule.Logic.IPaymentLogic)ActivatorUtilities.CreateInstance(_serviceProvider, paymentLogicType));
             }
             return paymentModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the feedback module version 2.
+        /// </summary>
+        /// <returns>
+        /// The Feedback module V2.
+        /// </returns>
+        public IFeedbackModule GetFeedbackModule()
+        {
+            if (feedbackModule == null)
+            {
+                feedbackModule = new FeedbackModule.FeedbackModule(_configuration);
+
+                Type feedbackLogicType = CreateTypeFromConfiguration("FeedbackModule", "FeedbackLogic", "OpenImis.ModulesV2.FeedbackModule.Logic.FeedbackLogic");
+                feedbackModule.SetFeedbackLogic((FeedbackModule.Logic.IFeedbackLogic)ActivatorUtilities.CreateInstance(_serviceProvider, feedbackLogicType));
+            }
+            return feedbackModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the premium module version 2.
+        /// </summary>
+        /// <returns>
+        /// The Premium module V2.
+        /// </returns>
+        public IPremiumModule GetPremiumModule()
+        {
+            if (premiumModule == null)
+            {
+                premiumModule = new PremiumModule.PremiumModule(_configuration);
+
+                Type premiumLogicType = CreateTypeFromConfiguration("PremiumModule", "PremiumLogic", "OpenImis.ModulesV2.PremiumModule.Logic.PremiumLogic");
+                premiumModule.SetPremiumLogic((PremiumModule.Logic.IPremiumLogic)ActivatorUtilities.CreateInstance(_serviceProvider, premiumLogicType));
+            }
+            return premiumModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the system module version 2.
+        /// </summary>
+        /// <returns>
+        /// The System module V2.
+        /// </returns>
+        public ISystemModule GetSystemModule()
+        {
+            if (systemModule == null)
+            {
+                systemModule = new SystemModule.SystemModule(_configuration);
+
+                Type systemLogicType = CreateTypeFromConfiguration("SystemModule", "SystemLogic", "OpenImis.ModulesV2.SystemModule.Logic.SystemLogic");
+                systemModule.SetSystemLogic((SystemModule.Logic.ISystemLogic)ActivatorUtilities.CreateInstance(_serviceProvider, systemLogicType));
+            }
+            return systemModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the master data module version 2.
+        /// </summary>
+        /// <returns>
+        /// The MasterData module V2.
+        /// </returns>
+        public IMasterDataModule GetMasterDataModule()
+        {
+            if (masterDataModule == null)
+            {
+                masterDataModule = new MasterDataModule.MasterDataModule(_configuration);
+
+                Type masterDataLogicType = CreateTypeFromConfiguration("MasterDataModule", "MasterDataLogic", "OpenImis.ModulesV2.MasterDataModule.Logic.MasterDataLogic");
+                masterDataModule.SetMasterDataLogic((MasterDataModule.Logic.IMasterDataLogic)ActivatorUtilities.CreateInstance(_serviceProvider, masterDataLogicType));
+            }
+            return masterDataModule;
         }
 
         /// <summary>

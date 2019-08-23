@@ -23,7 +23,7 @@ namespace OpenImis.ModulesV2.ClaimModule.Repositories
         {
             try
             {
-                var XML = claim.Serialize();
+                var XML = claim.XMLSerialize();
                 var RV = -99;
 
                 using (var imisContext = new ImisDB())

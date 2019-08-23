@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -9,7 +7,7 @@ namespace OpenImis.ModulesV2.Helpers
 {
     public static class Extensions
     {
-        public static string Serialize<T>(this T value)
+        public static string XMLSerialize<T>(this T value)
         {
             if (value == null)
             {
