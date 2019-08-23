@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.ClaimModule.Models.RegisterClaim;
+using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
 {
@@ -19,9 +20,9 @@ namespace OpenImis.RestApi.Controllers.V2
             _imisModules = imisModules;
         }
 
-        //[HasRights(Rights.ClaimAdd)]
+        [HasRights(Rights.ClaimAdd)]
         [HttpPost]
-        public IActionResult Create([FromBody] Claim claim)
+        public IActionResult Create([FromBody]Claim claim)
         {
             int response;
 
