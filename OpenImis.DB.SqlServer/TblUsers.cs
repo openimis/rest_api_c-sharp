@@ -13,6 +13,7 @@ namespace OpenImis.DB.SqlServer
         }
 
         public int UserId { get; set; }
+        public Guid UserUUID { get; set; }
         public string LanguageId { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }

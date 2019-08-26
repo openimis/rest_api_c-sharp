@@ -23,9 +23,9 @@ namespace OpenImis.ModulesV2.LoginModule.Logic
             loginRepository = new LoginRepository(_configuration);
         }
 
-        public UserData GetById(int userId)
+        public UserData GetByUUID(Guid userUUID)
         {
-            return loginRepository.GetById(userId);
+            return loginRepository.GetByUUID(userUUID);
         }
 
         public UserData FindUser(string UserName, string Password)

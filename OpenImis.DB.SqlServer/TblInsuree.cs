@@ -17,6 +17,7 @@ namespace OpenImis.DB.SqlServer
         }
 
         public int InsureeId { get; set; }
+        public Guid InsureeUUID { get; set; }
         public int FamilyId { get; set; }
         public string Chfid { get; set; }
         public string LastName { get; set; }

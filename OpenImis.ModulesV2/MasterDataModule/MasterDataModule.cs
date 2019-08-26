@@ -6,7 +6,6 @@ namespace OpenImis.ModulesV2.MasterDataModule
     public class MasterDataModule : IMasterDataModule
     {
         private IConfiguration _configuration;
-
         private IMasterDataLogic _masterDataLogic;
 
         public MasterDataModule(IConfiguration configuration)
