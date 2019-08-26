@@ -69,8 +69,7 @@ namespace OpenImis.RestApi
                 options.AllowCombiningAuthorizeFilters = false;
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-            .AddControllersAsServices()
-            .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+            .AddControllersAsServices();
 
             services.AddApiVersioning(o =>
             {
