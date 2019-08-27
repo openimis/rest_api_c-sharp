@@ -3,6 +3,7 @@ using OpenImis.ModulesV2.ClaimModule;
 using OpenImis.ModulesV2.InsureeModule;
 using OpenImis.ModulesV2.CoverageModule;
 using OpenImis.ModulesV2.PaymentModule;
+using OpenImis.ModulesV2.MasterDataModule;
 
 namespace OpenImis.ModulesV2
 {
@@ -20,5 +21,7 @@ namespace OpenImis.ModulesV2
         ICoverageModule GetCoverageModule();
 
         IPaymentModule GetPaymentModule();
+
+        IMasterDataModule GetMasterDataModule();
     }
 }
