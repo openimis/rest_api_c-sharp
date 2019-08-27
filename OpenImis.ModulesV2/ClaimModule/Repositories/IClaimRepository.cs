@@ -4,6 +4,6 @@ namespace OpenImis.ModulesV2.ClaimModule.Repositories
 {
     public interface IClaimRepository
     {
-        int RegisterClaim(Claim claim);
+        int Create(Claim claim);
     }
 }

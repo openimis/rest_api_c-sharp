@@ -28,7 +28,7 @@ namespace OpenImis.RestApi.Controllers.V2
 
             try
             {
-                response = _imisModules.GetClaimModule().GetClaimLogic().RegisterClaim(claim);
+                response = _imisModules.GetClaimModule().GetClaimLogic().Create(claim);
             }
             catch (ValidationException e)
             {

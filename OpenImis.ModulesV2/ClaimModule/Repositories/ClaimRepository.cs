@@ -19,7 +19,7 @@ namespace OpenImis.ModulesV2.ClaimModule.Repositories
             _configuration = configuration;
         }
 
-        public int RegisterClaim(Claim claim)
+        public int Create(Claim claim)
         {
             try
             {

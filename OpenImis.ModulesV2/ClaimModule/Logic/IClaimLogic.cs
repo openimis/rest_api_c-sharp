@@ -4,6 +4,6 @@ namespace OpenImis.ModulesV2.ClaimModule.Logic
 {
     public interface IClaimLogic
     {
-        int RegisterClaim(Claim claim);
+        int Create(Claim claim);
     }
 }
