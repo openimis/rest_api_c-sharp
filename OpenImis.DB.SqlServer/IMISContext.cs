@@ -73,6 +73,7 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblUsersDistricts> TblUsersDistricts { get; set; }
         public virtual DbSet<TblRoleRight> TblRoleRight { get; set; }
         public virtual DbSet<TblUserRole> TblUserRole { get; set; }
+        public virtual DbSet<TblIMISDetaulsPhone> TblIMISDetaulsPhone { get; set; }
         public virtual DbSet<TblVillages> TblVillages { get; set; }
         public virtual DbSet<TblWards> TblWards { get; set; }
         public virtual DbSet<TblDistricts> TblDistricts { get; set; }
@@ -2660,6 +2661,11 @@ namespace OpenImis.DB.SqlServer
             modelBuilder.Entity<TblUserRole>(entity =>
             {
                 entity.HasKey(e => e.UserRoleID);
+            });
+
+            modelBuilder.Entity<TblIMISDetaulsPhone>(entity =>
+            {
+                entity.HasKey(e => e.RuleName);
             });
 
             modelBuilder.Entity<TblVillages>(entity =>

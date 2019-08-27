@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace OpenImis.ModulesV2.MasterDataModule.Models
+{
+    public class OfficerModel
+    {
+        public Guid OfficerUUID { get; set; }
+        public string Code { get; set; }
+        public string LastName { get; set; }
+        public string OtherNames { get; set; }
+        public string Phone { get; set; }
+        public int? LocationId { get; set; }
+        public string OfficerIDSubst { get; set; }
+        public string WorksTo { get; set; }
+    }
+}
