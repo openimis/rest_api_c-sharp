@@ -39,6 +39,7 @@ namespace OpenImis.ModulesV2.Helpers
         public string FamilyLogic { get; set; }
         public string PolicyLogic { get; set; }
         public string ContributionLogic { get; set; }
+        public string InsureeLogic { get; set; }
     }
 
     public class PaymentModule

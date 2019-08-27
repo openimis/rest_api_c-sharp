@@ -34,7 +34,8 @@
       "InsureeModule": {
         "FamilyLogic": "OpenImis.ModulesV2.InsureeModule.Logic.FamilyLogic",
         "PolicyLogic": "OpenImis.ModulesV2.InsureeModule.Logic.PolicyLogic",
-        "ContributionLogic": "OpenImis.ModulesV2.InsureeModule.Logic.ContributionLogic"
+        "ContributionLogic": "OpenImis.ModulesV2.InsureeModule.Logic.ContributionLogic",
+        "InsureeLogic": "OpenImis.ModulesV2.InsureeModule.Logic.InsureeLogic"
       },
       "PaymentModule": {
         "PaymentLogic": "OpenImis.ModulesV2.PaymentModule.Logic.PaymentLogic"

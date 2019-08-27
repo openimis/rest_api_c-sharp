@@ -12,6 +12,7 @@ namespace OpenImis.ModulesV2.InsureeModule
         private IFamilyLogic _familyLogic;
         private IContributionLogic _contributionLogic;
         private IPolicyLogic _policyLogic;
+        private IInsureeLogic _insureeLogic;
 
         public InsureeModule(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
@@ -46,6 +47,15 @@ namespace OpenImis.ModulesV2.InsureeModule
             return _policyLogic;
         }
 
+        public IInsureeLogic GetInsureeLogic()
+        {
+            if (_insureeLogic == null)
+            {
+                _insureeLogic = new InsureeLogic(_configuration);
+            }
+            return _insureeLogic;
+        }
+
         public IInsureeModule SetFamilyLogic(IFamilyLogic familyLogic)
         {
             _familyLogic = familyLogic;
@@ -61,6 +71,12 @@ namespace OpenImis.ModulesV2.InsureeModule
         public IInsureeModule SetContributionLogic(IContributionLogic contributionLogic)
         {
             _contributionLogic = contributionLogic;
+            return this;
+        }
+
+        public IInsureeModule SetInsureeLogic(IInsureeLogic insureeLogic)
+        {
+            _insureeLogic = insureeLogic;
             return this;
         }
     }

@@ -101,6 +101,9 @@ namespace OpenImis.ModulesV2
 
                 Type contributionLogicType = CreateTypeFromConfiguration("InsureeModule", "ContributionLogic", "OpenImis.ModulesV2.InsureeModule.Logic.ContributionLogic");
                 insureeModule.SetContributionLogic((InsureeModule.Logic.IContributionLogic)ActivatorUtilities.CreateInstance(_serviceProvider, contributionLogicType));
+
+                Type insureeLogicType = CreateTypeFromConfiguration("InsureeModule", "InsureeLogic", "OpenImis.ModulesV2.InsureeModule.Logic.InsureeLogic");
+                insureeModule.SetInsureeLogic((InsureeModule.Logic.IInsureeLogic)ActivatorUtilities.CreateInstance(_serviceProvider, insureeLogicType));
             }
             return insureeModule;
         }
