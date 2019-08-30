@@ -8,8 +8,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Diagnostics;
 using System.Text;
+using System.Globalization;
 
 namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
@@ -22,9 +24,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             _configuration = configuration;
         }
 
-        public GetInsureeModel Get(string chfid)
+        public GetEnquireModel GetEnquire(string chfid)
         {
-            GetInsureeModel response = new GetInsureeModel();
+            GetEnquireModel response = new GetEnquireModel();
             List<DetailModel> details = new List<DetailModel>();
 
             try
@@ -83,6 +85,43 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 }
 
                 response.Details = details;
+
+                return response;
+            }
+            catch (SqlException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public GetInsureeModel Get(string chfid)
+        {
+            GetInsureeModel response = new GetInsureeModel();
+
+            try
+            {
+                using (var imisContext = new ImisDB())
+                {
+                    response = (from I in imisContext.TblInsuree
+                                join P in imisContext.TblPhotos on I.Chfid equals P.Chfid
+                                join G in imisContext.TblGender on I.Gender equals G.Code
+                                where I.Chfid == chfid
+                                && I.ValidityTo == null
+                                && P.ValidityTo == null
+                                select new GetInsureeModel()
+                                {
+                                    CHFID = I.Chfid,
+                                    DOB = I.Dob.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                                    Gender = G.Gender,
+                                    InsureeName = I.LastName + " " + I.OtherNames,
+                                    PhotoPath = P.PhotoFolder + P.PhotoFileName
+                                })
+                             .FirstOrDefault();
+                }
 
                 return response;
             }

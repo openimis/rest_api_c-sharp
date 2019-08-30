@@ -16,20 +16,20 @@ namespace OpenImis.ModulesV2.InsureeModule.Logic
             insureeRepository = new InsureeRepository(_configuration);
         }
 
+        public GetEnquireModel GetEnquire(string chfid)
+        {
+            GetEnquireModel response;
+
+            response = insureeRepository.GetEnquire(chfid);
+
+            return response;
+        }
+
         public GetInsureeModel Get(string chfid)
         {
             GetInsureeModel response;
 
             response = insureeRepository.Get(chfid);
-
-            return response;
-        }
-
-        public GetEnquireModel GetEnquire(string chfid)
-        {
-            GetInsureeModel insuree = insureeRepository.Get(chfid);
-
-            GetEnquireModel response = insuree.GetEnquire();
 
             return response;
         }

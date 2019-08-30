@@ -4,12 +4,20 @@ using System.Text;
 
 namespace OpenImis.ModulesV2.InsureeModule.Models
 {
-    public class GetEnquireModel
+    public class GetEnquireModel : GetInsureeModel
     {
-        public string CHFID { get; set; }
-        public string PhotoPath { get; set; }
-        public string InsureeName { get; set; }
-        public string DOB { get; set; }
-        public string Gender { get; set; }
+        public List<DetailModel> Details { get; set; }
+
+        public GetInsureeModel GetInsuree()
+        {
+            return new GetInsureeModel()
+            {
+                CHFID = CHFID,
+                DOB = DOB,
+                Gender = Gender,
+                InsureeName = InsureeName,
+                PhotoPath = PhotoPath
+            };
+        }
     }
 }
