@@ -47,5 +47,29 @@ namespace OpenImis.RestApi.Controllers.V2
 
             return Ok(getInsureeModel);
         }
+
+        [HasRights(Rights.InsureeEnquire)]
+        [HttpGet]
+        [Route("{chfid}/enquire")]
+        public IActionResult GetEnquire(string chfid)
+        {
+            GetEnquireModel getEnquireModel;
+
+            try
+            {
+                getEnquireModel = _imisModules.GetInsureeModule().GetInsureeLogic().GetEnquire(chfid);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+            }
+
+            if (getEnquireModel == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(getEnquireModel);
+        }
     }
 }

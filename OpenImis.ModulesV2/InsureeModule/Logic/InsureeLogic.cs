@@ -24,5 +24,14 @@ namespace OpenImis.ModulesV2.InsureeModule.Logic
 
             return response;
         }
+
+        public GetEnquireModel GetEnquire(string chfid)
+        {
+            GetInsureeModel insuree = insureeRepository.Get(chfid);
+
+            GetEnquireModel response = insuree.GetEnquire();
+
+            return response;
+        }
     }
 }
