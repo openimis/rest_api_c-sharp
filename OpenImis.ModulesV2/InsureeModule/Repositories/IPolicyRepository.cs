@@ -1,11 +1,10 @@
 ﻿using OpenImis.ModulesV2.InsureeModule.Models;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace OpenImis.ModulesV2.InsureeModule.Logic
+namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
-    public interface IPolicyLogic
+    public interface IPolicyRepository
     {
         List<GetPolicyModel> Get(string officerCode);
         int Post(PolicyRenewalModel policy);
