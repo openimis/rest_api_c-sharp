@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using OpenImis.ModulesV2.SystemModule.Repositories;
 
 namespace OpenImis.ModulesV2.SystemModule.Logic
 {
@@ -6,9 +7,22 @@ namespace OpenImis.ModulesV2.SystemModule.Logic
     {
         private IConfiguration _configuration;
 
+        protected ISystemRepository systemRepository;
+
         public SystemLogic(IConfiguration configuration)
         {
             _configuration = configuration;
+
+            systemRepository = new SystemRepository(_configuration);
+        }
+
+        public string Get(string name)
+        {
+            string response;
+
+            response = systemRepository.Get(name);
+
+            return response;
         }
     }
 }
