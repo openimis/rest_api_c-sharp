@@ -449,7 +449,9 @@ namespace ImisRestApi.Data
             {
                 DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
 
+                var jsonString = JsonConvert.SerializeObject(data);
                 //bool error = false;
+
                 DataTable dt = new DataTable();
 
                 if (data.Tables.Count > 0)
