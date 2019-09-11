@@ -9,5 +9,6 @@ namespace ImisRestApi.Models.Sms
     {
         public string Message { get; set; }
         public string Recipient { get; set; }
+        public object Response { get; set; }
     }
 }
