@@ -135,6 +135,11 @@ namespace ImisRestApi.Data
             return message;
         }
 
+        internal object GetClaims(GetClaimsModel model)
+        {
+            throw new NotImplementedException();
+        }
+
         public DataTable GetClaimAdministrators()
         {
             var sSQL = @"SELECT LastName,OtherNames,ClaimAdminCode FROM tblClaimAdmin WHERE ValidityTo IS NULL";
