@@ -112,23 +112,23 @@ namespace ImisRestApi.Controllers
 
         }
 
-        //[HttpGet]
-        //[Route("api/GetClaims")]
-        //public IActionResult GetClaims(GetClaimsModel model)
-        //{
+        [HttpGet]
+        [Route("api/GetClaims")]
+        public IActionResult GetClaims(GetClaimsModel model)
+        {
 
-        //    try
-        //    {
+            try
+            {
 
-        //        var data = imisClaims.GetClaims(model);
+                var data = imisClaims.GetClaims(model);
 
-        //        return Ok(new { error_occured = false, controls = data });
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest(new { error_occured = true, error_message = e.Message });
-        //    }
+                return Ok(new { error_occured = false, controls = data });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
+            }
 
-        //}
+        }
     }
 }

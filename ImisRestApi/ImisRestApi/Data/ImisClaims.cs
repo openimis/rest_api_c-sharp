@@ -137,7 +137,25 @@ namespace ImisRestApi.Data
 
         internal object GetClaims(GetClaimsModel model)
         {
-            throw new NotImplementedException();
+            var sSQL = @"Query";
+
+            DataHelper helper = new DataHelper(Configuration);
+
+            SqlParameter[] sqlParameters = {
+
+            };
+
+            try
+            {
+                var response = helper.GetDataTable(sSQL, sqlParameters, CommandType.Text);
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
         }
 
         public DataTable GetClaimAdministrators()
