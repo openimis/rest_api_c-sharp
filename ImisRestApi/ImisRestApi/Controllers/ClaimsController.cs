@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
@@ -112,7 +113,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("api/GetClaims")]
         public IActionResult GetClaims(GetClaimsModel model)
         {
@@ -122,6 +123,7 @@ namespace ImisRestApi.Controllers
 
                 var data = imisClaims.GetClaims(model);
 
+               
                 return Ok(new { error_occured = false, controls = data });
             }
             catch (Exception e)
