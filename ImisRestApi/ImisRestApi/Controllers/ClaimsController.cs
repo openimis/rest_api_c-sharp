@@ -75,6 +75,8 @@ namespace ImisRestApi.Controllers
 
         [HttpGet]
         [Route("api/Claims/GetClaimAdmins")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult ValidateClaimAdmin()
         {
 
@@ -94,6 +96,8 @@ namespace ImisRestApi.Controllers
 
         [HttpGet]
         [Route("api/Claims/Controls")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetControls()
         {
 
@@ -115,6 +119,8 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetClaims")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetClaims(GetClaimsModel model)
         {
 
