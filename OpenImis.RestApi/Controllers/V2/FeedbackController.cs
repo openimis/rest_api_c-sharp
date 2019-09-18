@@ -25,7 +25,25 @@ namespace OpenImis.RestApi.Controllers.V2
             _imisModules = imisModules;
         }
 
-        //[HasRights(Rights.ClaimFeedback)]
+        [HasRights(Rights.ClaimFeedback)]
+        [HttpPost]
+        public IActionResult Post([FromBody]Feedback model)
+        {
+            int response;
+
+            try
+            {
+                response = _imisModules.GetFeedbackModule().GetFeedbackLogic().Post(model);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+            }
+
+            return Ok(response);
+        }
+
+        [HasRights(Rights.ClaimFeedback)]
         [HttpGet]
         public IActionResult Get()
         {

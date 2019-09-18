@@ -8,5 +8,6 @@ namespace OpenImis.ModulesV2.FeedbackModule.Logic
     {
         List<FeedbackModel> Get(string officerCode);
         string GetLoginNameByUserUUID(Guid userUUID);
+        int Post(Feedback feedbackClaim);
     }
 }

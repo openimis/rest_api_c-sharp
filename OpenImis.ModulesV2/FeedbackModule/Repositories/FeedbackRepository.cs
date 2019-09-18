@@ -1,22 +1,121 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV2.FeedbackModule.Models;
+using OpenImis.ModulesV2.Helpers;
+using OpenImis.ModulesV2.InsureeModule.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Xml;
 
 namespace OpenImis.ModulesV2.FeedbackModule.Repositories
 {
     public class FeedbackRepository : IFeedbackRepository
     {
         private IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public FeedbackRepository(IConfiguration configuration)
+        public FeedbackRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
+        }
+
+        public int Post(Feedback feedbackClaim)
+        {
+            int RV = -99;
+
+            try
+            {
+                string webRootPath = _hostingEnvironment.WebRootPath;
+
+                var XML = feedbackClaim.XMLSerialize();
+
+                var tempDoc = new XmlDocument();
+                tempDoc.LoadXml(XML);
+                tempDoc.InnerXml = tempDoc.InnerXml.Replace("Feedback>", "feedback>");
+
+                XML = tempDoc.OuterXml;
+
+                var fromPhoneFeedbackDir = _configuration["AppSettings:FromPhone_Feedback"];
+
+                var claimCode = "";
+
+                using (var imisContext = new ImisDB())
+                {
+                    claimCode = imisContext.TblClaim
+                        .Where(u => u.ClaimId == feedbackClaim.ClaimID)
+                        .Select(x => x.ClaimCode)
+                        .FirstOrDefault();
+                }
+
+                var fileName = "feedback_" + feedbackClaim.Date + "_" + claimCode + ".xml";
+
+                var xmldoc = new XmlDocument();
+                xmldoc.InnerXml = XML;
+
+                try
+                {
+                    if (!Directory.Exists(webRootPath + fromPhoneFeedbackDir)) Directory.CreateDirectory(webRootPath + fromPhoneFeedbackDir);
+
+                    xmldoc.Save(webRootPath + fromPhoneFeedbackDir + fileName);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+
+                using (var imisContext = new ImisDB())
+                {
+                    var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                    var returnParameter = OutputParameter.CreateOutputParameter("@RV", SqlDbType.Int);
+
+                    var sql = "exec @RV = uspInsertFeedback @XML";
+
+                    DbConnection connection = imisContext.Database.GetDbConnection();
+
+                    using (DbCommand cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = sql;
+
+                        cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter });
+
+                        if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            // Displaying errors in the Stored Procedure in Debug mode
+                            //do
+                            //{
+                            //    while (reader.Read())
+                            //    {
+                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                            //    }
+                            //} while (reader.NextResult());
+                        }
+                    }
+
+                    RV = (int)returnParameter.Value;
+                }
+
+                return RV;
+            }
+            catch (SqlException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         public List<FeedbackModel> Get(string officerCode)
