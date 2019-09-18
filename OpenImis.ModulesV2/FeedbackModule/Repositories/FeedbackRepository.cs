@@ -57,7 +57,7 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
                         .FirstOrDefault();
                 }
 
-                var fileName = "feedback_" + feedbackClaim.Date + "_" + claimCode + ".xml";
+                var fileName = "feedback_" + claimCode + ".xml";
 
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
