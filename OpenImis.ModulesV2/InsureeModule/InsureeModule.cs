@@ -41,7 +41,7 @@ namespace OpenImis.ModulesV2.InsureeModule
         {
             if (_policyLogic == null)
             {
-                _policyLogic = new PolicyLogic(_configuration);
+                _policyLogic = new PolicyLogic(_configuration, _hostingEnvironment);
             }
             return _policyLogic;
         }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
@@ -24,7 +22,7 @@ namespace OpenImis.RestApi.Controllers.V2
             _imisModules = imisModules;
         }
 
-        //[HasRights(Rights.PolicySearch)]
+        [HasRights(Rights.PolicySearch)]
         [HttpGet]
         [Route("officer/{officerCode}")]
         public IActionResult Get(string officerCode)
@@ -43,7 +41,7 @@ namespace OpenImis.RestApi.Controllers.V2
             return Ok(response);
         }
 
-        //[HasRights(Rights.PolicyRenew)]
+        [HasRights(Rights.PolicyRenew)]
         [HttpPost]
         [Route("renew")]
         public IActionResult Post([FromBody]PolicyRenewalModel model)
@@ -62,7 +60,7 @@ namespace OpenImis.RestApi.Controllers.V2
             return Ok(response);
         }
 
-        //[HasRights(Rights.PolicyDelete)]
+        [HasRights(Rights.PolicyDelete)]
         [HttpDelete]
         [Route("renew/{uuid}")]
         public IActionResult Delete(Guid uuid)

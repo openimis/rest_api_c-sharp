@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV2.Helpers;
@@ -9,18 +10,21 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Xml;
 
 namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
     public class PolicyRepository : IPolicyRepository
     {
         private IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public PolicyRepository(IConfiguration configuration)
+        public PolicyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public List<GetPolicyModel> Get(string officerCode)
@@ -91,12 +95,28 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
             try
             {
+                string webRootPath = _hostingEnvironment.WebRootPath;
+
                 var policyRenew = policy.GetPolicy();
                 var XML = policyRenew.XMLSerialize();
 
-                Debug.WriteLine(XML);
+                var fromPhoneRenewalDir = _configuration["AppSettings:FromPhone_Renewal"];
 
-                string fileName = "test";
+                var fileName = "RenPol_" + policy.Date + "_" + policy.CHFID + "_" + policy.ReceiptNo + ".xml";
+
+                var xmldoc = new XmlDocument();
+                xmldoc.InnerXml = XML;
+
+                try
+                {
+                    if (!Directory.Exists(webRootPath + fromPhoneRenewalDir)) Directory.CreateDirectory(webRootPath + fromPhoneRenewalDir);
+
+                    xmldoc.Save(webRootPath + fromPhoneRenewalDir + fileName);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
 
                 using (var imisContext = new ImisDB())
                 {
