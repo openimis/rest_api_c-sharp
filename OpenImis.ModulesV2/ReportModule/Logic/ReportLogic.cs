@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using OpenImis.ModulesV2.ReportModule.Models;
 using OpenImis.ModulesV2.ReportModule.Repositories;
+using System;
 
 namespace OpenImis.ModulesV2.ReportModule.Logic
 {
@@ -15,29 +16,38 @@ namespace OpenImis.ModulesV2.ReportModule.Logic
             reportRepository = new ReportRepository(_configuration);
         }
 
-        public FeedbackModel GetFeedbackStats(ReportRequestModel feedbackRequestModel)
+        public FeedbackReportModel GetFeedbackStats(ReportRequestModel feedbackRequestModel, string officerCode)
         {
-            FeedbackModel response;
+            FeedbackReportModel response;
 
-            response = reportRepository.GetFeedbackStats(feedbackRequestModel);
+            response = reportRepository.GetFeedbackStats(feedbackRequestModel, officerCode);
 
             return response;
         }
 
-        public RenewalModel GetRenewalStats(ReportRequestModel renewalRequestModel)
+        public RenewalReportModel GetRenewalStats(ReportRequestModel renewalRequestModel, string officerCode)
         {
-            RenewalModel response;
+            RenewalReportModel response;
 
-            response = reportRepository.GetRenewalStats(renewalRequestModel);
+            response = reportRepository.GetRenewalStats(renewalRequestModel, officerCode);
 
             return response;
         }
 
-        public EnrolmentModel GetEnrolmentStats(ReportRequestModel enrolmentRequestModel)
+        public EnrolmentReportModel GetEnrolmentStats(ReportRequestModel enrolmentRequestModel, string officerCode)
         {
-            EnrolmentModel response;
+            EnrolmentReportModel response;
 
-            response = reportRepository.GetEnrolmentStats(enrolmentRequestModel);
+            response = reportRepository.GetEnrolmentStats(enrolmentRequestModel, officerCode);
+
+            return response;
+        }
+
+        public string GetLoginNameByUserUUID(Guid userUUID)
+        {
+            string response;
+
+            response = reportRepository.GetLoginNameByUserUUID(userUUID);
 
             return response;
         }

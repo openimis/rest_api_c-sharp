@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
@@ -26,11 +27,19 @@ namespace OpenImis.RestApi.Controllers.V2
         [Route("enrolment")]
         public IActionResult GetEnrolmentStats([FromBody]ReportRequestModel enrolmentRequestModel)
         {
-            EnrolmentModel enrolmentModel;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            EnrolmentReportModel enrolmentModel;
 
             try
             {
-                enrolmentModel = _imisModules.GetReportModule().GetReportLogic().GetEnrolmentStats(enrolmentRequestModel);
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+                string officerCode = _imisModules.GetReportModule().GetReportLogic().GetLoginNameByUserUUID(userUUID);
+
+                enrolmentModel = _imisModules.GetReportModule().GetReportLogic().GetEnrolmentStats(enrolmentRequestModel, officerCode);
             }
             catch (ValidationException e)
             {
@@ -50,11 +59,19 @@ namespace OpenImis.RestApi.Controllers.V2
         [Route("feedback")]
         public IActionResult GetFeedbackStats([FromBody]ReportRequestModel feedbackRequestModel)
         {
-            FeedbackModel feedbackModel;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            FeedbackReportModel feedbackModel;
 
             try
             {
-                feedbackModel = _imisModules.GetReportModule().GetReportLogic().GetFeedbackStats(feedbackRequestModel);
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+                string officerCode = _imisModules.GetReportModule().GetReportLogic().GetLoginNameByUserUUID(userUUID);
+
+                feedbackModel = _imisModules.GetReportModule().GetReportLogic().GetFeedbackStats(feedbackRequestModel, officerCode);
             }
             catch (ValidationException e)
             {
@@ -74,11 +91,19 @@ namespace OpenImis.RestApi.Controllers.V2
         [Route("renewal")]
         public IActionResult GetRenewalStats([FromBody]ReportRequestModel renewalRequestModel)
         {
-            RenewalModel renewalModel;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            RenewalReportModel renewalModel;
 
             try
             {
-                renewalModel = _imisModules.GetReportModule().GetReportLogic().GetRenewalStats(renewalRequestModel);
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+                string officerCode = _imisModules.GetReportModule().GetReportLogic().GetLoginNameByUserUUID(userUUID);
+
+                renewalModel = _imisModules.GetReportModule().GetReportLogic().GetRenewalStats(renewalRequestModel, officerCode);
             }
             catch (ValidationException e)
             {

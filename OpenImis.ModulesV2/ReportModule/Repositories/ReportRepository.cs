@@ -18,9 +18,9 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
             _configuration = configuration;
         }
 
-        public EnrolmentModel GetEnrolmentStats(ReportRequestModel enrolmentRequestModel)
+        public EnrolmentReportModel GetEnrolmentStats(ReportRequestModel enrolmentRequestModel, string officerCode)
         {
-            EnrolmentModel response = new EnrolmentModel();
+            EnrolmentReportModel response = new EnrolmentReportModel();
 
             try
             {
@@ -29,10 +29,10 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                     var submitted = (from FP in imisContext.TblFromPhone
                                      join O in imisContext.TblOfficer on FP.OfficerCode equals O.Code
                                      where FP.DocType == "E"
-                                     && FP.LandedDate >= DateTime.Parse(enrolmentRequestModel.FromDate)
-                                     && FP.LandedDate <= DateTime.Parse(enrolmentRequestModel.ToDate)
+                                     && FP.LandedDate >= enrolmentRequestModel.FromDate
+                                     && FP.LandedDate <= enrolmentRequestModel.ToDate
                                      && O.ValidityTo == null
-                                     && FP.OfficerCode == enrolmentRequestModel.OfficerCode
+                                     && FP.OfficerCode == officerCode
                                      select new { FromPhone = FP, Officer = O })
                                      .ToList();
 
@@ -44,7 +44,7 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                                     select S)
                                     .ToList();
 
-                    response = new EnrolmentModel()
+                    response = new EnrolmentReportModel()
                     {
                         TotalSubmitted = submitted.Select(x => x.FromPhone).Count(),
                         TotalAssigned = assigned.Count(),
@@ -63,9 +63,9 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
             }
         }
 
-        public FeedbackModel GetFeedbackStats(ReportRequestModel feedbackRequestModel)
+        public FeedbackReportModel GetFeedbackStats(ReportRequestModel feedbackRequestModel, string officerCode)
         {
-            FeedbackModel response = new FeedbackModel();
+            FeedbackReportModel response = new FeedbackReportModel();
 
             try
             {
@@ -73,9 +73,9 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                 {
                     var feedbackSent = (from FP in imisContext.TblFromPhone
                                         where FP.DocType == "F"
-                                        && FP.LandedDate >= DateTime.Parse(feedbackRequestModel.FromDate)
-                                        && FP.LandedDate <= DateTime.Parse(feedbackRequestModel.ToDate)
-                                        && FP.OfficerCode == feedbackRequestModel.OfficerCode
+                                        && FP.LandedDate >= feedbackRequestModel.FromDate
+                                        && FP.LandedDate <= feedbackRequestModel.ToDate
+                                        && FP.OfficerCode == officerCode
                                         select FP)
                                         .ToList();
 
@@ -83,7 +83,7 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                         .Where(f => f.DocStatus == "A")
                         .Count();
 
-                    response = new FeedbackModel()
+                    response = new FeedbackReportModel()
                     {
                         FeedbackSent = feedbackSent.Count(),
                         FeedbackAccepted = feedbackAccepted
@@ -102,9 +102,9 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
             }
         }
 
-        public RenewalModel GetRenewalStats(ReportRequestModel renewalRequestModel)
+        public RenewalReportModel GetRenewalStats(ReportRequestModel renewalRequestModel, string officerCode)
         {
-            RenewalModel response = new RenewalModel();
+            RenewalReportModel response = new RenewalReportModel();
 
             try
             {
@@ -112,9 +112,9 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                 {
                     var renewalSent = (from FP in imisContext.TblFromPhone
                                        where FP.DocType == "R"
-                                       && FP.LandedDate >= DateTime.Parse(renewalRequestModel.FromDate)
-                                       && FP.LandedDate <= DateTime.Parse(renewalRequestModel.ToDate)
-                                       && FP.OfficerCode == renewalRequestModel.OfficerCode
+                                       && FP.LandedDate >= renewalRequestModel.FromDate
+                                       && FP.LandedDate <= renewalRequestModel.ToDate
+                                       && FP.OfficerCode == officerCode
                                        select FP)
                                       .ToList();
 
@@ -127,7 +127,7 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                         .Where(f => f.DocStatus == "A")
                         .Count();
 
-                    response = new RenewalModel()
+                    response = new RenewalReportModel()
                     {
                         RenewalSent = renewalSent.Count(),
                         RenewalAccepted = renewalAccepted
@@ -141,6 +141,28 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                 throw e;
             }
             catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public string GetLoginNameByUserUUID(Guid userUUID)
+        {
+            string response;
+
+            try
+            {
+                using (var imisContext = new ImisDB())
+                {
+                    response = imisContext.TblUsers
+                        .Where(u => u.UserUUID == userUUID)
+                        .Select(x => x.LoginName)
+                        .FirstOrDefault();
+                }
+
+                return response;
+            }
+            catch (SqlException e)
             {
                 throw e;
             }

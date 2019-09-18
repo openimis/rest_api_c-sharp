@@ -4,9 +4,9 @@ using System.Text;
 
 namespace OpenImis.ModulesV2.ReportModule.Models
 {
-    public class FeedbackModel
+    public class EnrolmentReportModel
     {
-        public int FeedbackSent { get; set; }
-        public int FeedbackAccepted { get; set; }
+        public int TotalSubmitted { get; set; }
+        public int TotalAssigned { get; set; }
     }
 }
