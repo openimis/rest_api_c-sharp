@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ImisRestApi.Models
 {
-    public class GetClaimsModel
+    public class ClaimsModel
     {
         [Required]
         public string claim_administrator_code { get; set; }

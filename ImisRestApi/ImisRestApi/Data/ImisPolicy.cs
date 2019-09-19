@@ -68,8 +68,8 @@ namespace ImisRestApi.Data
 
             try
             {
-                var response = helper.GetDataTable("uspAPIRenewPolicy", sqlParameters,System.Data.CommandType.StoredProcedure);
-                message = new RenewPolicyResponse(0,false,0).Message;
+                var response = helper.Procedure("uspAPIRenewPolicy", sqlParameters);
+                message = new RenewPolicyResponse(response.Code,false,0).Message;
 
             }
             catch (Exception e)

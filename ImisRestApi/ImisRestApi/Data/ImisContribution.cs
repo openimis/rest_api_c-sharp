@@ -27,6 +27,11 @@ namespace ImisRestApi.Data
         {
             DataHelper helper = new DataHelper(Configuration);
 
+            bool reactionType = false;
+
+            if (model.ReactionType == ReactionType.Active)
+                reactionType = true;
+
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@AuditUserID", UserId),
                 new SqlParameter("@InsuranceNumber", model.InsuranceNumber),
@@ -34,7 +39,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@PaymentDate", model.PaymentDate),
                 new SqlParameter("@ProductCode", model.ProductCode),
                 new SqlParameter("@ReceiptNo", model.ReceiptNumber),
-                new SqlParameter("@ReactionType", model.ReactionType),
+                new SqlParameter("@ReactionType", reactionType),
                 new SqlParameter("@ContributionCategory", model.ContributionCategory),
                 new SqlParameter("@ContributionAmount", model.Amount),
                 new SqlParameter("@PaymentType", model.PaymentType)

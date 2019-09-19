@@ -121,7 +121,7 @@ namespace ImisRestApi.Controllers
         [Route("api/GetClaims")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public IActionResult GetClaims(GetClaimsModel model)
+        public IActionResult GetClaims([FromBody]ClaimsModel model)
         {
 
             try
@@ -130,7 +130,7 @@ namespace ImisRestApi.Controllers
                 var data = imisClaims.GetClaims(model);
 
                
-                return Ok(new { error_occured = false, controls = data });
+                return Ok(new { error_occured = false, data = data });
             }
             catch (Exception e)
             {

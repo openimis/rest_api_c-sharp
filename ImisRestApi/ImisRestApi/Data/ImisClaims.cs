@@ -135,7 +135,7 @@ namespace ImisRestApi.Data
             return message;
         }
 
-        internal object GetClaims(GetClaimsModel model)
+        internal object GetClaims(ClaimsModel model)
         {
           
             DataHelper helper = new DataHelper(Configuration);
