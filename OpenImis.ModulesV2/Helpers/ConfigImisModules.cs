@@ -17,6 +17,7 @@ namespace OpenImis.ModulesV2.Helpers
         public PremiumModule PremiumModule { get; set; }
         public SystemModule SystemModule { get; set; }
         public MasterDataModule MasterDataModule { get; set; }
+        public ReportModule ReportModule { get; set; }
     }
 
     public class LoginModule
@@ -64,5 +65,10 @@ namespace OpenImis.ModulesV2.Helpers
     public class MasterDataModule
     {
         public string MasterDataLogic { get; set; }
+    }
+
+    public class ReportModule
+    {
+        public string ReportLogic { get; set; }
     }
 }
