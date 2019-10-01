@@ -17,6 +17,9 @@ using OpenImis.ModulesV2.FeedbackModule;
 using Microsoft.AspNetCore.Hosting;
 using OpenImis.ModulesV2.PremiumModule;
 using OpenImis.ModulesV2.SystemModule;
+using OpenImis.ModulesV2.ReportModule;
+using OpenImis.ModulesV2.ReportModule.Logic;
+
 namespace OpenImis.ModulesV2
 {
     public class ImisModules : IImisModules
@@ -31,6 +34,7 @@ namespace OpenImis.ModulesV2
         private IFeedbackModule feedbackModule;
         private IPremiumModule premiumModule;
         private ISystemModule systemModule;
+        private IReportModule reportModule;
 
         private readonly IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -211,6 +215,24 @@ namespace OpenImis.ModulesV2
                 masterDataModule.SetMasterDataLogic((IMasterDataLogic)ActivatorUtilities.CreateInstance(_serviceProvider, masterDataLogicType));
             }
             return masterDataModule;
+        }
+
+        /// <summary>
+        /// Creates and returns the report module version 2.
+        /// </summary>
+        /// <returns>
+        /// The Report module V2.
+        /// </returns>
+        public IReportModule GetReportModule()
+        {
+            if (reportModule == null)
+            {
+                reportModule = new ReportModule.ReportModule(_configuration);
+
+                Type reportLogicType = CreateTypeFromConfiguration("ReportModule", "ReportLogic", "OpenImis.ModulesV2.ReportModule.Logic.ReportLogic");
+                reportModule.SetReportLogic((IReportLogic)ActivatorUtilities.CreateInstance(_serviceProvider, reportLogicType));
+            }
+            return reportModule;
         }
 
         /// <summary>
