@@ -69,7 +69,7 @@ namespace OpenImis.RestApi.Controllers.V2
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("api/Validate/Credentials")]
+        [Route("validate/credentials")]
         public virtual IActionResult Validate_Credentials([FromBody]UserLogin userlogin)
         {
             if (!ModelState.IsValid)
