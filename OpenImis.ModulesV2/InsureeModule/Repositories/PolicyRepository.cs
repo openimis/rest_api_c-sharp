@@ -91,7 +91,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
         public int Post(PolicyRenewalModel policy)
         {
-            int RV = -99;
+            int RV = 2;
 
             try
             {
@@ -101,56 +101,85 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 var XML = policyRenew.XMLSerialize();
 
                 var fromPhoneRenewalDir = _configuration["AppSettings:FromPhone_Renewal"];
+                var fromPhoneRenewalRejectedDir = _configuration["AppSettings:FromPhone_Renewal_Rejected"];
 
                 var fileName = "RenPol_" + policy.Date + "_" + policy.CHFID + "_" + policy.ReceiptNo + ".xml";
 
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
 
+                bool ifSaved = false;
+
                 try
                 {
                     if (!Directory.Exists(webRootPath + fromPhoneRenewalDir)) Directory.CreateDirectory(webRootPath + fromPhoneRenewalDir);
 
                     xmldoc.Save(webRootPath + fromPhoneRenewalDir + fileName);
+                    ifSaved = true;
                 }
                 catch (Exception e)
                 {
                     throw e;
+                    return RV;
                 }
 
-                using (var imisContext = new ImisDB())
+                if (ifSaved)
                 {
-                    var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
-                    var returnParameter = OutputParameter.CreateOutputParameter("@RV", SqlDbType.Int);
-                    var fileNameParameter = new SqlParameter("@FileName", SqlDbType.NVarChar, 200);
-                    fileNameParameter.Value = fileName;
-
-                    var sql = "exec @RV = uspIsValidRenewal @FileName, @XML";
-
-                    DbConnection connection = imisContext.Database.GetDbConnection();
-
-                    using (DbCommand cmd = connection.CreateCommand())
+                    using (var imisContext = new ImisDB())
                     {
-                        cmd.CommandText = sql;
+                        var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                        var returnParameter = OutputParameter.CreateOutputParameter("@RV", SqlDbType.Int);
+                        var fileNameParameter = new SqlParameter("@FileName", SqlDbType.NVarChar, 200);
+                        fileNameParameter.Value = fileName;
 
-                        cmd.Parameters.AddRange(new[] { fileNameParameter, xmlParameter, returnParameter });
+                        var sql = "exec @RV = uspIsValidRenewal @FileName, @XML";
 
-                        if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                        DbConnection connection = imisContext.Database.GetDbConnection();
 
-                        using (var reader = cmd.ExecuteReader())
+                        using (DbCommand cmd = connection.CreateCommand())
                         {
-                            // Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
+                            cmd.CommandText = sql;
+
+                            cmd.Parameters.AddRange(new[] { fileNameParameter, xmlParameter, returnParameter });
+
+                            if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                // Displaying errors in the Stored Procedure in Debug mode
+                                //do
+                                //{
+                                //    while (reader.Read())
+                                //    {
+                                //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                //    }
+                                //} while (reader.NextResult());
+                            }
+                        }
+
+                        int tempRV = (int)returnParameter.Value;
+
+                        if (tempRV == 0 || tempRV == -4)
+                        {
+                            RV = 1;
+                        }
+                        else if (tempRV == -1 || tempRV == -2 || tempRV == -3)
+                        {
+                            if (File.Exists(webRootPath + fromPhoneRenewalDir + fileName))
+                            {
+                                File.Move(webRootPath + fromPhoneRenewalDir + fileName, webRootPath + fromPhoneRenewalRejectedDir);
+                            }
+                            RV = 0;
+                        }
+                        else
+                        {
+                            if (File.Exists(webRootPath + fromPhoneRenewalDir + fileName))
+                            {
+                                File.Move(webRootPath + fromPhoneRenewalDir + fileName, webRootPath + fromPhoneRenewalRejectedDir);
+                            }
+                            RV = 2;
                         }
                     }
-
-                    RV = (int)returnParameter.Value;
                 }
 
                 return RV;

@@ -17,6 +17,7 @@ namespace OpenImis.RestApi.Controllers.V2
 {
     [ApiVersion("2")]
     [Authorize]
+    [Route("api/")]
     [ApiController]
     [EnableCors("AllowSpecificOrigin")]
     public class LoginController : Controller
