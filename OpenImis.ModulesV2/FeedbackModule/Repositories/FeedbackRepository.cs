@@ -31,7 +31,7 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
 
         public int Post(Feedback feedbackClaim)
         {
-            int RV = -99;
+            int RV = 2;
 
             try
             {
@@ -46,6 +46,7 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
                 XML = tempDoc.OuterXml;
 
                 var fromPhoneFeedbackDir = _configuration["AppSettings:FromPhone_Feedback"];
+                var fromPhoneFeedbackRejectedDir = _configuration["AppSettings:FromPhone_Feedback_Rejected"];
 
                 var claimCode = "";
 
@@ -62,48 +63,71 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
 
+                bool ifSaved = false;
+
                 try
                 {
                     if (!Directory.Exists(webRootPath + fromPhoneFeedbackDir)) Directory.CreateDirectory(webRootPath + fromPhoneFeedbackDir);
 
                     xmldoc.Save(webRootPath + fromPhoneFeedbackDir + fileName);
+                    ifSaved = true;
                 }
                 catch (Exception e)
                 {
-                    throw e;
+                    return RV;
                 }
 
-                using (var imisContext = new ImisDB())
+                if (ifSaved)
                 {
-                    var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
-                    var returnParameter = OutputParameter.CreateOutputParameter("@RV", SqlDbType.Int);
-
-                    var sql = "exec @RV = uspInsertFeedback @XML";
-
-                    DbConnection connection = imisContext.Database.GetDbConnection();
-
-                    using (DbCommand cmd = connection.CreateCommand())
+                    using (var imisContext = new ImisDB())
                     {
-                        cmd.CommandText = sql;
+                        var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                        var returnParameter = OutputParameter.CreateOutputParameter("@RV", SqlDbType.Int);
 
-                        cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter });
+                        var sql = "exec @RV = uspInsertFeedback @XML";
 
-                        if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                        DbConnection connection = imisContext.Database.GetDbConnection();
 
-                        using (var reader = cmd.ExecuteReader())
+                        using (DbCommand cmd = connection.CreateCommand())
                         {
-                            // Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
+                            cmd.CommandText = sql;
+
+                            cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter });
+
+                            if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                // Displaying errors in the Stored Procedure in Debug mode
+                                //do
+                                //{
+                                //    while (reader.Read())
+                                //    {
+                                //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                //    }
+                                //} while (reader.NextResult());
+                            }
+                        }
+
+                        int tempRV = (int)returnParameter.Value;
+
+                        if (tempRV == 0 || tempRV == 4)
+                        {
+                            RV = 1;
+                        }
+                        else if (tempRV == 1 || tempRV == 2 || tempRV == 3)
+                        {
+                            if (File.Exists(webRootPath + fromPhoneFeedbackDir + fileName))
+                            {
+                                File.Move(webRootPath + fromPhoneFeedbackDir + fileName, webRootPath + fromPhoneFeedbackRejectedDir);
+                            }
+                            RV = 0;
+                        }
+                        else
+                        {
+                            RV = 2;
                         }
                     }
-
-                    RV = (int)returnParameter.Value;
                 }
 
                 return RV;
