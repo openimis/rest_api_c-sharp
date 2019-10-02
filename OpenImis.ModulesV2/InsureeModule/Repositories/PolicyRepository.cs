@@ -173,10 +173,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                         }
                         else
                         {
-                            if (File.Exists(webRootPath + fromPhoneRenewalDir + fileName))
-                            {
-                                File.Move(webRootPath + fromPhoneRenewalDir + fileName, webRootPath + fromPhoneRenewalRejectedDir);
-                            }
                             RV = 2;
                         }
                     }
