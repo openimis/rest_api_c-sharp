@@ -27,6 +27,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
             _hostingEnvironment = hostingEnvironment;
         }
 
+        // TODO: Receiving RenewalUUID directly from SP
         public List<GetPolicyModel> Get(string officerCode)
         {
             List<GetPolicyModel> response = new List<GetPolicyModel>();
@@ -69,7 +70,8 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                                         ProductName = reader["ProductName"].ToString(),
                                         VillageName = reader["VillageName"].ToString(),
                                         RenewalPromptDate = reader["RenewalPromptDate"].ToString(),
-                                        Phone = reader["Phone"].ToString()
+                                        Phone = reader["Phone"].ToString(),
+                                        RenewalUUID = GetRenewalUUIDById(int.Parse(reader["RenewalId"].ToString()))
                                     });
                                 }
                             } while (reader.NextResult());
@@ -119,7 +121,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 }
                 catch (Exception e)
                 {
-                    throw e;
                     return RV;
                 }
 
@@ -205,6 +206,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                     renewal.ResponseStatus = 2;
                     renewal.ResponseDate = DateTime.Now;
                     imisContext.SaveChanges();
+                    response = 1;
                 }
 
                 return response;
@@ -214,6 +216,50 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 throw e;
             }
             catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        private Guid GetRenewalUUIDById(int id)
+        {
+            Guid response;
+
+            try
+            {
+                using (var imisContext = new ImisDB())
+                {
+                    response = imisContext.TblPolicyRenewals
+                        .Where(o => o.RenewalId == id)
+                        .Select(x => x.RenewalUUID)
+                        .FirstOrDefault();
+                }
+
+                return response;
+            }
+            catch (SqlException e)
+            {
+                throw e;
+            }
+        }
+
+        public string GetLoginNameByUserUUID(Guid userUUID)
+        {
+            string response;
+
+            try
+            {
+                using (var imisContext = new ImisDB())
+                {
+                    response = imisContext.TblUsers
+                        .Where(u => u.UserUUID == userUUID)
+                        .Select(x => x.LoginName)
+                        .FirstOrDefault();
+                }
+
+                return response;
+            }
+            catch (SqlException e)
             {
                 throw e;
             }

@@ -18,5 +18,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
         public string VillageName { get; set; }
         public string RenewalPromptDate { get; set; }
         public string Phone { get; set; }
+        public Guid RenewalUUID { get; set; }
     }
 }

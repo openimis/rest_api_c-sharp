@@ -48,5 +48,14 @@ namespace OpenImis.ModulesV2.InsureeModule.Logic
 
             return response;
         }
+
+        public string GetLoginNameByUserUUID(Guid userUUID)
+        {
+            string response;
+
+            response = policyRepository.GetLoginNameByUserUUID(userUUID);
+
+            return response;
+        }
     }
 }

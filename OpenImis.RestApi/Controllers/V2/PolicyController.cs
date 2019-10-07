@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
@@ -24,13 +26,16 @@ namespace OpenImis.RestApi.Controllers.V2
 
         [HasRights(Rights.PolicySearch)]
         [HttpGet]
-        [Route("officer/{officerCode}")]
-        public IActionResult Get(string officerCode)
+        public IActionResult Get()
         {
             List<GetPolicyModel> response;
 
             try
             {
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+
+                string officerCode = _imisModules.GetInsureeModule().GetPolicyLogic().GetLoginNameByUserUUID(userUUID);
+
                 response = _imisModules.GetInsureeModule().GetPolicyLogic().Get(officerCode);
             }
             catch (ValidationException e)

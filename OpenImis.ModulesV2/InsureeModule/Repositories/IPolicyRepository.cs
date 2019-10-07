@@ -9,5 +9,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
         List<GetPolicyModel> Get(string officerCode);
         int Post(PolicyRenewalModel policy);
         int Delete(Guid uuid);
+        string GetLoginNameByUserUUID(Guid userUUID);
     }
 }
