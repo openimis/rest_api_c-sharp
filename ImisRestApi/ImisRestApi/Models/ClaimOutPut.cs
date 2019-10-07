@@ -36,6 +36,7 @@ namespace ImisRestApi.Models
     {
         public string claim_number { get; set; }
         public string item { get; set; }
+        public string item_code { get; set; }
         public decimal? item_qty { get; set; }
         public decimal? item_price { get; set; }
         public decimal? item_adjusted_qty { get; set; }
@@ -50,6 +51,7 @@ namespace ImisRestApi.Models
     {
         public string claim_number { get; set; }
         public string service { get; set; }
+        public string service_code { get; set; }
         public decimal? service_qty { get; set; }
         public decimal? service_price { get; set; }
         public decimal? service_adjusted_qty { get; set; }
