@@ -1,13 +1,13 @@
-﻿using OpenImis.ModulesV2.InsureeModule.Models;
+﻿using OpenImis.ModulesV2.PolicyModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenImis.ModulesV2.InsureeModule.Logic
+namespace OpenImis.ModulesV2.PolicyModule.Logic
 {
-    public interface IPolicyLogic
+    public interface IPolicyRenewalLogic
     {
-        List<GetPolicyModel> Get(string officerCode);
+        List<GetPolicyRenewalModel> Get(string officerCode);
         int Post(PolicyRenewalModel policy);
         int Delete(Guid uuid);
         string GetLoginNameByUserUUID(Guid userUUID);

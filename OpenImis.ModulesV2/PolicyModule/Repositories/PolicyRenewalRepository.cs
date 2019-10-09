@@ -3,9 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV2.Helpers;
-using OpenImis.ModulesV2.InsureeModule.Helpers;
-using OpenImis.ModulesV2.InsureeModule.Models;
-using System;
+using OpenImis.ModulesV2.PolicyModule.Helpers;
+using OpenImis.ModulesV2.PolicyModule.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -13,24 +12,25 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using System;
 
-namespace OpenImis.ModulesV2.InsureeModule.Repositories
+namespace OpenImis.ModulesV2.PolicyModule.Repositories
 {
-    public class PolicyRepository : IPolicyRepository
+    public class PolicyRenewalRepository : IPolicyRenewalRepository
     {
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public PolicyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PolicyRenewalRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
         }
 
         // TODO: Receiving RenewalUUID directly from SP
-        public List<GetPolicyModel> Get(string officerCode)
+        public List<GetPolicyRenewalModel> Get(string officerCode)
         {
-            List<GetPolicyModel> response = new List<GetPolicyModel>();
+            List<GetPolicyRenewalModel> response = new List<GetPolicyRenewalModel>();
 
             try
             {
@@ -57,7 +57,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                             {
                                 while (reader.Read())
                                 {
-                                    response.Add(new GetPolicyModel()
+                                    response.Add(new GetPolicyRenewalModel()
                                     {
                                         RenewalId = int.Parse(reader["RenewalId"].ToString()),
                                         PolicyId = int.Parse(reader["PolicyId"].ToString()),

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OpenImis.ModulesV2.InsureeModule.Models
+namespace OpenImis.ModulesV2.PolicyModule.Models
 {
-    public class GetPolicyModel
+    public class GetPolicyRenewalModel
     {
         public int RenewalId { get; set; }
         public int PolicyId { get; set; }

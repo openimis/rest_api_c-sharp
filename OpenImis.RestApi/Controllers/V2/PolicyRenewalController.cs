@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
-using OpenImis.ModulesV2.InsureeModule.Models;
+using OpenImis.ModulesV2.PolicyModule.Models;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
@@ -15,11 +14,11 @@ namespace OpenImis.RestApi.Controllers.V2
     [Authorize]
     [Route("api/policy/")]
     [ApiController]
-    public class PolicyController : Controller
+    public class PolicyRenewalController : Controller
     {
         private readonly IImisModules _imisModules;
 
-        public PolicyController(IImisModules imisModules)
+        public PolicyRenewalController(IImisModules imisModules)
         {
             _imisModules = imisModules;
         }
@@ -28,15 +27,15 @@ namespace OpenImis.RestApi.Controllers.V2
         [HttpGet]
         public IActionResult Get()
         {
-            List<GetPolicyModel> response;
+            List<GetPolicyRenewalModel> response;
 
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
 
-                string officerCode = _imisModules.GetInsureeModule().GetPolicyLogic().GetLoginNameByUserUUID(userUUID);
+                string officerCode = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().GetLoginNameByUserUUID(userUUID);
 
-                response = _imisModules.GetInsureeModule().GetPolicyLogic().Get(officerCode);
+                response = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().Get(officerCode);
             }
             catch (ValidationException e)
             {
@@ -55,7 +54,7 @@ namespace OpenImis.RestApi.Controllers.V2
 
             try
             {
-                response = _imisModules.GetInsureeModule().GetPolicyLogic().Post(model);
+                response = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().Post(model);
             }
             catch (ValidationException e)
             {
@@ -74,7 +73,7 @@ namespace OpenImis.RestApi.Controllers.V2
 
             try
             {
-                response = _imisModules.GetInsureeModule().GetPolicyLogic().Delete(uuid);
+                response = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().Delete(uuid);
             }
             catch (ValidationException e)
             {
