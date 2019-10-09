@@ -119,7 +119,7 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
                         {
                             if (File.Exists(webRootPath + fromPhoneFeedbackDir + fileName))
                             {
-                                File.Move(webRootPath + fromPhoneFeedbackDir + fileName, webRootPath + fromPhoneFeedbackRejectedDir);
+                                File.Move(webRootPath + fromPhoneFeedbackDir + fileName, webRootPath + fromPhoneFeedbackRejectedDir + fileName);
                             }
                             RV = 0;
                         }
