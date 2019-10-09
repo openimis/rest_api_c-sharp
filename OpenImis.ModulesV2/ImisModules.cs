@@ -19,6 +19,8 @@ using OpenImis.ModulesV2.PremiumModule;
 using OpenImis.ModulesV2.SystemModule;
 using OpenImis.ModulesV2.PolicyModule;
 using OpenImis.ModulesV2.PolicyModule.Logic;
+using OpenImis.ModulesV2.ReportModule;
+using OpenImis.ModulesV2.ReportModule.Logic;
 
 namespace OpenImis.ModulesV2
 {
@@ -35,6 +37,7 @@ namespace OpenImis.ModulesV2
         private IPremiumModule premiumModule;
         private ISystemModule systemModule;
         private IPolicyModule policyModule;
+        private IReportModule reportModule;
 
         private readonly IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -230,6 +233,23 @@ namespace OpenImis.ModulesV2
                 policyModule.SetPolicyLogic((IPolicyRenewalLogic)ActivatorUtilities.CreateInstance(_serviceProvider, policyLogicType));
             }
             return policyModule;
+        }
+
+        /// Creates and returns the report module version 2.
+        /// </summary>
+        /// <returns>
+        /// The Report module V2.
+        /// </returns>
+        public IReportModule GetReportModule()
+        {
+            if (reportModule == null)
+            {
+                reportModule = new ReportModule.ReportModule(_configuration);
+
+                Type reportLogicType = CreateTypeFromConfiguration("ReportModule", "ReportLogic", "OpenImis.ModulesV2.ReportModule.Logic.ReportLogic");
+                reportModule.SetReportLogic((IReportLogic)ActivatorUtilities.CreateInstance(_serviceProvider, reportLogicType));
+            }
+            return reportModule;
         }
 
         /// <summary>

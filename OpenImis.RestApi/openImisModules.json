@@ -52,6 +52,9 @@
       },
       "PolicyModule": {
         "PolicyRenewalLogic": "OpenImis.ModulesV2.PolicyModule.Logic.PolicyRenewalLogic"
+      },
+      "ReportModule": {
+        "ReportLogic": "OpenImis.ModulesV2.ReportModule.Logic.ReportLogic"
       }
     }
   ]
