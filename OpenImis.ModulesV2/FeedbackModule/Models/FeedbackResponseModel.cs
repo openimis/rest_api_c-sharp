@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpenImis.ModulesV2.FeedbackModule.Models
 {
-    public class FeedbackModel
+    public class FeedbackResponseModel
     {
         public Guid ClaimUUID { get; set; }
         public int? OfficerId { get; set; }

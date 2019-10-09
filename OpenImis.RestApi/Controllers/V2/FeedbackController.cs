@@ -27,7 +27,7 @@ namespace OpenImis.RestApi.Controllers.V2
 
         [HasRights(Rights.ClaimFeedback)]
         [HttpPost]
-        public IActionResult Post([FromBody]Feedback model)
+        public IActionResult Post([FromBody]FeedbackRequest model)
         {
             int response;
 
@@ -47,7 +47,7 @@ namespace OpenImis.RestApi.Controllers.V2
         [HttpGet]
         public IActionResult Get()
         {
-            List<FeedbackModel> response;
+            List<FeedbackResponseModel> response;
 
             try
             {

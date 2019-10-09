@@ -22,7 +22,7 @@ namespace OpenImis.ModulesV2.FeedbackModule.Logic
             feedbackRepository = new FeedbackRepository(_configuration, _hostingEnvironment);
         }
 
-        public int Post(Feedback feedbackClaim)
+        public int Post(FeedbackRequest feedbackClaim)
         {
             int response;
 
@@ -31,9 +31,9 @@ namespace OpenImis.ModulesV2.FeedbackModule.Logic
             return response;
         }
 
-        public List<FeedbackModel> Get(string officerCode)
+        public List<FeedbackResponseModel> Get(string officerCode)
         {
-            List<FeedbackModel> response;
+            List<FeedbackResponseModel> response;
 
             response = feedbackRepository.Get(officerCode);
 

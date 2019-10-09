@@ -7,8 +7,8 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
 {
     public interface IFeedbackRepository
     {
-        List<FeedbackModel> Get(string officerCode);
+        List<FeedbackResponseModel> Get(string officerCode);
         string GetLoginNameByUserUUID(Guid userUUID);
-        int Post(Feedback feedbackClaim);
+        int Post(FeedbackRequest feedbackClaim);
     }
 }

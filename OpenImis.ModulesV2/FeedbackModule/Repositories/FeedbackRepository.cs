@@ -29,7 +29,8 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public int Post(Feedback feedbackClaim)
+        // TODO Change the RV assignment codes. It should be on the list for better understanding
+        public int Post(FeedbackRequest feedbackClaim)
         {
             int RV = 2;
 
@@ -37,7 +38,29 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
             {
                 string webRootPath = _hostingEnvironment.WebRootPath;
 
-                var XML = feedbackClaim.XMLSerialize();
+                dynamic claimData;
+
+                using (var imisContext = new ImisDB())
+                {
+                    claimData = imisContext.TblClaim
+                        .Where(u => u.ClaimUUID == feedbackClaim.ClaimUUID)
+                        .Select(x => new { x.ClaimId, x.ClaimCode })
+                        .FirstOrDefault();
+                }
+
+                string claimCode = claimData.ClaimCode.ToString();
+                int claimId = int.Parse(claimData.ClaimId.ToString());
+
+                Feedback feedback = new Feedback()
+                {
+                    Officer = feedbackClaim.Officer,
+                    ClaimID = claimId,
+                    CHFID = feedbackClaim.CHFID,
+                    Answers = feedbackClaim.Answers,
+                    Date = feedbackClaim.Date
+                };
+
+                var XML = feedback.XMLSerialize();
 
                 var tempDoc = new XmlDocument();
                 tempDoc.LoadXml(XML);
@@ -47,16 +70,6 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
 
                 var fromPhoneFeedbackDir = _configuration["AppSettings:FromPhone_Feedback"];
                 var fromPhoneFeedbackRejectedDir = _configuration["AppSettings:FromPhone_Feedback_Rejected"];
-
-                var claimCode = "";
-
-                using (var imisContext = new ImisDB())
-                {
-                    claimCode = imisContext.TblClaim
-                        .Where(u => u.ClaimId == feedbackClaim.ClaimID)
-                        .Select(x => x.ClaimCode)
-                        .FirstOrDefault();
-                }
 
                 var fileName = "feedback_" + claimCode + ".xml";
 
@@ -142,9 +155,9 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
             }
         }
 
-        public List<FeedbackModel> Get(string officerCode)
+        public List<FeedbackResponseModel> Get(string officerCode)
         {
-            List<FeedbackModel> response = new List<FeedbackModel>();
+            List<FeedbackResponseModel> response = new List<FeedbackResponseModel>();
 
             try
             {
@@ -159,7 +172,7 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
                                 && O.ValidityTo == null
                                 && O.Code == officerCode
                                 && C.FeedbackStatus == 4
-                                select new FeedbackModel()
+                                select new FeedbackResponseModel()
                                 {
                                     ClaimUUID = C.ClaimUUID,
                                     OfficerId = F.OfficerId,
