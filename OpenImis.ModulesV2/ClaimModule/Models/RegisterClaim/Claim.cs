@@ -20,25 +20,25 @@ namespace OpenImis.ModulesV2.ClaimModule.Models.RegisterClaim
         public string EndDate { get; set; }
         public string ICDCode { get; set; }
         public string Comment { get; set; }
-        public float Total { get; set; }
+        public string Total { get; set; }
         public string ICDCode1 { get; set; }
         public string ICDCode2 { get; set; }
         public string ICDCode3 { get; set; }
         public string ICDCode4 { get; set; }
-        public int VisitType { get; set; }
+        public string VisitType { get; set; }
     }
 
     public class Item
     {
         public string ItemCode { get; set; }
-        public float ItemPrice { get; set; }
-        public int ItemQuantity { get; set; }
+        public string ItemPrice { get; set; }
+        public string ItemQuantity { get; set; }
     }
 
     public class Service
     {
         public string ServiceCode { get; set; }
-        public float ServicePrice { get; set; }
-        public int ServiceQuantity { get; set; }
+        public string ServicePrice { get; set; }
+        public string ServiceQuantity { get; set; }
     }
 }

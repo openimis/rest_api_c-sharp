@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using OpenImis.ModulesV2.ClaimModule.Logic;
 
 namespace OpenImis.ModulesV2.ClaimModule
@@ -6,19 +7,21 @@ namespace OpenImis.ModulesV2.ClaimModule
     public class ClaimModule : IClaimModule
     {
         private IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private IClaimLogic _claimLogic;
 
-        public ClaimModule(IConfiguration configuration)
+        public ClaimModule(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public IClaimLogic GetClaimLogic()
         {
             if (_claimLogic == null)
             {
-                _claimLogic = new ClaimLogic(_configuration);
+                _claimLogic = new ClaimLogic(_configuration, _hostingEnvironment);
             }
             return _claimLogic;
         }
