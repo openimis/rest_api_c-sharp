@@ -5,6 +5,7 @@ using OpenImis.ModulesV2.CoverageModule;
 using OpenImis.ModulesV2.PaymentModule;
 using OpenImis.ModulesV2.MasterDataModule;
 using OpenImis.ModulesV2.SystemModule;
+using OpenImis.ModulesV2.ReportModule;
 
 namespace OpenImis.ModulesV2
 {
@@ -26,5 +27,7 @@ namespace OpenImis.ModulesV2
         IMasterDataModule GetMasterDataModule();
 
         ISystemModule GetSystemModule();
+
+        IReportModule GetReportModule();
     }
 }
