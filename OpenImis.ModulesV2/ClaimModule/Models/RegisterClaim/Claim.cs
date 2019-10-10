@@ -4,12 +4,12 @@ namespace OpenImis.ModulesV2.ClaimModule.Models.RegisterClaim
 {
     public class Claim
     {
-        public Details Details { get; set; }
+        public ClaimDetails Details { get; set; }
         public List<Item> Items { get; set; }
         public List<Service> Services { get; set; }
     }
 
-    public class Details
+    public class ClaimDetails
     {
         public string ClaimDate { get; set; }
         public string HFCode { get; set; }

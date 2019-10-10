@@ -25,6 +25,7 @@ namespace OpenImis.ModulesV2.ClaimModule.Repositories
             _hostingEnvironment = hostingEnvironment;
         }
 
+        // TODO Change the RV assignment codes. It should be on the list for better understanding
         public int Create(Claim claim)
         {
             try
