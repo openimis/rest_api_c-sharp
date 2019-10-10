@@ -137,8 +137,14 @@ namespace ImisRestApi.Data
 
         internal object GetClaims(ClaimsModel model)
         {
-          
+
             DataHelper helper = new DataHelper(Configuration);
+
+
+            int? claimStatus = null;
+
+            if (model.status_claim != 0)
+                claimStatus = (int)model.status_claim;
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@ClaimAdminCode", model.claim_administrator_code),
@@ -146,7 +152,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@EndDate",  model.visit_date_to),
                 new SqlParameter("@DateProcessedFrom",  model.processed_date_from),
                 new SqlParameter("@DateProcessedTo",  model.processed_date_to),
-                new SqlParameter("@ClaimStatus",  model.status_claim),
+                new SqlParameter("@ClaimStatus", claimStatus),
             };
 
             try
@@ -163,7 +169,7 @@ namespace ImisRestApi.Data
 
                 List<ClaimOutPut> admin_claims = new List<ClaimOutPut>();
 
-                foreach(var obj in ObjectList)
+                foreach (var obj in ObjectList)
                 {
                     var obj_services = services.Where(x => x.claim_number == obj.claim_number).ToList();
                     obj.services = obj_services;
@@ -183,6 +189,7 @@ namespace ImisRestApi.Data
             }
 
         }
+
 
         public DataTable GetClaimAdministrators()
         {
