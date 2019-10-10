@@ -6,7 +6,9 @@ namespace OpenImis.ModulesV2.InsureeModule
     {
         IFamilyLogic GetFamilyLogic();
         IContributionLogic GetContributionLogic();
+        IInsureeLogic GetInsureeLogic();
         IInsureeModule SetFamilyLogic(IFamilyLogic familyLogic);
         IInsureeModule SetContributionLogic(IContributionLogic contributionLogic);
+        IInsureeModule SetInsureeLogic(IInsureeLogic insureeLogic);
     }
 }
