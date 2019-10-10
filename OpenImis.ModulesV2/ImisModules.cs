@@ -80,7 +80,7 @@ namespace OpenImis.ModulesV2
         {
             if (claimModule == null)
             {
-                claimModule = new ClaimModule.ClaimModule();
+                claimModule = new ClaimModule.ClaimModule(_configuration, _hostingEnvironment);
 
                 Type claimLogicType = CreateTypeFromConfiguration("ClaimModule", "ClaimLogic", "OpenImis.ModulesV2.ClaimModule.Logic.ClaimLogic");
                 claimModule.SetClaimLogic((ClaimModule.Logic.IClaimLogic)ActivatorUtilities.CreateInstance(_serviceProvider, claimLogicType));
@@ -155,7 +155,7 @@ namespace OpenImis.ModulesV2
         {
             if (feedbackModule == null)
             {
-                feedbackModule = new FeedbackModule.FeedbackModule(_configuration);
+                feedbackModule = new FeedbackModule.FeedbackModule(_configuration, _hostingEnvironment);
 
                 Type feedbackLogicType = CreateTypeFromConfiguration("FeedbackModule", "FeedbackLogic", "OpenImis.ModulesV2.FeedbackModule.Logic.FeedbackLogic");
                 feedbackModule.SetFeedbackLogic((FeedbackModule.Logic.IFeedbackLogic)ActivatorUtilities.CreateInstance(_serviceProvider, feedbackLogicType));
