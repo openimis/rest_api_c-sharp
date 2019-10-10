@@ -17,6 +17,7 @@ namespace OpenImis.ModulesV2.Helpers
         public PremiumModule PremiumModule { get; set; }
         public SystemModule SystemModule { get; set; }
         public MasterDataModule MasterDataModule { get; set; }
+        public PolicyModule PolicyModule { get; set; }
         public ReportModule ReportModule { get; set; }
     }
 
@@ -38,7 +39,6 @@ namespace OpenImis.ModulesV2.Helpers
     public class InsureeModule
     {
         public string FamilyLogic { get; set; }
-        public string PolicyLogic { get; set; }
         public string ContributionLogic { get; set; }
     }
 
@@ -65,6 +65,11 @@ namespace OpenImis.ModulesV2.Helpers
     public class MasterDataModule
     {
         public string MasterDataLogic { get; set; }
+    }
+
+    public class PolicyModule
+    {
+        public string PolicyRenewalLogic { get; set; }
     }
 
     public class ReportModule

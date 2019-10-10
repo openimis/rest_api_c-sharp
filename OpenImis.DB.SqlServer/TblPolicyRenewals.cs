@@ -11,6 +11,7 @@ namespace OpenImis.DB.SqlServer
         }
 
         public int RenewalId { get; set; }
+        public Guid RenewalUUID { get; set; }
         public DateTime RenewalPromptDate { get; set; }
         public DateTime RenewalDate { get; set; }
         public int? NewOfficerId { get; set; }
