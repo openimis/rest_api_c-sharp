@@ -33,7 +33,6 @@
       },
       "InsureeModule": {
         "FamilyLogic": "OpenImis.ModulesV2.InsureeModule.Logic.FamilyLogic",
-        "PolicyLogic": "OpenImis.ModulesV2.InsureeModule.Logic.PolicyLogic",
         "ContributionLogic": "OpenImis.ModulesV2.InsureeModule.Logic.ContributionLogic",
         "InsureeLogic": "OpenImis.ModulesV2.InsureeModule.Logic.InsureeLogic"
       },
@@ -51,6 +50,12 @@
       },
       "MasterDataModule": {
         "MasterDataLogic": "OpenImis.ModulesV2.MasterDataModule.Logic.MasterDataLogic"
+      },
+      "PolicyModule": {
+        "PolicyRenewalLogic": "OpenImis.ModulesV2.PolicyModule.Logic.PolicyRenewalLogic"
+      },
+      "ReportModule": {
+        "ReportLogic": "OpenImis.ModulesV2.ReportModule.Logic.ReportLogic"
       }
     }
   ]
