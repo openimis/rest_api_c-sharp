@@ -17,6 +17,8 @@ using OpenImis.ModulesV2.FeedbackModule;
 using Microsoft.AspNetCore.Hosting;
 using OpenImis.ModulesV2.PremiumModule;
 using OpenImis.ModulesV2.SystemModule;
+using OpenImis.ModulesV2.PolicyModule;
+using OpenImis.ModulesV2.PolicyModule.Logic;
 using OpenImis.ModulesV2.ReportModule;
 using OpenImis.ModulesV2.ReportModule.Logic;
 
@@ -34,6 +36,7 @@ namespace OpenImis.ModulesV2
         private IFeedbackModule feedbackModule;
         private IPremiumModule premiumModule;
         private ISystemModule systemModule;
+        private IPolicyModule policyModule;
         private IReportModule reportModule;
 
         private readonly IConfiguration _configuration;
@@ -99,9 +102,6 @@ namespace OpenImis.ModulesV2
 
                 Type familyLogicType = CreateTypeFromConfiguration("InsureeModule", "FamilyLogic", "OpenImis.ModulesV2.InsureeModule.Logic.FamilyLogic");
                 insureeModule.SetFamilyLogic((InsureeModule.Logic.IFamilyLogic)ActivatorUtilities.CreateInstance(_serviceProvider, familyLogicType));
-
-                Type policyLogicType = CreateTypeFromConfiguration("InsureeModule", "PolicyLogic", "OpenImis.ModulesV2.InsureeModule.Logic.PolicyLogic");
-                insureeModule.SetPolicyLogic((InsureeModule.Logic.IPolicyLogic)ActivatorUtilities.CreateInstance(_serviceProvider, policyLogicType));
 
                 Type contributionLogicType = CreateTypeFromConfiguration("InsureeModule", "ContributionLogic", "OpenImis.ModulesV2.InsureeModule.Logic.ContributionLogic");
                 insureeModule.SetContributionLogic((InsureeModule.Logic.IContributionLogic)ActivatorUtilities.CreateInstance(_serviceProvider, contributionLogicType));
@@ -218,6 +218,23 @@ namespace OpenImis.ModulesV2
         }
 
         /// <summary>
+        /// Creates and returns the policy module version 2.
+        /// </summary>
+        /// <returns>
+        /// The Policy module V2.
+        /// </returns>
+        public IPolicyModule GetPolicyModule()
+        {
+            if (policyModule == null)
+            {
+                policyModule = new PolicyModule.PolicyModule(_configuration, _hostingEnvironment);
+
+                Type policyLogicType = CreateTypeFromConfiguration("PolicyModule", "PolicyRenewalLogic", "OpenImis.ModulesV2.PolicyModule.Logic.PolicyRenewalLogic");
+                policyModule.SetPolicyLogic((IPolicyRenewalLogic)ActivatorUtilities.CreateInstance(_serviceProvider, policyLogicType));
+            }
+            return policyModule;
+        }
+
         /// Creates and returns the report module version 2.
         /// </summary>
         /// <returns>
