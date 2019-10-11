@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using OpenImis.DB.SqlServer;
+using OpenImis.ModulesV2.ClaimModule.Models;
 using OpenImis.ModulesV2.ClaimModule.Models.RegisterClaim;
 using OpenImis.ModulesV2.ClaimModule.Repositories;
+using System.Collections.Generic;
 
 namespace OpenImis.ModulesV2.ClaimModule.Logic
 {
@@ -24,6 +27,42 @@ namespace OpenImis.ModulesV2.ClaimModule.Logic
             int response;
 
             response = claimRepository.Create(claim);
+
+            return response;
+        }
+
+        public DiagnosisServiceItem GetDsi(DsiInputModel model)
+        {
+            DiagnosisServiceItem message;
+
+            message = claimRepository.GetDsi(model);
+
+            return message;
+        }
+
+        public List<ClaimAdminModel> GetClaimAdministrators()
+        {
+            List<ClaimAdminModel> response = new List<ClaimAdminModel>();
+
+            response = claimRepository.GetClaimAdministrators();
+
+            return response;
+        }
+
+        public List<TblControls> GetControls()
+        {
+            List<TblControls> response = new List<TblControls>();
+
+            response = claimRepository.GetControls();
+
+            return response;
+        }
+
+        public PaymentLists GetPaymentLists(PaymentListsInputModel model)
+        {
+            PaymentLists response;
+
+            response = claimRepository.GetPaymentLists(model);
 
             return response;
         }
