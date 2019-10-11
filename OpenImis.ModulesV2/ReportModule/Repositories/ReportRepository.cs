@@ -145,27 +145,5 @@ namespace OpenImis.ModulesV2.ReportModule.Repositories
                 throw e;
             }
         }
-
-        public string GetLoginNameByUserUUID(Guid userUUID)
-        {
-            string response;
-
-            try
-            {
-                using (var imisContext = new ImisDB())
-                {
-                    response = imisContext.TblUsers
-                        .Where(u => u.UserUUID == userUUID)
-                        .Select(x => x.LoginName)
-                        .FirstOrDefault();
-                }
-
-                return response;
-            }
-            catch (SqlException e)
-            {
-                throw e;
-            }
-        }
     }
 }

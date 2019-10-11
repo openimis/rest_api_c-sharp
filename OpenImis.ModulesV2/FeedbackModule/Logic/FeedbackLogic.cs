@@ -39,14 +39,5 @@ namespace OpenImis.ModulesV2.FeedbackModule.Logic
 
             return response;
         }
-
-        public string GetLoginNameByUserUUID(Guid userUUID)
-        {
-            string response;
-
-            response = feedbackRepository.GetLoginNameByUserUUID(userUUID);
-
-            return response;
-        }
     }
 }

@@ -36,7 +36,8 @@ namespace OpenImis.RestApi.Controllers.V2
 		/// </remarks>
 		/// <response code="200">Returns the list of Locations</response>
 		/// <response code="401">If the token is missing, is wrong or expired</response>      
-        [HasRights(Rights.ExtractMasterDataDownload)]
+        //[HasRights(Rights.ExtractMasterDataDownload)]
+        [AllowAnonymous]
         [HttpGet]
         [Route("master")]
         [ProducesResponseType(typeof(GetMasterDataResponse), 200)]

@@ -7,7 +7,6 @@ namespace OpenImis.ModulesV2.FeedbackModule.Logic
     public interface IFeedbackLogic
     {
         List<FeedbackResponseModel> Get(string officerCode);
-        string GetLoginNameByUserUUID(Guid userUUID);
         int Post(FeedbackRequest feedbackClaim);
     }
 }
