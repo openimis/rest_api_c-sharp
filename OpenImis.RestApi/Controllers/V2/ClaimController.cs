@@ -43,7 +43,8 @@ namespace OpenImis.RestApi.Controllers.V2
             return Ok(response);
         }
 
-        [HasRights(Rights.DiagnosesDownload)]
+        //[HasRights(Rights.DiagnosesDownload)]
+        [AllowAnonymous]
         [HttpPost]
         [Route("GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
@@ -91,7 +92,8 @@ namespace OpenImis.RestApi.Controllers.V2
             }
         }
 
-        [HasRights(Rights.FindClaimAdministrator)]
+        //[HasRights(Rights.FindClaimAdministrator)]
+        [AllowAnonymous]
         [HttpGet]
         [Route("claims/getclaimadmins")]
         public IActionResult ValidateClaimAdmin()
@@ -107,7 +109,8 @@ namespace OpenImis.RestApi.Controllers.V2
             }
         }
 
-        [HasRights(Rights.ClaimSearch)]
+        //[HasRights(Rights.ClaimSearch)]
+        [AllowAnonymous]
         [HttpGet]
         [Route("claims/controls")]
         public IActionResult GetControls()
