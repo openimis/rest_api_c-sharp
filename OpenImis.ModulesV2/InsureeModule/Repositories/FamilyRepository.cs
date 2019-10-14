@@ -9,8 +9,6 @@ using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV2.Helpers;
 using OpenImis.ModulesV2.InsureeModule.Models;
 using OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels;
-using System.Diagnostics;
-using OpenImis.ModulesV2.InsureeModule.Helpers;
 using System.Data.Common;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;

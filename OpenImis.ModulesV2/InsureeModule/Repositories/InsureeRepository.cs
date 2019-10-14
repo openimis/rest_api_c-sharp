@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
-using OpenImis.ModulesV2.InsureeModule.Helpers;
 using OpenImis.ModulesV2.InsureeModule.Models;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,8 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Diagnostics;
-using System.Text;
 using System.Globalization;
+using OpenImis.ModulesV2.Helpers;
 
 namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {

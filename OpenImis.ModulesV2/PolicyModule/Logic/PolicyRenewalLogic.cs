@@ -48,14 +48,5 @@ namespace OpenImis.ModulesV2.PolicyModule.Logic
 
             return response;
         }
-
-        public string GetLoginNameByUserUUID(Guid userUUID)
-        {
-            string response;
-
-            response = policyRenewalRepository.GetLoginNameByUserUUID(userUUID);
-
-            return response;
-        }
     }
 }

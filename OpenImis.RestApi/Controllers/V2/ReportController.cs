@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.ReportModule.Models;
+using OpenImis.ModulesV2.Utils;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
@@ -37,7 +38,9 @@ namespace OpenImis.RestApi.Controllers.V2
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
-                string officerCode = _imisModules.GetReportModule().GetReportLogic().GetLoginNameByUserUUID(userUUID);
+
+                Repository rep = new Repository();
+                string officerCode = rep.GetLoginNameByUserUUID(userUUID);
 
                 enrolmentModel = _imisModules.GetReportModule().GetReportLogic().GetEnrolmentStats(enrolmentRequestModel, officerCode);
             }
@@ -69,7 +72,9 @@ namespace OpenImis.RestApi.Controllers.V2
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
-                string officerCode = _imisModules.GetReportModule().GetReportLogic().GetLoginNameByUserUUID(userUUID);
+
+                Repository rep = new Repository();
+                string officerCode = rep.GetLoginNameByUserUUID(userUUID);
 
                 feedbackModel = _imisModules.GetReportModule().GetReportLogic().GetFeedbackStats(feedbackRequestModel, officerCode);
             }
@@ -101,7 +106,9 @@ namespace OpenImis.RestApi.Controllers.V2
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
-                string officerCode = _imisModules.GetReportModule().GetReportLogic().GetLoginNameByUserUUID(userUUID);
+
+                Repository rep = new Repository();
+                string officerCode = rep.GetLoginNameByUserUUID(userUUID);
 
                 renewalModel = _imisModules.GetReportModule().GetReportLogic().GetRenewalStats(renewalRequestModel, officerCode);
             }

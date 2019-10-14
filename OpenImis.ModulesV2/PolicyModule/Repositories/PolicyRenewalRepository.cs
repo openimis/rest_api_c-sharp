@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV2.Helpers;
-using OpenImis.ModulesV2.PolicyModule.Helpers;
 using OpenImis.ModulesV2.PolicyModule.Models;
 using System.Collections.Generic;
 using System.Data;
@@ -233,28 +232,6 @@ namespace OpenImis.ModulesV2.PolicyModule.Repositories
                     response = imisContext.TblPolicyRenewals
                         .Where(o => o.RenewalId == id)
                         .Select(x => x.RenewalUUID)
-                        .FirstOrDefault();
-                }
-
-                return response;
-            }
-            catch (SqlException e)
-            {
-                throw e;
-            }
-        }
-
-        public string GetLoginNameByUserUUID(Guid userUUID)
-        {
-            string response;
-
-            try
-            {
-                using (var imisContext = new ImisDB())
-                {
-                    response = imisContext.TblUsers
-                        .Where(u => u.UserUUID == userUUID)
-                        .Select(x => x.LoginName)
                         .FirstOrDefault();
                 }
 

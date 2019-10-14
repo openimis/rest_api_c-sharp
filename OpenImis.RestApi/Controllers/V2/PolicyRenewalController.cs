@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.PolicyModule.Models;
+using OpenImis.ModulesV2.Utils;
 using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
@@ -33,7 +34,8 @@ namespace OpenImis.RestApi.Controllers.V2
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
 
-                string officerCode = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().GetLoginNameByUserUUID(userUUID);
+                Repository rep = new Repository();
+                string officerCode = rep.GetLoginNameByUserUUID(userUUID);
 
                 response = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().Get(officerCode);
             }

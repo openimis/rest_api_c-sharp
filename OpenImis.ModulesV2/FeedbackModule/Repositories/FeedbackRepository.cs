@@ -4,13 +4,11 @@ using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV2.FeedbackModule.Models;
 using OpenImis.ModulesV2.Helpers;
-using OpenImis.ModulesV2.InsureeModule.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -198,28 +196,6 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
                 throw e;
             }
             catch (Exception e)
-            {
-                throw e;
-            }
-        }
-
-        public string GetLoginNameByUserUUID(Guid userUUID)
-        {
-            string response;
-
-            try
-            {
-                using (var imisContext = new ImisDB())
-                {
-                    response = imisContext.TblUsers
-                        .Where(u => u.UserUUID == userUUID)
-                        .Select(x => x.LoginName)
-                        .FirstOrDefault();
-                }
-
-                return response;
-            }
-            catch (SqlException e)
             {
                 throw e;
             }
