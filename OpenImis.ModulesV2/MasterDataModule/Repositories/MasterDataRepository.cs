@@ -322,7 +322,7 @@ namespace OpenImis.ModulesV2.MasterDataModule.Repositories
 
             using (var imisContext = new ImisDB())
             {
-                phoneDefaults = imisContext.TblIMISDetaulsPhone
+                phoneDefaults = imisContext.TblIMISDefaultsPhone
                     .Select(x => new PhoneDefaultModel()
                     {
                         RuleName = x.RuleName,
