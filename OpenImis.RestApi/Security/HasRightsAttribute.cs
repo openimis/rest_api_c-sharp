@@ -23,8 +23,8 @@ namespace OpenImis.RestApi.Security
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            int userId = Convert.ToInt32(context.HttpContext.User.Claims
-                .Where(w => w.Type == "UserId")
+            Guid userId = Guid.Parse(context.HttpContext.User.Claims
+                .Where(w => w.Type == "UserUUID")
                 .Select(x => x.Value)
                 .FirstOrDefault());
 
@@ -34,7 +34,8 @@ namespace OpenImis.RestApi.Security
             {
                 rights = (from UR in imisContext.TblUserRole
                           join RR in imisContext.TblRoleRight.Where(x => x.ValidityTo == null) on UR.RoleID equals RR.RoleID
-                          where (UR.UserID == userId && UR.ValidityTo == null)
+                          join US in imisContext.TblUsers.Where(x => x.ValidityTo == null) on UR.UserID equals US.UserId
+                          where (US.UserUUID == userId && UR.ValidityTo == null)
                           select RR.RightID
                           ).ToHashSet();
             }
