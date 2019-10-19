@@ -1,9 +1,8 @@
 ﻿using OpenImis.ModulesV2.PremiumModule.Models;
-using System;
 
-namespace OpenImis.ModulesV2.PremiumModule.Logic
+namespace OpenImis.ModulesV2.PremiumModule.Repositories
 {
-    public interface IPremiumLogic
+    public interface IPremiumRepository
     {
         bool Get(ReceiptRequestModel receipt);
     }

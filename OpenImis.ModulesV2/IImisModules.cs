@@ -8,6 +8,7 @@ using OpenImis.ModulesV2.SystemModule;
 using OpenImis.ModulesV2.FeedbackModule;
 using OpenImis.ModulesV2.PolicyModule;
 using OpenImis.ModulesV2.ReportModule;
+using OpenImis.ModulesV2.PremiumModule;
 
 namespace OpenImis.ModulesV2
 {
@@ -35,5 +36,7 @@ namespace OpenImis.ModulesV2
         IPolicyModule GetPolicyModule();
 
         IReportModule GetReportModule();
+
+        IPremiumModule GetPremiumModule();
     }
 }
