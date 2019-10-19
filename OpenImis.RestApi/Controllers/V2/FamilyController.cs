@@ -24,6 +24,7 @@ namespace OpenImis.RestApi.Controllers.V2
             _imisModules = imisModules;
         }
 
+        // TODO Remove from Model ID for Family and Insuree after changes in SP
         [HasRights(Rights.FamilySearch)]
         [HttpGet]
         [Route("{chfid}")]
