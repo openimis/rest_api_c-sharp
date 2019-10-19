@@ -9,6 +9,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
 {
     public class InsureeModel
     {
+        public int InsureeId { get; set; }
         public Guid InsureeUUID { get; set; }
         public string IdentificationNumber { get; set; }
         public string CHFID { get; set; }
@@ -42,6 +43,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
 
             InsureeModel insuree = new InsureeModel()
             {
+                InsureeId = tblInsuree.InsureeId,
                 InsureeUUID = tblInsuree.InsureeUUID,
                 IdentificationNumber = tblInsuree.Passport,
                 CHFID = tblInsuree.Chfid,

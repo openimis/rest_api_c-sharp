@@ -8,8 +8,10 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
 {
     public class FamilyModel
     {
+        public int FamilyId { get; set; }
         public Guid FamilyUUID { get; set; }
         public IEnumerable<InsureeModel> Insurees { get; set; }
+        public int InsureeId { get; set; }
         public Guid InsureeUUID { get; set; }
         public int LocationId { get; set; }
 		public bool Poverty { get; set; }
@@ -24,7 +26,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
         {
             FamilyModel familyModel = new FamilyModel()
             {
+                FamilyId = tblFamilies.FamilyId,
                 FamilyUUID = tblFamilies.FamilyUUID,
+                InsureeId = tblFamilies.InsureeId,
                 InsureeUUID = tblFamilies.Insuree.InsureeUUID,
                 LocationId = TypeCast.GetValue<int>(tblFamilies.LocationId),
                 Poverty = TypeCast.GetValue<bool>(tblFamilies.Poverty),
