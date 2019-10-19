@@ -124,5 +124,73 @@ namespace OpenImis.RestApi.Controllers.V2
 
             return Ok(renewalModel);
         }
+
+        [HasRights(Rights.ReportsPrimaryOperationalIndicatorPolicies)]
+        [HttpPost]
+        [Route("indicators/snapshot")]
+        public IActionResult GetSnapshotIndicators([FromBody]SnapshotRequestModel snapshotRequestModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            SnapshotResponseModel snapshotResponseModel;
+
+            try
+            {
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+
+                Repository rep = new Repository();
+                string officerCode = rep.GetLoginNameByUserUUID(userUUID);
+
+                snapshotResponseModel = _imisModules.GetReportModule().GetReportLogic().GetSnapshotIndicators(snapshotRequestModel, officerCode);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+            }
+
+            if (snapshotResponseModel == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(snapshotResponseModel);
+        }
+
+        [HasRights(Rights.ReportsPrimaryOperationalIndicatorPolicies)]
+        [HttpPost]
+        [Route("indicators/cumulative")]
+        public IActionResult GetCumulativeIndicators([FromBody]IndicatorRequestModel cumulativeRequestModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            CumulativeIndicatorsResponseModel cumulativeIndicatorsResponseModel;
+
+            try
+            {
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+
+                Repository rep = new Repository();
+                string officerCode = rep.GetLoginNameByUserUUID(userUUID);
+
+                cumulativeIndicatorsResponseModel = _imisModules.GetReportModule().GetReportLogic().GetCumulativeIndicators(cumulativeRequestModel, officerCode);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+            }
+
+            if (cumulativeIndicatorsResponseModel == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(cumulativeIndicatorsResponseModel);
+        }
     }
 }

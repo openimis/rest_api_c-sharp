@@ -42,5 +42,23 @@ namespace OpenImis.ModulesV2.ReportModule.Logic
 
             return response;
         }
+
+        public SnapshotResponseModel GetSnapshotIndicators(SnapshotRequestModel snapshotRequestModel, string officerCode)
+        {
+            SnapshotResponseModel response;
+
+            response = reportRepository.GetSnapshotIndicators(snapshotRequestModel, officerCode);
+
+            return response;
+        }
+
+        public CumulativeIndicatorsResponseModel GetCumulativeIndicators(IndicatorRequestModel cumulativeIndicatorsRequestModel, string officerCode)
+        {
+            CumulativeIndicatorsResponseModel response;
+
+            response = reportRepository.GetCumulativeIndicators(cumulativeIndicatorsRequestModel, officerCode);
+
+            return response;
+        }
     }
 }
