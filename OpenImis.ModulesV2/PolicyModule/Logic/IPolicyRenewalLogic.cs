@@ -10,5 +10,6 @@ namespace OpenImis.ModulesV2.PolicyModule.Logic
         List<GetPolicyRenewalModel> Get(string officerCode);
         int Post(PolicyRenewalModel policy);
         int Delete(Guid uuid);
+        DataMessage GetCommissions(GetCommissionInputs model);
     }
 }

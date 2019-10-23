@@ -8,16 +8,16 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
     {
         public int PolicyId { get; set; }
         public int FamilyId { get; set; }
-        public DateTime EnrollDate { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EffectiveDate { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public int PolicyStatus { get; set; }
-        public decimal PolicyValue { get; set; }
+        public DateTime? EnrollDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EffectiveDate { get; set; }
+        public DateTime? ExpiryDate { get; set; }
+        public string PolicyStatus { get; set; }
+        public string PolicyValue { get; set; }
         public int ProdId { get; set; }
         public int OfficerId { get; set; }
-        public int PolicyStage { get; set; }
-        public bool isOffline { get; set; }
+        public string PolicyStage { get; set; }
+        public string isOffline { get; set; }
         public Premium Premium { get; set; }
     }
 }

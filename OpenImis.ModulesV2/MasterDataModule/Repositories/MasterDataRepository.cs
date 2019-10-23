@@ -194,6 +194,7 @@ namespace OpenImis.ModulesV2.MasterDataModule.Repositories
                     .Where(o => o.ValidityTo == null)
                     .Select(x => new OfficerModel()
                     {
+                        OfficerId = x.OfficerId,
                         OfficerUUID = x.OfficerUUID,
                         Code = x.Code,
                         LastName = x.LastName,

@@ -11,9 +11,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
         public int PayerId { get; set; }
         public string Amount { get; set; }
         public string Receipt { get; set; }
-        public DateTime PayDate { get; set; }
-        public int PayType { get; set; }
-        public bool isPhotoFee { get; set; }
-        public bool isOffline { get; set; }
+        public DateTime? PayDate { get; set; }
+        public string PayType { get; set; }
+        public string isPhotoFee { get; set; }
+        public string isOffline { get; set; }
     }
 }
