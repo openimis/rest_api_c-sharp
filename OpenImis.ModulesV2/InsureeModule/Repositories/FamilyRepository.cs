@@ -106,17 +106,10 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"];
                 var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"];
 
-                var hof = "";
+                var hof = enrollFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
-                if (enrollFamily.Insurees.Any(x => x.isHead == "true" || x.isHead == "1"))
-                {
-                    hof = enrollFamily.Insurees.Where(x => x.isHead == "true" || x.isHead == "1").Select(z => z.CHFID).FirstOrDefault();
-                }
-                else hof = "Unknown";
-
-                var FileName = string.Format("{0}__{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss.XML"));
+                var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
                 var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
-
 
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
