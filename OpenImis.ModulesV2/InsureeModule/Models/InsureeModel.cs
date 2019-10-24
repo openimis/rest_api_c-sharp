@@ -49,7 +49,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
                 CHFID = tblInsuree.Chfid,
                 LastName = tblInsuree.LastName,
                 OtherNames = tblInsuree.OtherNames,
-                DOB = tblInsuree.Dob.ToString("yyyy-mm-dd"),
+                DOB = tblInsuree.Dob.ToString("yyyy-MM-dd"),
                 IsHead = tblInsuree.IsHead,
                 Phone = tblInsuree.Phone,
                 Gender = tblInsuree.Gender,

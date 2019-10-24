@@ -14,6 +14,8 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Xml;
 using Newtonsoft.Json;
+using System.Diagnostics;
+using System.Text;
 
 namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
@@ -178,7 +180,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                         using (var reader = cmd.ExecuteReader())
                         {
-                            //Displaying errors in the Stored Procedure in Debug mode
+                            // Displaying errors in the Stored Procedure in Debug mode
                             //do
                             //{
                             //    while (reader.Read())
@@ -206,9 +208,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                             {
                                 if (picture.ImageContent != null)
                                 {
-                                    if (picture.ImageContent.Length == 0)
+                                    if (picture.ImageContent.Length != 0)
                                     {
-                                        File.WriteAllBytes(webRootPath + UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, picture.ImageContent);
+                                        File.WriteAllBytes(webRootPath + UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, Convert.FromBase64String(picture.ImageContent));
                                     }
                                 }
                             }
