@@ -29,7 +29,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
         public string GeoLocation { get; set; }
         public string CurVillage { get; set; }
         public string isOffline { get; set; }
-        public DateTime? EffectiveDate { get; set; }
         public InsureeImage Picture { get; set; }
     }
 }
