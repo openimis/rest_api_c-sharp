@@ -57,6 +57,12 @@ namespace OpenImis.RestApi.Controllers.V2
         {
             int response;
 
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());

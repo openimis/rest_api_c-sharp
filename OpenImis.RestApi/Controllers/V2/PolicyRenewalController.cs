@@ -84,5 +84,21 @@ namespace OpenImis.RestApi.Controllers.V2
 
             return Ok(response);
         }
+
+        [HasRights(Rights.PolicySearch)]
+        [HttpPost]
+        [Route("commissions")]
+        public virtual IActionResult GetCommissions([FromBody]GetCommissionInputs model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
+            var response = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().GetCommissions(model);
+
+            return Json(response);
+        }
     }
 }

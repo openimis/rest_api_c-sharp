@@ -7,6 +7,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
     public class InsureeImage
     {
         public string ImageName { get; set; }
-        public byte[] ImageContent { get; set; }
+        public string ImageContent { get; set; }
     }
 }

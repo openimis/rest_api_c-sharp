@@ -48,5 +48,14 @@ namespace OpenImis.ModulesV2.PolicyModule.Logic
 
             return response;
         }
+
+        public DataMessage GetCommissions(GetCommissionInputs model)
+        {
+            DataMessage response;
+
+            response = policyRenewalRepository.GetCommissions(model);
+
+            return response;
+        }
     }
 }

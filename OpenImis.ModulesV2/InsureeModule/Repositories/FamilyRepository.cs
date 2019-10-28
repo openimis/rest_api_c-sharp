@@ -14,6 +14,8 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Xml;
 using Newtonsoft.Json;
+using System.Diagnostics;
+using System.Text;
 
 namespace OpenImis.ModulesV2.InsureeModule.Repositories
 {
@@ -104,17 +106,10 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"];
                 var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"];
 
-                var hof = "";
+                var hof = enrollFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
-                if (enrollFamily.Insurees.Any(x => x.isHead == "true" || x.isHead == "1"))
-                {
-                    hof = enrollFamily.Insurees.Where(x => x.isHead == "true" || x.isHead == "1").Select(z => z.CHFID).FirstOrDefault();
-                }
-                else hof = "Unknown";
-
-                var FileName = string.Format("{0}__{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss.XML"));
+                var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
                 var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
-
 
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
@@ -178,7 +173,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                         using (var reader = cmd.ExecuteReader())
                         {
-                            //Displaying errors in the Stored Procedure in Debug mode
+                            // Displaying errors in the Stored Procedure in Debug mode
                             //do
                             //{
                             //    while (reader.Read())
@@ -206,9 +201,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                             {
                                 if (picture.ImageContent != null)
                                 {
-                                    if (picture.ImageContent.Length == 0)
+                                    if (picture.ImageContent.Length != 0)
                                     {
-                                        File.WriteAllBytes(webRootPath + UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, picture.ImageContent);
+                                        File.WriteAllBytes(webRootPath + UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, Convert.FromBase64String(picture.ImageContent));
                                     }
                                 }
                             }

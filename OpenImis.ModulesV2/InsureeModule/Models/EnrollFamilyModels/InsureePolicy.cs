@@ -8,6 +8,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
     {
         public int InsureeId { get; set; }
         public int PolicyId { get; set; }
-        public DateTime EffectiveDate { get; set; }
+        public DateTime? EffectiveDate { get; set; }
     }
 }
