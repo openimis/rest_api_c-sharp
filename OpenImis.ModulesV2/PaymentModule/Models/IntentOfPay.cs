@@ -5,7 +5,7 @@ namespace OpenImis.ModulesV2.PaymentModule.Models
 {
     public class IntentOfPay
     {
-        [Required(ErrorMessage = "9: Phone number not provided")]
+        [Required(ErrorMessage = "9-Phone number not provided")]
         public virtual string phone_number { get; set; }
         [DataType(DataType.DateTime)]
         public string request_date { get; set; }

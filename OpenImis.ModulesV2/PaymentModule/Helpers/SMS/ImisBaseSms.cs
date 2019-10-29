@@ -13,17 +13,22 @@ namespace OpenImis.ModulesV2.PaymentModule.Helpers.SMS
 {
     public class ImisBaseSms
     {
-        private string SmsTampletes = string.Empty;
+        private string SmsTemplates = string.Empty;
         private string webRootPath;
+        private string smsGateWay;
 
         public ImisBaseSms(IConfiguration config, string webRootPath, string contentRootPath, Language language = Language.Primary)
         {
             this.webRootPath = webRootPath;
+            smsGateWay = config["SmsGateWay"];
+
+            var smsStrings = config["AppSettings:SmsStrings"];
+            var smsStringsSecondary = config["AppSettings:SmsStringsSecondary"];
 
             if (language == Language.Primary)
-                SmsTampletes = contentRootPath + @"\Escape\Sms\Strings\";
+                SmsTemplates = contentRootPath + smsStrings;
             else
-                SmsTampletes = contentRootPath + @"\Escape\Sms\StringsSecondaryLanguage\";
+                SmsTemplates = contentRootPath + smsStringsSecondary;
         }
 
         public virtual async Task<string> SendSMS(List<SmsContainer> containers, string filename)
@@ -38,7 +43,7 @@ namespace OpenImis.ModulesV2.PaymentModule.Helpers.SMS
 
             try
             {
-                var response = await client.PostAsync("url", content);
+                var response = await client.PostAsync(smsGateWay, content);
                 var ret = await response.Content.ReadAsStringAsync();
                 response_message = ret;
             }
@@ -68,7 +73,7 @@ namespace OpenImis.ModulesV2.PaymentModule.Helpers.SMS
 
         public virtual string GetMessage(string filename)
         {
-            string text = File.ReadAllText(SmsTampletes + filename + ".txt", Encoding.UTF8);
+            string text = File.ReadAllText(SmsTemplates + filename + ".txt", Encoding.UTF8);
             return text;
         }
 
