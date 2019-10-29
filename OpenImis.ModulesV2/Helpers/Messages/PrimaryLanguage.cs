@@ -28,7 +28,7 @@ namespace OpenImis.ModulesV2.Helpers.Messages
         public static string NotFountINMember = "Insurance number of member not found.";
         public static string WrongVillageCode = "Wrong current village code.";
         public static string WrongRelationship = "Wrong relationship.";
-        public static string WrongOrMissingPC = "Wrong or missing product code (not existing or not applicable to the family\/group).";
+        public static string WrongOrMissingPC = "Wrong or missing product code (not existing or not applicable to the family/group).";
         public static string WrongOrMissingPayDate = "Wrong or missing payment date.";
         public static string WrongContributionCat = "Wrong contribution category.";
         public static string WrongOrMissingPayType = "Wrong or missing payment type.";
@@ -43,8 +43,8 @@ namespace OpenImis.ModulesV2.Helpers.Messages
         public static string MissingOtherName = "Missing other name.";
         public static string DuplicatedMemberIN = "Insurance number of member duplicated.";
         public static string WrongOrMissingEnrolDate = "Wrong or missing enrollment date.";
-        public static string WrongOrMissingEOcode = "Wrong or missing enrollment officer code (not existing or not applicable to the family\/group).";
-        public static string NoMemberOfOrder = "No member of the specified order number in the family\/group.";
+        public static string WrongOrMissingEOcode = "Wrong or missing enrollment officer code (not existing or not applicable to the family/group).";
+        public static string NoMemberOfOrder = "No member of the specified order number in the family/group.";
         public static string PayIdDoesntExist = "1. The payment identifier does not exist.";
         public static string WrongOrMissingRenDate = "Wrong or missing renewal date.";
         public static string WrongInternalIdFormat = "1. Wrong format of internal identifier.";
@@ -68,6 +68,6 @@ namespace OpenImis.ModulesV2.Helpers.Messages
         public static string DoesntExistEO = "6. Enrollment Officer Code does not exist.";
         public static string DoesntExistPC = "7. Product Code Does not Exist.";
         public static string NoPolicyForRenewal = "8. Beneficiary has no policy of specified insurance product for renewal.";
-        public static string UnknownTypeOfPay = "9. Unknown type of payment."
+        public static string UnknownTypeOfPay = "9. Unknown type of payment.";
     }
 }
