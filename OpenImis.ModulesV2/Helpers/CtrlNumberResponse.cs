@@ -1,0 +1,48 @@
+﻿using OpenImis.ModulesV2.Helpers;
+using OpenImis.ModulesV2.Helpers.Messages;
+using System;
+using System.Data;
+
+namespace OpenImis.ModulesV2.PaymentModule.Helpers
+{
+    public class CtrlNumberResponse : ImisApiResponse
+    {
+        public CtrlNumberResponse(Exception e) : base(e)
+        {
+
+        }
+
+        public CtrlNumberResponse(int value, bool error, int lang) : base(value, error, lang)
+        {
+            SetMessage(value);
+
+        }
+
+        public CtrlNumberResponse(int value, bool error, DataTable data, int lang) : base(value, error, data, lang)
+        {
+            SetMessage(value);
+        }
+
+        private void SetMessage(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    msg.Code = value;
+                    msg.MessageValue = new Language().GetMessage(language, "Success");
+                    Message = msg;
+                    break;
+                case 1:
+                    msg.Code = value;
+                    msg.MessageValue = new Language().GetMessage(language, "CantAssignCN");
+                    Message = msg;
+                    break;
+                case 2:
+                    msg.Code = value;
+                    msg.MessageValue = new Language().GetMessage(language, "DuplicateCN");
+                    Message = msg;
+                    break;
+            }
+        }
+    }
+}
