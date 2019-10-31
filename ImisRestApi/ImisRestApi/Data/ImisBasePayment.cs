@@ -276,7 +276,8 @@ namespace ImisRestApi.Data
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", model.internal_identifier),
                 new SqlParameter("@ControlNumber", model.control_number),
-                new SqlParameter("@Failed", failed)
+                new SqlParameter("@Failed", failed),
+                new SqlParameter("@Message",model.error_message)
              };
 
             DataMessage message;
@@ -448,7 +449,9 @@ namespace ImisRestApi.Data
             {
                 DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
 
+                var jsonString = JsonConvert.SerializeObject(data);
                 //bool error = false;
+
                 DataTable dt = new DataTable();
 
                 if (data.Tables.Count > 0)

@@ -101,12 +101,26 @@ namespace ImisRestApi.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.MatchPayment(model);
 
-            List<MatchSms> PaymentIds = new List<MatchSms>();
+            if (model.internal_identifier == null)
+            {
+                List<MatchSms> PaymentIds = new List<MatchSms>();
 
-            PaymentIds = payment.GetPaymentIdsForSms();
+                PaymentIds = payment.GetPaymentIdsForSms();
 
-            if (PaymentIds != null)
-                SendMatchSms(PaymentIds);
+                if (PaymentIds != null)
+                    SendMatchSms(PaymentIds);
+            }
+            else
+            {
+                var matchdata = JsonConvert.SerializeObject(response.Data);
+                var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
+
+                if (matchedPayments.FirstOrDefault().PaymentMatched > 0)
+                {
+                    SendPaymentSms(payment);
+                }
+
+            }
 
             return response;
         }
@@ -174,13 +188,13 @@ namespace ImisRestApi.Logic
 
                 var matchresponse = await MatchPayment(matchModel);
                
-                var matchdata = JsonConvert.SerializeObject(matchresponse.Data);
-                var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
+                //var matchdata = JsonConvert.SerializeObject(matchresponse.Data);
+                //var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
 
-                if (matchedPayments.Select(x => x.PaymentId).Contains(payment.PaymentId))
-                {
-                    SendPaymentSms(payment);
-                }
+                //if (matchedPayments.Select(x => x.PaymentId).Contains(payment.PaymentId))
+                //{
+                //    SendPaymentSms(payment);
+                //}
 
             }
 

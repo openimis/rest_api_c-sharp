@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
@@ -74,9 +75,11 @@ namespace ImisRestApi.Controllers
 
         [HttpGet]
         [Route("api/Claims/GetClaimAdmins")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult ValidateClaimAdmin()
         {
-
+            
             try
             {
 
@@ -93,6 +96,8 @@ namespace ImisRestApi.Controllers
 
         [HttpGet]
         [Route("api/Claims/Controls")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetControls()
         {
 
@@ -108,6 +113,33 @@ namespace ImisRestApi.Controllers
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
 
+            }
+
+        }
+
+        [HttpPost]
+        [Route("api/GetClaims")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public IActionResult GetClaims([FromBody]ClaimsModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
+            try
+            {
+
+                var data = imisClaims.GetClaims(model);
+
+               
+                return Ok(new { error_occured = false, data = data });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
             }
 
         }
