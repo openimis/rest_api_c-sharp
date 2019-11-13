@@ -137,6 +137,84 @@ namespace ImisRestApi.Data
 
         internal object GetClaims(ClaimsModel model)
         {
+            var sSQL = @";WITH TotalForItems AS
+                        (
+                            SELECT C.ClaimId, SUM(CI.PriceAsked * CI.QtyProvided)Claimed,
+                            SUM(ISNULL(CI.PriceApproved, CI.PriceAsked) * ISNULL(CI.QtyApproved, CI.QtyProvided)) Approved,
+                            SUM(CI.PriceValuated)Adjusted,
+                            SUM(CI.RemuneratedAmount)Remunerated
+                            FROM tblClaim C LEFT OUTER JOIN tblClaimItems CI ON C.ClaimId = CI.ClaimID
+                            WHERE C.ValidityTo IS NULL
+                            AND CI.ValidityTo IS NULL
+                            GROUP BY C.ClaimID
+                        ), TotalForServices AS
+                        (
+                            SELECT C.ClaimId, SUM(CS.PriceAsked * CS.QtyProvided)Claimed,
+                            SUM(ISNULL(CS.PriceApproved, CS.PriceAsked) * ISNULL(CS.QtyApproved, CS.QtyProvided)) Approved,
+                            SUM(CS.PriceValuated)Adjusted,
+                            SUM(CS.RemuneratedAmount)Remunerated
+                            FROM tblClaim C
+                            LEFT OUTER JOIN tblClaimServices CS ON C.ClaimId = CS.ClaimID
+                            WHERE C.ValidityTo IS NULL
+                            AND CS.ValidityTo IS NULL
+                            GROUP BY C.ClaimID
+                        )
+
+                        SELECT ICD1.ICDName sec_dg_1, ICD.ICDName main_dg, C.DateProcessed, C.ClaimID, I.ItemId, S.ServiceID, HF.HFCode health_facility_code, HF.HFName health_facility_name, C.ClaimCode claim_number, CONVERT(NVARCHAR, C.DateClaimed, 111) date_claimed, CA.LastName + ' ' + CA.OtherNames ClaimAdminName,
+	                    CONVERT(NVARCHAR, C.DateFrom, 111) visit_date_from, CONVERT(NVARCHAR, C.DateTo, 111) visit_date_to, Ins.CHFID insurance_number, Ins.LastName + ' ' + Ins.OtherNames patient_name,
+	                    CASE C.ClaimStatus WHEN 1 THEN N'Rejected' WHEN 2 THEN N'Entered' WHEN 4 THEN N'Checked' WHEN 8 THEN N'Processed' WHEN 16 THEN N'Valuated' END claim_status,
+                        C.RejectionReason, COALESCE(TFI.Claimed + TFS.Claimed, TFI.Claimed, TFS.Claimed) claimed, 
+	                    COALESCE(TFI.Approved + TFS.Approved, TFI.Approved, TFS.Approved) approved,
+	                    COALESCE(TFI.Adjusted + TFS.Adjusted, TFI.Adjusted, TFS.Adjusted) adjusted,
+	                    COALESCE(TFI.Remunerated + TFS.Remunerated, TFI.Remunerated, TFS.Remunerated) paid,
+	                    CASE WHEN CI.RejectionReason <> 0 THEN I.ItemCode ELSE NULL END RejectedItem, CI.RejectionReason ItemRejectionCode,
+                        CASE WHEN CS.RejectionReason > 0 THEN S.ServCode ELSE NULL END RejectedService, CS.RejectionReason ServiceRejectionCode,
+                        CASE WHEN CI.QtyProvided<> COALESCE(CI.QtyApproved, CI.QtyProvided) THEN I.ItemCode ELSE NULL END AdjustedItem,
+	                    CASE WHEN CI.QtyProvided<> COALESCE(CI.QtyApproved, CI.QtyProvided) THEN CI.QtyProvided ELSE NULL END item_qty,
+	                    CASE WHEN CI.QtyProvided<> COALESCE(CI.QtyApproved , CI.QtyProvided)  THEN CI.QtyApproved ELSE NULL END item_adjusted_qty,
+	                    CASE WHEN CS.QtyProvided<> COALESCE(CS.QtyApproved, CS.QtyProvided)  THEN S.ServCode ELSE NULL END AdjustedService,
+	                    CASE WHEN CS.QtyProvided<> COALESCE(CS.QtyApproved, CS.QtyProvided)   THEN CS.QtyProvided ELSE NULL END service_qty,
+	                    CASE WHEN CS.QtyProvided<> COALESCE(CS.QtyApproved , CS.QtyProvided)   THEN CS.QtyApproved ELSE NULL END service_adjusted_qty,
+	                    C.Explanation explination,
+                        CASE C.VisitType WHEN 'E' THEN 'Emergency' WHEN 'R' THEN 'Referral' WHEN 'O' THEN 'Others' END visit_type,
+                      C.Adjustment adjustment,
+                      C.GuaranteeId guarantee_number,
+                      I.ItemName item, I.ItemCode item_code, CI.PriceAdjusted item_adjusted_price, I.ItemPrice item_price, CI.Explanation item_explination, CI.Justification item_justification, CI.PriceValuated item_valuated, CI.RejectionReason item_result,
+                            S.ServName[service],S.ServCode service_code, CS.PriceAdjusted service_adjusted_price, S.ServPrice service_price, CS.Explanation service_explination, CS.Justification service_justification, CS.PriceValuated service_valuated, CI.RejectionReason item_result
+
+                        FROM tblClaim C
+                        LEFT OUTER JOIN tblClaimItems CI ON C.ClaimId = CI.ClaimID
+
+                        LEFT OUTER JOIN tblClaimServices CS ON C.ClaimId = CS.ClaimID
+
+                        LEFT OUTER JOIN tblItems I ON CI.ItemId = I.ItemID
+
+                        LEFT OUTER JOIN tblServices S ON CS.ServiceID = S.ServiceID
+
+                        LEFT OUTER JOIN tblHF HF ON C.HFID = HF.HfID
+
+                        LEFT OUTER JOIN tblClaimAdmin CA ON C.ClaimAdminId = CA.ClaimAdminId
+
+                        LEFT OUTER JOIN tblInsuree Ins ON C.InsureeId = Ins.InsureeId
+
+                        LEFT OUTER JOIN TotalForItems TFI ON C.ClaimId = TFI.ClaimID
+
+                        LEFT OUTER JOIN TotalForServices TFS ON C.ClaimId = TFS.ClaimId
+
+                        LEFT OUTER JOIN tblICDCodes ICD ON C.ICDID = ICD.ICDID
+
+                        LEFT OUTER JOIN tblICDCodes ICD1 ON C.ICDID1 = ICD1.ICDID
+
+                        WHERE C.ValidityTo IS NULL
+                        AND CA.ClaimAdminCode = @ClaimAdminCode
+
+                        AND(C.ClaimStatus = @ClaimStatus OR @ClaimStatus IS NULL)
+
+                        AND ISNULL(C.DateTo, C.DateFrom) BETWEEN ISNULL(@StartDate, (SELECT CAST(-53690 AS DATETIME))) AND ISNULL(@EndDate, GETDATE())
+
+                        AND(C.DateProcessed BETWEEN ISNULL(@DateProcessedFrom, CAST('1753-01-01' AS DATE)) AND ISNULL(@DateProcessedTo, GETDATE()) OR C.DateProcessed IS NULL)
+
+                    ";
 
             DataHelper helper = new DataHelper(Configuration);
 
@@ -148,33 +226,33 @@ namespace ImisRestApi.Data
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@ClaimAdminCode", model.claim_administrator_code),
-                new SqlParameter("@StartDate", model.visit_date_from),
-                new SqlParameter("@EndDate",  model.visit_date_to),
-                new SqlParameter("@DateProcessedFrom",  model.processed_date_from),
-                new SqlParameter("@DateProcessedTo",  model.processed_date_to),
-                new SqlParameter("@ClaimStatus", claimStatus),
+                new SqlParameter("@StartDate",SqlDbType.DateTime){ Value = (model.visit_date_from != null)?model.visit_date_from:(object)DBNull.Value},
+                new SqlParameter("@EndDate",SqlDbType.DateTime){ Value = (model.visit_date_to != null)?model.visit_date_to:(object)DBNull.Value},
+                new SqlParameter("@DateProcessedFrom",SqlDbType.DateTime){ Value = (model.processed_date_from != null)?model.processed_date_from:(object)DBNull.Value},
+                new SqlParameter("@DateProcessedTo", SqlDbType.DateTime){ Value = (model.processed_date_to != null)?model.processed_date_to:(object)DBNull.Value},
+                new SqlParameter("@ClaimStatus", SqlDbType.Int){ Value = (claimStatus != null)?claimStatus:(object)DBNull.Value},
             };
 
             try
             {
-                var response = helper.Procedure("uspAPIGetClaimOverview", sqlParameters);
+                var response = helper.GetDataTable(sSQL, sqlParameters, CommandType.Text);
 
-                var responseData = response.Data;
+                var responseData = response;
 
                 var jsonString = JsonConvert.SerializeObject(responseData);
 
                 var ObjectList = JsonConvert.DeserializeObject<List<ClaimOutPut>>(jsonString).Distinct(new ClaimEqualityComparer());
-                var services = JsonConvert.DeserializeObject<List<ClaimServices>>(jsonString).Distinct(new ServiceEqualityComparer());
-                var items = JsonConvert.DeserializeObject<List<ClaimItems>>(jsonString).Distinct(new ItemEqualityComparer());
+                var services = JsonConvert.DeserializeObject<List<ClaimServices>>(jsonString);//.Distinct(new ServiceEqualityComparer());
+                var items = JsonConvert.DeserializeObject<List<ClaimItems>>(jsonString);//.Distinct(new ItemEqualityComparer());
 
                 List<ClaimOutPut> admin_claims = new List<ClaimOutPut>();
 
                 foreach (var obj in ObjectList)
                 {
-                    var obj_services = services.Where(x => x.claim_number == obj.claim_number).ToList();
+                    var obj_services = services.Where(x => x.claim_number == obj.claim_number).Distinct(new ServiceEqualityComparer()).ToList();
                     obj.services = obj_services;
 
-                    var obj_items = items.Where(x => x.claim_number == obj.claim_number).ToList();
+                    var obj_items = items.Where(x => x.claim_number == obj.claim_number).ToList().Distinct(new ItemEqualityComparer()).ToList();
                     obj.items = obj_items;
 
                     admin_claims.Add(obj);
@@ -261,15 +339,15 @@ namespace ImisRestApi.Data
         public bool Equals(ClaimServices x, ClaimServices y)
         {
             // Two items are equal if their keys are equal.
-            return x.service == y.service;
+            return x.service_code == y.service_code;
         }
 
         public int GetHashCode(ClaimServices obj)
         {
             
-            if (obj.service != null)
+            if (obj.service_code != null)
             {
-                return obj.service.GetHashCode();
+                return obj.service_code.GetHashCode();
             }
             else
             {
@@ -283,14 +361,14 @@ namespace ImisRestApi.Data
         public bool Equals(ClaimItems x, ClaimItems y)
         {
             // Two items are equal if their keys are equal.
-            return x.item == y.item;
+            return x.item_code == y.item_code;
         }
 
         public int GetHashCode(ClaimItems obj)
         {
-            if(obj.item != null)
+            if(obj.item_code != null)
             {
-                return obj.item.GetHashCode();
+                return obj.item_code.GetHashCode();
             }
             else
             {
