@@ -89,6 +89,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Docs\ApiVersion2Description.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\ApiVersion1Description.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
