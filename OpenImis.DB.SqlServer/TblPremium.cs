@@ -20,6 +20,8 @@ namespace OpenImis.DB.SqlServer
         public bool? IsPhotoFee { get; set; }
         public bool? IsOffline { get; set; }
         public int? ReportingId { get; set; }
+        public int? ReportingCommissionID { get; set; }
+        public int? ReportingCommisionID { get; set; }
 
         public TblPayer Payer { get; set; }
         public TblPolicy Policy { get; set; }

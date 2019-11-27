@@ -13,6 +13,7 @@ namespace OpenImis.DB.SqlServer
         }
 
         public int ClaimId { get; set; }
+        public Guid ClaimUUID { get; set; }
         public int InsureeId { get; set; }
         public string ClaimCode { get; set; }
         public DateTime DateFrom { get; set; }

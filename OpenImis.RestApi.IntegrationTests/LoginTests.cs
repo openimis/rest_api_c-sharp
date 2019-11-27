@@ -2,7 +2,7 @@ using FluentAssertions;
 using FluentAssertions.Json;
 using Newtonsoft.Json.Linq;
 using OpenImis.RestApi.IntegrationTests.Helpers;
-using OpenImis.RestApi.Protocol.LoginModel;
+using OpenImis.RestApi.Protocol.LoginModels;
 using System;
 using System.Net;
 using System.Net.Http;

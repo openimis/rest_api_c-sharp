@@ -13,6 +13,7 @@ namespace OpenImis.DB.SqlServer
         }
 
         public int UserId { get; set; }
+        public Guid UserUUID { get; set; }
         public string LanguageId { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
@@ -28,6 +29,7 @@ namespace OpenImis.DB.SqlServer
         public string DummyPwd { get; set; }
         public string EmailId { get; set; }
         public string PrivateKey { get; set; }
+        public string StoredPassword { get; set; }
 
         public TblLanguages Language { get; set; }
         public ICollection<TblClaim> TblClaim { get; set; }

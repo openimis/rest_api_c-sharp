@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using System.Text;
 using OpenImis.Modules.UserModule.Entities;
 using Newtonsoft.Json;
 using OpenImis.Modules.Utils;
@@ -47,22 +49,6 @@ namespace OpenImis.Modules.UserModule.Repository
         }
 
         /// <summary>
-        /// Creates the SQL string for the GetByUsernameAndPassword[Async] calls
-        /// </summary>
-        /// <param name="userParameter"></param>
-        /// <param name="passwordParameter"></param>
-        /// <returns></returns>
-        private RawSqlString GetByUsernameAndPasswordSQL() {
-            return new RawSqlString($@"OPEN SYMMETRIC KEY EncryptionKey DECRYPTION BY Certificate EncryptData
-                        SELECT *
-                        FROM TblUsers
-                        WHERE LoginName = @user
-                        AND CONVERT(NVARCHAR(25), DECRYPTBYKEY(Password)) COLLATE LATIN1_GENERAL_CS_AS = @password
-                        AND ValidityTo is null
-                        CLOSE SYMMETRIC KEY EncryptionKey");
-        }
-
-        /// <summary>
         /// Get user by username and password by asychronious call
         /// </summary>
         /// <param name="username"></param>
@@ -73,10 +59,15 @@ namespace OpenImis.Modules.UserModule.Repository
             TblUsers user;
             using (var imisContext = new ImisDB())
             {
-                var userParameter = new SqlParameter("user", username);
-                var passwordParameter = new SqlParameter("password", password);
+                user = await imisContext.TblUsers.Where(u => u.LoginName == username).FirstOrDefaultAsync();
 
-                user = await imisContext.TblUsers.FromSql(GetByUsernameAndPasswordSQL(),userParameter, passwordParameter).SingleOrDefaultAsync();
+                if (user != null)
+                {
+                    if (!ValidateLogin(user.StoredPassword, user.PrivateKey, password))
+                    {
+                        user = null;
+                    }
+                }
             }
             return TypeCast.Cast<User>(user);
         }
@@ -90,15 +81,52 @@ namespace OpenImis.Modules.UserModule.Repository
         /// <returns></returns>
         public User GetByUsernameAndPassword(string username, string password)
         {
-            User user;
-            using (var imisContext = new ImisDB())
-            {
-                var userParameter = new SqlParameter("user", username);
-                var passwordParameter = new SqlParameter("password", password);
+            User user = GetByUsername(username);
 
-                user = (User)imisContext.TblUsers.FromSql(GetByUsernameAndPasswordSQL(), userParameter, passwordParameter).SingleOrDefault();
+            if (user == null)
+            {
+                return null;
             }
-            return user;
+            else
+            {
+                if (ValidateLogin(user.StoredPassword, user.PrivateKey, password))
+                {
+                    return user;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private bool ValidateLogin(string storedPassword, string privateKey, string password)
+        {
+            var generatedSHA = GenerateSHA256String(password + privateKey);
+            if (generatedSHA == storedPassword)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private string GenerateSHA256String(string inputString)
+        {
+            SHA256 sha256 = SHA256Managed.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(inputString);
+            byte[] hash = sha256.ComputeHash(bytes);
+            var stringBuilder = new StringBuilder();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                var str = hash[i].ToString("X2");
+                stringBuilder.Append(str);
+            }
+
+            return stringBuilder.ToString();
         }
 
     }

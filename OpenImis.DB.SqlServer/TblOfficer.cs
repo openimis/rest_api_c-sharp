@@ -14,6 +14,7 @@ namespace OpenImis.DB.SqlServer
         }
 
         public int OfficerId { get; set; }
+        public Guid OfficerUUID { get; set; }
         public string Code { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }

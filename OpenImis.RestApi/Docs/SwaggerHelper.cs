@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -29,12 +30,15 @@ namespace OpenImis.RestApi.Docs
             swaggerGenOptions.OperationFilter<FormatXmlCommentProperties>();
 			swaggerGenOptions.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
 			swaggerGenOptions.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
-		}
+
+            swaggerGenOptions.OperationFilter<AddRequiredHeaderParameter>();
+        }
 
         private static void AddSwaggerDocPerVersion(SwaggerGenOptions swaggerGenOptions, Assembly webApiAssembly)
         {
             var apiVersionDescriptions = new ApiVersionDescriptions();
             apiVersionDescriptions.AddDescription("1", File.ReadAllText("Docs\\ApiVersion1Description.md"));
+            apiVersionDescriptions.AddDescription("2", File.ReadAllText("Docs\\ApiVersion2Description.md"));
 			var apiVersions = GetApiVersions(webApiAssembly);
             foreach (var apiVersion in apiVersions)
             {
@@ -89,9 +93,17 @@ namespace OpenImis.RestApi.Docs
         {
             var webApiAssembly = Assembly.GetEntryAssembly();
             var apiVersions = GetApiVersions(webApiAssembly);
+
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"appsettings.json")
+                .Build();
+
+            var appPrefixDir = configuration.GetValue<string>("AppPrefixDir");
+
             foreach (var apiVersion in apiVersions)
             {
-                swaggerUIOptions.SwaggerEndpoint($"/api-docs/v{apiVersion}/swagger.json", $"V{apiVersion} Docs");
+                swaggerUIOptions.SwaggerEndpoint($"{appPrefixDir}/api-docs/v{apiVersion}/swagger.json", $"V{apiVersion} Docs");
             }
             swaggerUIOptions.RoutePrefix = "api-docs";
             swaggerUIOptions.InjectStylesheet("theme-feeling-blue-v2.css");

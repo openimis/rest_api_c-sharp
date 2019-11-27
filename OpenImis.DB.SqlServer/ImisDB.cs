@@ -16,7 +16,7 @@ namespace OpenImis.DB.SqlServer
 			.AddJsonFile($"appsettings.json")
 			//.AddJsonFile(Environment.GetEnvironmentVariable("REGISTRY_CONFIG_FILE"))
 			//.AddJsonFile("appsettings.json")
-			.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
+			.AddJsonFile(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")!=null?$"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json": "appsettings.Production.json", optional: false, reloadOnChange: true)
 			.Build();
 
 			optionsBuilder.UseSqlServer(configuration.GetConnectionString("IMISDatabase"));

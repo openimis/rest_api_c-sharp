@@ -121,11 +121,11 @@ namespace OpenImis.Modules.InsureeManagementModule.Logic
 
 			// check each insuree number is correct and unique
 			/// TODO: add only one validator for the Insuree class as it will be used here and in the InsureeLogic 
-			IInsureeLogic insureeLogic = this.imisModules.GetInsureeManagementModule().GetInsureeLogic();
-			UniqueInsureeNumberValidator uniqueInsureeNumberValidator = new UniqueInsureeNumberValidator(insureeLogic, insureeNumberValidator);
-			foreach (InsureeModel insuree in family.Insurees) {
-				await uniqueInsureeNumberValidator.ValidateAsync(insuree.CHFID);
-			}
+			//IInsureeLogic insureeLogic = this.imisModules.GetInsureeManagementModule().GetInsureeLogic();
+			//UniqueInsureeNumberValidator uniqueInsureeNumberValidator = new UniqueInsureeNumberValidator(insureeLogic, insureeNumberValidator);
+			//foreach (InsureeModel insuree in family.Insurees) {
+			//	await uniqueInsureeNumberValidator.ValidateAsync(insuree.CHFID);
+			//}
 
 			#endregion
 
