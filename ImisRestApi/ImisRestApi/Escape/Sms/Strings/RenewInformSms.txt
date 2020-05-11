@@ -1,0 +1,1 @@
+The policy of the insurance product @@insurance_product for the family @@insurance_number successfully renewed.
