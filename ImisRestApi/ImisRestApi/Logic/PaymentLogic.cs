@@ -12,6 +12,7 @@ using ImisRestApi.Models.Sms;
 using ImisRestApi.Chanels.Sms;
 using Newtonsoft.Json;
 using ImisRestApi.Models.Payment.Response;
+using System.Diagnostics;
 
 namespace ImisRestApi.Logic
 {
@@ -471,6 +472,20 @@ namespace ImisRestApi.Logic
 
             }
 
+        }
+
+        public async Task<ReconciliationMessage> ProvideReconciliationData(ReconciliationRequest model)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+
+            var response = payment.ProvideReconciliationData(model);
+
+            ReconciliationMessage return_message = new ReconciliationMessage();
+
+            return_message.transactions = response;
+            return_message.error_occurred = false;
+
+            return return_message;
         }
     }
 }

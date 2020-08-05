@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ImisRestApi.Chanels.Payment.Models;
@@ -234,6 +236,30 @@ namespace ImisRestApi.Controllers
             {
                 return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = "Unknown Error Occured" });
             }
+        }
+
+        [Authorize(Roles = "PaymentAdd")]
+        [HttpPost]
+        [Route("api/ProvideReconciliationData")]
+        public virtual async Task<IActionResult> ProvideReconciliationData([FromBody]ReconciliationRequest model)
+        {
+            ValidationResult validation = new ValidationBase().ReconciliationData(model);
+
+            if (validation != ValidationResult.Success)
+            {
+                return BadRequest(new { error_occured = true, error_message = validation.ErrorMessage });
+            }
+
+            try
+            {
+                var response = await _payment.ProvideReconciliationData(model);
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+            }
+
         }
     }
 }
