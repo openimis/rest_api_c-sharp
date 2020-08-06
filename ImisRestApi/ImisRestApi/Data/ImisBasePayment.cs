@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -757,6 +758,52 @@ namespace ImisRestApi.Data
             }
 
             return paymentId;
+        }
+
+        public List<ReconciliationItem> ProvideReconciliationData(ReconciliationRequest model)
+        {
+            List<ReconciliationItem> result = new List<ReconciliationItem>();
+
+            DateTime startDate = DateTime.ParseExact(model.date_from, "ddMMyyyy", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime endDate = DateTime.ParseExact(model.date_to, "ddMMyyyy", System.Globalization.CultureInfo.InvariantCulture);
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@DateFrom", startDate),
+                new SqlParameter("@DateTo", endDate)
+            };
+
+            var sSQL = @"SELECT * FROM tblPayment WHERE ReceivedDate BETWEEN @DateFrom AND @DateTo";
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+                if (data.Rows.Count > 0)
+                {
+                    for (int i = 0; i < data.Rows.Count; i++)
+                    {
+                        var rw = data.Rows[i];
+
+                        result.Add(new ReconciliationItem{
+                            control_number = rw["PaymentID"].ToString(),
+                            enrolment_officer_code = rw["OfficerCode"].ToString(),
+                            insurance_number = rw["PaymentID"].ToString(),
+                            language = rw["LanguageName"] != System.DBNull.Value ? Convert.ToString(rw["LanguageName"]) : null,
+                            payment_date = rw["PaymentDate"] != System.DBNull.Value ? DateTime.Parse(rw["PaymentDate"].ToString()).ToString("ddMMyyyy") : null,
+                            payment_origin = rw["PaymentOrigin"].ToString(),
+                            receipt_identification = rw["ReceiptNo"].ToString(),
+                            received_amount = rw["ReceivedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ReceivedAmount"]) : 0,
+                            received_date = rw["ReceivedDate"] != System.DBNull.Value ? DateTime.Parse(rw["ReceivedDate"].ToString()).ToString("ddMMyyyy") : null,
+                            transaction_identification = rw["TransactionNo"].ToString(),
+                            type_of_payment = rw["TypeOfPayment"] != System.DBNull.Value ? Convert.ToString(rw["TypeOfPayment"]) : null
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {}
+
+            return result;
         }
     }
 }
