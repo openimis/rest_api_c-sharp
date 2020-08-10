@@ -37,6 +37,14 @@ namespace ImisRestApi.ImisAttributes
                     {
                         return ValidationResult.Success;
                     }
+                    else if (DateTime.TryParseExact(value.ToString(), "yyyy-M-d", CultureInfo.InvariantCulture, DateTimeStyles.None, out Odate))
+                    {
+                        return ValidationResult.Success;
+                    }
+                    else if (DateTime.TryParseExact(value.ToString(), "yyyy/M/d", CultureInfo.InvariantCulture, DateTimeStyles.None, out Odate))
+                    {
+                        return ValidationResult.Success;
+                    }
                     else
                     {
                         return new ValidationResult(null);

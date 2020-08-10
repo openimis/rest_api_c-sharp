@@ -1,1 +1,1 @@
-﻿The payment {0} performed on {1} for the control number {2} received  and the policy for the family/group {3} - {4} with the insurance product {5} - {6} activated from the date {7} until the expiry date {8}. The allocated payment for the policy is {0}.
+﻿Payment for control number {2} paid successfully. CHFID:{3},Product:{5},Start Date:{7},Expire Date:{8}

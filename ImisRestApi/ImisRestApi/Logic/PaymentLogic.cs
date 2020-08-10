@@ -259,8 +259,8 @@ namespace ImisRestApi.Logic
 
             var txtmsg = string.Format(txtmsgTemplate,
                 payment.ControlNum,
-                DateTime.UtcNow.ToLongDateString(),
-                DateTime.UtcNow.ToLongTimeString(),
+                DateTime.UtcNow.ToString("dd-MM-yyyy"),
+                DateTime.UtcNow.ToString("dd-MM-yyyy"),
                 payment.InsureeProducts.FirstOrDefault().InsureeNumber,
                 payment.InsureeProducts.FirstOrDefault().InsureeName,
                 payment.InsureeProducts.FirstOrDefault().ProductCode,
@@ -307,8 +307,8 @@ namespace ImisRestApi.Logic
 
             var txtmsg = string.Format(txtmsgTemplate,
                 payment.ControlNum,
-                DateTime.UtcNow.ToLongDateString(),
-                DateTime.UtcNow.ToLongTimeString(),
+                DateTime.UtcNow.ToString("dd-MM-yyyy"),
+                DateTime.UtcNow.ToString("dd-MM-yyyy"),
                 payment.InsureeProducts.FirstOrDefault().InsureeNumber,
                 payment.InsureeProducts.FirstOrDefault().ProductCode,
                 error,
@@ -334,7 +334,7 @@ namespace ImisRestApi.Logic
 
                 var txtmsg = string.Format(sms.GetMessage("PaidAndActivated"),
                     payment.PaidAmount,
-                    DateTime.UtcNow.ToLongDateString(),
+                    DateTime.UtcNow.ToString("dd-MM-yyyy"),
                     payment.ControlNum,
                     familyproduct.InsureeNumber,
                     familyproduct.InsureeName,
@@ -360,7 +360,7 @@ namespace ImisRestApi.Logic
 
                 var txtmsg = string.Format(sms.GetMessage("PaidAndNotActivated"),
                     payment.PaidAmount,
-                    DateTime.UtcNow.ToLongDateString(),
+                    DateTime.UtcNow.ToString("dd-MM-yyyy"),
                     payment.ControlNum,
                     familyproduct.InsureeNumber,
                     familyproduct.InsureeName,
@@ -399,7 +399,7 @@ namespace ImisRestApi.Logic
             var familyproduct = payment.InsureeProducts.FirstOrDefault();
             var txtmsg = string.Format(txtmsgTemplate,
                      payment.PaidAmount,
-                     DateTime.UtcNow.ToLongDateString(),
+                     DateTime.UtcNow.ToString("dd-MM-yyyy"),
                      payment.ControlNum,
                      familyproduct.InsureeNumber,
                      familyproduct.InsureeName,
@@ -449,7 +449,7 @@ namespace ImisRestApi.Logic
                         var familyproduct = _pay.InsureeProducts.FirstOrDefault();
                         var txtmsg = string.Format(txtmsgTemplate,
                                  _pay.PaidAmount,
-                                 DateTime.UtcNow.ToLongDateString(),
+                                 DateTime.UtcNow.ToString("dd-MM-yyyy"),
                                  _pay.ControlNum,
                                  familyproduct.InsureeNumber,
                                  familyproduct.InsureeName,

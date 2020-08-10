@@ -187,7 +187,7 @@ namespace ImisRestApi.Controllers
                 var response = await _payment.SavePayment(model);
 
                 if (response.Code == 0) {
-                    return Ok();
+                    return Ok(response);
                 }
                 else
                 {
@@ -195,7 +195,7 @@ namespace ImisRestApi.Controllers
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return BadRequest(new PaymentDataBadResp() { error_message = "Unknown Error Occured" });
             }
@@ -241,7 +241,7 @@ namespace ImisRestApi.Controllers
         [Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/ProvideReconciliationData")]
-        public virtual async Task<IActionResult> ProvideReconciliationData([FromBody]ReconciliationRequest model)
+        public virtual async Task<IActionResult> ProvideReconciliationData([FromBody] ReconciliationRequest model)
         {
             ValidationResult validation = new ValidationBase().ReconciliationData(model);
 
@@ -259,6 +259,7 @@ namespace ImisRestApi.Controllers
             {
                 return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
             }
+
 
         }
     }
