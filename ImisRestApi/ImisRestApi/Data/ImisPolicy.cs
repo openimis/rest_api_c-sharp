@@ -62,8 +62,6 @@ namespace ImisRestApi.Data
                 new SqlParameter("@EnrollmentOfficerCode", model.EnrollmentOfficerCode)
             };
 
-            
-
             DataMessage message;
 
             try

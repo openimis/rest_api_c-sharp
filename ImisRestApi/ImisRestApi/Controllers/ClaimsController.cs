@@ -79,7 +79,7 @@ namespace ImisRestApi.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult ValidateClaimAdmin()
         {
-            
+
             try
             {
 
@@ -123,11 +123,6 @@ namespace ImisRestApi.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetClaims([FromBody]ClaimsModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new { error_occured = true, error_message = error });
-            }
 
             try
             {

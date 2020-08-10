@@ -9,6 +9,9 @@ namespace ImisRestApi.Responses.Messages
     {
         public static string Success = "Imefanikiwa";
 
+        public static string InvalidCred = "Taarifa za mtumiaji sio sahihi";
+        public static string PolicyNotActivated = "Sera hii haijawa activated";
+
         public static string CantAssignCN = "1-Na. ya ankara imeshindikana kutotelewa na mfumo wa malipo";
         public static string DuplicateCN = "2-Na. ya ankara imejirudia";
 

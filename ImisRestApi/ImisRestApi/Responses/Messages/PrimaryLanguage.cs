@@ -9,6 +9,8 @@ namespace ImisRestApi.Responses.Messages
     {
         public static string Success = "Success";
 
+        public static string InvalidCred = "Invalid User Credentials";
+        public static string PolicyNotActivated = "The policy was not activated";
         //CtrlNumberResponse
         public static string CantAssignCN = "1-Control number cannot be assigned by the external payment gateway";
         public static string DuplicateCN = "2-Duplicate Control Number";

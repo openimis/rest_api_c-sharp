@@ -137,6 +137,7 @@ namespace ImisRestApi.Data
 
         internal object GetClaims(ClaimsModel model)
         {
+
             var sSQL = @";WITH TotalForItems AS
                         (
                             SELECT C.ClaimId, SUM(CI.PriceAsked * CI.QtyProvided)Claimed,
@@ -235,24 +236,24 @@ namespace ImisRestApi.Data
 
             try
             {
-                var response = helper.GetDataTable(sSQL, sqlParameters, CommandType.Text);
+                var response = helper.GetDataTable(sSQL, sqlParameters,CommandType.Text);
 
                 var responseData = response;
 
                 var jsonString = JsonConvert.SerializeObject(responseData);
 
                 var ObjectList = JsonConvert.DeserializeObject<List<ClaimOutPut>>(jsonString).Distinct(new ClaimEqualityComparer());
-                var services = JsonConvert.DeserializeObject<List<ClaimServices>>(jsonString);//.Distinct(new ServiceEqualityComparer());
-                var items = JsonConvert.DeserializeObject<List<ClaimItems>>(jsonString);//.Distinct(new ItemEqualityComparer());
+                var services = JsonConvert.DeserializeObject<List<ClaimServices>>(jsonString).Distinct(new ServiceEqualityComparer());
+                var items = JsonConvert.DeserializeObject<List<ClaimItems>>(jsonString).Distinct(new ItemEqualityComparer());
 
                 List<ClaimOutPut> admin_claims = new List<ClaimOutPut>();
 
-                foreach (var obj in ObjectList)
+                foreach(var obj in ObjectList)
                 {
-                    var obj_services = services.Where(x => x.claim_number == obj.claim_number).Distinct(new ServiceEqualityComparer()).ToList();
+                    var obj_services = services.Where(x => x.claim_number == obj.claim_number).ToList();
                     obj.services = obj_services;
 
-                    var obj_items = items.Where(x => x.claim_number == obj.claim_number).ToList().Distinct(new ItemEqualityComparer()).ToList();
+                    var obj_items = items.Where(x => x.claim_number == obj.claim_number).ToList();
                     obj.items = obj_items;
 
                     admin_claims.Add(obj);
@@ -267,7 +268,6 @@ namespace ImisRestApi.Data
             }
 
         }
-
 
         public DataTable GetClaimAdministrators()
         {
@@ -339,15 +339,15 @@ namespace ImisRestApi.Data
         public bool Equals(ClaimServices x, ClaimServices y)
         {
             // Two items are equal if their keys are equal.
-            return x.service_code == y.service_code;
+            return x.service == y.service;
         }
 
         public int GetHashCode(ClaimServices obj)
         {
             
-            if (obj.service_code != null)
+            if (obj.service != null)
             {
-                return obj.service_code.GetHashCode();
+                return obj.service.GetHashCode();
             }
             else
             {
@@ -361,14 +361,14 @@ namespace ImisRestApi.Data
         public bool Equals(ClaimItems x, ClaimItems y)
         {
             // Two items are equal if their keys are equal.
-            return x.item_code == y.item_code;
+            return x.item == y.item;
         }
 
         public int GetHashCode(ClaimItems obj)
         {
-            if(obj.item_code != null)
+            if(obj.item != null)
             {
-                return obj.item_code.GetHashCode();
+                return obj.item.GetHashCode();
             }
             else
             {

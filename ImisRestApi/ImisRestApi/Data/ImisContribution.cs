@@ -56,7 +56,7 @@ namespace ImisRestApi.Data
             catch (Exception e)
             {
 
-                message = new EditFamilyResponse(e).Message;
+                message = new EnterContibutionResponse(e).Message;
             }
 
             return message;

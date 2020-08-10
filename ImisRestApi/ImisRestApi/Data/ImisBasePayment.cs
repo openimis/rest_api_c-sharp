@@ -278,7 +278,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@PaymentID", model.internal_identifier),
                 new SqlParameter("@ControlNumber", model.control_number),
                 new SqlParameter("@Failed", failed),
-                new SqlParameter("@Message",model.error_message)
+                new SqlParameter("@Message", model.error_message)
              };
 
             DataMessage message;
@@ -291,7 +291,6 @@ namespace ImisRestApi.Data
             }
             catch (Exception e)
             {
-
                 message = new CtrlNumberResponse(e).Message;
             }
 
@@ -450,9 +449,7 @@ namespace ImisRestApi.Data
             {
                 DataSet data = dh.FillDataSet("uspMatchPayment", sqlParameters, CommandType.StoredProcedure);
 
-                var jsonString = JsonConvert.SerializeObject(data);
                 //bool error = false;
-
                 DataTable dt = new DataTable();
 
                 if (data.Tables.Count > 0)
@@ -629,9 +626,8 @@ namespace ImisRestApi.Data
                                     EffectiveDate = (DateTime?)(rw["EffectiveDate"] != System.DBNull.Value ? rw["EffectiveDate"] : null),
                                     PolicyActivated = active,
                                     ExpectedProductAmount = rw["ExpectedDetailAmount"] != System.DBNull.Value ? Convert.ToDecimal(rw["ExpectedDetailAmount"]) : 0
-                    }
-                            );
-                        
+                                 }
+                            );               
                     }
 
                 }
@@ -666,7 +662,7 @@ namespace ImisRestApi.Data
                         ON tblPremium.PolicyID = tblPolicy.PolicyID 
                         ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
                         WHERE (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)
-						AND tblPayment.PaymentStatus >= 4";
+						AND tblPayment.PaymentStatus >= 4 AND tblPayment.PaymentStatus < 5";
 
             SqlParameter[] parameters = {};
 
@@ -759,7 +755,6 @@ namespace ImisRestApi.Data
 
             return paymentId;
         }
-
         public List<ReconciliationItem> ProvideReconciliationData(ReconciliationRequest model)
         {
             List<ReconciliationItem> result = new List<ReconciliationItem>();
@@ -784,7 +779,8 @@ namespace ImisRestApi.Data
                     {
                         var rw = data.Rows[i];
 
-                        result.Add(new ReconciliationItem{
+                        result.Add(new ReconciliationItem
+                        {
                             control_number = rw["PaymentID"].ToString(),
                             enrolment_officer_code = rw["OfficerCode"].ToString(),
                             insurance_number = rw["PaymentID"].ToString(),
@@ -801,7 +797,7 @@ namespace ImisRestApi.Data
                 }
             }
             catch (Exception e)
-            {}
+            { }
 
             return result;
         }
