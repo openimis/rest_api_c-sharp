@@ -149,11 +149,28 @@ namespace ImisRestApi.Data
   
             }
 
+            string ProductCode = products.FirstOrDefault().ProductCode;
+            var getAccountCodeQuery = @"SELECT AccCodePremiums FROM tblProduct WHERE ProductCode = @ProductCode AND ValidityTo is NULL";
+            SqlParameter[] sqlParameters = {
+                        new SqlParameter("@ProductCode", ProductCode),
+                };
+            var sData = new DataHelper(Configuration);
+            string accountCode = "";
+            DataTable results = sData.GetDataTable(getAccountCodeQuery, sqlParameters, CommandType.Text);
+            if (results.Rows.Count > 0)
+            {
+                var result = results.Rows[0];
+                if (!string.IsNullOrEmpty(Convert.ToString(result["AccCodePremiums"])))
+                {
+                    accountCode = Convert.ToString(result["AccCodePremiums"]);
+                }
+            }
+
             newBill = new gepgBillSubReq()
             {
-                BillHdr = new BillHdr() { SpCode = configuration["PaymentGateWay:GePG:SpCode"], RtrRespFlg = true },
+                BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true },
                 BillTrxInf = billTrxInf
-            };         
+            };
 
             XmlSerializer xs = null;
             XmlSerializerNamespaces ns = null;
