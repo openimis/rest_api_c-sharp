@@ -92,7 +92,7 @@ namespace ImisRestApi.Data
             var signature = gepg.GenerateSignature(bill);
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
-            var billAck = gepg.SendHttpRequest(signedMesg);
+            var billAck = gepg.SendHttpRequest(signedMesg, InsureeProducts);
 
             string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
             string namepart = new Random().Next(100000, 999999).ToString();

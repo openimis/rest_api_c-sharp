@@ -149,22 +149,7 @@ namespace ImisRestApi.Data
   
             }
 
-            string ProductCode = products.FirstOrDefault().ProductCode;
-            var getAccountCodeQuery = @"SELECT AccCodePremiums FROM tblProduct WHERE ProductCode = @ProductCode AND ValidityTo is NULL";
-            SqlParameter[] sqlParameters = {
-                        new SqlParameter("@ProductCode", ProductCode),
-                };
-            var sData = new DataHelper(Configuration);
-            string accountCode = "";
-            DataTable results = sData.GetDataTable(getAccountCodeQuery, sqlParameters, CommandType.Text);
-            if (results.Rows.Count > 0)
-            {
-                var result = results.Rows[0];
-                if (!string.IsNullOrEmpty(Convert.ToString(result["AccCodePremiums"])))
-                {
-                    accountCode = Convert.ToString(result["AccCodePremiums"]);
-                }
-            }
+            string accountCode = getAccountCode(products);
 
             newBill = new gepgBillSubReq()
             {
@@ -448,14 +433,14 @@ namespace ImisRestApi.Data
             }
         }
 
-        public string SendHttpRequest(String content)
+        public string SendHttpRequest(String content, List<InsureeProduct> products)
         {
 
             try
             {
-
                 var url = configuration["PaymentGateWay:GePG:Url"];
 
+                string accountCode = getAccountCode(products);
                 // Create a request using a URL that can receive a post.   
                 WebRequest request = WebRequest.Create(url+"/api/bill/sigqrequest");
                 // Set the Method property of the request to POST.  
@@ -467,7 +452,7 @@ namespace ImisRestApi.Data
                 // Set the ContentLength property of the WebRequest. 
                 request.ContentLength = byteArray.Length;
                 //Set Custom Headers
-                request.Headers.Add("Gepg-Code", configuration["PaymentGateWay:GePG:SpCode"]);
+                request.Headers.Add("Gepg-Code", accountCode);
                 request.Headers.Add("Gepg-Com", "default.sp.in");
                 // Get the request stream.  
                 Stream dataStream = request.GetRequestStream();
@@ -650,6 +635,27 @@ namespace ImisRestApi.Data
             {
                 return false;
             }
+        }
+
+        public string getAccountCode(List<InsureeProduct> products)
+        {
+            string ProductCode = products.FirstOrDefault().ProductCode;
+            var getAccountCodeQuery = @"SELECT AccCodePremiums FROM tblProduct WHERE ProductCode = @ProductCode AND ValidityTo is NULL";
+            SqlParameter[] sqlParameters = {
+                        new SqlParameter("@ProductCode", ProductCode),
+                };
+            var sData = new DataHelper(configuration);
+            string accountCode = "";
+            DataTable results = sData.GetDataTable(getAccountCodeQuery, sqlParameters, CommandType.Text);
+            if (results.Rows.Count > 0)
+            {
+                var result = results.Rows[0];
+                if (!string.IsNullOrEmpty(Convert.ToString(result["AccCodePremiums"])))
+                {
+                    accountCode = Convert.ToString(result["AccCodePremiums"]);
+                }
+            }
+            return accountCode;
         }
 
     }
