@@ -11,7 +11,7 @@ namespace ImisRestApi.Chanels.Payment.Models
     {
        
         [Required]
-        public string Msisdn { get; set; }
+        public string Msisdn { get; set; } // Mobile Station International Subscriber Directory Number
         public override string phone_number { get; set; } = "+255";
         public string OfficerCode { get; set; }
         [Required]

@@ -57,7 +57,7 @@ namespace ImisRestApi.Logic
                 var amountToBePaid = payment.GetToBePaidAmount(payment.ExpectedAmount, transferFee);
                 var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid, intent.policies);
 
-                if (response.ControlNumber != null)
+                if (response.ControlNumber != null) // 
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
                     return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
@@ -74,16 +74,17 @@ namespace ImisRestApi.Logic
                         }
                     }
                 }
-                else if (response.Posted == true)
-                {
-                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
-                }
-                else if (response.ErrorOccured == true)
-                {
-                    return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
-                    ControlNumberNotassignedSms(payment, response.ErrorMessage);
+                else 
+                    if (response.Posted == true)
+                    {
+                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
+                    }
+                    else if (response.ErrorOccured == true)
+                    {
+                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
+                        ControlNumberNotassignedSms(payment, response.ErrorMessage);
 
-                }
+                    }
 
                 return_message.Data = ret_data;
 

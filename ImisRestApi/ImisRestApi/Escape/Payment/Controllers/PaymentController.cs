@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
+    #if CHF
     public class PaymentController : PaymentBaseController
     {
         private ImisPayment imisPayment;
@@ -347,4 +348,5 @@ namespace ImisRestApi.Controllers
         }
 
     }
+#endif
 }

@@ -404,7 +404,7 @@ namespace ImisRestApi.Data
                 new XElement("PhoneNumber", payment.payment_origin),
                 new XElement("PaymentOrigin", payment.payment_origin),
                 new XElement("OfficerCode", payment.enrolment_officer_code),
-                new XElement("LanguageName",payment.language),
+                new XElement("LanguageName",payment.language), // not used
                 new XElement("Detail",
                     new XElement("InsureeNumber", payment.insurance_number),
                     new XElement("ProductCode", payment.insurance_product_code),

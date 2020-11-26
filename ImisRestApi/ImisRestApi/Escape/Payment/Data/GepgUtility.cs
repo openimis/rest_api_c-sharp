@@ -122,13 +122,13 @@ namespace ImisRestApi.Data
                 else
                 {
                     billTrxInf.PyrName = InsureeNumber;
-                    billTrxInf.PyrEmail = "info@imis.co.tz";
+                    billTrxInf.PyrEmail = "info@imis.co.tz"; // TODO: replace with insuree's email if exists
                     billTrxInf.PyrCellNum = PhoneNumber;
                 }
             }
             else
             {
-                var sSQL = @"SELECT Code,LastName,OtherNames,DOB,Phone,VEOCode,VEOLastName,VEOOtherNames,VEODOB,VEOPhone,EmailId
+                var sSQL = @"SELECT Code,LastName,OtherNames,DOB,Phone,EmailId
                             FROM tblOfficer WHERE Code = @OfficerCode";
                 SqlParameter[] parameters = {
                         new SqlParameter("@OfficerCode", OfficerCode),
@@ -143,8 +143,8 @@ namespace ImisRestApi.Data
 
                     billTrxInf.PyrId = OfficerCode;
                     billTrxInf.PyrName = Convert.ToString(row["LastName"]) + " " + Convert.ToString(row["OtherNames"]);
-                    billTrxInf.PyrEmail = "info@imis.co.tz";
-                    billTrxInf.PyrCellNum = Convert.ToString(row["VEOPhone"]).Length == 0 ? PhoneNumber : Convert.ToString(row["VEOPhone"]);
+                    billTrxInf.PyrEmail = "info@imis.co.tz"; // TODO: replace with officer's email 
+                    billTrxInf.PyrCellNum = Convert.ToString(row["Phone"]).Length == 0 ? PhoneNumber : Convert.ToString(row["Phone"]);
                 }
   
             }
