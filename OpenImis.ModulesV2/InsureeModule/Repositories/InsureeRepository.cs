@@ -33,7 +33,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 {
                     var chfidParameter = new SqlParameter("@CHFID", chfid) { SqlDbType = SqlDbType.VarChar, Size = 12 };
 
-                    var sql = "exec uspPolicyInquiry @CHFID";
+                    var sql = "exec uspAPIGetCoverage @CHFID";
 
                     DbConnection connection = imisContext.Database.GetDbConnection();
 
@@ -55,17 +55,32 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                                 {
                                     if (firstValue)
                                     {
+                                        response.InsureeName = String.Join(' ', reader["OtherNames"].ToString()) + ' ' + reader["LastName"].ToString();
                                         response.CHFID = reader["CHFID"].ToString();
                                         response.PhotoPath = reader["PhotoPath"].ToString();
-                                        response.InsureeName = reader["InsureeName"].ToString();
                                         response.DOB = reader["DOB"].ToString();
                                         response.Gender = reader["Gender"].ToString();
 
                                         firstValue = false;
                                     }
+                                    
 
                                     details.Add(new DetailModel
                                     {
+                                        AntenatalAmountLeft = reader["AntenatalAmountLeft"].ToString().ToNullableDecimal(),
+                                        ConsultationAmountLeft = reader["ConsultationAmountLeft"].ToString().ToNullableDecimal(),
+                                        DeliveryAmountLeft = reader["DeliveryAmountLeft"].ToString().ToNullableDecimal(),
+                                        HospitalizationAmountLeft = reader["HospitalizationAmountLeft"].ToString().ToNullableDecimal(),
+                                        SurgeryAmountLeft = reader["SurgeryAmountLeft"].ToString().ToNullableDecimal(),
+                                        TotalAdmissionsLeft = reader["TotalAdmissionsLeft"].ToString().ToNullableDecimal(),
+                                        TotalAntenatalLeft = reader["TotalAntenatalLeft"].ToString().ToNullableDecimal(),
+                                        TotalConsultationsLeft = reader["TotalConsultationsLeft"].ToString().ToNullableDecimal(),
+                                        TotalDelivieriesLeft = reader["TotalDelivieriesLeft"].ToString().ToNullableDecimal(),
+                                        TotalSurgeriesLeft = reader["TotalSurgeriesLeft"].ToString().ToNullableDecimal(),
+                                        TotalVisitsLeft = reader["TotalVisitsLeft"].ToString().ToNullableDecimal(),
+                                        PolicyValue = reader["PolicyValue"].ToString().ToNullableDecimal(),
+                                        EffectiveDate = reader["EffectiveDate"].ToString(),
+                                        ProductCode = reader["ProductCode"].ToString(),
                                         ProductName = reader["ProductName"].ToString(),
                                         ExpiryDate = reader["ExpiryDate"].ToString(),
                                         Status = reader["Status"].ToString(),
@@ -74,7 +89,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                                         Ded2 = reader["Ded2"].ToString().ToNullableDecimal(),
                                         Ceiling1 = reader["Ceiling1"].ToString().ToNullableDecimal(),
                                         Ceiling2 = reader["Ceiling2"].ToString().ToNullableDecimal(),
-                                        ProductCode = reader["ProductCode"].ToString()
                                     });
                                 }
                             } while (reader.NextResult());
