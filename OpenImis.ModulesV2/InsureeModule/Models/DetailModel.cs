@@ -15,5 +15,19 @@ namespace OpenImis.ModulesV2.InsureeModule.Models
         public decimal? Ceiling1 { get; set; }
         public decimal? Ceiling2 { get; set; }
         public string ProductCode { get; set; }
+
+        public decimal? AntenatalAmountLeft { get; set; }
+        public decimal? ConsultationAmountLeft { get; set; }
+        public decimal? DeliveryAmountLeft { get; set; }
+        public decimal? HospitalizationAmountLeft { get; set; }
+        public decimal? SurgeryAmountLeft { get; set; }
+        public decimal? TotalAdmissionsLeft { get; set; }
+        public decimal? TotalAntenatalLeft { get; set; }
+        public decimal? TotalConsultationsLeft { get; set; }
+        public decimal? TotalDelivieriesLeft { get; set; }
+        public decimal? TotalSurgeriesLeft { get; set; }
+        public decimal? TotalVisitsLeft { get; set; }
+        public decimal? PolicyValue { get; set; }
+        public string EffectiveDate { get; set; }
     }
 }
