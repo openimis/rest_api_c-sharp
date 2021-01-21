@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
+    <UserSecretsId>25c4613d-dca4-4a86-8ca9-9bf91873a550</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFDebug|AnyCPU'">
@@ -39,6 +40,81 @@
     <Folder Include="wwwroot\Payments\" />
     <Folder Include="wwwroot\Reconciliations\" />
     <Folder Include="wwwroot\SentMessages\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\ControlNumberAssigned.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\ControlNumberAssignedV2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\ControlNumberError.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\ControlNumberErrorV2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\EnquireErrorSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\EnquireInformSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\PaidAndActivated.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\PaidAndNotActivated.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\PaidAndNotMatched.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\PaidAndNotMatchedV2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\CommissionInformSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\ControlNumberAssigned.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\ControlNumberAssignedV2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\ControlNumberError.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\ControlNumberErrorV2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\CtrlNumReqErrorSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\EnquireErrorSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\EnquireInformSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\PaidAndActivated.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\PaidAndNotActivated.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\PaidAndNotMatched.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\PaidAndNotMatchedV2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\RenewErrorSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\RenewInformSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
