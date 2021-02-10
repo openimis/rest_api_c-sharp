@@ -91,8 +91,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
         {
             try
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-
                 var enrollFamily = model.GetEnrolmentFromModel();
 
                 enrollFamily.FileInfo.UserId = userId;
@@ -101,10 +99,10 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 var XML = enrollFamily.XMLSerialize();
                 var JSON = JsonConvert.SerializeObject(enrollFamily);
 
-                var EnrollmentDir = _configuration["AppSettings:Enrollment_Phone"];
-                var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"];
-                var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"];
-                var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"];
+                var EnrollmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
+                var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar;
+                var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
+                var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
 
                 var hof = enrollFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
@@ -116,13 +114,13 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                 try
                 {
-                    if (!Directory.Exists(webRootPath + EnrollmentDir)) Directory.CreateDirectory(webRootPath + EnrollmentDir);
+                    if (!Directory.Exists(EnrollmentDir)) Directory.CreateDirectory(EnrollmentDir);
 
-                    xmldoc.Save(webRootPath + EnrollmentDir + FileName);
+                    xmldoc.Save(EnrollmentDir + FileName);
 
-                    if (!Directory.Exists(webRootPath + JsonDebugFolder)) Directory.CreateDirectory(webRootPath + JsonDebugFolder);
+                    if (!Directory.Exists(JsonDebugFolder)) Directory.CreateDirectory(JsonDebugFolder);
 
-                    File.WriteAllText(webRootPath + JsonDebugFolder + JsonFileName, JSON);
+                    File.WriteAllText(JsonDebugFolder + JsonFileName, JSON);
                 }
                 catch (Exception e)
                 {
@@ -190,9 +188,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                     if (RV == 0 && (InsureeImported > 0 || InsureeUpd > 0))
                     {
-                        if (!Directory.Exists(webRootPath + UpdatedFolder))
+                        if (!Directory.Exists(UpdatedFolder))
                         {
-                            Directory.CreateDirectory(webRootPath + UpdatedFolder);
+                            Directory.CreateDirectory(UpdatedFolder);
                         }
 
                         foreach (var picture in model.Family.Select(x => x.Insurees.Select(s => s.Picture)).FirstOrDefault().ToList())
@@ -203,7 +201,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                                 {
                                     if (picture.ImageContent.Length != 0)
                                     {
-                                        File.WriteAllBytes(webRootPath + UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, Convert.FromBase64String(picture.ImageContent));
+                                        File.WriteAllBytes(UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, Convert.FromBase64String(picture.ImageContent));
                                     }
                                 }
                             }
