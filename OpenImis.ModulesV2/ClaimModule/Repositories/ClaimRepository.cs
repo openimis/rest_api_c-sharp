@@ -37,10 +37,8 @@ namespace OpenImis.ModulesV2.ClaimModule.Repositories
 
                 bool ifSaved = false;
 
-                string webRootPath = _hostingEnvironment.WebRootPath;
-
-                var fromPhoneClaimDir = _configuration["AppSettings:FromPhone_Claim"];
-                var fromPhoneClaimRejectedDir = _configuration["AppSettings:FromPhone_Claim_Rejected"];
+                var fromPhoneClaimDir = _configuration["AppSettings:FromPhone_Claim"] + Path.DirectorySeparatorChar;
+                var fromPhoneClaimRejectedDir = _configuration["AppSettings:FromPhone_Claim_Rejected"] + Path.DirectorySeparatorChar;
 
                 var fileName = "Claim_" + claim.Details.HFCode + "_" + claim.Details.CHFID + "_" + claim.Details.ClaimCode + ".xml";
 
@@ -50,12 +48,12 @@ namespace OpenImis.ModulesV2.ClaimModule.Repositories
                 try
                 {
 
-                    if (!Directory.Exists(webRootPath + fromPhoneClaimDir)) Directory.CreateDirectory(webRootPath + fromPhoneClaimDir);
-                    if (!Directory.Exists(webRootPath + fromPhoneClaimRejectedDir)) Directory.CreateDirectory(webRootPath + fromPhoneClaimRejectedDir);
+                    if (!Directory.Exists(fromPhoneClaimDir)) Directory.CreateDirectory(fromPhoneClaimDir);
+                    if (!Directory.Exists(fromPhoneClaimRejectedDir)) Directory.CreateDirectory(fromPhoneClaimRejectedDir);
 
-                    if (!File.Exists(webRootPath + fromPhoneClaimDir + fileName))
+                    if (!File.Exists(fromPhoneClaimDir + fileName))
                     {
-                        xmldoc.Save(webRootPath + fromPhoneClaimDir + fileName);
+                        xmldoc.Save(fromPhoneClaimDir + fileName);
                     }
 
                     ifSaved = true;
@@ -109,9 +107,9 @@ namespace OpenImis.ModulesV2.ClaimModule.Repositories
                         }
                         else
                         {
-                            if (File.Exists(webRootPath + fromPhoneClaimDir + fileName) && !File.Exists(webRootPath + fromPhoneClaimRejectedDir + fileName))
+                            if (File.Exists(fromPhoneClaimDir + fileName) && !File.Exists(fromPhoneClaimRejectedDir + fileName))
                             {
-                                File.Move(webRootPath + fromPhoneClaimDir + fileName, webRootPath + fromPhoneClaimRejectedDir + fileName);
+                                File.Move(fromPhoneClaimDir + fileName, fromPhoneClaimRejectedDir + fileName);
                             }
 
                             RV = 0;

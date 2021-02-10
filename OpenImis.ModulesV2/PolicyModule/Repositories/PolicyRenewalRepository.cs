@@ -98,13 +98,11 @@ namespace OpenImis.ModulesV2.PolicyModule.Repositories
 
             try
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-
                 var policyRenew = policy.GetPolicy();
                 var XML = policyRenew.XMLSerialize();
 
-                var fromPhoneRenewalDir = _configuration["AppSettings:FromPhone_Renewal"];
-                var fromPhoneRenewalRejectedDir = _configuration["AppSettings:FromPhone_Renewal_Rejected"];
+                var fromPhoneRenewalDir = _configuration["AppSettings:FromPhone_Renewal"] + Path.DirectorySeparatorChar;
+                var fromPhoneRenewalRejectedDir = _configuration["AppSettings:FromPhone_Renewal_Rejected"] + Path.DirectorySeparatorChar;
 
                 var fileName = "RenPol_" + policy.Date + "_" + policy.CHFID + "_" + policy.ReceiptNo + ".xml";
 
@@ -115,9 +113,10 @@ namespace OpenImis.ModulesV2.PolicyModule.Repositories
 
                 try
                 {
-                    if (!Directory.Exists(webRootPath + fromPhoneRenewalDir)) Directory.CreateDirectory(webRootPath + fromPhoneRenewalDir);
+                    if (!Directory.Exists(fromPhoneRenewalDir)) Directory.CreateDirectory(fromPhoneRenewalDir);
+                    if (!Directory.Exists(fromPhoneRenewalRejectedDir)) Directory.CreateDirectory(fromPhoneRenewalRejectedDir);
 
-                    xmldoc.Save(webRootPath + fromPhoneRenewalDir + fileName);
+                    xmldoc.Save(fromPhoneRenewalDir + fileName);
                     ifSaved = true;
                 }
                 catch (Exception e)
@@ -167,9 +166,9 @@ namespace OpenImis.ModulesV2.PolicyModule.Repositories
                         }
                         else if (tempRV == -1 || tempRV == -2 || tempRV == -3)
                         {
-                            if (File.Exists(webRootPath + fromPhoneRenewalDir + fileName))
+                            if (File.Exists(fromPhoneRenewalDir + fileName))
                             {
-                                File.Move(webRootPath + fromPhoneRenewalDir + fileName, webRootPath + fromPhoneRenewalRejectedDir + fileName);
+                                File.Move(fromPhoneRenewalDir + fileName, fromPhoneRenewalRejectedDir + fileName);
                             }
                             RV = 0;
                         }
