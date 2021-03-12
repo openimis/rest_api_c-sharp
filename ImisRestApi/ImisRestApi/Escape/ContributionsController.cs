@@ -19,7 +19,7 @@ namespace ImisRestApi.Escape
         {
 
         }
-
+#if CHF
         [NonAction]
         public override IActionResult Enter_Contribution([FromBody] Contribution model)
         {
@@ -62,5 +62,6 @@ namespace ImisRestApi.Escape
             }
            
         }
+#endif
     }
 }

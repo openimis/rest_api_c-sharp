@@ -8,6 +8,7 @@ namespace ImisRestApi.Logic
 {
     public class Validation:ValidationBase
     {
+#if CHF
         public override ValidationResult InsureeNumber(string insureeNumber)
         {
             if (insureeNumber.Length != 9)
@@ -28,5 +29,6 @@ namespace ImisRestApi.Logic
                 return new ValidationResult("Invalid CHF ID");
             }
         }
+#endif
     }
 }

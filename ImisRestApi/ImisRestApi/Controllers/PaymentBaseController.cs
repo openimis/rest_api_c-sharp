@@ -41,7 +41,7 @@ namespace ImisRestApi.Controllers
             _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
  
-        [Authorize(Roles = "PaymentAdd")]
+        //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/MatchPayment")]
         public virtual async Task<IActionResult> MatchPayment([FromBody]MatchModel model)
@@ -62,7 +62,7 @@ namespace ImisRestApi.Controllers
         }
 
         //Recieve Payment from Operator/
-        [Authorize(Roles = "PaymentAdd")]
+        //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/GetControlNumber")]
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]
@@ -101,7 +101,7 @@ namespace ImisRestApi.Controllers
             }
         }
 
-        [Authorize(Roles = "PaymentAdd")]
+        //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/PostReqControlNumberAck")]
         [ProducesResponseType(typeof(void), 200)]
@@ -134,7 +134,7 @@ namespace ImisRestApi.Controllers
             }
         }
 
-        [Authorize(Roles = "PaymentAdd")]
+        //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         [ProducesResponseType(typeof(void), 200)]
@@ -168,7 +168,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [Authorize(Roles = "PaymentAdd")]
+        //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/GetPaymentData")]
         [ProducesResponseType(typeof(void), 200)]
@@ -202,7 +202,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [Authorize(Roles = "PaymentSearch")]
+        //[Authorize(Roles = "PaymentSearch")]
         [HttpPost]
         [Route("api/GetAssignedControlNumbers")]
         [ProducesResponseType(typeof(AsignedControlNumbersResponse), 200)]
@@ -238,7 +238,7 @@ namespace ImisRestApi.Controllers
             }
         }
 
-        [Authorize(Roles = "PaymentAdd")]
+        //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/ProvideReconciliationData")]
         public virtual async Task<IActionResult> ProvideReconciliationData([FromBody] ReconciliationRequest model)

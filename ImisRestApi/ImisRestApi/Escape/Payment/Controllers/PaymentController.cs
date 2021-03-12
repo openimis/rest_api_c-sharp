@@ -22,7 +22,7 @@ using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
-    #if CHF
+
     public class PaymentController : PaymentBaseController
     {
         private ImisPayment imisPayment;
@@ -34,6 +34,7 @@ namespace ImisRestApi.Controllers
             env = hostingEnvironment;
         }
 
+#if CHF
         [NonAction]
         public override Task<IActionResult> GetControlNumber([FromBody] IntentOfPay intent)
         {           
@@ -347,6 +348,6 @@ namespace ImisRestApi.Controllers
 
         }
 
-    }
 #endif
+    }
 }

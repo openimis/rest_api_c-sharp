@@ -26,6 +26,7 @@ namespace ImisRestApi.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
+#if CHF
         [NonAction]
         public override IActionResult Validate_Credentials([FromBody] UserLogin userlogin)
         {
@@ -59,6 +60,7 @@ namespace ImisRestApi.Controllers
             }
             
         }
+#endif
 
     }
 }

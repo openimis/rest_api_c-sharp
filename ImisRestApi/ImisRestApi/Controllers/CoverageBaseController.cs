@@ -24,6 +24,7 @@ namespace ImisRestApi.Controllers
         {
             coverage = new ImisCoverage(configuration);
         }
+
         // GET api/Coverage
         [HttpGet]
         [Route("api/Coverage/Get_Coverage")]

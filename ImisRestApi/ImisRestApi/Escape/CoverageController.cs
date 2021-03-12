@@ -29,6 +29,7 @@ namespace ImisRestApi.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
+#if CHF
         [NonAction]
         public override IActionResult Get(string InsureeNumber)
         {
@@ -117,5 +118,6 @@ namespace ImisRestApi.Controllers
             }
            
         }
+#endif
     }
 }

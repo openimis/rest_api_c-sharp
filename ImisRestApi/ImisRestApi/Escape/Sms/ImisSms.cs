@@ -16,18 +16,30 @@ namespace ImisRestApi.Chanels.Sms
 {
     public class ImisSms:ImisBaseSms
     {
-        private static string PRIVATE_KEY;
-        private static string USER_ID;
-        private static string URL;
-        private static string SMS_RESOURCE;
-        private static string REQUEST_TYPE;
 
-        private static string sender = string.Empty;
-        private static string service = string.Empty;
-        private static Dictionary<string, string> configuredHeaders;
+        IConfiguration config;
 
         public ImisSms(IConfiguration config, IHostingEnvironment env,Language lang = Language.Primary) : base(config, env,lang)
         {
+            this.config = config;
+        }
+
+        public override async Task<string> SendSMS(List<SmsContainer> containers, string filename = null)
+        {
+            string response_message = string.Empty;
+
+#if CHF
+            string PRIVATE_KEY;
+            string USER_ID;
+            string URL;
+            string SMS_RESOURCE;
+            string REQUEST_TYPE;
+
+            string sender = string.Empty;
+            string service = string.Empty;
+            Dictionary<string, string> configuredHeaders;
+
+
             PRIVATE_KEY = config["SmsGateWay:PrivateKey"];
             USER_ID = config["SmsGateWay:UserId"];
             URL = config["SmsGateWay:GateUrl"];
@@ -48,18 +60,14 @@ namespace ImisRestApi.Chanels.Sms
             }
 
             //configuredHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(headers);
-        }
 
-        public override async Task<string> SendSMS(List<SmsContainer> containers, string filename = null)
-        {
-            string response_message = string.Empty;
 
             foreach (var container in containers)
             {
                 string message = container.Message;
                 string recipients = container.Recipient;
                 
-                string json = GetRequestBody(message, recipients);
+                string json = GetRequestBody(message, sender, service, recipients);
 
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri(URL);
@@ -96,15 +104,18 @@ namespace ImisRestApi.Chanels.Sms
                     container.Response = status + " "+e.ToString();
                 }
             }
-
+#else
+            // Generic approach without connection to an SMS Gateway 
+            response_message = "Intent to send " + containers.Count + " SMSs";
+#endif
             var msg = JsonConvert.SerializeObject(containers);
-            SaveMessage(msg, filename);
+            await Task.Run(() => SaveMessage(msg, filename));
 
             return response_message;
         }
 
 
-        private static string GetRequestBody(string message, string recipients)
+        private static string GetRequestBody(string message, string sender, string service, string recipients)
         {
 
             string todayDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");

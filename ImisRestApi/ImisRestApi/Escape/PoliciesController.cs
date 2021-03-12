@@ -33,6 +33,7 @@ namespace ImisRestApi.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
+#if CHF
         [HttpPost]
         [AllowAnonymous]
         [Route("api/Policies/Renew_Policy")]
@@ -137,7 +138,7 @@ namespace ImisRestApi.Controllers
         {
             return base.Renew_Policy(model);
         }
-
+#endif
 
     }
 }

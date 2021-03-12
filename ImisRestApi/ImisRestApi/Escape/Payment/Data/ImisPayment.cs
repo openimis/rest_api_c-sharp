@@ -28,6 +28,7 @@ namespace ImisRestApi.Data
             config = configuration;
         }
 
+#if CHF
         public object RequestReconciliationReport(int daysAgo)
         {
             daysAgo = -1 * daysAgo;
@@ -232,5 +233,6 @@ namespace ImisRestApi.Data
             return sw.ToString();
         }
 
+#endif
     }
 }

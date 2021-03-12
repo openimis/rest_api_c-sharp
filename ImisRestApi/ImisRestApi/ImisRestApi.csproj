@@ -1,20 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
     <UserSecretsId>25c4613d-dca4-4a86-8ca9-9bf91873a550</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFDebug|AnyCPU'">
-    <DefineConstants>TRACE;CHF</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;CHF</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Escape\Payment\Controllers\Tanzania\**" />
+    <Compile Remove="Escape\Payment\Response\**" />
     <Content Remove="Escape\Payment\Controllers\Tanzania\**" />
+    <Content Remove="Escape\Payment\Response\**" />
     <EmbeddedResource Remove="Escape\Payment\Controllers\Tanzania\**" />
+    <EmbeddedResource Remove="Escape\Payment\Response\**" />
     <None Remove="Escape\Payment\Controllers\Tanzania\**" />
+    <None Remove="Escape\Payment\Response\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Escape\Payment\Response\" />
     <Folder Include="wwwroot\controlNumberAck\" />
     <Folder Include="wwwroot\Payments\" />
     <Folder Include="wwwroot\Reconciliations\" />

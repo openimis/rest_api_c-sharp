@@ -75,12 +75,12 @@ namespace ImisRestApi.Data
             bool result = SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
 
-            //BEGIN Temporary Control Number Generator(Simulation For Testing Only)
-            // var randomNumber = new Random().Next(100000, 999999);
+            // BEGIN Temporary Control Number Generator(Simulation For Testing Only)
+            var randomNumber = new Random().Next(100000, 999999);
 
             //if(randomNumber%2 == 0)
             //{
-            //   ctrlNumber = randomNumber.ToString();
+            ctrlNumber = randomNumber.ToString();
             //}
             //END Temporary 
 
