@@ -189,14 +189,16 @@ namespace ImisRestApi.Logic
                 MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
 
                 var matchresponse = await MatchPayment(matchModel);
-               
-                //var matchdata = JsonConvert.SerializeObject(matchresponse.Data);
-                //var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
 
-                //if (matchedPayments.Select(x => x.PaymentId).Contains(payment.PaymentId))
-                //{
-                //    SendPaymentSms(payment);
-                //}
+#if DEBUG
+                var matchdata = JsonConvert.SerializeObject(matchresponse.Data);
+                var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
+
+                if (matchedPayments.Select(x => x.PaymentId).Contains(payment.PaymentId))
+                {
+                    SendPaymentSms(payment);
+                }
+#endif
 
             }
 

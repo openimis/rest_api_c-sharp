@@ -278,7 +278,7 @@ namespace ImisRestApi.Data
                 new SqlParameter("@PaymentID", model.internal_identifier),
                 new SqlParameter("@ControlNumber", model.control_number),
                 new SqlParameter("@Failed", failed),
-                new SqlParameter("@Message", model.error_message)
+                //new SqlParameter("@Message", model.error_message)
              };
 
             DataMessage message;
@@ -423,6 +423,7 @@ namespace ImisRestApi.Data
             try
             {
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
+                // TODO: manage error messages from SP execution 
                 message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(data[0].Value.ToString());
 
