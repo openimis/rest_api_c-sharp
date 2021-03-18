@@ -263,3 +263,4 @@ __pycache__/
 *.pyc
 
 CnAssigned_*.json
+PayStatSms_*.json
