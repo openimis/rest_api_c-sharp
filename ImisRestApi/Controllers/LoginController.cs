@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
+using ImisRestApi.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -54,12 +55,11 @@ namespace ImisRestApi.Controllers
             {
                 
             }
-
             var claimsArrayLength = user.Rights.Count + 1;
             var claims = new List<Claim>
             {
-               new Claim("UserId", user.UserID),
-               
+                new Claim("UserId", user.UserID),
+                new Claim("UserUUID", user.UserUUID.ToString()),
             };
 
             foreach(var right in user.Rights) {

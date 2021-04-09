@@ -1,4 +1,5 @@
 ﻿using ImisRestApi.Models;
+using ImisRestApi.Security;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace ImisRestApi.Data
                 {
                     var row = dt.Rows[i];
                     var rightId = Convert.ToInt32(row["RightID"]);
-                    var rightName = Enum.GetName(typeof(Models.Rights), rightId);
+                    var rightName = Enum.GetName(typeof(Rights), rightId);
 
                     if (rightName != null)
                     {
@@ -67,7 +68,7 @@ namespace ImisRestApi.Data
             DataHelper helper = new DataHelper(Configuration);
 
             var sSQL = @"
-                        SELECT UserID,LoginName, LanguageID, RoleID,StoredPassword,PrivateKey
+                        SELECT UserID, UserUUID, LoginName, LanguageID, RoleID,StoredPassword,PrivateKey
                         FROM tblUsers
                         WHERE LoginName = @LoginName                        
                         AND ValidityTo is null
@@ -151,10 +152,10 @@ namespace ImisRestApi.Data
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 var rw = dt.Rows[i];
-
                 UserData user = new UserData()
                 {
                     UserID = Convert.ToString(rw["UserID"]),
+                    UserUUID = (Guid)rw["UserUUID"],
                     LoginName = Convert.ToString(rw["LoginName"]),
                     PrivateKey = Convert.ToString(rw["PrivateKey"]),
                     StoredPassword = Convert.ToString(rw["StoredPassword"])

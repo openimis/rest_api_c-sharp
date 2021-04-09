@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace ImisRestApi.Models
+namespace OpenImis.Modules.LoginModule.Models
 {
     public class UserData
     {
         public string UserID { get; set; }
+        public Guid UserUUID { get; set; }
         public string LoginName { get; set; }
         public string PrivateKey { get; set; }
         public string StoredPassword { get; set; }

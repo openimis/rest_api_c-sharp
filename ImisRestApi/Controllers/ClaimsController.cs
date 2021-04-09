@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
 using ImisRestApi.Responses;
+using ImisRestApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,7 @@ namespace ImisRestApi.Controllers
 
         
         [HttpPost]
+        [HasRights(Security.Rights.DiagnosesDownload)]
         [Route("api/GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]

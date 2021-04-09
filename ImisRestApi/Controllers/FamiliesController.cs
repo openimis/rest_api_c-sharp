@@ -4,6 +4,7 @@ using ImisRestApi.Logic;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Sms;
 using ImisRestApi.Responses;
+using ImisRestApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,7 @@ namespace ImisRestApi.Controllers
             family = new ImisFamily(configuration);
         }
         // GET api/Families
+        [HasRights(Rights.FamilySearch)]
         [HttpGet]
         [Route("api/Families/Get_Family")]
         public IActionResult Get(string insureeNumber)
@@ -71,6 +73,7 @@ namespace ImisRestApi.Controllers
         }
 
         // GET api/Families/5
+        [HasRights(Rights.FamilySearch)]
         [HttpGet]
         [Route("api/Families/Get_Member_Family")]
         public IActionResult Get_Member_Family(string insureeNumber, int order)
@@ -108,6 +111,7 @@ namespace ImisRestApi.Controllers
             return Json(response);
         }
 
+        [HasRights(Rights.FamilyAdd)]
         [HttpPost]
         [Route("api/Families/Enter_Family")]
         public IActionResult Enter_Family([FromBody]Family model)
@@ -127,6 +131,7 @@ namespace ImisRestApi.Controllers
 
         }
 
+        [HasRights(Security.Rights.FamilyAdd)]
         [HttpPost]
         [Route("api/Families/Enter_Member_Family")]
         public IActionResult Enter_Member_Family([FromBody]FamilyMember model)
@@ -146,6 +151,7 @@ namespace ImisRestApi.Controllers
 
         }
 
+        [HasRights(Security.Rights.FamilyEdit)]
         [HttpPost]
         [Route("api/Families/Edit_Family")]
         public IActionResult Edit_Family([FromBody]EditFamily model)
@@ -164,6 +170,7 @@ namespace ImisRestApi.Controllers
 
         }
 
+        [HasRights(Security.Rights.FamilyEdit)]
         [HttpPost]
         [Route("api/Families/Edit_Member_Family")]
         public IActionResult Edit_Member_Family([FromBody]EditFamilyMember model)
@@ -182,6 +189,7 @@ namespace ImisRestApi.Controllers
 
         }
 
+        [HasRights(Security.Rights.FamilyDelete)]
         [HttpPost]
         [Route("api/Families/Delete_Member_Family")]
         public IActionResult Delete_Member_Family([FromBody]string insureeNumber)

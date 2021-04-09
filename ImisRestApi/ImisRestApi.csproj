@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
     <UserSecretsId>25c4613d-dca4-4a86-8ca9-9bf91873a550</UserSecretsId>
   </PropertyGroup>
@@ -47,6 +47,11 @@
     <Folder Include="wwwroot\Payments\" />
     <Folder Include="wwwroot\Reconciliations\" />
     <Folder Include="wwwroot\SentMessages\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenImis.DB.SqlServer\OpenImis.DB.SqlServer.csproj" />
+    <ProjectReference Include="..\OpenImis.Modules\OpenImis.Modules.csproj" />
   </ItemGroup>
 
   <ItemGroup>

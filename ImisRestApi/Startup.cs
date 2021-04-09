@@ -8,10 +8,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using ImisRestApi.Security;
+using OpenImis.Modules.Helpers;
 
 namespace ImisRestApi
 {
@@ -32,6 +35,12 @@ namespace ImisRestApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var configImisModules = Configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
+
+            services.AddSingleton<OpenImis.Modules.IImisModules, OpenImis.Modules.ImisModules>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             TokenValidationParameters tokenParams = new TokenValidationParameters()
             {
                 ValidateIssuer = true,
@@ -46,8 +55,11 @@ namespace ImisRestApi
            .AddJwtBearer(jwtconfig =>
            {
                jwtconfig.TokenValidationParameters = tokenParams;
-              // jwtconfig.SecurityTokenValidators.Clear();
-              // jwtconfig.SecurityTokenValidators.Add(new TokenValidatorImis());
+               // jwtconfig.SecurityTokenValidators.Clear();
+               // jwtconfig.SecurityTokenValidators.Add(new TokenValidatorImis());
+               jwtconfig.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(
+                         services.BuildServiceProvider().GetService<OpenImis.Modules.IImisModules>(),
+                         services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
            });
             
             services.AddMvc(config => {
@@ -57,7 +69,8 @@ namespace ImisRestApi
             });
             //services.ConfigureMvc();
             services.AddSwaggerGen(x => {
-                x.SwaggerDoc("v1", new Info { Title = "IMIS REST" , Version = "v1"});
+                x.SwaggerDoc("v1", new Info { Title = "IMIS REST" //, Version = "v1"
+                });
             });
 
         }
