@@ -18,6 +18,7 @@ namespace ImisRestApi.Security
         {
             return new UserData()
             {
+                UserID = v.UserID,
                 UserUUID = v.UserUUID,
                 LoginName = v.LoginName,
                 PrivateKey = v.PrivateKey
