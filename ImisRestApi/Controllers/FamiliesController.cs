@@ -131,7 +131,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [HasRights(Security.Rights.FamilyAdd)]
+        [HasRights(Rights.FamilyAdd)]
         [HttpPost]
         [Route("api/Families/Enter_Member_Family")]
         public IActionResult Enter_Member_Family([FromBody]FamilyMember model)
@@ -151,7 +151,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [HasRights(Security.Rights.FamilyEdit)]
+        [HasRights(Rights.FamilyEdit)]
         [HttpPost]
         [Route("api/Families/Edit_Family")]
         public IActionResult Edit_Family([FromBody]EditFamily model)
@@ -170,7 +170,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [HasRights(Security.Rights.FamilyEdit)]
+        [HasRights(Rights.FamilyEdit)]
         [HttpPost]
         [Route("api/Families/Edit_Member_Family")]
         public IActionResult Edit_Member_Family([FromBody]EditFamilyMember model)
@@ -189,7 +189,7 @@ namespace ImisRestApi.Controllers
 
         }
 
-        [HasRights(Security.Rights.FamilyDelete)]
+        [HasRights(Rights.FamilyDelete)]
         [HttpPost]
         [Route("api/Families/Delete_Member_Family")]
         public IActionResult Delete_Member_Family([FromBody]string insureeNumber)
