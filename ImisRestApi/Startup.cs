@@ -12,9 +12,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using ImisRestApi.Security;
 using OpenImis.Modules.Helpers;
+using ImisRestApi.Docs;
 
 namespace ImisRestApi
 {
@@ -71,6 +74,12 @@ namespace ImisRestApi
             services.AddSwaggerGen(x => {
                 x.SwaggerDoc("v1", new Info { Title = "IMIS REST" //, Version = "v1"
                 });
+
+                x.DescribeAllEnumsAsStrings();
+                x.OperationFilter<FormatXmlCommentProperties>();
+                x.OperationFilter<AuthorizationInputOperationFilter>();
+                x.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+                x.OperationFilter<AddRequiredHeaderParameter>();
             });
 
         }

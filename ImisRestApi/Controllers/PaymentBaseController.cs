@@ -28,6 +28,7 @@ using Newtonsoft.Json;
 namespace ImisRestApi.Controllers
 {
     
+    [Authorize]
     public abstract class PaymentBaseController : Controller
     {
         public PaymentLogic _payment;

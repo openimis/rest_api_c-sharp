@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace ImisRestApi.Controllers
 {
-
+    [Authorize]
     public abstract class LocationsBaseController : Controller
     {
         private ImisBaseLocations locations;
