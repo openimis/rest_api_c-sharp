@@ -49,7 +49,7 @@ namespace OpenImis.Modules.PolicyModule.Logic
             return response;
         }
 
-        public DataMessage GetCommissions(GetCommissionInputs model)
+        public DataMessage GetCommissions(GetCommissionInputsMv model)
         {
             DataMessage response;
 

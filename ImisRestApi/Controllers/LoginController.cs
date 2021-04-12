@@ -4,79 +4,66 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using ImisRestApi.Data;
-using ImisRestApi.Models;
-using ImisRestApi.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using OpenImis.Modules;
+using OpenImis.Modules.LoginModule.Models;
 
 namespace ImisRestApi.Controllers
 {
+    //[ApiVersion("2")]
+    [Authorize]
+    [Route("api/")]
+    //[ApiController]
+    [EnableCors("AllowSpecificOrigin")]
     public class LoginController : Controller
     {
-        private IConfiguration Configuration;
+        private readonly IConfiguration _configuration;
+        private readonly IImisModules _imisModules;
 
-        public LoginController(IConfiguration configuration)
+        public LoginController(IConfiguration configuration, IImisModules imisModules)
         {
-            Configuration = configuration;
-           
+            _configuration = configuration;
+            _imisModules = imisModules;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        public IActionResult Index([FromBody]LoginModel model)
+        public IActionResult Index([FromBody] LoginModel model)
         {
-            IActionResult response = Unauthorized();
-
-            ImisValidate repo = new ImisValidate(Configuration);
-
-            var user = repo.FindUser(model.UserName, model.Password);
-
+            var user = _imisModules.GetLoginModule().GetLoginLogic().FindUser(model.UserName, model.Password);
             if (user != null)
             {
-                var jwtToken = JwtTokenBuilder(user);
-                response = Ok(new { access_token = jwtToken,expires_on = DateTime.Now.AddDays(5)});
-            }
-            return response;
-        }
+                DateTime expirationDate = DateTime.Now.AddDays(double.Parse(_configuration["JwtExpireDays"]));
 
-        private string JwtTokenBuilder(UserData user)
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:key"]));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            double TokenValidDays = 0;
-            try
-            {
-                TokenValidDays = Convert.ToDouble(Configuration["JWT:validdays"]);
-            }
-            catch (Exception)
-            {
-                
-            }
-            var claimsArrayLength = user.Rights.Count + 1;
-            var claims = new List<Claim>
-            {
-                new Claim("UserId", user.UserID),
-                new Claim("UserUUID", user.UserUUID.ToString()),
-            };
+                List<Claim> claims = new List<Claim>()
+                {
+                    new Claim("UserId", user.UserID),
+                    new Claim("UserUUID", user.UserUUID.ToString())
+                };
 
-            foreach(var right in user.Rights) {
-                claims.Add(new Claim(ClaimTypes.Role, right));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(user.PrivateKey));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["JwtIssuer"],
+                    audience: _configuration["JwtIssuer"],
+                    claims: claims,
+                    expires: expirationDate,
+                    signingCredentials: creds);
+
+                return Ok(new
+                {
+                    access_token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expires_on = expirationDate
+                });
             }
 
-            var JwtToken = new JwtSecurityToken(
-                issuer:Configuration["JWT:issuer"],
-                audience:Configuration["JWT:audience"],
-                claims: claims,
-                signingCredentials:credentials,expires:DateTime.Now.AddDays(TokenValidDays)
-                )
-            {
-
-            };
- 
-            return new JwtSecurityTokenHandler().WriteToken(JwtToken);
+            return Unauthorized();
         }
     }
 }

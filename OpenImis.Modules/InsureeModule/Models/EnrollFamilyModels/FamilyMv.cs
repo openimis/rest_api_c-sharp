@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpenImis.Modules.InsureeModule.Models.EnrollFamilyModels
 {
-    public class Family
+    public class FamilyMv
     {
         public int FamilyId { get; set; }
         public int InsureeId { get; set; }
@@ -18,7 +18,7 @@ namespace OpenImis.Modules.InsureeModule.Models.EnrollFamilyModels
         public string ConfirmationType { get; set; }
         public string isOffline { get; set; }
         public List<Insuree> Insurees { get; set; }
-        public List<Policy> Policies { get; set; }
+        public List<PolicyMv> Policies { get; set; }
         public List<InsureePolicy> InsureePolicy { get; set; }
     }
 }

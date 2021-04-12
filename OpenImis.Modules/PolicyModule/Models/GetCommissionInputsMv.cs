@@ -5,7 +5,7 @@ using System.Text;
 
 namespace OpenImis.Modules.PolicyModule.Models
 {
-    public class GetCommissionInputs
+    public class GetCommissionInputsMv
     {
         public string enrolment_officer_code { get; set; }
         public string month { get; set; }

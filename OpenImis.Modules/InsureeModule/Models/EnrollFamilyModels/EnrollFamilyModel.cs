@@ -7,16 +7,16 @@ namespace OpenImis.Modules.InsureeModule.Models.EnrollFamilyModels
 {
     public class EnrollFamilyModel
     {
-        public List<Family> Family { get; set; }
+        public List<FamilyMv> Family { get; set; }
 
         public Enrolment GetEnrolmentFromModel()
         {
             return new Enrolment()
             {
                 FileInfo = new FileInfo(),
-                Families = Family.Select(x => new List<Family>()
+                Families = Family.Select(x => new List<FamilyMv>()
                 {
-                    new Family()
+                    new FamilyMv()
                     {
                         FamilyId = x.FamilyId,
                         InsureeId = x.InsureeId,

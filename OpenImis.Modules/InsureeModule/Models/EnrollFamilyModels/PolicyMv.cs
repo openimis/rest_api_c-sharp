@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OpenImis.Modules.InsureeModule.Models.EnrollFamilyModels
 {
-    public class Policy
+    public class PolicyMv
     {
         public int PolicyId { get; set; }
         public int FamilyId { get; set; }

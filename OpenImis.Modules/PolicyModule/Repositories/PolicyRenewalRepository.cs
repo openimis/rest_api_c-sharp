@@ -243,7 +243,7 @@ namespace OpenImis.Modules.PolicyModule.Repositories
             }
         }
 
-        public DataMessage GetCommissions(GetCommissionInputs model)
+        public DataMessage GetCommissions(GetCommissionInputsMv model)
         {
             dynamic response;
 
