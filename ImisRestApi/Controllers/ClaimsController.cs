@@ -1,52 +1,31 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using ImisRestApi.Data;
+using ImisRestApi.Models;
+using ImisRestApi.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OpenImis.Modules;
-using OpenImis.Modules.ClaimModule.Models;
-using OpenImis.Modules.ClaimModule.Models.RegisterClaim;
-using ImisRestApi.Security;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace ImisRestApi.Controllers
 {
-    //[ApiVersion("2")]
-    [Authorize]
-    [Route("api/")]
-    //[ApiController]
-    public class ClaimController : Controller
+    [Produces("application/json")]
+    public class ClaimsController : Controller
     {
-        private readonly IImisModules _imisModules;
+        private ImisClaims imisClaims;
 
-        public ClaimController(IImisModules imisModules)
+        public ClaimsController(IConfiguration configuration)
         {
-            _imisModules = imisModules;
+            imisClaims = new ImisClaims(configuration);
         }
 
-        [HasRights(Rights.ClaimAdd)]
-        [Route("claim")]
+
         [HttpPost]
-        public IActionResult Create([FromBody] Claim claim)
-        {
-            int response;
-
-            try
-            {
-                response = _imisModules.GetClaimModule().GetClaimLogic().Create(claim);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
-            }
-
-            return Ok(response);
-        }
-
-        //[HasRights(Rights.DiagnosesDownload)]
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("GetDiagnosesServicesItems")]
+        [Route("api/GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetDiagnosesServicesItems([FromBody] DsiInputModel model)
@@ -59,18 +38,19 @@ namespace ImisRestApi.Controllers
 
             try
             {
-                var response = _imisModules.GetClaimModule().GetClaimLogic().GetDsi(model);
+                var response = imisClaims.GetDsi(model);
                 return Json(response);
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
             }
+
         }
 
-        [HasRights(Rights.ClaimAdd)]
+        [Authorize(Roles = "ClaimAdd")]
         [HttpPost]
-        [Route("getpaymentlists")]
+        [Route("api/GetPaymentLists")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetPaymentLists([FromBody] PaymentListsInputModel model)
@@ -83,47 +63,80 @@ namespace ImisRestApi.Controllers
 
             try
             {
-                var response = _imisModules.GetClaimModule().GetClaimLogic().GetPaymentLists(model);
+                var response = imisClaims.GetPaymentLists(model);
                 return Json(response);
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
             }
+
         }
 
-        //[HasRights(Rights.FindClaimAdministrator)]
-        [AllowAnonymous]
         [HttpGet]
-        [Route("claims/getclaimadmins")]
+        [Route("api/Claims/GetClaimAdmins")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult ValidateClaimAdmin()
         {
+
             try
             {
-                var data = _imisModules.GetClaimModule().GetClaimLogic().GetClaimAdministrators();
+
+                var data = imisClaims.GetClaimAdministrators();
                 return Ok(new { error_occured = false, claim_admins = data });
+
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
             }
+
         }
 
-        //[HasRights(Rights.ClaimSearch)]
-        [AllowAnonymous]
         [HttpGet]
-        [Route("claims/controls")]
+        [Route("api/Claims/Controls")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetControls()
         {
+
             try
             {
-                var data = _imisModules.GetClaimModule().GetClaimLogic().GetControls();
+
+                var data = imisClaims.GetControls();
+
                 return Ok(new { error_occured = false, controls = data });
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
+
+            }
+
+        }
+
+        [HttpPost]
+        [Route("api/GetClaims")]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public IActionResult GetClaims([FromBody] ClaimsModel model)
+        {
+
+            try
+            {
+
+                var data = imisClaims.GetClaims(model);
+
+
+                return Ok(new { error_occured = false, data = data });
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
             }
+
         }
     }
 }
