@@ -65,36 +65,44 @@ namespace ImisRestApi
                          services.BuildServiceProvider().GetService<OpenImis.Modules.IImisModules>(),
                          services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
            });
-            
-            services.AddMvc(config => {
-                config.RespectBrowserAcceptHeader = true;
-                config.InputFormatters.Add(new XmlSerializerInputFormatter());
-                config.OutputFormatters.Add(new XmlSerializerOutputFormatter());
-            });
-            //services.ConfigureMvc();
-            services.AddSwaggerGen(x => {
-                var apiVersionDescriptions = new ApiVersionDescriptions();
-                apiVersionDescriptions.AddDescription("1", File.ReadAllText("Docs\\ApiVersionDescription.md"));
+
+           services.AddAuthorization();
+
+           services.AddMvc(config => {
+               config.RespectBrowserAcceptHeader = true;
+               config.InputFormatters.Add(new XmlSerializerInputFormatter());
+               config.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+           });
+           //services.ConfigureMvc();
+           services.AddSwaggerGen(x => {
+               var apiVersionDescriptions = new ApiVersionDescriptions();
+               apiVersionDescriptions.AddDescription("1", File.ReadAllText("Docs\\ApiVersionDescription.md"));
                 
-                x.SwaggerDoc("v1", new Info { Title = "IMIS REST",
-                    Description = apiVersionDescriptions.GetDescription("1"),
-                    Contact = new Contact()
-                    {
-                        Name = "openIMIS",
-                        Url = "http://openimis.org"
-                    }
-                });
+               x.SwaggerDoc("v1", new Info { Title = "IMIS REST",
+                   Description = apiVersionDescriptions.GetDescription("1"),
+                   Contact = new Contact()
+                   {
+                       Name = "openIMIS",
+                       Url = "http://openimis.org"
+                   }
+               });
 
-                var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
-                foreach (var xmlFile in xmlFiles)
-                    x.IncludeXmlComments(xmlFile);
+               var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+               foreach (var xmlFile in xmlFiles)
+                   x.IncludeXmlComments(xmlFile);
 
-                x.DescribeAllEnumsAsStrings();
-                x.OperationFilter<FormatXmlCommentProperties>();
-                x.OperationFilter<AuthorizationInputOperationFilter>();
-                x.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
-                x.OperationFilter<AddRequiredHeaderParameter>();
-            });
+               x.DescribeAllEnumsAsStrings();
+               x.OperationFilter<FormatXmlCommentProperties>();
+               x.OperationFilter<AuthorizationInputOperationFilter>();
+               x.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+               x.OperationFilter<AddRequiredHeaderParameter>();
+           });
+
+           services.AddCors(options =>
+           {
+               options.AddPolicy("AllowSpecificOrigin",
+                   builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+           });
 
         }
 
