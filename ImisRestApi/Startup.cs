@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using ImisRestApi.Repo;
@@ -72,8 +73,21 @@ namespace ImisRestApi
             });
             //services.ConfigureMvc();
             services.AddSwaggerGen(x => {
-                x.SwaggerDoc("v1", new Info { Title = "IMIS REST" //, Version = "v1"
+                var apiVersionDescriptions = new ApiVersionDescriptions();
+                apiVersionDescriptions.AddDescription("1", File.ReadAllText("Docs\\ApiVersionDescription.md"));
+                
+                x.SwaggerDoc("v1", new Info { Title = "IMIS REST",
+                    Description = apiVersionDescriptions.GetDescription("1"),
+                    Contact = new Contact()
+                    {
+                        Name = "openIMIS",
+                        Url = "http://openimis.org"
+                    }
                 });
+
+                var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
+                foreach (var xmlFile in xmlFiles)
+                    x.IncludeXmlComments(xmlFile);
 
                 x.DescribeAllEnumsAsStrings();
                 x.OperationFilter<FormatXmlCommentProperties>();

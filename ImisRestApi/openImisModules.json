@@ -1,7 +1,6 @@
 ﻿{
   "ImisModules": [
     {
-      "Version": "2",
       "LoginModule": {
         "LoginLogic": "OpenImis.Modules.LoginModule.Logic.LoginLogic"
       },
