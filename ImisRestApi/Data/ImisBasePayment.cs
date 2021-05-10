@@ -802,5 +802,36 @@ namespace ImisRestApi.Data
 
             return result;
         }
+
+        public List<String> GetProductsSPCode()
+        {
+
+            var getProductsSPCodes = @"SELECT tblProduct.AccCodePremiums FROM tblProduct WHERE tblProduct.AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND tblProduct.ValidityTo is NULL";
+
+            SqlParameter[] parameters = { };
+
+            try
+            {
+                DataTable results = dh.GetDataTable(getProductsSPCodes, parameters, CommandType.Text);
+                List<String> productsCodes = new List<String>();
+                if (results.Rows.Count > 0)
+                {
+                    foreach (DataRow result in results.Rows) 
+                    {
+                        if (!string.IsNullOrEmpty(Convert.ToString(result["AccCodePremiums"]))) 
+                        {
+                            productsCodes.Add(Convert.ToString(result["AccCodePremiums"]));
+                        }
+                    }
+                }
+
+                return productsCodes;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
+        }
     }
 }
