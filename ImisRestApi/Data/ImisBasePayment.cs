@@ -806,7 +806,7 @@ namespace ImisRestApi.Data
         public List<String> GetProductsSPCode()
         {
 
-            var getProductsSPCodes = @"SELECT AccCodePremiums FROM tblProduct WHERE AccCodePremiums LIKE '%SP[0-9{3}]%' AND ValidityTo is NULL";
+            var getProductsSPCodes = @"SELECT AccCodePremiums FROM tblProduct WHERE AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND ValidityTo is NULL";
 
             SqlParameter[] parameters = { };
 
