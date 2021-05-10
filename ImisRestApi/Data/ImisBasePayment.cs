@@ -806,14 +806,14 @@ namespace ImisRestApi.Data
         public List<String> GetProductsSPCode()
         {
 
-            var getProductsSPCodes = @"SELECT AccCodePremiums FROM tblProduct WHERE AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND ValidityTo is NULL";
+            var getProductsSPCodes = @"SELECT tblProduct.AccCodePremiums FROM tblProduct WHERE tblProduct.AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND tblProduct.ValidityTo is NULL";
 
             SqlParameter[] parameters = { };
 
             try
             {
                 DataTable results = dh.GetDataTable(getProductsSPCodes, parameters, CommandType.Text);
-                List<String> productsCodes = null;
+                List<String> productsCodes = new List<String>();
                 if (results.Rows.Count > 0)
                 {
                     foreach (DataRow result in results.Rows) 

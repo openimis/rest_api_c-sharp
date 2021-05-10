@@ -146,26 +146,25 @@ namespace ImisRestApi.Controllers
         [Route("api/Reconciliation")]
         public IActionResult Reconciliation(int daysAgo)
         {
-            object done = new { resp = "" };
+            List<object> done = new List<object>();
             // Make loop for all product from database that have account follow SP[0-9]{3} and do the function for all sp codes
             var productsSPCodes = imisPayment.GetProductsSPCode();
-            if (productsSPCodes != null)
+            if (productsSPCodes.Count > 0)
             {
                 foreach (String productSPCode in productsSPCodes)
                 {
-                    done = imisPayment.RequestReconciliationReport(daysAgo, productSPCode);
+                    var result = imisPayment.RequestReconciliationReport(daysAgo, productSPCode);
+                    //check if we have done result - if no - then return 500
+                    System.Reflection.PropertyInfo pi = result.GetType().GetProperty("resp");
+                    done.Add(result);
                 }
             }
-            System.Reflection.PropertyInfo pi = done.GetType().GetProperty("resp");
-            //check if we have done result - if yes then we can output Ok, else NotFound
-            if ((String)(pi.GetValue(done, null)) != "")
+            else
             {
-                return Ok(done);
-            }
-            else 
-            {
+                //return not found - no sp codes to proceed 
                 return NotFound();
             }
+            return Ok(done);
         }
 
         [HttpPost]
