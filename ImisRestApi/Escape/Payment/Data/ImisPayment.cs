@@ -29,7 +29,7 @@ namespace ImisRestApi.Data
         }
 
 #if CHF
-        public object RequestReconciliationReport(int daysAgo)
+        public object RequestReconciliationReport(int daysAgo, String productSPCode)
         {
             daysAgo = -1 * daysAgo;
 
@@ -39,7 +39,7 @@ namespace ImisRestApi.Data
 
             gepgSpReconcReq request = new gepgSpReconcReq();
             request.SpReconcReqId = Math.Abs(Guid.NewGuid().GetHashCode());//Convert.ToInt32(DateTime.UtcNow.Year.ToString() + DateTime.UtcNow.Month.ToString() + DateTime.UtcNow.Day.ToString());
-            request.SpCode = Configuration["PaymentGateWay:GePG:SpCode"];
+            request.SpCode = productSPCode;
             request.SpSysId = Configuration["PaymentGateWay:GePG:SystemId"];
             request.TnxDt = DateTime.Now.AddDays(daysAgo).ToString("yyyy-MM-dd");
             request.ReconcOpt = 1;
@@ -48,7 +48,7 @@ namespace ImisRestApi.Data
             string signature = gepg.GenerateSignature(requestString);
             var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
 
-            var result = gepg.SendReconcHttpRequest(signedRequest);
+            var result = gepg.SendReconcHttpRequest(signedRequest, productSPCode);
 
             return new { reconcId = request.SpReconcReqId, resp = result };
 
