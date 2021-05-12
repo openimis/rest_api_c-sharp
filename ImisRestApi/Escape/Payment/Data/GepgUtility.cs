@@ -26,7 +26,7 @@ namespace ImisRestApi.Data
         string GepgPublicCertStorePath = string.Empty;
         string GepgPayCertStorePath = string.Empty;
 
-        string CertPass = "HPSS1234";
+        string CertPass = "passpass";//HPSS1234
         string GepgCertPass = "gepg@2018";
 
         RSA rsaCrypto = null;
