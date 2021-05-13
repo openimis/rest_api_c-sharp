@@ -37,10 +37,10 @@ namespace ImisRestApi.Data
         {
             configuration = Configuration;
 
-            PrivateStorePath = hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PrivateStorePath"];
-            PublicStorePath = hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PublicStorePath"];
-            GepgPublicCertStorePath = hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPublicCertStorePath"];
-            GepgPayCertStorePath = hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"];
+            PrivateStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PrivateStorePath"]);
+            PublicStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PublicStorePath"]);
+            GepgPublicCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPublicCertStorePath"]);
+            GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode,string PhoneNumber, string BillId, decimal ExpectedAmount, List<InsureeProduct> products)
