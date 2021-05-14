@@ -26,8 +26,8 @@ namespace ImisRestApi.Data
         string GepgPublicCertStorePath = string.Empty;
         string GepgPayCertStorePath = string.Empty;
 
-        string CertPass = "passpass";//HPSS1234
-        string GepgCertPass = "gepg@2018";
+        string CertPass = string.Empty;
+        string GepgCertPass = string.Empty;
 
         RSA rsaCrypto = null;
         gepgBillSubReq newBill = null;
@@ -41,6 +41,9 @@ namespace ImisRestApi.Data
             PublicStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PublicStorePath"]);
             GepgPublicCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPublicCertStorePath"]);
             GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
+
+            CertPass = Configuration["PaymentGateWay:GePG:CertPass"];
+            GepgCertPass = Configuration["PaymentGateWay:GePG:GepgCertPass"]; 
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode,string PhoneNumber, string BillId, decimal ExpectedAmount, List<InsureeProduct> products)
