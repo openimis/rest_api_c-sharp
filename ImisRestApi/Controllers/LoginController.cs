@@ -16,7 +16,6 @@ namespace ImisRestApi.Controllers
 {
     //[ApiVersion("2")]
     [Authorize]
-    [Route("api/")]
     //[ApiController]
     [EnableCors("AllowSpecificOrigin")]
     public class LoginController : Controller
