@@ -320,7 +320,7 @@ namespace ImisRestApi.Controllers
 
             var serializer = new XmlSerializer(typeof(GepgBillResponse));
             var model = (GepgBillResponse)serializer.Deserialize(writer);
-            if (imisPayment.IsCallValid(body, 0))
+            if (imisPayment.IsValidCall(model, 0))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ControlNumberResp(7246));
