@@ -299,13 +299,31 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
-         {
-            
-            if (imisPayment.IsValidCall(model, 0))
+        public async Task<IActionResult> GetReqControlNumberChf()
+        {
+            var buffer = new byte[Convert.ToInt32(Request.ContentLength)];
+            string body = string.Empty;
+
+            using (var reader = new StreamReader(
+               Request.Body,
+               encoding: Encoding.ASCII,
+               detectEncodingFromByteOrderMarks: false,
+               bufferSize: buffer.Length,
+               leaveOpen: true
+               ))
+            {
+                body = await reader.ReadToEndAsync();
+                // stream = reader;// Do something
+            }
+
+            TextReader writer = new StringReader(body);
+
+            var serializer = new XmlSerializer(typeof(GepgBillResponse));
+            var model = (GepgBillResponse)serializer.Deserialize(writer);
+            if (imisPayment.IsCallValid(body, 0))
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.ControlNumberResp(7101));
+                    return BadRequest(imisPayment.ControlNumberResp(7246));
 
                 foreach (var bill in model.BillTrxInf)
                 {
