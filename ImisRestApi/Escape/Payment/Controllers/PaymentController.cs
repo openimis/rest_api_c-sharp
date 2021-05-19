@@ -91,7 +91,7 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReconciliationData")]
         public IActionResult GetReconciliation([FromBody] GepgReconcMessage model)
         {
-            if (imisPayment.IsValidCall(model, 0))
+            if (imisPayment.IsValidCall(model, 2))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ReconciliationResp(7101));
@@ -198,7 +198,7 @@ namespace ImisRestApi.Controllers
         [Route("api/GetPaymentData")]
         public async Task<IActionResult> GetPaymentChf([FromBody] GepgPaymentMessage model)
         {
-            if (imisPayment.IsValidCall(model, 0))
+            if (imisPayment.IsValidCall(model, 1))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(7101));
