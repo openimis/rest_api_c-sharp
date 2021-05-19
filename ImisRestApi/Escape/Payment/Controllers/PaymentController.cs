@@ -88,29 +88,9 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetReconciliationData")]
-        public async Task<IActionResult> GetReconciliation()
+        public IActionResult GetReconciliation([FromBody] GepgReconcMessage model)
         {
-            var buffer = new byte[Convert.ToInt32(Request.ContentLength)];
-            string body = string.Empty;
-
-            using (var reader = new StreamReader(
-               Request.Body,
-               encoding: Encoding.ASCII,
-               detectEncodingFromByteOrderMarks: false,
-               bufferSize: buffer.Length,
-               leaveOpen: true
-               ))
-            {
-                body = await reader.ReadToEndAsync();
-                // stream = reader;// Do something
-            }
-
-            TextReader writer = new StringReader(body);
-
-            var serializer = new XmlSerializer(typeof(GepgReconcMessage));
-            var model = (GepgReconcMessage)serializer.Deserialize(writer);
-
-            if (imisPayment.IsCallValid(body,2))
+            if (imisPayment.IsValidCall(model, 0))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ReconciliationResp(7101));
@@ -215,30 +195,9 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetPaymentData")]
-        public async Task<IActionResult> GetPaymentChf()
+        public async Task<IActionResult> GetPaymentChf([FromBody] GepgPaymentMessage model)
         {
-
-            var buffer = new byte[Convert.ToInt32(Request.ContentLength)];
-            string body = string.Empty;
-
-            using (var reader = new StreamReader(
-               Request.Body,
-               encoding: Encoding.ASCII,
-               detectEncodingFromByteOrderMarks: false,
-               bufferSize: buffer.Length,
-               leaveOpen: true
-               ))
-            {
-                body = await reader.ReadToEndAsync();
-                // stream = reader;// Do something
-            }
-
-            TextReader writer = new StringReader(body);
-
-            var serializer = new XmlSerializer(typeof(GepgPaymentMessage));
-            var model = (GepgPaymentMessage)serializer.Deserialize(writer);
-
-            if (imisPayment.IsCallValid(body, 1))
+            if (imisPayment.IsValidCall(model, 0))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(7101));
@@ -299,27 +258,8 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public async Task<IActionResult> GetReqControlNumberChf()
+        public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
         {
-            var buffer = new byte[Convert.ToInt32(Request.ContentLength)];
-            string body = string.Empty;
-
-            using (var reader = new StreamReader(
-               Request.Body,
-               encoding: Encoding.ASCII,
-               detectEncodingFromByteOrderMarks: false,
-               bufferSize: buffer.Length,
-               leaveOpen: true
-               ))
-            {
-                body = await reader.ReadToEndAsync();
-                // stream = reader;// Do something
-            }
-
-            TextReader writer = new StringReader(body);
-
-            var serializer = new XmlSerializer(typeof(GepgBillResponse));
-            var model = (GepgBillResponse)serializer.Deserialize(writer);
             if (imisPayment.IsValidCall(model, 0))
             {
                 if (!ModelState.IsValid)
