@@ -1,5 +1,6 @@
 ﻿using ImisRestApi.Escape.Payment.Models;
 using ImisRestApi.Data;
+using ImisRestApi.Extensions;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using ImisRestApi.Models.Payment.Response;
@@ -101,10 +102,9 @@ namespace ImisRestApi.Data
             string reconc = JsonConvert.SerializeObject(billAck);
             string sentbill = JsonConvert.SerializeObject(bill);
 
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ControlNumberAttempt_" + namepart + ".json")))
-            {
-                outputFile.WriteLine(sentbill+"********************"+reconc);
-            }
+            var content = sentbill + "********************" + reconc;
+            var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
+            gepgFile.putToTargetFolderPayment();
 
             return base.PostReqControlNumber(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
         }
