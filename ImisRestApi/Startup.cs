@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImisRestApi.Formaters;
 using ImisRestApi.Repo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -52,7 +53,12 @@ namespace ImisRestApi
             
             services.AddMvc(config => {
                 config.RespectBrowserAcceptHeader = true;
+                config.ReturnHttpNotAcceptable = true;
+#if CHF
+                config.InputFormatters.Add(new GePGXmlSerializerInputFormatter());
+#else
                 config.InputFormatters.Add(new XmlSerializerInputFormatter());
+#endif
                 config.OutputFormatters.Add(new XmlSerializerOutputFormatter());
             });
             //services.ConfigureMvc();
