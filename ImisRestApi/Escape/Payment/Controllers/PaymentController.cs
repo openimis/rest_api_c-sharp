@@ -118,7 +118,7 @@ namespace ImisRestApi.Controllers
                 {
                     outputFile.WriteLine(reconc);
                 }
-                return Ok(imisPayment.ReconciliationResp(7101));
+                return Ok(imisPayment.ReconciliationResp(7303));
             }
         }
 
@@ -251,7 +251,7 @@ namespace ImisRestApi.Controllers
                     outputFile.WriteLine(reconc);
                 }
 
-                return Ok(imisPayment.PaymentResp(7101));
+                return Ok(imisPayment.PaymentResp(7303));
             }
 
          }
