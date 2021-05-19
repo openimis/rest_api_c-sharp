@@ -10,6 +10,7 @@ using ImisRestApi.Chanels;
 using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Escape.Payment.Models;
+using ImisRestApi.Extensions;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using ImisRestApi.Models.Payment.Response;
@@ -265,9 +266,10 @@ namespace ImisRestApi.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ControlNumberResp(7246));
 
+                var billId = String.Empty;
+                ControlNumberResp ControlNumberResponse = new ControlNumberResp();
                 foreach (var bill in model.BillTrxInf)
                 {
-                    ControlNumberResp ControlNumberResponse = new ControlNumberResp();
 
                     if (bill.TrxStsCode == "7101")
                     {
@@ -291,6 +293,7 @@ namespace ImisRestApi.Controllers
                         };
                     }
 
+                    billId = bill.BillId;
 
                     try
                     {
@@ -302,20 +305,22 @@ namespace ImisRestApi.Controllers
                     }
                 }
 
+                string reconc = JsonConvert.SerializeObject(ControlNumberResponse);
+                var gepgFile = new GepgFoldersCreating(billId, "CN_Response", reconc, env);
+                gepgFile.putToTargetFolderPayment();
+
                 return Ok(imisPayment.ControlNumberResp(7101));
             }
             else
             {
-
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
-                string reconc = JsonConvert.SerializeObject(model);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ControlNumberAttempt_" + namepart + ".json")))
+                var billId = String.Empty;
+                foreach (var bill in model.BillTrxInf)
                 {
-                    outputFile.WriteLine(reconc);
+                    billId = bill.BillId;
                 }
+                string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating(billId, "CN_Response", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
                 return Ok(imisPayment.ControlNumberResp(7303));
             }
