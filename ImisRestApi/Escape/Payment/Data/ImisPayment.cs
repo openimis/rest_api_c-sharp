@@ -1,4 +1,4 @@
-﻿using ImisRestApi.Chanels.Payment.Models;
+﻿using ImisRestApi.Escape.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;

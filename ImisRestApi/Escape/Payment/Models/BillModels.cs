@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace ImisRestApi.Chanels.Payment.Models
+namespace ImisRestApi.Escape.Payment.Models
 {
     [XmlRoot("Gepg")]
     public class GepgBillMessage
