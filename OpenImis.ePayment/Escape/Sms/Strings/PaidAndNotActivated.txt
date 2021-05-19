@@ -1,0 +1,1 @@
+﻿Paid amount:{0} ,Control No:{2} CHFID {3} is insufficient. {8} should be paid to activate the policy.

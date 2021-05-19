@@ -1,14 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <UserSecretsId>aspnet-ImisRestApi-0F650C61-A020-4549-AC0C-C49F0334E2D7</UserSecretsId>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ProjectGuid>{0F650C61-A020-4549-AC0C-C49F0334E2D7}</ProjectGuid>
+    <Configurations>Debug;Release;CHFDebug</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\ImisRestApi.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\OpenImisOpenImis.ePayment.ePaymentxml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFDebug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp2.1\OpenImisOpenImis.ePayment.ePaymentxml</DocumentationFile>
+    <DefineConstants>TRACE;DEBUG;CHF</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -36,6 +42,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings.CHF.json" />
+    <Content Remove="appsettings.Development.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="appsettings.Production.json.dist" />
     <None Remove="NuGet.Config.old" />
     <None Remove="openImisModules.json.dist" />
@@ -54,7 +65,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.28" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="2.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
@@ -68,6 +79,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="appsettings.CHF.json" />
+    <None Include="appsettings.Development.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenImis.ePayment\OpenImis.ePayment.csproj" />
     <ProjectReference Include="..\OpenImis.Extensions.Configuration\OpenImis.Extensions.Configuration.csproj" />
     <ProjectReference Include="..\OpenImis.ModulesV1\OpenImis.ModulesV1.csproj" />
     <ProjectReference Include="..\OpenImis.ModulesV2\OpenImis.ModulesV2.csproj" />
@@ -96,5 +113,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

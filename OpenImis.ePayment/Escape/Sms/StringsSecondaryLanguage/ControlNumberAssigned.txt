@@ -1,0 +1,1 @@
+﻿Ankara Na:{0},Tarehe:{1},CHFID:{3},Bidhaa:{5},Kiasi:{7}

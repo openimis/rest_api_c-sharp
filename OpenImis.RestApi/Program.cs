@@ -43,15 +43,15 @@ namespace OpenImis.RestApi
                     //config.AddOpenImisConfig(secretsMode, "REGISTRY_CONFIG_FILE");
 					//config.AddOpenImisConfig(SecretsMode.LocalFile, $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
 					config.AddJsonFile($"appsettings.json", optional: false, reloadOnChange: true);
-                    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != null)
-                    {
-                        config.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: false, reloadOnChange: true);
-                    }
-                    else
-                    {
-                        config.AddJsonFile($"appsettings.Production.json", optional: false, reloadOnChange: true);
-                    }
-					config.AddJsonFile("openImisModules.json", optional: true, reloadOnChange: true);
+#if DEBUG
+                    config.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+#else
+                    config.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
+#endif
+#if CHF
+                    config.AddJsonFile("appsettings.CHF.json", optional: false, reloadOnChange: true);
+#endif
+                    config.AddJsonFile("openImisModules.json", optional: true, reloadOnChange: true);
 				})
                 .UseStartup<Startup>();
 

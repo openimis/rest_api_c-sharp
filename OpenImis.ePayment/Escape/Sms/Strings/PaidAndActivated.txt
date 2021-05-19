@@ -1,0 +1,1 @@
+﻿Payment for control number {2} paid successfully. CHFID:{3},Product:{5},Start Date:{7},Expire Date:{8}

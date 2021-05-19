@@ -1,0 +1,38 @@
+﻿{
+	"JWT": {
+		"key": "",
+		"issuer": "http://domainname.com",
+		"audience": "http://domainname.com",
+		"validdays": 3
+	},
+	"PaymentGateWay": {
+		"GePG": {
+			"SystemId": "",
+			"SpCode": "",
+			"SubSpCode": 1001,
+			"Url": "",
+			"GfsCode": [ "", ""],
+			"PrivateStorePath": "",
+			"PublicStorePath": "",
+			"GepgPublicCertStorePath": "",
+			"GepgPayCertStorePath": "",
+			"CertPass": "",
+			"GepgCertPass": ""
+		}
+	},
+	"SmsGateWay": {
+		"GateUrl": "",
+		"SmsResource": "",
+		"PrivateKey": "",
+		"UserId": "",
+		"SenderId": "",
+		"ServiceId": "",
+		"RequestType": "",
+		"HeaderKeys": "X-Auth-Request-Hash,X-Auth-Request-Id,X-Auth-Request-Type",
+		"HeaderValues": "HashMessage1,UserId,RequestType"
+	},
+	"Language": {
+		"Primary": "english,en,primary,0,1",
+		"Languages": [ "en", "sw" ]
+	}
+}

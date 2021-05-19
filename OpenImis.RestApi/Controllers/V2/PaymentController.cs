@@ -14,8 +14,8 @@ using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
 {
-    [ApiVersion("2")]
-    [Authorize]
+    //[ApiVersion("2")]
+/*    [Authorize]
     [Route("api/payment/")]
     [ApiController]
     public class PaymentController : Controller
@@ -104,5 +104,5 @@ namespace OpenImis.RestApi.Controllers.V2
                 return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "Unknown Error Occured" });
             }
         }
-    }
+    }*/
 }

@@ -13,12 +13,14 @@ using Microsoft.Extensions.Logging;
 using OpenImis.RestApi.Controllers;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV2;
+using OpenImis.ePayment.Formaters;
 using Microsoft.AspNetCore.Http;
 using OpenImis.ModulesV1.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace OpenImis.RestApi
 {
@@ -67,6 +69,14 @@ namespace OpenImis.RestApi
             services.AddMvc(options =>
             {
                 options.AllowCombiningAuthorizeFilters = false;
+                options.RespectBrowserAcceptHeader = true;
+                options.ReturnHttpNotAcceptable = true;
+#if CHF
+                options.InputFormatters.Add(new GePGXmlSerializerInputFormatter());
+#else
+                options.InputFormatters.Add(new XmlSerializerInputFormatter());
+#endif
+                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
             .AddControllersAsServices();
