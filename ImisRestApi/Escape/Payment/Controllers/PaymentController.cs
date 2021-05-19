@@ -377,7 +377,7 @@ namespace ImisRestApi.Controllers
                     outputFile.WriteLine(reconc);
                 }
 
-                return Ok(imisPayment.ControlNumberResp(7101));
+                return Ok(imisPayment.ControlNumberResp(7303));
             }
 
         }
