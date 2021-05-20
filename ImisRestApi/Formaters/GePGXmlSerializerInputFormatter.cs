@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using ImisRestApi.Escape.Payment.Models;
+using ImisRestApi.Extensions;
+using Newtonsoft.Json;
 using System.Xml.Serialization;
 
 namespace ImisRestApi.Formaters
@@ -66,6 +68,9 @@ namespace ImisRestApi.Formaters
                 body = await reader.ReadToEndAsync();
                 // stream = reader;// Do something
             }
+
+            var gepgFile = new GepgFoldersCreating("request_"+type.ToString(), body, Path.Combine(System.Environment.CurrentDirectory, "Formaters"));
+            gepgFile.putRequestBody();
 
             TextReader writer = new StringReader(body);
 

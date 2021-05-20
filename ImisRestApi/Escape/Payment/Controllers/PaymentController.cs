@@ -97,29 +97,18 @@ namespace ImisRestApi.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
 
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
                 string reconc = JsonConvert.SerializeObject(model);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "Reconc_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc);
-                }
+                var gepgFile = new GepgFoldersCreating("Reconc", "Data", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
                 return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.Successful));
             }
             else
             {
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
                 string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating("Reconc", "DataInvalidSig", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ReconcInvalidSig_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc);
-                }
                 return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidSignature));
             }
         }
