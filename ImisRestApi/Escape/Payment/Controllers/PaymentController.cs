@@ -97,29 +97,18 @@ namespace ImisRestApi.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
 
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
                 string reconc = JsonConvert.SerializeObject(model);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "Reconc_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc);
-                }
+                var gepgFile = new GepgFoldersCreating("Reconc", "Data", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
                 return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.Successful));
             }
             else
             {
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
                 string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating("Reconc", "DataInvalidSig", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ReconcInvalidSig_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc);
-                }
                 return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidSignature));
             }
         }
@@ -204,6 +193,7 @@ namespace ImisRestApi.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.InvalidRequestData));
 
+                var billId = String.Empty;
                 object _response = null;
 
                 foreach (var payment in model.PymtTrxInf)
@@ -223,35 +213,29 @@ namespace ImisRestApi.Controllers
                         insurance_number = payment.PyrCellNum.ToString()
                     };
 
+                    billId = payment.BillId;
+
                     _response = await base.GetPaymentData(pay);
 
                 }
 
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Payments");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
-                string reconc = JsonConvert.SerializeObject(model);
-                var payresponse = JsonConvert.SerializeObject(_response);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "Payment_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc +"________"+ payresponse);
-                }
+                string reconc = JsonConvert.SerializeObject(_response);
+                var gepgFile = new GepgFoldersCreating(billId, "Payment", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
                 return Ok(imisPayment.PaymentResp(GepgCodeResponses.Successful));
             }
             else
             {
-
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Payments");
-                string namepart = new Random().Next(100000, 999999).ToString();
+                var billId = String.Empty;
+                foreach (var payment in model.PymtTrxInf)
+                {
+                    billId = payment.BillId;
+                }
 
                 string reconc = JsonConvert.SerializeObject(model);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "InvalidSignature" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc);
-                }
+                var gepgFile = new GepgFoldersCreating(billId, "PaymentInvalidSignature", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
                 return Ok(imisPayment.PaymentResp(GepgCodeResponses.InvalidSignature));
             }
