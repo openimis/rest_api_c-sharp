@@ -11,6 +11,7 @@ using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Escape.Payment.Models;
 using ImisRestApi.Extensions;
+using ImisRestApi.Formaters;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using ImisRestApi.Models.Payment.Response;
@@ -91,10 +92,10 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReconciliationData")]
         public IActionResult GetReconciliation([FromBody] GepgReconcMessage model)
         {
-            if (imisPayment.IsValidCall(model, 2))
+            if (imisPayment.IsValidCall(model, CallNumbersStructure.GepgSpReconcResp))
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.ReconciliationResp(7101));
+                    return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
 
                 string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
                 string namepart = new Random().Next(100000, 999999).ToString();
@@ -106,7 +107,7 @@ namespace ImisRestApi.Controllers
                     outputFile.WriteLine(reconc);
                 }
 
-                return Ok(imisPayment.ReconciliationResp(7101));
+                return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.Successful));
             }
             else
             {
@@ -119,7 +120,7 @@ namespace ImisRestApi.Controllers
                 {
                     outputFile.WriteLine(reconc);
                 }
-                return Ok(imisPayment.ReconciliationResp(7303));
+                return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidSignature));
             }
         }
 
@@ -198,10 +199,10 @@ namespace ImisRestApi.Controllers
         [Route("api/GetPaymentData")]
         public async Task<IActionResult> GetPaymentChf([FromBody] GepgPaymentMessage model)
         {
-            if (imisPayment.IsValidCall(model, 1))
+            if (imisPayment.IsValidCall(model, CallNumbersStructure.GepgPmtSpInfo))
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.PaymentResp(7101));
+                    return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.InvalidRequestData));
 
                 object _response = null;
 
@@ -237,7 +238,7 @@ namespace ImisRestApi.Controllers
                     outputFile.WriteLine(reconc +"________"+ payresponse);
                 }
 
-                return Ok(imisPayment.PaymentResp(7101));
+                return Ok(imisPayment.PaymentResp(GepgCodeResponses.Successful));
             }
             else
             {
@@ -252,7 +253,7 @@ namespace ImisRestApi.Controllers
                     outputFile.WriteLine(reconc);
                 }
 
-                return Ok(imisPayment.PaymentResp(7303));
+                return Ok(imisPayment.PaymentResp(GepgCodeResponses.InvalidSignature));
             }
 
          }
@@ -261,10 +262,10 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReqControlNumber")]
         public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
         {
-            if (imisPayment.IsValidCall(model, 0))
+            if (imisPayment.IsValidCall(model, CallNumbersStructure.GepgBillSubResp))
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.ControlNumberResp(7246));
+                    return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidRequestData));
 
                 var billId = String.Empty;
                 ControlNumberResp ControlNumberResponse = new ControlNumberResp();
@@ -309,7 +310,7 @@ namespace ImisRestApi.Controllers
                 var gepgFile = new GepgFoldersCreating(billId, "CN_Response", reconc, env);
                 gepgFile.putToTargetFolderPayment();
 
-                return Ok(imisPayment.ControlNumberResp(7101));
+                return Ok(imisPayment.ControlNumberResp(GepgCodeResponses.Successful));
             }
             else
             {
@@ -322,7 +323,7 @@ namespace ImisRestApi.Controllers
                 var gepgFile = new GepgFoldersCreating(billId, "CN_Response", reconc, env);
                 gepgFile.putToTargetFolderPayment();
 
-                return Ok(imisPayment.ControlNumberResp(7303));
+                return Ok(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidSignature));
             }
 
         }
