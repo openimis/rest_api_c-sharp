@@ -6,7 +6,7 @@ using System.Linq;
 using System.Web;
 
 namespace OpenImis.ePayment.Models
-{
+{/*
     public class Contribution
     {
         [Required]
@@ -26,5 +26,5 @@ namespace OpenImis.ePayment.Models
         public ReactionType ReactionType { get; set; }
         [StringLength(1,ErrorMessage = "5:Wrong contribution category")]
         public string ContributionCategory { get; set; }
-    }
+    }*/
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web;
 
 namespace OpenImis.ePayment.Models
-{
+{/*
     public class UserLogin
     {
         [Required]
@@ -13,5 +13,5 @@ namespace OpenImis.ePayment.Models
         [Required]
         [MaxLength(15)]
         public string Password { get; set; }
-    }
+    }*/
 }

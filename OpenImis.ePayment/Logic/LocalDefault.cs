@@ -109,7 +109,7 @@ namespace OpenImis.ePayment.Logic
             }
         }
 
-        public static string[] PrimaryLangReprisantations(IConfiguration config)
+        public static string[] PrimaryLanguageRepresentations(IConfiguration config)
         {
             List<string> langs = new List<string>();
             try

@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 using System.Web;
 
 namespace OpenImis.ePayment.Models
-{
+{/*
     /// <summary>
     ///  IMIS Family Group
     /// </summary>
@@ -53,5 +53,5 @@ namespace OpenImis.ePayment.Models
         public string IdentificationType { get; set; }
         public string IdentificationNumber { get; set; }
         public string FspCode { get; set; }
-    }
+    }*/
 }

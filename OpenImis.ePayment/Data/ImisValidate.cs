@@ -10,8 +10,8 @@ using System.Text;
 using System.Web;
 
 namespace OpenImis.ePayment.Data
-{
-    public class ImisValidate
+{/*
+  * public class ImisValidate
     {
         private IConfiguration Configuration;
 
@@ -166,4 +166,5 @@ namespace OpenImis.ePayment.Data
             return list;
         }
     }
+*/
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Web;
 
 namespace OpenImis.ePayment.Responses
-{
+{/*
     public class EnterContibutionResponse : ImisApiResponse
     {
         public EnterContibutionResponse(Exception e):base(e)
@@ -79,5 +79,5 @@ namespace OpenImis.ePayment.Responses
                     break;
             }
         }
-    }
+    }*/
 }

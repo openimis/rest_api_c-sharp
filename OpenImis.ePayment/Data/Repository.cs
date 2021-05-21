@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenImis.ePayment.Data
-{
+{/*
     public class Repository
     {
         private ImisValidate dh;
@@ -21,5 +21,5 @@ namespace OpenImis.ePayment.Data
 
         
 
-    }
+    }*/
 }

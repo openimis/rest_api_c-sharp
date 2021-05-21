@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace OpenImis.ePayment.Controllers
-{
+{/*
     public class LoginController : Controller
     {
         private IConfiguration Configuration;
@@ -78,5 +78,5 @@ namespace OpenImis.ePayment.Controllers
  
             return new JwtSecurityTokenHandler().WriteToken(JwtToken);
         }
-    }
+    }*/
 }

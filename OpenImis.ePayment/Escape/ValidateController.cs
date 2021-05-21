@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace OpenImis.ePayment.Controllers
-{
+{/*
     public class ValidateController : ValidateBaseController
     {
         private IConfiguration _configuration;
@@ -62,5 +62,5 @@ namespace OpenImis.ePayment.Controllers
         }
 #endif
 
-    }
+    }*/
 }

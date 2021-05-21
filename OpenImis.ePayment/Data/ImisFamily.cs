@@ -9,7 +9,7 @@ using OpenImis.ePayment.Responses;
 using Microsoft.Extensions.Configuration;
 
 namespace OpenImis.ePayment.Data
-{
+{/*
     public class ImisFamily
     {
         private IConfiguration Configuration;
@@ -356,4 +356,4 @@ namespace OpenImis.ePayment.Data
             return message;
         }
     }
-}
+*/}

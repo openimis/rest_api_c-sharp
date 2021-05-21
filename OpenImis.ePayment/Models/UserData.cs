@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenImis.ePayment.Models
-{
+{/*
     public class UserData
     {
         public string UserID { get; set; }
@@ -12,5 +12,5 @@ namespace OpenImis.ePayment.Models
         public string PrivateKey { get; set; }
         public string StoredPassword { get; set; }
         public List<string> Rights { get; set; }
-    }
+    }*/
 }

@@ -277,4 +277,5 @@ __pycache__/
 /OpenImis.DB.SqlServer/importDBStructure.bat
 /OpenImis.Modules/PaymentModule/CHF
 /OpenImis.RestApi/ControllersForChf
-/Certificates
+**/Certificates/
+**/controlNumberAck/

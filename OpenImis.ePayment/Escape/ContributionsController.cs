@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace OpenImis.ePayment.Escape
-{
+{/*
     public class ContributionsController : ContributionsBaseController
     {
         public ContributionsController(IConfiguration configuration) : base(configuration)
@@ -63,5 +63,5 @@ namespace OpenImis.ePayment.Escape
            
         }
 #endif
-    }
+    }*/
 }

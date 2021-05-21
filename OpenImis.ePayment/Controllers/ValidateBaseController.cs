@@ -12,7 +12,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace OpenImis.ePayment.Controllers
-{
+{/*
     [Authorize]
     public abstract class ValidateBaseController : Controller
     {
@@ -61,5 +61,5 @@ namespace OpenImis.ePayment.Controllers
             return Json(response);
 
         }
-    }
+    }*/
 }

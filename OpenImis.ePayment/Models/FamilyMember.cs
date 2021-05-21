@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace OpenImis.ePayment.Models
-{
+{/*
     public class FamilyMember
     {
         [Required]
@@ -35,5 +35,5 @@ namespace OpenImis.ePayment.Models
         public string IdentificationType { get; set; }
         public string IdentificationNumber { get; set; }
         public string FspCode { get; set; }
-    }
+    }*/
 }

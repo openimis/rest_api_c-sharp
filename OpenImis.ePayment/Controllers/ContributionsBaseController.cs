@@ -12,6 +12,7 @@ using System.Security.Claims;
 
 namespace OpenImis.ePayment.Controllers
 {
+    /*
     [Authorize]
     public abstract class ContributionsBaseController : Controller
     {
@@ -51,5 +52,5 @@ namespace OpenImis.ePayment.Controllers
             
         }
 
-    }
+    }*/
 }

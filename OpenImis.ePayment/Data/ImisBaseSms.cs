@@ -58,7 +58,7 @@ namespace OpenImis.ePayment.Data
 
         public virtual void SaveMessage(string message,string name)
         {
-            //string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            //Todo: replace with function create for ePayment payloads but in SentSMSs folder 
             string mydocpath = System.IO.Path.Combine(env.WebRootPath,"SentMessages");
             string namepart = new Random().Next(100000, 999999).ToString();
 

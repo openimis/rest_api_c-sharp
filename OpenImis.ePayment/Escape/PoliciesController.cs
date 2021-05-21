@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 
 namespace OpenImis.ePayment.Controllers
 {
+    [ApiVersion("2")]
     public class PoliciesController : PoliciesBaseController
     {
         private ImisPolicy policies;

@@ -20,7 +20,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace OpenImis.ePayment.Controllers
-{
+{/*
     [Authorize]
     public class FamiliesController : Controller
     {
@@ -199,5 +199,5 @@ namespace OpenImis.ePayment.Controllers
 
         }
         
-    }
+    }*/
 }

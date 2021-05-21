@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenImis.ePayment.Models
-{
+{/*
     public class EditFamily
     {
         public string VillageCode { get; set; }
@@ -35,5 +35,5 @@ namespace OpenImis.ePayment.Models
         public string IdentificationType { get; set; }
         public string IdentificationNumber { get; set; }
         public string FspCode { get; set; }
-    }
+    }*/
 }

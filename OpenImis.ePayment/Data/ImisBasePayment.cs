@@ -218,7 +218,7 @@ namespace OpenImis.ePayment.Data
 
                 ExpectedAmount = decimal.Parse(data[1].Value.ToString());
 
-                var languages = LocalDefault.PrimaryLangReprisantations(Configuration);
+                var languages = LocalDefault.PrimaryLanguageRepresentations(Configuration);
 
                 if (_intent.language == null || languages.Contains(_intent.language.ToLower()))
                 {
@@ -582,7 +582,7 @@ namespace OpenImis.ePayment.Data
                     SmsRequired = row1["SmsRequired"] != System.DBNull.Value ? Convert.ToBoolean(row1["SmsRequired"]) : false;
 
                     var language = row1["LanguageName"] != System.DBNull.Value ? Convert.ToString(row1["LanguageName"]) : "en";
-                    var languages = LocalDefault.PrimaryLangReprisantations(Configuration);
+                    var languages = LocalDefault.PrimaryLanguageRepresentations(Configuration);
 
                     if (language == null || languages.Contains(language.ToLower()))
                     {

@@ -11,7 +11,7 @@ using System.Linq;
 using System.Web;
 
 namespace OpenImis.ePayment.Data
-{
+{/*
     public class ImisContribution
     {
         private IConfiguration Configuration;
@@ -64,5 +64,5 @@ namespace OpenImis.ePayment.Data
         }
 
         
-    }
+    }*/
 }
