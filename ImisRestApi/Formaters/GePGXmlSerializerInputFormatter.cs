@@ -69,8 +69,19 @@ namespace ImisRestApi.Formaters
                 // stream = reader;// Do something
             }
 
-            var gepgFile = new GepgFoldersCreating("request_"+type.ToString(), body, Path.Combine(System.Environment.CurrentDirectory, "Formaters"));
-            gepgFile.putRequestBody();
+            //get the billId/paymentId from request body - from <BillId> node
+            string billId = StringExtensions.Between(body, "<BillId>", "</BillId>");
+            string typeOfMessage = type.ToString().Split('.').Last();
+            if (!String.IsNullOrEmpty(billId)) 
+            {
+                var gepgFile = new GepgFoldersCreating(billId + "_" + typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                gepgFile.putRequestBody();
+            }
+            else
+            {
+                var gepgFile = new GepgFoldersCreating(typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                gepgFile.putRequestBody();
+            }
 
             TextReader writer = new StringReader(body);
 
