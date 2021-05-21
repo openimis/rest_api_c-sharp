@@ -151,31 +151,14 @@ namespace ImisRestApi.Data
             return signedReconcAck;
         }
 
-        public bool IsValidCall(object Reqbody,int callNo) {
+        public bool IsValidCall(object Reqbody, string responseType) {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
 
             var _body = GetXmlStringFromObject(Reqbody);
             var body = _body.Replace(" />","/>");
-            var content = string.Empty;
-            var signature = string.Empty;
-            switch (callNo)
-            {
-                case 0:
-                    content = gepg.getContent(body, "gepgBillSubResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 1:
-                    content = gepg.getContent(body, "gepgPmtSpInfo");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 2:
-                    content = gepg.getContent(body, "gepgSpReconcResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                default:
-                    break;
-            }
-
+            var content = gepg.getContent(body, responseType);
+            var signature = gepg.getSig(body, "gepgSignature");
+            
             return gepg.VerifyData(content, signature);
         }
 
