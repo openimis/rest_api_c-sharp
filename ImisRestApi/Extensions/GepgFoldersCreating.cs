@@ -59,7 +59,7 @@ namespace ImisRestApi.Extensions
                 System.IO.Directory.CreateDirectory(targetPath);
             }
             //we have target folder for current date - then we can save file
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, finality + "_" + currentDateTime + ".txt")))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, finality + "_" + currentDateTime + ".xml")))
             {
                 outputFile.WriteLine(content);
             }
