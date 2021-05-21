@@ -51,6 +51,10 @@ namespace ImisRestApi.Data
 
             var result = gepg.SendReconcHttpRequest(signedRequest, productSPCode);
 
+            var content = signedRequest + "********************" + result;
+            var gepgFile = new GepgFoldersCreating(productSPCode, "GepGReconRequest", content, env);
+            gepgFile.putToTargetFolderPayment();
+
             return new { reconcId = request.SpReconcReqId, resp = result };
 
         }
@@ -95,9 +99,6 @@ namespace ImisRestApi.Data
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
             var billAck = gepg.SendHttpRequest(signedMesg, InsureeProducts);
-
-            string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
-            string namepart = new Random().Next(100000, 999999).ToString();
 
             string reconc = JsonConvert.SerializeObject(billAck);
             string sentbill = JsonConvert.SerializeObject(bill);
