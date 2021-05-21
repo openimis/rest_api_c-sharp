@@ -70,12 +70,20 @@ namespace ImisRestApi.Formaters
             }
 
             //get the billId/paymentId from request body - from <BillId> node
-            string billId = StringExtensions.Between(body, "<BillId>", "</BillId>");
             string typeOfMessage = type.ToString().Split('.').Last();
-            if (!String.IsNullOrEmpty(billId)) 
+            if (typeOfMessage != "GepgReconcMessage")
             {
-                var gepgFile = new GepgFoldersCreating(billId + "_" + typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
-                gepgFile.putRequestBody();
+                string billId = StringExtensions.Between(body, "<BillId>", "</BillId>");
+                if (!String.IsNullOrEmpty(billId))
+                {
+                    var gepgFile = new GepgFoldersCreating(billId + "_" + typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                    gepgFile.putRequestBody();
+                }
+                else
+                {
+                    var gepgFile = new GepgFoldersCreating(typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                    gepgFile.putRequestBody();
+                }
             }
             else
             {
