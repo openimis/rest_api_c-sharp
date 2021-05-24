@@ -100,21 +100,16 @@ namespace ImisRestApi.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetControls()
         {
-
             try
             {
-
                 var data = imisClaims.GetControls();
 
                 return Ok(new { error_occured = false, controls = data });
-
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
-
             }
-
         }
 
         [HttpPost]
@@ -126,10 +121,8 @@ namespace ImisRestApi.Controllers
 
             try
             {
-
                 var data = imisClaims.GetClaims(model);
 
-               
                 return Ok(new { error_occured = false, data = data });
             }
             catch (Exception e)
