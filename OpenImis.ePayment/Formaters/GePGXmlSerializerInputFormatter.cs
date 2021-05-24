@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using OpenImis.ePayment.Escape.Payment.Models;
+using OpenImis.ePayment.Extensions;
+using Newtonsoft.Json;
 using System.Xml.Serialization;
 
 namespace OpenImis.ePayment.Formaters
@@ -65,6 +67,28 @@ namespace OpenImis.ePayment.Formaters
             {
                 body = await reader.ReadToEndAsync();
                 // stream = reader;// Do something
+            }
+
+            //get the billId/paymentId from request body - from <BillId> node
+            string typeOfMessage = type.ToString().Split('.').Last();
+            if (typeOfMessage != "GepgReconcMessage")
+            {
+                string billId = StringExtensions.Between(body, "<BillId>", "</BillId>");
+                if (!String.IsNullOrEmpty(billId))
+                {
+                    var gepgFile = new GepgFoldersCreating(billId + "_" + typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                    gepgFile.putRequestBody();
+                }
+                else
+                {
+                    var gepgFile = new GepgFoldersCreating(typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                    gepgFile.putRequestBody();
+                }
+            }
+            else
+            {
+                var gepgFile = new GepgFoldersCreating(typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                gepgFile.putRequestBody();
             }
 
             TextReader writer = new StringReader(body);
