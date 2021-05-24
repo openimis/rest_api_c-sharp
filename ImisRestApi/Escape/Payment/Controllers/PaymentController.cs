@@ -10,6 +10,8 @@ using ImisRestApi.Chanels;
 using ImisRestApi.Chanels.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Escape.Payment.Models;
+using ImisRestApi.Extensions;
+using ImisRestApi.Formaters;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using ImisRestApi.Models.Payment.Response;
@@ -88,57 +90,26 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetReconciliationData")]
-        public async Task<IActionResult> GetReconciliation()
+        public IActionResult GetReconciliation([FromBody] GepgReconcMessage model)
         {
-            var buffer = new byte[Convert.ToInt32(Request.ContentLength)];
-            string body = string.Empty;
-
-            using (var reader = new StreamReader(
-               Request.Body,
-               encoding: Encoding.ASCII,
-               detectEncodingFromByteOrderMarks: false,
-               bufferSize: buffer.Length,
-               leaveOpen: true
-               ))
-            {
-                body = await reader.ReadToEndAsync();
-                // stream = reader;// Do something
-            }
-
-            TextReader writer = new StringReader(body);
-
-            var serializer = new XmlSerializer(typeof(GepgReconcMessage));
-            var model = (GepgReconcMessage)serializer.Deserialize(writer);
-
-            if (imisPayment.IsCallValid(body,2))
+            if (imisPayment.IsValidCall(model, "gepgSpReconcResp"))
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.ReconciliationResp(7101));
-
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
+                    return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
 
                 string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating("Reconc", "Data", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "Reconc_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc);
-                }
-
-                return Ok(imisPayment.ReconciliationResp(7101));
+                return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.Successful));
             }
             else
             {
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
                 string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating("Reconc", "DataInvalidSig", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ReconcInvalidSig_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc);
-                }
-                return Ok(imisPayment.ReconciliationResp(7101));
+                return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidSignature));
             }
         }
 
@@ -146,8 +117,24 @@ namespace ImisRestApi.Controllers
         [Route("api/Reconciliation")]
         public IActionResult Reconciliation(int daysAgo)
         {
-            var done = imisPayment.RequestReconciliationReport(daysAgo);
-
+            List<object> done = new List<object>();
+            // Make loop for all product from database that have account follow SP[0-9]{3} and do the function for all sp codes
+            var productsSPCodes = imisPayment.GetProductsSPCode();
+            if (productsSPCodes.Count > 0)
+            {
+                foreach (String productSPCode in productsSPCodes)
+                {
+                    var result = imisPayment.RequestReconciliationReport(daysAgo, productSPCode);
+                    //check if we have done result - if no - then return 500
+                    System.Reflection.PropertyInfo pi = result.GetType().GetProperty("resp");
+                    done.Add(result);
+                }
+            }
+            else
+            {
+                //return not found - no sp codes to proceed 
+                return NotFound();
+            }
             return Ok(done);
         }
 
@@ -199,34 +186,14 @@ namespace ImisRestApi.Controllers
 
         [HttpPost]
         [Route("api/GetPaymentData")]
-        public async Task<IActionResult> GetPaymentChf()
+        public async Task<IActionResult> GetPaymentChf([FromBody] GepgPaymentMessage model)
         {
-
-            var buffer = new byte[Convert.ToInt32(Request.ContentLength)];
-            string body = string.Empty;
-
-            using (var reader = new StreamReader(
-               Request.Body,
-               encoding: Encoding.ASCII,
-               detectEncodingFromByteOrderMarks: false,
-               bufferSize: buffer.Length,
-               leaveOpen: true
-               ))
-            {
-                body = await reader.ReadToEndAsync();
-                // stream = reader;// Do something
-            }
-
-            TextReader writer = new StringReader(body);
-
-            var serializer = new XmlSerializer(typeof(GepgPaymentMessage));
-            var model = (GepgPaymentMessage)serializer.Deserialize(writer);
-
-            if (imisPayment.IsCallValid(body, 1))
+            if (imisPayment.IsValidCall(model, "gepgPmtSpInfo"))
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.PaymentResp(7101));
+                    return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.InvalidRequestData));
 
+                var billId = String.Empty;
                 object _response = null;
 
                 foreach (var payment in model.PymtTrxInf)
@@ -246,37 +213,31 @@ namespace ImisRestApi.Controllers
                         insurance_number = payment.PyrCellNum.ToString()
                     };
 
+                    billId = payment.BillId;
+
                     _response = await base.GetPaymentData(pay);
 
                 }
 
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Payments");
-                string namepart = new Random().Next(100000, 999999).ToString();
+                string reconc = JsonConvert.SerializeObject(_response);
+                var gepgFile = new GepgFoldersCreating(billId, "Payment", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
-                string reconc = JsonConvert.SerializeObject(model);
-                var payresponse = JsonConvert.SerializeObject(_response);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "Payment_" + namepart + ".json")))
-                {
-                    outputFile.WriteLine(reconc +"________"+ payresponse);
-                }
-
-                return Ok(imisPayment.PaymentResp(7101));
+                return Ok(imisPayment.PaymentResp(GepgCodeResponses.Successful));
             }
             else
             {
-
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Payments");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
-                string reconc = JsonConvert.SerializeObject(model);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "InvalidSignature" + namepart + ".json")))
+                var billId = String.Empty;
+                foreach (var payment in model.PymtTrxInf)
                 {
-                    outputFile.WriteLine(reconc);
+                    billId = payment.BillId;
                 }
 
-                return Ok(imisPayment.PaymentResp(7101));
+                string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating(billId, "PaymentInvalidSignature", reconc, env);
+                gepgFile.putToTargetFolderPayment();
+
+                return Ok(imisPayment.PaymentResp(GepgCodeResponses.InvalidSignature));
             }
 
          }
@@ -284,16 +245,16 @@ namespace ImisRestApi.Controllers
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
-         {
-            
-            if (imisPayment.IsValidCall(model, 0))
+        {
+            if (imisPayment.IsValidCall(model, "gepgBillSubResp"))
             {
                 if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.ControlNumberResp(7101));
+                    return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidRequestData));
 
+                var billId = String.Empty;
+                ControlNumberResp ControlNumberResponse = new ControlNumberResp();
                 foreach (var bill in model.BillTrxInf)
                 {
-                    ControlNumberResp ControlNumberResponse = new ControlNumberResp();
 
                     if (bill.TrxStsCode == "7101")
                     {
@@ -317,6 +278,7 @@ namespace ImisRestApi.Controllers
                         };
                     }
 
+                    billId = bill.BillId;
 
                     try
                     {
@@ -328,22 +290,24 @@ namespace ImisRestApi.Controllers
                     }
                 }
 
-                return Ok(imisPayment.ControlNumberResp(7101));
+                string reconc = JsonConvert.SerializeObject(ControlNumberResponse);
+                var gepgFile = new GepgFoldersCreating(billId, "CN_Response", reconc, env);
+                gepgFile.putToTargetFolderPayment();
+
+                return Ok(imisPayment.ControlNumberResp(GepgCodeResponses.Successful));
             }
             else
             {
-
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "Reconciliations");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
-                string reconc = JsonConvert.SerializeObject(model);
-
-                using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ControlNumberAttempt_" + namepart + ".json")))
+                var billId = String.Empty;
+                foreach (var bill in model.BillTrxInf)
                 {
-                    outputFile.WriteLine(reconc);
+                    billId = bill.BillId;
                 }
+                string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating(billId, "CN_Response", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
-                return Ok(imisPayment.ControlNumberResp(7101));
+                return Ok(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidSignature));
             }
 
         }

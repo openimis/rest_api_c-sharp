@@ -76,13 +76,7 @@ namespace ImisRestApi.Data
             string ctrlNumber = null;
 
             // BEGIN Temporary Control Number Generator(Simulation For Testing Only)
-            var randomNumber = new Random().Next(100000, 999999);
-
-            //if(randomNumber%2 == 0)
-            //{
-            ctrlNumber = randomNumber.ToString();
-            //}
-            //END Temporary 
+            //var randomNumber = new Random().Next(100000, 999999);
 
             PostReqCNResponse response = new PostReqCNResponse() {
                
@@ -801,6 +795,37 @@ namespace ImisRestApi.Data
             { }
 
             return result;
+        }
+
+        public List<String> GetProductsSPCode()
+        {
+
+            var getProductsSPCodes = @"SELECT DISTINCT tblProduct.AccCodePremiums FROM tblProduct WHERE tblProduct.AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND tblProduct.ValidityTo is NULL";
+
+            SqlParameter[] parameters = { };
+
+            try
+            {
+                DataTable results = dh.GetDataTable(getProductsSPCodes, parameters, CommandType.Text);
+                List<String> productsCodes = new List<String>();
+                if (results.Rows.Count > 0)
+                {
+                    foreach (DataRow result in results.Rows) 
+                    {
+                        if (!string.IsNullOrEmpty(Convert.ToString(result["AccCodePremiums"]))) 
+                        {
+                            productsCodes.Add(Convert.ToString(result["AccCodePremiums"]));
+                        }
+                    }
+                }
+
+                return productsCodes;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
         }
     }
 }

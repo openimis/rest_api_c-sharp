@@ -1,4 +1,4 @@
-﻿using ImisRestApi.Chanels.Payment.Models;
+﻿using ImisRestApi.Escape.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -26,8 +26,8 @@ namespace ImisRestApi.Data
         string GepgPublicCertStorePath = string.Empty;
         string GepgPayCertStorePath = string.Empty;
 
-        string CertPass = "HPSS1234";
-        string GepgCertPass = "gepg@2018";
+        string CertPass = string.Empty;
+        string GepgCertPass = string.Empty;
 
         RSA rsaCrypto = null;
         gepgBillSubReq newBill = null;
@@ -37,10 +37,13 @@ namespace ImisRestApi.Data
         {
             configuration = Configuration;
 
-            PrivateStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgclientprivatekey.pfx";
-            PublicStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgclientpubliccertificate.pfx";
-            GepgPublicCertStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgpubliccertificatetoclients.pfx";
-            GepgPayCertStorePath = hostingEnvironment.ContentRootPath + @"\Escape\Payment\Certificates\gepgpaypubliccertificate.pfx";
+            PrivateStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PrivateStorePath"]);
+            PublicStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PublicStorePath"]);
+            GepgPublicCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPublicCertStorePath"]);
+            GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
+
+            CertPass = Configuration["PaymentGateWay:GePG:CertPass"];
+            GepgCertPass = Configuration["PaymentGateWay:GePG:GepgCertPass"]; 
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode,string PhoneNumber, string BillId, decimal ExpectedAmount, List<InsureeProduct> products)
@@ -488,7 +491,7 @@ namespace ImisRestApi.Data
 
         }
 
-        public string SendReconcHttpRequest(String content)
+        public string SendReconcHttpRequest(String content, String productSPCode)
         {
 
             try
@@ -504,7 +507,7 @@ namespace ImisRestApi.Data
                 // Set the ContentLength property of the WebRequest. 
                 request.ContentLength = byteArray.Length;
                 //Set Custom Headers
-                request.Headers.Add("Gepg-Code", configuration["PaymentGateWay:GePG:SpCode"]);
+                request.Headers.Add("Gepg-Code", productSPCode);
                 request.Headers.Add("Gepg-Com", "default.sp.in");
                 // Get the request stream.  
                 Stream dataStream = request.GetRequestStream();

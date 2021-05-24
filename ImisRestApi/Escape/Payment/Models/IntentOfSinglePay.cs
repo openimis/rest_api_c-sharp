@@ -5,7 +5,7 @@ using ImisRestApi.ImisAttributes;
 using ImisRestApi.Models;
 using Newtonsoft.Json;
 
-namespace ImisRestApi.Chanels.Payment.Models
+namespace ImisRestApi.Escape.Payment.Models
 {
     public class IntentOfSinglePay:IntentOfPay
     {

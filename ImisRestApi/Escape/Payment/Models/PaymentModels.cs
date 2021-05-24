@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 
-namespace ImisRestApi.Models
+namespace ImisRestApi.Escape.Payment.Models
 {
     [XmlRoot("Gepg")]
     public class GepgPaymentMessage

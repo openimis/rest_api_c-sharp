@@ -1,5 +1,6 @@
-﻿using ImisRestApi.Chanels.Payment.Models;
+﻿using ImisRestApi.Escape.Payment.Models;
 using ImisRestApi.Data;
+using ImisRestApi.Extensions;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using ImisRestApi.Models.Payment.Response;
@@ -29,7 +30,7 @@ namespace ImisRestApi.Data
         }
 
 #if CHF
-        public object RequestReconciliationReport(int daysAgo)
+        public object RequestReconciliationReport(int daysAgo, String productSPCode)
         {
             daysAgo = -1 * daysAgo;
 
@@ -39,7 +40,7 @@ namespace ImisRestApi.Data
 
             gepgSpReconcReq request = new gepgSpReconcReq();
             request.SpReconcReqId = Math.Abs(Guid.NewGuid().GetHashCode());//Convert.ToInt32(DateTime.UtcNow.Year.ToString() + DateTime.UtcNow.Month.ToString() + DateTime.UtcNow.Day.ToString());
-            request.SpCode = Configuration["PaymentGateWay:GePG:SpCode"];
+            request.SpCode = productSPCode;
             request.SpSysId = Configuration["PaymentGateWay:GePG:SystemId"];
             request.TnxDt = DateTime.Now.AddDays(daysAgo).ToString("yyyy-MM-dd");
             request.ReconcOpt = 1;
@@ -48,7 +49,11 @@ namespace ImisRestApi.Data
             string signature = gepg.GenerateSignature(requestString);
             var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
 
-            var result = gepg.SendReconcHttpRequest(signedRequest);
+            var result = gepg.SendReconcHttpRequest(signedRequest, productSPCode);
+
+            var content = signedRequest + "********************" + result;
+            var gepgFile = new GepgFoldersCreating(productSPCode, "GepGReconRequest", content, env);
+            gepgFile.putToTargetFolderPayment();
 
             return new { reconcId = request.SpReconcReqId, resp = result };
 
@@ -95,16 +100,12 @@ namespace ImisRestApi.Data
             var signedMesg = gepg.FinaliseSignedMsg(signature);
             var billAck = gepg.SendHttpRequest(signedMesg, InsureeProducts);
 
-            string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
-            string namepart = new Random().Next(100000, 999999).ToString();
-
             string reconc = JsonConvert.SerializeObject(billAck);
             string sentbill = JsonConvert.SerializeObject(bill);
 
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ControlNumberAttempt_" + namepart + ".json")))
-            {
-                outputFile.WriteLine(sentbill+"********************"+reconc);
-            }
+            var content = sentbill + "********************" + reconc;
+            var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
+            gepgFile.putToTargetFolderPayment();
 
             return base.PostReqControlNumber(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
         }
@@ -151,31 +152,14 @@ namespace ImisRestApi.Data
             return signedReconcAck;
         }
 
-        public bool IsValidCall(object Reqbody,int callNo) {
+        public bool IsValidCall(object Reqbody, string responseType) {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
 
             var _body = GetXmlStringFromObject(Reqbody);
             var body = _body.Replace(" />","/>");
-            var content = string.Empty;
-            var signature = string.Empty;
-            switch (callNo)
-            {
-                case 0:
-                    content = gepg.getContent(body, "gepgBillSubResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 1:
-                    content = gepg.getContent(body, "gepgPmtSpInfo");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 2:
-                    content = gepg.getContent(body, "gepgSpReconcResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                default:
-                    break;
-            }
-
+            var content = gepg.getContent(body, responseType);
+            var signature = gepg.getSig(body, "gepgSignature");
+            
             return gepg.VerifyData(content, signature);
         }
 
