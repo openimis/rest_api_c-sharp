@@ -1,5 +1,6 @@
 ﻿using OpenImis.ePayment.Escape.Payment.Models;
 using OpenImis.ePayment.Data;
+using OpenImis.ePayment.Extensions;
 using OpenImis.ePayment.Models;
 using OpenImis.ePayment.Models.Payment;
 using OpenImis.ePayment.Models.Payment.Response;
@@ -49,6 +50,10 @@ namespace OpenImis.ePayment.Data
             var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
 
             var result = gepg.SendReconcHttpRequest(signedRequest, productSPCode);
+
+            var content = signedRequest + "********************" + result;
+            var gepgFile = new GepgFoldersCreating(productSPCode, "GepGReconRequest", content, env);
+            gepgFile.putToTargetFolderPayment();
 
             return new { reconcId = request.SpReconcReqId, resp = result };
 
@@ -101,10 +106,9 @@ namespace OpenImis.ePayment.Data
             string reconc = JsonConvert.SerializeObject(billAck);
             string sentbill = JsonConvert.SerializeObject(bill);
 
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "ControlNumberAttempt_" + namepart + ".json")))
-            {
-                outputFile.WriteLine(sentbill+"********************"+reconc);
-            }
+            var content = sentbill + "********************" + reconc;
+            var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
+            gepgFile.putToTargetFolderPayment();
 
             return base.PostReqControlNumber(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
         }
@@ -151,30 +155,14 @@ namespace OpenImis.ePayment.Data
             return signedReconcAck;
         }
 
-        public bool IsValidCall(object Reqbody,int callNo) {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
+        public bool IsValidCall(object Reqbody, string responseType)
+        {
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
 
             var _body = GetXmlStringFromObject(Reqbody);
-            var body = _body.Replace(" />","/>");
-            var content = string.Empty;
-            var signature = string.Empty;
-            switch (callNo)
-            {
-                case 0:
-                    content = gepg.getContent(body, "gepgBillSubResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 1:
-                    content = gepg.getContent(body, "gepgPmtSpInfo");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 2:
-                    content = gepg.getContent(body, "gepgSpReconcResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                default:
-                    break;
-            }
+            var body = _body.Replace(" />", "/>");
+            var content = gepg.getContent(body, responseType);
+            var signature = gepg.getSig(body, "gepgSignature");
 
             return gepg.VerifyData(content, signature);
         }

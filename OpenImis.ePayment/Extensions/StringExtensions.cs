@@ -50,5 +50,23 @@ namespace OpenImis.ePayment.Extensions
                 }
             }
         }
+
+        public static string Between(string text, string firstString, string lastString)
+        {
+            string finalString;
+
+            int pos1 = text.IndexOf(firstString) + firstString.Length;
+            int pos2 = text.IndexOf(lastString);
+            finalString = text.Substring(pos1, pos2 - pos1);
+
+            if (String.IsNullOrEmpty(finalString))
+            {
+                return null;
+            }
+            else
+            {
+                return finalString;
+            }
+        }
     }
 }
