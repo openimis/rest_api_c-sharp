@@ -123,12 +123,9 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetClaims([FromBody]ClaimsModel model)
         {
-
             try
-            {
-
+            { 
                 var data = imisClaims.GetClaims(model);
-
                
                 return Ok(new { error_occured = false, data = data });
             }
@@ -136,7 +133,6 @@ namespace OpenImis.ePayment.Controllers
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
             }
-
         }
     }
 }
