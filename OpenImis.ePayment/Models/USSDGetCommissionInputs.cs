@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenImis.ePayment.Models
 {
-    public class GetCommissionInputs
+    public class USSDGetCommissionInputs
     {
         [Required]
         public string enrolment_officer_code { get; set; }
@@ -16,7 +16,7 @@ namespace OpenImis.ePayment.Models
         public string year { get; set; }
         [Required]
         public CommissionMode mode { get; set; }
-        public string insrance_product_code { get; set; }
+        public string insurance_product_code { get; set; }
         public string payer { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace OpenImis.ePayment.Data
             Configuration = configuration;
         }
 
-        public DataMessage Enter(Policy model)
+        public DataMessage Enter(USSDPolicy model)
         {
             DataHelper helper = new DataHelper(Configuration);
 
@@ -50,7 +50,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public DataMessage Renew(Policy model)
+        public DataMessage Renew(USSDPolicy model)
         {
             DataHelper helper = new DataHelper(Configuration);
 
@@ -80,7 +80,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public DataMessage GetCommissions(GetCommissionInputs model)
+        public DataMessage GetCommissions(USSDGetCommissionInputs model)
         {
 
             var sSQL = @"SELECT ISNULL(SUM(ISNULL(R.CammissionRate, 0.00) * PR.Amount),0.00) AS Commission, ISNULL(SUM(ISNULL(PR.Amount,0.00)),0.00) AS Amount
@@ -115,7 +115,7 @@ namespace OpenImis.ePayment.Data
                 new SqlParameter("@Mode", model.mode),
                 new SqlParameter("@EnrollmentOfficerCode", (model.enrolment_officer_code != null)?model.enrolment_officer_code:(object)DBNull.Value),
                 new SqlParameter("@Payer",(model.payer != null)? model.payer:(object)DBNull.Value),
-                new SqlParameter("@ProductCode", (model.insrance_product_code != null)? model.insrance_product_code:(object)DBNull.Value)
+                new SqlParameter("@ProductCode", (model.insurance_product_code != null)? model.insurance_product_code:(object)DBNull.Value)
             };
 
            

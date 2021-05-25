@@ -279,3 +279,4 @@ __pycache__/
 /OpenImis.RestApi/ControllersForChf
 **/Certificates/
 **/controlNumberAck/
+**/wwwroot/ePayment/

@@ -1,10 +1,9 @@
 ﻿using OpenImis.ePayment.ImisAttributes;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace OpenImis.ePayment.Models
 {
-    public class Policy
+    public class USSDPolicy
     {
         [Required]
         [InsureeNumber(ErrorMessage = "1:Wrong format or missing insurance number")]

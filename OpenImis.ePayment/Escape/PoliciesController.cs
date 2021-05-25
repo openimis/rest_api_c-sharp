@@ -46,7 +46,7 @@ namespace OpenImis.ePayment.Controllers
                 return BadRequest(new { success = false, message = error });
             }
 
-            Policy policy = new Policy()
+            USSDPolicy policy = new USSDPolicy()
             {
                 InsuranceNumber = model.InsuranceNumber,
                 EnrollmentOfficerCode = model.OfficerCode,
@@ -82,10 +82,10 @@ namespace OpenImis.ePayment.Controllers
                 return BadRequest(new { success = false, message = error });
             }
 
-            GetCommissionInputs commision = new GetCommissionInputs()
+            USSDGetCommissionInputs commision = new USSDGetCommissionInputs()
             {
                 enrolment_officer_code = model.officer_code,
-                insrance_product_code = model.product_code,
+                insurance_product_code = model.product_code,
                 mode = CommissionMode.Paid,
                 year = model.year,
                 month = model.month,
@@ -135,7 +135,7 @@ namespace OpenImis.ePayment.Controllers
         }
 
         [NonAction]
-        public override IActionResult Renew_Policy([FromBody] Policy model)
+        public override IActionResult Renew_Policy([FromBody] USSDPolicy model)
         {
             return base.Renew_Policy(model);
         }

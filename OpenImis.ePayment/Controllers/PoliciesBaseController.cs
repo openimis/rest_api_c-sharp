@@ -24,7 +24,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/Policies/Enter_Policy")]
-        public virtual IActionResult Enter_Policy([FromBody]Policy model)
+        public virtual IActionResult Enter_Policy([FromBody]USSDPolicy model)
         {
             if (!ModelState.IsValid)
             {
@@ -51,7 +51,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/Policies/Renew_Policy")]
-        public virtual IActionResult Renew_Policy([FromBody]Policy model)
+        public virtual IActionResult Renew_Policy([FromBody]USSDPolicy model)
         {
             if (!ModelState.IsValid)
             {
@@ -79,7 +79,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/Policies/Get_Commissions")]
-        public virtual IActionResult Get_Commissions([FromBody]GetCommissionInputs model)
+        public virtual IActionResult Get_Commissions([FromBody]USSDGetCommissionInputs model)
         {
             if (!ModelState.IsValid)
             {
