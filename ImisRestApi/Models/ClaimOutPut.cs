@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ImisRestApi.Models
 {
-    public class ClaimOutPut
+    public class ClaimOutput
     {
         public string claim_uuid { get; set; }
         public string health_facility_code { get; set; }

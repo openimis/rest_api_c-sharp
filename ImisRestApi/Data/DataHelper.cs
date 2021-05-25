@@ -197,7 +197,7 @@ namespace ImisRestApi.Data
         }
     }
 
-    public static class ExtensionMetods
+    public static class ExtensionMethods
     {
         public static decimal? ParseNullableDecimal(this string s)
         {

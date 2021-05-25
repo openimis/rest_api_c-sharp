@@ -160,8 +160,8 @@ namespace ImisRestApi.Data
                 DataTable responseServices = response.Tables[1];
                 DataTable responseClaims = response.Tables[2];
 
-                Dictionary<string, ClaimOutPut> admin_claims = (from DataRow dr in responseClaims.Rows 
-                                                                     select new ClaimOutPut()
+                Dictionary<string, ClaimOutput> admin_claims = (from DataRow dr in responseClaims.Rows 
+                                                                     select new ClaimOutput()
                 {
                     claim_uuid = dr["claim_uuid"].ToStringWithDBNull(),
                     health_facility_code = dr["health_facility_code"].ToStringWithDBNull(),
@@ -223,7 +223,7 @@ namespace ImisRestApi.Data
                      service_result = dr["service_result"].ToStringWithDBNull(),
                  }).ToList().ForEach((x) => { if (admin_claims.ContainsKey(x.claim_uuid)) admin_claims[x.claim_uuid].services.Add(x); });
 
-                List<ClaimOutPut> output = admin_claims.Values.ToList();
+                List<ClaimOutput> output = admin_claims.Values.ToList();
 
                 return output;
             }
@@ -283,63 +283,5 @@ namespace ImisRestApi.Data
         }
 
 
-    }
-
-    class ClaimEqualityComparer : IEqualityComparer<ClaimOutPut>
-    {
-        public bool Equals(ClaimOutPut x, ClaimOutPut y)
-        {
-            // Two items are equal if their keys are equal.
-            return x.claim_number == y.claim_number;
-        }
-
-        public int GetHashCode(ClaimOutPut obj)
-        {
-            return obj.claim_number.GetHashCode();
-        }
-    }
-
-    public class ServiceEqualityComparer : IEqualityComparer<ClaimService>
-    {
-        public bool Equals(ClaimService x, ClaimService y)
-        {
-            // Two items are equal if their keys are equal.
-            return x.service_code == y.service_code && x.claim_number == y.claim_number;
-        }
-
-        public int GetHashCode(ClaimService obj)
-        {
-            
-            if (obj.service_code != null && obj.claim_number != null)
-            {
-                return obj.service_code.GetHashCode() + obj.claim_number.GetHashCode();
-            }
-            else
-            {
-                return string.Empty.GetHashCode();
-            }
-        }
-    }
-
-    public class ItemEqualityComparer : IEqualityComparer<ClaimItem>
-    {
-        public bool Equals(ClaimItem x, ClaimItem y)
-        {
-            // Two items are equal if their keys are equal.
-            return x.item_code == y.item_code && x.claim_number == y.claim_number;
-        }
-
-        public int GetHashCode(ClaimItem obj)
-        {
-            if(obj.item_code != null && obj.claim_number != null)
-            {
-                return obj.item_code.GetHashCode() + obj.claim_number.GetHashCode();
-            }
-            else
-            {
-                return string.Empty.GetHashCode();
-            }
-            
-        }
     }
 }
