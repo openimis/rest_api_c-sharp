@@ -1,5 +1,4 @@
 ﻿using ImisRestApi.Models;
-using ImisRestApi.Responses;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -7,7 +6,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ImisRestApi.Data
 {
@@ -137,89 +135,9 @@ namespace ImisRestApi.Data
 
         internal object GetClaims(ClaimsModel model)
         {
-
-            var sSQL = @";WITH TotalForItems AS
-                        (
-                            SELECT C.ClaimId, SUM(CI.PriceAsked * CI.QtyProvided)Claimed,
-                            SUM(ISNULL(CI.PriceApproved, CI.PriceAsked) * ISNULL(CI.QtyApproved, CI.QtyProvided)) Approved,
-                            SUM(CI.PriceValuated)Adjusted,
-                            SUM(CI.RemuneratedAmount)Remunerated
-                            FROM tblClaim C LEFT OUTER JOIN tblClaimItems CI ON C.ClaimId = CI.ClaimID
-                            WHERE C.ValidityTo IS NULL
-                            AND CI.ValidityTo IS NULL
-                            GROUP BY C.ClaimID
-                        ), TotalForServices AS
-                        (
-                            SELECT C.ClaimId, SUM(CS.PriceAsked * CS.QtyProvided)Claimed,
-                            SUM(ISNULL(CS.PriceApproved, CS.PriceAsked) * ISNULL(CS.QtyApproved, CS.QtyProvided)) Approved,
-                            SUM(CS.PriceValuated)Adjusted,
-                            SUM(CS.RemuneratedAmount)Remunerated
-                            FROM tblClaim C
-                            LEFT OUTER JOIN tblClaimServices CS ON C.ClaimId = CS.ClaimID
-                            WHERE C.ValidityTo IS NULL
-                            AND CS.ValidityTo IS NULL
-                            GROUP BY C.ClaimID
-                        )
-
-                        SELECT ICD1.ICDName sec_dg_1, ICD.ICDName main_dg, C.DateProcessed, C.ClaimID, I.ItemId, S.ServiceID, HF.HFCode health_facility_code, HF.HFName health_facility_name, C.ClaimCode claim_number, CONVERT(NVARCHAR, C.DateClaimed, 111) date_claimed, CA.LastName + ' ' + CA.OtherNames ClaimAdminName,
-	                    CONVERT(NVARCHAR, C.DateFrom, 111) visit_date_from, CONVERT(NVARCHAR, C.DateTo, 111) visit_date_to, Ins.CHFID insurance_number, Ins.LastName + ' ' + Ins.OtherNames patient_name,
-	                    CASE C.ClaimStatus WHEN 1 THEN N'Rejected' WHEN 2 THEN N'Entered' WHEN 4 THEN N'Checked' WHEN 8 THEN N'Processed' WHEN 16 THEN N'Valuated' END claim_status,
-                        C.RejectionReason, COALESCE(TFI.Claimed + TFS.Claimed, TFI.Claimed, TFS.Claimed) claimed, 
-	                    COALESCE(TFI.Approved + TFS.Approved, TFI.Approved, TFS.Approved) approved,
-	                    COALESCE(TFI.Adjusted + TFS.Adjusted, TFI.Adjusted, TFS.Adjusted) adjusted,
-	                    COALESCE(TFI.Remunerated + TFS.Remunerated, TFI.Remunerated, TFS.Remunerated) paid,
-	                    CASE WHEN CI.RejectionReason <> 0 THEN I.ItemCode ELSE NULL END RejectedItem, CI.RejectionReason ItemRejectionCode,
-                        CASE WHEN CS.RejectionReason > 0 THEN S.ServCode ELSE NULL END RejectedService, CS.RejectionReason ServiceRejectionCode,
-                        CASE WHEN CI.QtyProvided<> COALESCE(CI.QtyApproved, CI.QtyProvided) THEN I.ItemCode ELSE NULL END AdjustedItem,
-	                    CASE WHEN CI.QtyProvided<> COALESCE(CI.QtyApproved, CI.QtyProvided) THEN CI.QtyProvided ELSE NULL END item_qty,
-	                    CASE WHEN CI.QtyProvided<> COALESCE(CI.QtyApproved , CI.QtyProvided)  THEN CI.QtyApproved ELSE NULL END item_adjusted_qty,
-	                    CASE WHEN CS.QtyProvided<> COALESCE(CS.QtyApproved, CS.QtyProvided)  THEN S.ServCode ELSE NULL END AdjustedService,
-	                    CASE WHEN CS.QtyProvided<> COALESCE(CS.QtyApproved, CS.QtyProvided)   THEN CS.QtyProvided ELSE NULL END service_qty,
-	                    CASE WHEN CS.QtyProvided<> COALESCE(CS.QtyApproved , CS.QtyProvided)   THEN CS.QtyApproved ELSE NULL END service_adjusted_qty,
-	                    C.Explanation explination,
-                        CASE C.VisitType WHEN 'E' THEN 'Emergency' WHEN 'R' THEN 'Referral' WHEN 'O' THEN 'Others' END visit_type,
-                      C.Adjustment adjustment,
-                      C.GuaranteeId guarantee_number,
-                      I.ItemName item, I.ItemCode item_code, CI.PriceAdjusted item_adjusted_price, I.ItemPrice item_price, CI.Explanation item_explination, CI.Justification item_justification, CI.PriceValuated item_valuated, CI.RejectionReason item_result,
-                            S.ServName[service],S.ServCode service_code, CS.PriceAdjusted service_adjusted_price, S.ServPrice service_price, CS.Explanation service_explination, CS.Justification service_justification, CS.PriceValuated service_valuated, CI.RejectionReason item_result
-
-                        FROM tblClaim C
-                        LEFT OUTER JOIN tblClaimItems CI ON C.ClaimId = CI.ClaimID
-
-                        LEFT OUTER JOIN tblClaimServices CS ON C.ClaimId = CS.ClaimID
-
-                        LEFT OUTER JOIN tblItems I ON CI.ItemId = I.ItemID
-
-                        LEFT OUTER JOIN tblServices S ON CS.ServiceID = S.ServiceID
-
-                        LEFT OUTER JOIN tblHF HF ON C.HFID = HF.HfID
-
-                        LEFT OUTER JOIN tblClaimAdmin CA ON C.ClaimAdminId = CA.ClaimAdminId
-
-                        LEFT OUTER JOIN tblInsuree Ins ON C.InsureeId = Ins.InsureeId
-
-                        LEFT OUTER JOIN TotalForItems TFI ON C.ClaimId = TFI.ClaimID
-
-                        LEFT OUTER JOIN TotalForServices TFS ON C.ClaimId = TFS.ClaimId
-
-                        LEFT OUTER JOIN tblICDCodes ICD ON C.ICDID = ICD.ICDID
-
-                        LEFT OUTER JOIN tblICDCodes ICD1 ON C.ICDID1 = ICD1.ICDID
-
-                        WHERE C.ValidityTo IS NULL
-                        AND CA.ClaimAdminCode = @ClaimAdminCode
-
-                        AND(C.ClaimStatus = @ClaimStatus OR @ClaimStatus IS NULL)
-
-                        AND ISNULL(C.DateTo, C.DateFrom) BETWEEN ISNULL(@StartDate, (SELECT CAST(-53690 AS DATETIME))) AND ISNULL(@EndDate, GETDATE())
-
-                        AND(C.DateProcessed BETWEEN ISNULL(@DateProcessedFrom, CAST('1753-01-01' AS DATE)) AND ISNULL(@DateProcessedTo, GETDATE()) OR C.DateProcessed IS NULL)
-
-                    ";
+            string sSQL = @"exec uspAPIGetClaims @ClaimAdminCode,@StartDate,@EndDate,@DateProcessedFrom,@DateProcessedTo,@ClaimStatus";
 
             DataHelper helper = new DataHelper(Configuration);
-
-
             int? claimStatus = null;
 
             if (model.status_claim != 0)
@@ -236,31 +154,78 @@ namespace ImisRestApi.Data
 
             try
             {
-                var response = helper.GetDataTable(sSQL, sqlParameters,CommandType.Text);
+                var response = helper.GetDataSet(sSQL, sqlParameters,CommandType.Text);
 
-                var responseData = response;
+                DataTable responseItems = response.Tables[0];
+                DataTable responseServices = response.Tables[1];
+                DataTable responseClaims = response.Tables[2];
 
-                var jsonString = JsonConvert.SerializeObject(responseData);
-
-                var ObjectList = JsonConvert.DeserializeObject<List<ClaimOutPut>>(jsonString).Distinct(new ClaimEqualityComparer());
-                var services = JsonConvert.DeserializeObject<List<ClaimServices>>(jsonString).Distinct(new ServiceEqualityComparer());
-                var items = JsonConvert.DeserializeObject<List<ClaimItems>>(jsonString).Distinct(new ItemEqualityComparer());
-
-                List<ClaimOutPut> admin_claims = new List<ClaimOutPut>();
-
-                foreach(var obj in ObjectList)
+                Dictionary<string, ClaimOutput> admin_claims = (from DataRow dr in responseClaims.Rows 
+                                                                     select new ClaimOutput()
                 {
-                    var obj_services = services.Where(x => x.claim_number == obj.claim_number).ToList();
-                    obj.services = obj_services;
+                    claim_uuid = dr["claim_uuid"].ToStringWithDBNull(),
+                    health_facility_code = dr["health_facility_code"].ToStringWithDBNull(),
+                    health_facility_name = dr["health_facility_name"].ToStringWithDBNull(),
+                    insurance_number = dr["insurance_number"].ToStringWithDBNull(),
+                    patient_name = dr["patient_name"].ToStringWithDBNull(),
+                    main_dg = dr["main_dg"].ToStringWithDBNull(),
+                    claim_number = dr["claim_number"].ToStringWithDBNull(),
+                    date_claimed = dr["date_claimed"].ToStringWithDBNull(),
+                    visit_date_from = dr["visit_date_from"].ToStringWithDBNull(),
+                    visit_type = dr["visit_type"].ToStringWithDBNull(),
+                    claim_status = dr["claim_status"].ToStringWithDBNull(),
+                    sec_dg_1 = dr["sec_dg_1"].ToStringWithDBNull(),
+                    sec_dg_2 = dr["sec_dg_2"].ToStringWithDBNull(),
+                    sec_dg_3 = dr["sec_dg_3"].ToStringWithDBNull(),
+                    sec_dg_4 = dr["sec_dg_4"].ToStringWithDBNull(),
+                    visit_date_to = dr["visit_date_to"].ToStringWithDBNull(),
+                    claimed = dr["claimed"].ToString().ParseNullableDecimal(),
+                    approved = dr["approved"].ToString().ParseNullableDecimal(),
+                    adjusted = dr["adjusted"].ToString().ParseNullableDecimal(),
+                    explanation = dr["explanation"].ToStringWithDBNull(),
+                    adjustment = dr["adjustment"].ToStringWithDBNull(),
+                    guarantee_number = dr["guarantee_number"].ToStringWithDBNull(),
+                    services = new List<ClaimService>(),
+                    items = new List<ClaimItem>()
+                }).ToList().ToDictionary(x => x.claim_uuid, x => x,StringComparer.OrdinalIgnoreCase);
 
-                    var obj_items = items.Where(x => x.claim_number == obj.claim_number).ToList();
-                    obj.items = obj_items;
+                (from DataRow dr in responseItems.Rows
+                 select new ClaimItem()
+                 {
+                     claim_uuid = dr["claim_uuid"].ToStringWithDBNull(),
+                     claim_number = dr["claim_number"].ToStringWithDBNull(),
+                     item = dr["item"].ToStringWithDBNull(),
+                     item_code = dr["item_code"].ToStringWithDBNull(),
+                     item_qty = dr["item_qty"].ToString().ParseNullableDecimal(),
+                     item_price = dr["item_price"].ToString().ParseNullableDecimal(),
+                     item_adjusted_qty = dr["item_adjusted_qty"].ToString().ParseNullableDecimal(),
+                     item_adjusted_price = dr["item_adjusted_price"].ToString().ParseNullableDecimal(),
+                     item_explination = dr["item_explination"].ToStringWithDBNull(),
+                     item_justificaion = dr["item_justificaion"].ToStringWithDBNull(),
+                     item_valuated = dr["item_valuated"].ToString().ParseNullableDecimal(),
+                     item_result = dr["item_result"].ToStringWithDBNull(),
+                 }).ToList().ForEach((x) => { if (admin_claims.ContainsKey(x.claim_uuid)) admin_claims[x.claim_uuid].items.Add(x); });
 
-                    admin_claims.Add(obj);
-                }
-                //var uniqueClaims = ObjectList.Distinct(new ClaimEqualityComparer());
+                (from DataRow dr in responseServices.Rows
+                 select new ClaimService()
+                 {
+                     claim_uuid = dr["claim_uuid"].ToStringWithDBNull(),
+                     claim_number = dr["claim_number"].ToStringWithDBNull(),
+                     service = dr["service"].ToStringWithDBNull(),
+                     service_code = dr["service_code"].ToStringWithDBNull(),
+                     service_qty = dr["service_qty"].ToString().ParseNullableDecimal(),
+                     service_price = dr["service_price"].ToString().ParseNullableDecimal(),
+                     service_adjusted_qty = dr["service_adjusted_qty"].ToString().ParseNullableDecimal(),
+                     service_adjusted_price = dr["service_adjusted_price"].ToString().ParseNullableDecimal(),
+                     service_explination = dr["service_explination"].ToStringWithDBNull(),
+                     service_justificaion = dr["service_justificaion"].ToStringWithDBNull(),
+                     service_valuated = dr["service_valuated"].ToString().ParseNullableDecimal(),
+                     service_result = dr["service_result"].ToStringWithDBNull(),
+                 }).ToList().ForEach((x) => { if (admin_claims.ContainsKey(x.claim_uuid)) admin_claims[x.claim_uuid].services.Add(x); });
 
-                return admin_claims;
+                List<ClaimOutput> output = admin_claims.Values.ToList();
+
+                return output;
             }
             catch (Exception e)
             {
@@ -318,63 +283,5 @@ namespace ImisRestApi.Data
         }
 
 
-    }
-
-    class ClaimEqualityComparer : IEqualityComparer<ClaimOutPut>
-    {
-        public bool Equals(ClaimOutPut x, ClaimOutPut y)
-        {
-            // Two items are equal if their keys are equal.
-            return x.claim_number == y.claim_number;
-        }
-
-        public int GetHashCode(ClaimOutPut obj)
-        {
-            return obj.claim_number.GetHashCode();
-        }
-    }
-
-    public class ServiceEqualityComparer : IEqualityComparer<ClaimServices>
-    {
-        public bool Equals(ClaimServices x, ClaimServices y)
-        {
-            // Two items are equal if their keys are equal.
-            return x.service == y.service;
-        }
-
-        public int GetHashCode(ClaimServices obj)
-        {
-            
-            if (obj.service != null)
-            {
-                return obj.service.GetHashCode();
-            }
-            else
-            {
-                return string.Empty.GetHashCode();
-            }
-        }
-    }
-
-    public class ItemEqualityComparer : IEqualityComparer<ClaimItems>
-    {
-        public bool Equals(ClaimItems x, ClaimItems y)
-        {
-            // Two items are equal if their keys are equal.
-            return x.item == y.item;
-        }
-
-        public int GetHashCode(ClaimItems obj)
-        {
-            if(obj.item != null)
-            {
-                return obj.item.GetHashCode();
-            }
-            else
-            {
-                return string.Empty.GetHashCode();
-            }
-            
-        }
     }
 }

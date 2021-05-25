@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace ImisRestApi.Models
 {
-    public class ClaimOutPut
+    public class ClaimOutput
     {
+        public string claim_uuid { get; set; }
         public string health_facility_code { get; set; }
         public string health_facility_name { get; set; }
         public string insurance_number { get; set; }
@@ -25,15 +26,16 @@ namespace ImisRestApi.Models
         public decimal? claimed { get; set; }
         public decimal? approved { get; set; }
         public decimal? adjusted { get; set; }
-        public string explination { get; set; }
+        public string explanation { get; set; }
         public string adjustment { get; set; }
         public string guarantee_number { get; set; }
-        public List<ClaimServices> services { get; set; }
-        public List<ClaimItems> items { get; set; }
+        public List<ClaimService> services { get; set; }
+        public List<ClaimItem> items { get; set; }
     }
 
-    public class ClaimItems
+    public class ClaimItem
     {
+        public string claim_uuid { get; set; }
         public string claim_number { get; set; }
         public string item { get; set; }
         public string item_code { get; set; }
@@ -47,8 +49,9 @@ namespace ImisRestApi.Models
         public string item_result { get; set; }
     }
 
-    public class ClaimServices
+    public class ClaimService
     {
+        public string claim_uuid { get; set; }
         public string claim_number { get; set; }
         public string service { get; set; }
         public string service_code { get; set; }

@@ -71,6 +71,27 @@ namespace ImisRestApi.Data
             return dt;
         }
 
+        public DataSet GetDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
+        {
+            DataSet ds = new DataSet();
+            var sqlConnection = new SqlConnection(ConnectionString);
+            var command = new SqlCommand(SQL, sqlConnection)
+            {
+                CommandType = commandType
+            };
+
+            var adapter = new SqlDataAdapter(command);
+
+            using (command)
+            {
+                if (parameters.Length > 0)
+                    command.Parameters.AddRange(parameters);
+                adapter.Fill(ds);
+            }
+
+            return ds;
+        }
+
         public void Execute(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
             var sqlConnection = new SqlConnection(ConnectionString);
@@ -174,6 +195,22 @@ namespace ImisRestApi.Data
 
             return rv;
         }
+    }
 
+    public static class ExtensionMethods
+    {
+        public static decimal? ParseNullableDecimal(this string s)
+        {
+            if (decimal.TryParse(s, out decimal d))
+                return d;
+            return null;
+        }
+
+        public static string ToStringWithDBNull(this object o)
+        {
+            if (o is DBNull)
+                return null;
+            return o.ToString();
+        }
     }
 }
