@@ -408,34 +408,6 @@ namespace ImisRestApi.Data
             return signature;
         }
 
-        public bool VerifyData(string strContent, string strSignature)
-        {
-            try
-            {
-                byte[] str = Encoding.UTF8.GetBytes(strContent);
-                byte[] signature = Convert.FromBase64String(strSignature);
-
-                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(GepgPublicCertStorePath), GepgCertPass);
-                rsaCrypto = (RSA)certificate.PublicKey.Key;
-
-                SHA1Managed sha1hash = new SHA1Managed();
-                byte[] hashdata = sha1hash.ComputeHash(str);
-
-               if (rsaCrypto.VerifyHash(hashdata,signature, HashAlgorithmName.SHA1,RSASignaturePadding.Pkcs1))
-               {
-                  return true;
-               }
-               else
-               {
-                  return false;
-               }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
         public string SendHttpRequest(String content, List<InsureeProduct> products)
         {
 
@@ -543,45 +515,6 @@ namespace ImisRestApi.Data
 
         }
 
-        internal bool VerifyGePGData(string gepgResponse, int responseNo)
-        {
-            string dataTag = "gepgBillSubReqAck";
-
-            string sigTag = "gepgSignature";
-
-            string data = getContent(gepgResponse, dataTag);
-            string signature = getSig(gepgResponse, sigTag);
-
-
-            try
-            {
-                byte[] str = Encoding.UTF8.GetBytes(data);
-                byte[] sig = Convert.FromBase64String(signature);
-
-                // read the public key 
-                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(GepgPublicCertStorePath), CertPass);
-                rsaCrypto = (RSA)certificate.PublicKey.Key;
-
-                // compute the hash again, also we can pass it as a parameter
-                SHA1Managed sha1hash = new SHA1Managed();
-                byte[] hashdata = sha1hash.ComputeHash(str);
-
-                if (rsaCrypto.VerifyHash(hashdata, sig, HashAlgorithmName.SHA1, RSASignaturePadding.Pss))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-
-        }
-
         public string getContent(string rawData, string dataTag)
         {
             try
@@ -610,34 +543,6 @@ namespace ImisRestApi.Data
                 return string.Empty;
             }
             
-        }
-
-        public bool VerifyPayData(string strContent, string strSignature)
-        {
-            try
-            {
-                byte[] str = Encoding.UTF8.GetBytes(strContent);
-                byte[] signature = Convert.FromBase64String(strSignature);
-
-                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(GepgPayCertStorePath), GepgCertPass);
-                rsaCrypto = (RSA)certificate.PublicKey.Key;
-
-                SHA1Managed sha1hash = new SHA1Managed();
-                byte[] hashdata = sha1hash.ComputeHash(str);
-
-                if (rsaCrypto.VerifyHash(hashdata, signature, HashAlgorithmName.SHA1, RSASignaturePadding.Pss))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
         }
 
         public string getAccountCode(List<InsureeProduct> products)

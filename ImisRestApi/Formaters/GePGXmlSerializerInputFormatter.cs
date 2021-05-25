@@ -6,10 +6,15 @@ using Microsoft.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using ImisRestApi.Data;
 using ImisRestApi.Escape.Payment.Models;
 using ImisRestApi.Extensions;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Configuration;
 
 namespace ImisRestApi.Formaters
 {
@@ -17,10 +22,11 @@ namespace ImisRestApi.Formaters
     {
 
         private Type type;
+        static IConfiguration Configuration;
 
-        public GePGXmlSerializerInputFormatter()
+        public GePGXmlSerializerInputFormatter(IConfiguration configuration)
         {
-
+            Configuration = configuration;
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/xml"));
 
             SupportedEncodings.Add(Encoding.UTF8);
@@ -98,10 +104,109 @@ namespace ImisRestApi.Formaters
                 var serializer = new XmlSerializer(this.type);
                 var model = Convert.ChangeType(serializer.Deserialize(writer), this.type);
                 return await InputFormatterResult.SuccessAsync(model);
+               
             }
             catch
             {
                 return await InputFormatterResult.FailureAsync();
+            }
+
+        }
+
+        public static bool IsValidCall(object Reqbody, string responseType)
+        {
+            var _body = GetXmlStringFromObject(Reqbody);
+            var body = _body.Replace(" />", "/>");
+            var content = getContent(body, responseType);
+            var signature = getSig(body, "gepgSignature");
+
+            return VerifyData(content, signature);
+        }
+
+        private static bool VerifyData(string strContent, string strSignature)
+        {
+            try
+            {
+                var appRoot = AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.LastIndexOf("\\bin"));
+                var gepgPublicCertStorePath = Path.Combine(appRoot + Configuration["PaymentGateWay:GePG:GepgPublicCertStorePath"]);
+                var gepgCertPass = Configuration["PaymentGateWay:GePG:GepgCertPass"];
+
+                byte[] str = Encoding.UTF8.GetBytes(strContent);
+                byte[] signature = Convert.FromBase64String(strSignature);
+
+                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(gepgPublicCertStorePath), gepgCertPass);
+                RSA rsaCrypto = (RSA)certificate.PublicKey.Key;
+
+                SHA1Managed sha1hash = new SHA1Managed();
+                byte[] hashdata = sha1hash.ComputeHash(str);
+
+                if (rsaCrypto.VerifyHash(hashdata, signature, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private static string GetXmlStringFromObject(object obj)
+        {
+            StringWriter sw = new StringWriter();
+            XmlTextWriter tw = null;
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(obj.GetType());
+                tw = new XmlTextWriter(sw);
+                serializer.Serialize(tw, obj);
+            }
+            catch (Exception ex)
+            {
+                //Handle Exception Code
+            }
+            finally
+            {
+                sw.Close();
+                if (tw != null)
+                {
+                    tw.Close();
+                }
+            }
+
+            return sw.ToString();
+        }
+
+        private static string getContent(string rawData, string dataTag)
+        {
+            try
+            {
+                string content = rawData.Substring(rawData.IndexOf(dataTag) - 1, rawData.LastIndexOf(dataTag) + dataTag.Length + 2 - rawData.IndexOf(dataTag));
+                return content;
+            }
+            catch (Exception)
+            {
+
+                return string.Empty;
+            }
+
+        }
+
+        private static string getSig(string rawData, string sigTag)
+        {
+            try
+            {
+                string content = rawData.Substring(rawData.IndexOf(sigTag) + sigTag.Length + 1, rawData.LastIndexOf(sigTag) - rawData.IndexOf(sigTag) - sigTag.Length - 3);
+                return content;
+            }
+            catch (Exception)
+            {
+
+                return string.Empty;
             }
 
         }

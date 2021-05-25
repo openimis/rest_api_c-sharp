@@ -1,6 +1,7 @@
 ﻿using ImisRestApi.Escape.Payment.Models;
 using ImisRestApi.Data;
 using ImisRestApi.Extensions;
+using ImisRestApi.Formaters;
 using ImisRestApi.Models;
 using ImisRestApi.Models.Payment;
 using ImisRestApi.Models.Payment.Response;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Text;
 
 namespace ImisRestApi.Data
 {
@@ -150,71 +152,6 @@ namespace ImisRestApi.Data
             var signedReconcAck = gepg.FinaliseSignedAcks(new GepgReconcRespAck() { gepgSpReconcRespAck = ReconcAck, gepgSignature = signature }, typeof(GepgReconcRespAck));
 
             return signedReconcAck;
-        }
-
-        public bool IsValidCall(object Reqbody, string responseType) {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
-
-            var _body = GetXmlStringFromObject(Reqbody);
-            var body = _body.Replace(" />","/>");
-            var content = gepg.getContent(body, responseType);
-            var signature = gepg.getSig(body, "gepgSignature");
-            
-            return gepg.VerifyData(content, signature);
-        }
-
-        public bool IsCallValid(string Reqbody, int callNo)
-        {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
-
-            var body = Reqbody;
-            var content = string.Empty;
-            var signature = string.Empty;
-            switch (callNo)
-            {
-                case 0:
-                    content = gepg.getContent(body, "gepgBillSubResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 1:
-                    content = gepg.getContent(body, "gepgPmtSpInfo");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 2:
-                    content = gepg.getContent(body, "gepgSpReconcResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                default:
-                    break;
-            }
-
-            return gepg.VerifyData(content, signature);
-        }
-
-        private string GetXmlStringFromObject(object obj)
-        {
-            StringWriter sw = new StringWriter();
-            XmlTextWriter tw = null;
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(obj.GetType());
-                tw = new XmlTextWriter(sw);
-                serializer.Serialize(tw, obj);
-            }
-            catch (Exception ex)
-            {
-                //Handle Exception Code
-            }
-            finally
-            {
-                sw.Close();
-                if (tw != null)
-                {
-                    tw.Close();
-                }
-            }
-
-            return sw.ToString();
         }
 
 #endif

@@ -92,7 +92,7 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReconciliationData")]
         public IActionResult GetReconciliation([FromBody] GepgReconcMessage model)
         {
-            if (imisPayment.IsValidCall(model, "gepgSpReconcResp"))
+            if (GePGXmlSerializerInputFormatter.IsValidCall(model, "gepgSpReconcResp"))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
@@ -188,7 +188,7 @@ namespace ImisRestApi.Controllers
         [Route("api/GetPaymentData")]
         public async Task<IActionResult> GetPaymentChf([FromBody] GepgPaymentMessage model)
         {
-            if (imisPayment.IsValidCall(model, "gepgPmtSpInfo"))
+            if (GePGXmlSerializerInputFormatter.IsValidCall(model, "gepgPmtSpInfo"))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.InvalidRequestData));
@@ -246,7 +246,7 @@ namespace ImisRestApi.Controllers
         [Route("api/GetReqControlNumber")]
         public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
         {
-            if (imisPayment.IsValidCall(model, "gepgBillSubResp"))
+            if (GePGXmlSerializerInputFormatter.IsValidCall(model, "gepgBillSubResp"))
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidRequestData));

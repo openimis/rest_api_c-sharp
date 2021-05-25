@@ -55,7 +55,7 @@ namespace ImisRestApi
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
 #if CHF
-                config.InputFormatters.Add(new GePGXmlSerializerInputFormatter());
+                config.InputFormatters.Add(new GePGXmlSerializerInputFormatter(Configuration));
 #else
                 config.InputFormatters.Add(new XmlSerializerInputFormatter());
 #endif
