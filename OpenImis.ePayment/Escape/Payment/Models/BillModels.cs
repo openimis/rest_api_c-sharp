@@ -79,10 +79,10 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public int TrxStsCode { get; set; }
     }
 
-   
+    [XmlRoot("gepgBillSubResp")]
     public class gepgBillSubResp : GePGValidatedResponseModel
     {
-        [XmlArrayItem("BillTrxInf")]
+        [XmlElement("BillTrxInf")]
         public BillTrxRespInf[] BillTrxInf { get; set; }
     }
 

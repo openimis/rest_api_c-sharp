@@ -69,7 +69,7 @@ namespace OpenImis.ePayment.Formaters
 
             using (var reader = new StreamReader(
                Request.Body,
-               encoding: Encoding.ASCII,
+               encoding: effectiveEncoding,
                detectEncodingFromByteOrderMarks: false,
                bufferSize: buffer.Length,
                leaveOpen: true
@@ -111,7 +111,7 @@ namespace OpenImis.ePayment.Formaters
             try
             {
                 var serializer = new XmlSerializer(this.type);
-                dynamic model = serializer.Deserialize(writer);
+                dynamic model = Convert.ChangeType(serializer.Deserialize(writer), this.type);
                 model.HasValidSignature = hasValidSignature;
                 return await InputFormatterResult.SuccessAsync(Convert.ChangeType(model, this.type));
             }

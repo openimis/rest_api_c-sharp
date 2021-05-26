@@ -91,7 +91,8 @@ namespace OpenImis.ePayment.Controllers
         [Route("api/GetReconciliationData")]
         public IActionResult GetReconciliation([FromBody] gepgSpReconcResp model)
         {
-            if (model.HasValidSignature) { 
+            if (model.HasValidSignature) 
+            { 
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
 

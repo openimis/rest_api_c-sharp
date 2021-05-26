@@ -23,9 +23,10 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public string gepgSignature { get; set; }
     }
 
+    [XmlRoot("gepgPmtSpInfo")]
     public class gepgPmtSpInfo : GePGValidatedResponseModel
     {
-        [XmlArray]
+        [XmlElement("PymtTrxInf")]
         public List<PymtTrxInf> PymtTrxInf { get; set; }
         
     }
