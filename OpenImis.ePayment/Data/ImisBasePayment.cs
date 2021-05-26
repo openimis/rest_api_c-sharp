@@ -802,7 +802,7 @@ namespace OpenImis.ePayment.Data
         public List<String> GetProductsSPCode()
         {
 
-            var getProductsSPCodes = @"SELECT tblProduct.AccCodePremiums FROM tblProduct WHERE tblProduct.AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND tblProduct.ValidityTo is NULL";
+            var getProductsSPCodes = @"SELECT DISTINCT tblProduct.AccCodePremiums FROM tblProduct WHERE tblProduct.AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND tblProduct.ValidityTo is NULL";
 
             SqlParameter[] parameters = { };
 
