@@ -10,6 +10,8 @@ using OpenImis.ePayment.Escape.Payment.Models;
 using OpenImis.ePayment.Extensions;
 using Newtonsoft.Json;
 using System.Xml.Serialization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace OpenImis.ePayment.Formaters
 {
@@ -17,9 +19,13 @@ namespace OpenImis.ePayment.Formaters
     {
 
         private Type type;
+        private IConfiguration configuration;
+        private IHostingEnvironment hostingEnvironment;
 
-        public GePGXmlSerializerInputFormatter()
+        public GePGXmlSerializerInputFormatter(IHostingEnvironment hostingEnvironment, IConfiguration configuration)
         {
+            this.configuration = configuration;
+            this.hostingEnvironment = hostingEnvironment;
 
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/xml"));
 
@@ -31,7 +37,7 @@ namespace OpenImis.ePayment.Formaters
         protected override bool CanReadType(Type type)
         {
             this.type = type;
-            if (type == typeof(GepgPaymentMessage) || type == typeof(GepgBillResponse) || type == typeof(GepgReconcMessage))
+            if (type == typeof(gepgPmtSpInfo) || type == typeof(gepgBillSubResp) || type == typeof(gepgSpReconcResp))
             {
                 return base.CanReadType(type);
             }
@@ -42,6 +48,10 @@ namespace OpenImis.ePayment.Formaters
         #region readrequest
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding effectiveEncoding)
         {
+            string content;
+            string signature;
+            bool hasValidSignature = true;
+
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
@@ -69,39 +79,75 @@ namespace OpenImis.ePayment.Formaters
                 // stream = reader;// Do something
             }
 
+            GePGSignatureValidator signatureValidator = new GePGSignatureValidator(this.hostingEnvironment, this.configuration);
+            content = this.getContent(body, this.type.Name);
+            signature = this.getSignature(body, "gepgSignature");
+
+            hasValidSignature = signatureValidator.VerifyData(content, signature);
+            
             //get the billId/paymentId from request body - from <BillId> node
-            string typeOfMessage = type.ToString().Split('.').Last();
-            if (typeOfMessage != "GepgReconcMessage")
+            if (this.type.Name != "gepgSpReconcResp")
             {
                 string billId = StringExtensions.Between(body, "<BillId>", "</BillId>");
                 if (!String.IsNullOrEmpty(billId))
                 {
-                    var gepgFile = new GepgFoldersCreating(billId + "_" + typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                    var gepgFile = new GepgFoldersCreating(billId + "_" + this.type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
                     gepgFile.putRequestBody();
                 }
                 else
                 {
-                    var gepgFile = new GepgFoldersCreating(typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                    var gepgFile = new GepgFoldersCreating(this.type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
                     gepgFile.putRequestBody();
                 }
             }
             else
             {
-                var gepgFile = new GepgFoldersCreating(typeOfMessage, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                var gepgFile = new GepgFoldersCreating(this.type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
                 gepgFile.putRequestBody();
             }
 
-            TextReader writer = new StringReader(body);
+            TextReader writer = new StringReader(content);
 
             try
             {
                 var serializer = new XmlSerializer(this.type);
-                var model = Convert.ChangeType(serializer.Deserialize(writer), this.type);
-                return await InputFormatterResult.SuccessAsync(model);
+                dynamic model = serializer.Deserialize(writer);
+                model.HasValidSignature = hasValidSignature;
+                return await InputFormatterResult.SuccessAsync(Convert.ChangeType(model, this.type));
             }
             catch
             {
                 return await InputFormatterResult.FailureAsync();
+            }
+
+        }
+
+        public string getContent(string rawData, string dataTag)
+        {
+            try
+            {
+                string content = rawData.Substring(rawData.IndexOf(dataTag) - 1, rawData.LastIndexOf(dataTag) + dataTag.Length + 2 - rawData.IndexOf(dataTag));
+                return content;
+            }
+            catch (Exception)
+            {
+
+                return string.Empty;
+            }
+
+        }
+
+        public string getSignature(string rawData, string sigTag)
+        {
+            try
+            {
+                string content = rawData.Substring(rawData.IndexOf(sigTag) + sigTag.Length + 1, rawData.LastIndexOf(sigTag) - rawData.IndexOf(sigTag) - sigTag.Length - 3);
+                return content;
+            }
+            catch (Exception)
+            {
+
+                return string.Empty;
             }
 
         }

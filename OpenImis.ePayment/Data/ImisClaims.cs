@@ -1,5 +1,5 @@
 ﻿using OpenImis.ePayment.Models;
-using OpenImis.ePayment.Responses;
+//using OpenImis.ePayment.Responses;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
-using ImisRestApi.Models;
+//using System.Threading.Tasks;
+//using OpenImis.ePayment.Models;
 
 namespace OpenImis.ePayment.Data
 {

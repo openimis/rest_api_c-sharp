@@ -1,5 +1,5 @@
 ﻿
-namespace OpenImis.ePayment.Formaters
+namespace OpenImis.ePayment.Escape.Payment.Models
 {
     public static class GepgCodeResponses
     {

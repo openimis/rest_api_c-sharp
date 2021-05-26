@@ -89,10 +89,9 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetReconciliationData")]
-        public IActionResult GetReconciliation([FromBody] GepgReconcMessage model)
+        public IActionResult GetReconciliation([FromBody] gepgSpReconcResp model)
         {
-            if (imisPayment.IsValidCall(model, "gepgSpReconcResp"))
-            {
+            if (model.HasValidSignature) { 
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
 
@@ -185,9 +184,9 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetPaymentData")]
-        public async Task<IActionResult> GetPaymentChf([FromBody] GepgPaymentMessage model)
+        public async Task<IActionResult> GetPaymentChf([FromBody] gepgPmtSpInfo model)
         {
-            if (imisPayment.IsValidCall(model, "gepgPmtSpInfo"))
+            if (model.HasValidSignature)
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.InvalidRequestData));
@@ -243,9 +242,9 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public IActionResult GetReqControlNumberChf([FromBody] GepgBillResponse model)
+        public IActionResult GetReqControlNumberChf([FromBody] gepgBillSubResp model)
         {
-            if (imisPayment.IsValidCall(model, "gepgBillSubResp"))
+            if (model.HasValidSignature)
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidRequestData));

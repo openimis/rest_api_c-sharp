@@ -155,19 +155,9 @@ namespace OpenImis.ePayment.Data
             return signedReconcAck;
         }
 
-        public bool IsValidCall(object Reqbody, string responseType)
-        {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+        
 
-            var _body = GetXmlStringFromObject(Reqbody);
-            var body = _body.Replace(" />", "/>");
-            var content = gepg.getContent(body, responseType);
-            var signature = gepg.getSig(body, "gepgSignature");
-
-            return gepg.VerifyData(content, signature);
-        }
-
-        public bool IsCallValid(string Reqbody, int callNo)
+        /*public bool IsCallValid(string Reqbody, int callNo)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
 
@@ -193,7 +183,7 @@ namespace OpenImis.ePayment.Data
             }
 
             return gepg.VerifyData(content, signature);
-        }
+        }*/
 
         private string GetXmlStringFromObject(object obj)
         {

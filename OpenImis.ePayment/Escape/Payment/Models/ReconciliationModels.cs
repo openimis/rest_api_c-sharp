@@ -27,12 +27,13 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public string gepgSignature { get; set; }
     }
 
-    public class gepgSpReconcResp
+    public class gepgSpReconcResp : GePGValidatedResponseModel
     {
         public ReconcBatchInfo ReconcBatchInfo { get; set; }
         [XmlArray("ReconcTrans")]
         [XmlArrayItem("ReconcTrxInf")]
         public ReconcTrxInf[] ReconcTrxInf { get; set; }
+        
     }
 
     public class ReconcTrxInf

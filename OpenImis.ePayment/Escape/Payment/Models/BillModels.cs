@@ -15,12 +15,12 @@ namespace OpenImis.ePayment.Escape.Payment.Models
     }
 
     [XmlRoot("Gepg")]
-    public class GepgBillResponse
+    public class GepgBillResponse: GePGValidatedResponseModel
     {     
         [XmlArray("gepgBillSubResp")]
         [XmlArrayItem("BillTrxInf")]
         public BillTrxRespInf[] BillTrxInf { get; set; }
-        public string gepgSignature { get; set; }
+        
     }
 
     [XmlRoot("Gepg")]
@@ -80,7 +80,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
     }
 
    
-    public class gepgBillSubResp
+    public class gepgBillSubResp : GePGValidatedResponseModel
     {
         [XmlArrayItem("BillTrxInf")]
         public BillTrxRespInf[] BillTrxInf { get; set; }

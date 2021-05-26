@@ -21,14 +21,12 @@ namespace OpenImis.ePayment.Data
 {
     public class GepgUtility
     {
-        string PrivateStorePath = string.Empty;
         string PublicStorePath = string.Empty;
-        string GepgPublicCertStorePath = string.Empty;
+        string PrivateStorePath = string.Empty;
         string GepgPayCertStorePath = string.Empty;
 
         string CertPass = string.Empty;
-        string GepgCertPass = string.Empty;
-
+        
         RSA rsaCrypto = null;
         gepgBillSubReq newBill = null;
         private IConfiguration configuration;
@@ -37,13 +35,12 @@ namespace OpenImis.ePayment.Data
         {
             configuration = Configuration;
 
-            PrivateStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PrivateStorePath"]);
             PublicStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PublicStorePath"]);
-            GepgPublicCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPublicCertStorePath"]);
+            PrivateStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PrivateStorePath"]);
             GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
 
             CertPass = Configuration["PaymentGateWay:GePG:CertPass"];
-            GepgCertPass = Configuration["PaymentGateWay:GePG:GepgCertPass"];
+            
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode, string PhoneNumber, string BillId, decimal ExpectedAmount, List<InsureeProduct> products)
@@ -408,33 +405,7 @@ namespace OpenImis.ePayment.Data
             return signature;
         }
 
-        public bool VerifyData(string strContent, string strSignature)
-        {
-            try
-            {
-                byte[] str = Encoding.UTF8.GetBytes(strContent);
-                byte[] signature = Convert.FromBase64String(strSignature);
-
-                X509Certificate2 certificate = new X509Certificate2(File.ReadAllBytes(GepgPublicCertStorePath), GepgCertPass);
-                rsaCrypto = (RSA)certificate.PublicKey.Key;
-
-                SHA1Managed sha1hash = new SHA1Managed();
-                byte[] hashdata = sha1hash.ComputeHash(str);
-
-                if (rsaCrypto.VerifyHash(hashdata, signature, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
+       
 
         public string SendHttpRequest(String content, List<InsureeProduct> products)
         {
@@ -543,7 +514,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        internal bool VerifyGePGData(string gepgResponse, int responseNo)
+        /*internal bool VerifyGePGData(string gepgResponse, int responseNo)
         {
             string dataTag = "gepgBillSubReqAck";
 
@@ -580,39 +551,12 @@ namespace OpenImis.ePayment.Data
                 return false;
             }
 
-        }
+        }*/
 
-        public string getContent(string rawData, string dataTag)
-        {
-            try
-            {
-                string content = rawData.Substring(rawData.IndexOf(dataTag) - 1, rawData.LastIndexOf(dataTag) + dataTag.Length + 2 - rawData.IndexOf(dataTag));
-                return content;
-            }
-            catch (Exception)
-            {
+       
+        
 
-                return string.Empty;
-            }
-
-        }
-
-        public string getSig(string rawData, string sigTag)
-        {
-            try
-            {
-                string content = rawData.Substring(rawData.IndexOf(sigTag) + sigTag.Length + 1, rawData.LastIndexOf(sigTag) - rawData.IndexOf(sigTag) - sigTag.Length - 3);
-                return content;
-            }
-            catch (Exception)
-            {
-
-                return string.Empty;
-            }
-
-        }
-
-        public bool VerifyPayData(string strContent, string strSignature)
+        /*public bool VerifyPayData(string strContent, string strSignature)
         {
             try
             {
@@ -638,7 +582,7 @@ namespace OpenImis.ePayment.Data
             {
                 return false;
             }
-        }
+        }*/
 
         public string getAccountCode(List<InsureeProduct> products)
         {

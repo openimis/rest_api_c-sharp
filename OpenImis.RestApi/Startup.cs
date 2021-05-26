@@ -26,12 +26,14 @@ namespace OpenImis.RestApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
         }
 
         private IConfiguration Configuration { get; }
+        private IHostingEnvironment HostingEnvironment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -72,7 +74,7 @@ namespace OpenImis.RestApi
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
 #if CHF
-                options.InputFormatters.Add(new GePGXmlSerializerInputFormatter());
+                options.InputFormatters.Add(new GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration));
 #else
                 options.InputFormatters.Add(new XmlSerializerInputFormatter());
 #endif
