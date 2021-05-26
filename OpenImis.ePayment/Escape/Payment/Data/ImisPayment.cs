@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace OpenImis.ePayment.Data
 {
@@ -209,6 +211,37 @@ namespace OpenImis.ePayment.Data
             }
 
             return sw.ToString();
+        }
+
+        public List<String> GetProductsSPCode()
+        {
+
+            var getProductsSPCodes = @"SELECT DISTINCT tblProduct.AccCodePremiums FROM tblProduct WHERE tblProduct.AccCodePremiums LIKE 'SP[0-9][0-9][0-9]' AND tblProduct.ValidityTo is NULL";
+
+            SqlParameter[] parameters = { };
+
+            try
+            {
+                DataTable results = dh.GetDataTable(getProductsSPCodes, parameters, CommandType.Text);
+                List<String> productsCodes = new List<String>();
+                if (results.Rows.Count > 0)
+                {
+                    foreach (DataRow result in results.Rows)
+                    {
+                        if (!string.IsNullOrEmpty(Convert.ToString(result["AccCodePremiums"])))
+                        {
+                            productsCodes.Add(Convert.ToString(result["AccCodePremiums"]));
+                        }
+                    }
+                }
+
+                return productsCodes;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
         }
 
 #endif
