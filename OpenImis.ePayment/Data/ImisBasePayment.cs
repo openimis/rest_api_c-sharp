@@ -378,6 +378,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
+
         public DataMessage SavePayment(PaymentData payment,bool failed = false)
         {
             int? isRenewal = null;
@@ -799,6 +800,27 @@ namespace OpenImis.ePayment.Data
             return result;
         }
 
-        
+        public void CancelPayment(int payment_id)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET PaymentStatus = 0
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", payment_id)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+
     }
 }

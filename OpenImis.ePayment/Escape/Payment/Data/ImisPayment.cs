@@ -51,7 +51,7 @@ namespace OpenImis.ePayment.Data
             string signature = gepg.GenerateSignature(requestString);
             var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
 
-            var result = gepg.SendReconcHttpRequest(signedRequest, productSPCode);
+            var result = gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode);
 
             var content = signedRequest + "********************" + result;
             var gepgFile = new GepgFoldersCreating(productSPCode, "GepGReconRequest", content, env);
@@ -100,7 +100,7 @@ namespace OpenImis.ePayment.Data
             var signature = gepg.GenerateSignature(bill);
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
-            var billAck = gepg.SendHttpRequest(signedMesg, InsureeProducts);
+            var billAck = gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode));
 
             string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
             string namepart = new Random().Next(100000, 999999).ToString();
@@ -129,6 +129,23 @@ namespace OpenImis.ePayment.Data
             return signedCnAck;
         }
 
+        public string GePGPostCancelPayment(int PaymentId)
+        {
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            
+            var GePGCancelPaymentRequest = gepg.CreateGePGCancelPaymentRequest(Configuration, PaymentId);
+            
+            var response = gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, gepg.GetAccountCodeByPaymentId(PaymentId));
+
+
+
+            var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
+            var gepgFile = new GepgFoldersCreating(PaymentId.ToString(), "CancelPayment", content, env);
+            gepgFile.putToTargetFolderPayment();
+
+            return response;
+        }
+
         public string PaymentResp(int code)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
@@ -155,62 +172,6 @@ namespace OpenImis.ePayment.Data
             var signedReconcAck = gepg.FinaliseSignedAcks(new GepgReconcRespAck() { gepgSpReconcRespAck = ReconcAck, gepgSignature = signature }, typeof(GepgReconcRespAck));
 
             return signedReconcAck;
-        }
-
-        
-
-        /*public bool IsCallValid(string Reqbody, int callNo)
-        {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
-
-            var body = Reqbody;
-            var content = string.Empty;
-            var signature = string.Empty;
-            switch (callNo)
-            {
-                case 0:
-                    content = gepg.getContent(body, "gepgBillSubResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 1:
-                    content = gepg.getContent(body, "gepgPmtSpInfo");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                case 2:
-                    content = gepg.getContent(body, "gepgSpReconcResp");
-                    signature = gepg.getSig(body, "gepgSignature");
-                    break;
-                default:
-                    break;
-            }
-
-            return gepg.VerifyData(content, signature);
-        }*/
-
-        private string GetXmlStringFromObject(object obj)
-        {
-            StringWriter sw = new StringWriter();
-            XmlTextWriter tw = null;
-            try
-            {
-                XmlSerializer serializer = new XmlSerializer(obj.GetType());
-                tw = new XmlTextWriter(sw);
-                serializer.Serialize(tw, obj);
-            }
-            catch (Exception ex)
-            {
-                //Handle Exception Code
-            }
-            finally
-            {
-                sw.Close();
-                if (tw != null)
-                {
-                    tw.Close();
-                }
-            }
-
-            return sw.ToString();
         }
 
         public List<String> GetProductsSPCode()

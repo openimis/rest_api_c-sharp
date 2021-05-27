@@ -38,7 +38,9 @@ namespace OpenImis.ePayment.Controllers
             _hostingEnvironment = hostingEnvironment;
             _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
- 
+
+        
+
         //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/MatchPayment")]
@@ -164,6 +166,34 @@ namespace OpenImis.ePayment.Controllers
                 return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
             }
 
+        }
+
+        [HttpPost]
+        [Route("api/payment/cancel")]
+        //[ProducesResponseType(typeof(GetControlNumberResp), 200)]
+        [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public virtual async Task<IActionResult> CancelPayment([FromBody] PaymentCancelModel model)
+        {
+
+            try
+            {
+                var response = await _payment.CancelPayment(model);
+
+                if (response.Code == 0)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(new PaymentDataBadResp() { error_message = response.MessageValue });
+                }
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new PaymentDataBadResp() { error_message = "Unknown Error Occured" });
+            }
         }
 
         //[Authorize(Roles = "PaymentAdd")]

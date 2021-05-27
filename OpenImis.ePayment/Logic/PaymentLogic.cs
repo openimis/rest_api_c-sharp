@@ -490,5 +490,53 @@ namespace OpenImis.ePayment.Logic
 
             return return_message;
         }
+
+        public async Task<DataMessage> CancelPayment(PaymentCancelModel model)
+        {
+
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            DataMessage dt = new DataMessage();
+            
+            if (model.control_number != null)
+            {
+                // todo: change string type to int
+                string paymentId = payment.GetPaymentId(model.control_number);
+
+                if (paymentId != null && paymentId != string.Empty)
+                {
+                    var response = payment.GePGPostCancelPayment(int.Parse(paymentId));
+
+                    dt.MessageValue = response;
+
+                    payment.CancelPayment(int.Parse(paymentId));
+                }
+                else
+                {
+                    //Todo: move hardcoded message to translation file
+                    DataMessage dm = new DataMessage
+                    {
+                        Code = 2,
+                        ErrorOccured = true,
+                        MessageValue = "CancelPayment:2:Control Number doesn't exists",
+                    };
+
+                    return dm;
+                }
+            }
+            else
+            {
+                DataMessage dm = new DataMessage
+                {
+                    Code = 1,
+                    ErrorOccured = true,
+                    MessageValue = "CancelPayment:1:Missing Control Number",
+                };
+
+                return dm;
+            }
+
+
+            return dt;
+        }
     }
 }
