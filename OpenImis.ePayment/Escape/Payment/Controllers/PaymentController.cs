@@ -204,8 +204,8 @@ namespace OpenImis.ePayment.Controllers
         [Route("api/GetPaymentData")]
         public async Task<IActionResult> GetPaymentChf([FromBody] gepgPmtSpInfo model)
         {
-            //if (model.HasValidSignature)
-            //{
+            if (model.HasValidSignature)
+            {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.InvalidRequestData));
 
@@ -240,21 +240,21 @@ namespace OpenImis.ePayment.Controllers
                 gepgFile.putToTargetFolderPayment();
 
                 return Ok(imisPayment.PaymentResp(GepgCodeResponses.Successful));
-            //}
-            //else
-            //{
-            //    var billId = String.Empty;
-            //    foreach (var payment in model.PymtTrxInf)
-            //    {
-            //        billId = payment.BillId;
-            //    }
+            }
+            else
+            {
+                var billId = String.Empty;
+                foreach (var payment in model.PymtTrxInf)
+                {
+                    billId = payment.BillId;
+                }
 
-            //    string reconc = JsonConvert.SerializeObject(model);
-            //    var gepgFile = new GepgFoldersCreating(billId, "PaymentInvalidSignature", reconc, env);
-            //    gepgFile.putToTargetFolderPayment();
+                string reconc = JsonConvert.SerializeObject(model);
+                var gepgFile = new GepgFoldersCreating(billId, "PaymentInvalidSignature", reconc, env);
+                gepgFile.putToTargetFolderPayment();
 
-            //    return Ok(imisPayment.PaymentResp(GepgCodeResponses.InvalidSignature));
-            //}
+                return Ok(imisPayment.PaymentResp(GepgCodeResponses.InvalidSignature));
+            }
 
         }
 
