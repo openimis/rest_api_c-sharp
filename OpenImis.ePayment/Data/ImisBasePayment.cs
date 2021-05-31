@@ -883,6 +883,55 @@ namespace OpenImis.ePayment.Data
             }
         }
 
+        public void updateReconciliatedPaymentError(string billId)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET PaymentStatus = -5
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", billId),
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public bool CheckPaymentExist(string id)
+        {
+            var sSQL = @"SELECT PaymentID FROM tblPayment WHERE PaymentID = @paymentId";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@paymentId", id)
+            };
+            var paymentExist = false; 
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    var row = data.Rows[0];
+                    if (row["PaymentID"].ToString()==id) 
+                    {
+                        paymentExist = true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return paymentExist;
+        }
+
 
     }
 }
