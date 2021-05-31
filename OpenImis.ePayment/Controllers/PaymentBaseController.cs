@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using OpenImis.ePayment.Responses;
 
 namespace OpenImis.ePayment.Controllers
 {
@@ -83,7 +84,6 @@ namespace OpenImis.ePayment.Controllers
                 {           
                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "10-Uknown type of payment" });
                 }
-                
             }
 
             try
@@ -170,7 +170,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/payment/cancel")]
-        //[ProducesResponseType(typeof(GetControlNumberResp), 200)]
+        [ProducesResponseType(typeof(DataMessage), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public virtual async Task<IActionResult> CancelPayment([FromBody] PaymentCancelModel model)

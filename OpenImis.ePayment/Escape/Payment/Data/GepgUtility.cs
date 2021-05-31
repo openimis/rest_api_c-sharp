@@ -474,7 +474,7 @@ namespace OpenImis.ePayment.Data
             return signature;
         }
 
-        public string SendHttpRequest(string FunctionURL, string Content, string SPCode)
+        public string SendHttpRequest(string FunctionURL, string Content, string SPCode, string GepgCom)
         {
 
             try
@@ -493,7 +493,7 @@ namespace OpenImis.ePayment.Data
                 request.ContentLength = byteArray.Length;
                 //Set Custom Headers
                 request.Headers.Add("Gepg-Code", SPCode);
-                request.Headers.Add("Gepg-Com", "default.sp.in");
+                request.Headers.Add("Gepg-Com", GepgCom);
                 // Get the request stream.  
                 Stream dataStream = request.GetRequestStream();
                 // Write the data to the request stream.  

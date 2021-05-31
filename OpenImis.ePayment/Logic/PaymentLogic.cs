@@ -506,7 +506,7 @@ namespace OpenImis.ePayment.Logic
                 {
                     var response = payment.GePGPostCancelPayment(int.Parse(paymentId));
 
-                    dt.MessageValue = response;
+                    dt.Data = response;
 
                     payment.CancelPayment(int.Parse(paymentId));
                 }

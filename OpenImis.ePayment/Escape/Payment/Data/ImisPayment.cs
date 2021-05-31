@@ -51,7 +51,7 @@ namespace OpenImis.ePayment.Data
             string signature = gepg.GenerateSignature(requestString);
             var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
 
-            var result = gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode);
+            var result = gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode, "default.sp.in");
 
             var content = signedRequest + "********************" + result;
             var gepgFile = new GepgFoldersCreating(productSPCode, "GepGReconRequest", content, env);
@@ -100,7 +100,7 @@ namespace OpenImis.ePayment.Data
             var signature = gepg.GenerateSignature(bill);
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
-            var billAck = gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode));
+            var billAck = gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
 
             string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
             string namepart = new Random().Next(100000, 999999).ToString();
@@ -134,8 +134,10 @@ namespace OpenImis.ePayment.Data
             GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
             
             var GePGCancelPaymentRequest = gepg.CreateGePGCancelPaymentRequest(Configuration, PaymentId);
-            
-            var response = gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, gepg.GetAccountCodeByPaymentId(PaymentId));
+            string SPCode = gepg.GetAccountCodeByPaymentId(PaymentId);
+
+
+            var response = gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
 
 
 
