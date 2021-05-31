@@ -803,11 +803,12 @@ namespace OpenImis.ePayment.Data
         public void CancelPayment(int payment_id)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = 0
+                         SET PaymentStatus = @PaymentStatus
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
-                new SqlParameter("@PaymentID", payment_id)
+                new SqlParameter("@PaymentID", payment_id),
+                new SqlParameter("@PaymentStatus", PaymentStatus.Cancelled)
             };
 
             try
@@ -819,6 +820,79 @@ namespace OpenImis.ePayment.Data
 
                 throw;
             }
+        }
+
+        public void updateReconciliatedPayment(string billId)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET PaymentStatus = @PaymentStatus
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", billId),
+                new SqlParameter("@PaymentStatus", PaymentStatus.Reconciliated)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public void updateReconciliatedPaymentError(string billId)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET PaymentStatus = @PaymentStatus
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", billId),
+                new SqlParameter("@PaymentStatus", PaymentStatus.FailedReconciliated)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public bool CheckPaymentExistError(string id)
+        {
+            var sSQL = @"SELECT PaymentID FROM tblPayment WHERE PaymentID = @paymentId And PaymentStatus<>@PaymentStatus And ValidityTo is Null";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@paymentId", id),
+                new SqlParameter("@PaymentStatus", PaymentStatus.FailedReconciliated)
+            };
+            var paymentExist = false; 
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    var row = data.Rows[0];
+                    if (row["PaymentID"].ToString()==id) 
+                    {
+                        paymentExist = true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return paymentExist;
         }
 
 

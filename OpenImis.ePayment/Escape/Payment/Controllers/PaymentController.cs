@@ -300,6 +300,28 @@ namespace OpenImis.ePayment.Controllers
                 var gepgFile = new GepgFoldersCreating("Reconc", "Data", reconc, env);
                 gepgFile.putToTargetFolderPayment();
 
+                foreach (var recon in model.ReconcTrxInf)
+                {
+                    var paymentToCompare = imisPayment.GetPaymentToReconciliate(recon);
+                    if (paymentToCompare != null)
+                    {
+                        int paymentStatus = (int)paymentToCompare.GetType().GetProperty("paymentStatus").GetValue(paymentToCompare);
+                        if (paymentStatus < PaymentStatus.Reconciliated)
+                        {
+                            imisPayment.updateReconciliatedPayment(recon.SpBillId);
+                            //TODO update policy
+                        }
+                    }
+                    else
+                    {
+                        //send error if payment from GePG not found in IMIS
+                        if (imisPayment.CheckPaymentExistError(recon.SpBillId))
+                        {
+                            imisPayment.updateReconciliatedPaymentError(recon.SpBillId);
+                        }
+                    }
+
+                }
                 return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.Successful));
             }
             else
