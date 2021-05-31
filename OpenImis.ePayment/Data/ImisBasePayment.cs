@@ -868,7 +868,7 @@ namespace OpenImis.ePayment.Data
 
         public bool CheckPaymentExistError(string id)
         {
-            var sSQL = @"SELECT PaymentID FROM tblPayment WHERE PaymentID = @paymentId And @PaymentStatus<>-5";
+            var sSQL = @"SELECT PaymentID FROM tblPayment WHERE PaymentID = @paymentId And PaymentStatus<>@PaymentStatus";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@paymentId", id),
