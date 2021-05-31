@@ -132,7 +132,7 @@ namespace OpenImis.ePayment.Controllers
                     else 
                     {
                         //send error if payment from GePG not found in IMIS
-                        if (imisPayment.CheckPaymentExist(recon.SpBillId))
+                        if (imisPayment.CheckPaymentExistError(recon.SpBillId))
                         {
                             imisPayment.updateReconciliatedPaymentError(recon.SpBillId);
                         }
