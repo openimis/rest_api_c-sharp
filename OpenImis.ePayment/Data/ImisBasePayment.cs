@@ -843,7 +843,7 @@ namespace OpenImis.ePayment.Data
                         var rw = data.Rows[i];
                         var expectedAmount = rw["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ExpectedAmount"]) : 0;
                         var receivedAmount = rw["ReceivedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ReceivedAmount"]) : 0;
-                        if (paidAmount == expectedAmount && receivedAmount != 0)
+                        if (paidAmount == expectedAmount && receivedAmount == paidAmount)
                         {
                             result = new
                             {
