@@ -204,6 +204,48 @@ namespace OpenImis.ePayment.Data
                 throw e;
             }
         }
+
+        public object GetPaymentToReconciliate(ReconcTrxInf payment)
+        {
+            object result = null;
+            double paidAmount = Convert.ToDouble(payment.PaidAmt);
+            SqlParameter[] parameters = {
+                new SqlParameter("@Id", payment.SpBillId),
+                new SqlParameter("@paidAmount", payment.PaidAmt),
+                new SqlParameter("@PaymentStatus", PaymentStatus.Reconciliated),
+            };
+
+            var sSQL = @"SELECT PaymentId, ExpectedAmount, ReceivedAmount, PaymentStatus FROM tblPayment WHERE PaymentId=@Id And PaymentStatus<=@PaymentStatus And ExpectedAmount=@paidAmount And ValidityTo is Null";
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+                if (data.Rows.Count > 0)
+                {
+                    for (int i = 0; i < data.Rows.Count; i++)
+                    {
+                        var rw = data.Rows[i];
+                        var expectedAmount = rw["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ExpectedAmount"]) : 0;
+                        var receivedAmount = rw["ReceivedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ReceivedAmount"]) : 0;
+                        if (paidAmount == expectedAmount && receivedAmount == paidAmount)
+                        {
+                            result = new
+                            {
+                                paymentId = rw["PaymentID"].ToString(),
+                                expectedAmount = expectedAmount,
+                                receivedAmount = receivedAmount,
+                                paymentStatus = rw["PaymentStatus"],
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            { }
+
+            return result;
+        }
 #endif
     }
 }

@@ -803,11 +803,12 @@ namespace OpenImis.ePayment.Data
         public void CancelPayment(int payment_id)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = 0
+                         SET PaymentStatus = @PaymentStatus
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
-                new SqlParameter("@PaymentID", payment_id)
+                new SqlParameter("@PaymentID", payment_id),
+                new SqlParameter("@PaymentStatus", PaymentStatus.Cancelled)
             };
 
             try
@@ -821,55 +822,15 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public object GetPaymentToReconciliate(object payment)
-        {
-            object result = null;
-            double paidAmount = Convert.ToDouble(payment.GetType().GetProperty("paidAmount").GetValue(payment));
-            SqlParameter[] parameters = {
-                new SqlParameter("@Id", payment.GetType().GetProperty("billId").GetValue(payment)),
-                new SqlParameter("@paidAmount", paidAmount),
-            };
-           
-            var sSQL = @"SELECT PaymentId, ExpectedAmount, ReceivedAmount, PaymentStatus FROM tblPayment WHERE PaymentId=@Id And PaymentStatus<=5 And ExpectedAmount=@paidAmount And ValidityTo is Null";
-
-            try
-            {
-                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
-
-                if (data.Rows.Count > 0)
-                {
-                    for (int i = 0; i < data.Rows.Count; i++)
-                    {
-                        var rw = data.Rows[i];
-                        var expectedAmount = rw["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ExpectedAmount"]) : 0;
-                        var receivedAmount = rw["ReceivedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ReceivedAmount"]) : 0;
-                        if (paidAmount == expectedAmount && receivedAmount == paidAmount)
-                        {
-                            result = new
-                            {
-                                paymentId = rw["PaymentID"].ToString(),
-                                expectedAmount = expectedAmount,
-                                receivedAmount = receivedAmount,
-                                paymentStatus = rw["PaymentStatus"],
-                            };
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            { }
-
-            return result;
-        }
-
         public void updateReconciliatedPayment(string billId)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = 5
+                         SET PaymentStatus = @PaymentStatus
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", billId),
+                new SqlParameter("@PaymentStatus", PaymentStatus.Reconciliated)
             };
 
             try
@@ -886,11 +847,12 @@ namespace OpenImis.ePayment.Data
         public void updateReconciliatedPaymentError(string billId)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = -5
+                         SET PaymentStatus = @PaymentStatus
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", billId),
+                new SqlParameter("@PaymentStatus", PaymentStatus.FailedReconciliated)
             };
 
             try
@@ -906,10 +868,11 @@ namespace OpenImis.ePayment.Data
 
         public bool CheckPaymentExistError(string id)
         {
-            var sSQL = @"SELECT PaymentID FROM tblPayment WHERE PaymentID = @paymentId And PaymentStatus<>-5";
+            var sSQL = @"SELECT PaymentID FROM tblPayment WHERE PaymentID = @paymentId And @PaymentStatus<>-5";
 
             SqlParameter[] parameters = {
-                new SqlParameter("@paymentId", id)
+                new SqlParameter("@paymentId", id),
+                new SqlParameter("@PaymentStatus", PaymentStatus.FailedReconciliated)
             };
             var paymentExist = false; 
             try

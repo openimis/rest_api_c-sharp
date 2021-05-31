@@ -119,11 +119,11 @@ namespace OpenImis.ePayment.Controllers
 
                 foreach (var recon in model.ReconcTrxInf) 
                 {
-                    var paymentToCompare = imisPayment.GetPaymentToReconciliate(new { billId = recon.SpBillId, paidAmount = recon.PaidAmt });
+                    var paymentToCompare = imisPayment.GetPaymentToReconciliate(recon);
                     if (paymentToCompare != null)
                     {
-                        int billId = (int) paymentToCompare.GetType().GetProperty("paymentStatus").GetValue(paymentToCompare);
-                        if (billId < 5)
+                        int paymentStatus = (int) paymentToCompare.GetType().GetProperty("paymentStatus").GetValue(paymentToCompare);
+                        if (paymentStatus < PaymentStatus.Reconciliated)
                         {
                             imisPayment.updateReconciliatedPayment(recon.SpBillId);
                             //TODO update policy
