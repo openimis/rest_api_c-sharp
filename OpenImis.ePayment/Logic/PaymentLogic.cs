@@ -55,7 +55,7 @@ namespace OpenImis.ePayment.Logic
                 }
 
                 var amountToBePaid = payment.GetToBePaidAmount(payment.ExpectedAmount, transferFee);
-                var response = payment.PostReqControlNumber(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid, intent.policies);
+                var response = await payment.PostReqControlNumberAsync(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid, intent.policies);
 
                 if (response.ControlNumber != null) // 
                 {

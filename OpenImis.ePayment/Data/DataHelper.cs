@@ -196,6 +196,33 @@ namespace OpenImis.ePayment.Data
             return rv;
         }
 
+        public async Task<IList<SqlParameter>> ExecProcedureAsync(string StoredProcedure, SqlParameter[] parameters)
+        {
+            SqlConnection sqlConnection = new SqlConnection(ConnectionString);
+            SqlCommand command = new SqlCommand();
+
+            SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
+            returnParameter.Direction = ParameterDirection.ReturnValue;
+
+            command.CommandText = StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
+            command.Connection = sqlConnection;
+            command.Parameters.Add(returnParameter);
+
+            if (parameters.Length > 0)
+                command.Parameters.AddRange(parameters);
+
+            sqlConnection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output) || x.Direction.Equals(ParameterDirection.ReturnValue)).ToList();
+            rv.Add(returnParameter);
+
+            sqlConnection.Close();
+
+            return rv;
+        }
     }
 
     public static class ExtensionMethods

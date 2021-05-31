@@ -474,7 +474,7 @@ namespace OpenImis.ePayment.Data
             return signature;
         }
 
-        public string SendHttpRequest(string FunctionURL, string Content, string SPCode, string GepgCom)
+        public async Task<string> SendHttpRequest(string FunctionURL, string Content, string SPCode, string GepgCom)
         {
 
             try
@@ -503,7 +503,7 @@ namespace OpenImis.ePayment.Data
 
 
                 // Get the response.  
-                WebResponse response = request.GetResponse();
+                WebResponse response = await request.GetResponseAsync();
                 // Display the status.  
                 Console.WriteLine(((HttpWebResponse)response).StatusDescription);
                 // Get the stream containing content returned by the server.  

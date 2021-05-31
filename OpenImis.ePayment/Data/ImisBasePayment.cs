@@ -49,7 +49,7 @@ namespace OpenImis.ePayment.Data
             dh = new DataHelper(configuration);
         }
 
-        public bool SaveControlNumberRequest(string BillId,bool failed)
+        public async Task<bool> SaveControlNumberRequest(string BillId,bool failed)
         {
 
             SqlParameter[] sqlParameters = {
@@ -59,7 +59,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                var data = dh.ExecProcedure("uspRequestGetControlNumber", sqlParameters);
+                var data = await dh.ExecProcedureAsync("uspRequestGetControlNumber", sqlParameters);
                 GetPaymentInfo(BillId);
             }
             catch (Exception e)
@@ -70,9 +70,9 @@ namespace OpenImis.ePayment.Data
             return true;
         }
 
-        public virtual PostReqCNResponse PostReqControlNumber(string OfficerCode, string PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
+        public virtual async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, string PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
-            bool result = SaveControlNumberRequest(PaymentId,error);
+            bool result = await SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
 #if !CHF
             // BEGIN Temporary Control Number Generator(Simulation For Testing Only)

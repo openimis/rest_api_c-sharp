@@ -47,42 +47,30 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CHFRequestControlNumberForMultiplePolicies([FromBody] IntentOfPay intent)
         {
-
             return await base.GetControlNumber(intent);
         }
 
         [HttpPost]
         [Route("api/GetControlNumber/Single")]
-        public async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody]IntentOfSinglePay payment)
+        public async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody]IntentOfSinglePay intent)
         {
-            payment.phone_number = payment.Msisdn;
-            payment.enrolment_officer_code = payment.OfficerCode;
-            payment.SmsRequired = true;
-
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
                 return BadRequest(new { success = false, message = error, error_occured = true, error_message = error });
             }
 
-            try
-            {
-                if (payment.enrolment_officer_code == null)
-                    payment.EnrolmentType = EnrolmentType.Renewal + 1;
+            intent.phone_number = intent.Msisdn;
+            intent.enrolment_officer_code = intent.OfficerCode;
+            intent.SmsRequired = true;
 
-                payment.SetDetails();
+            if (intent.enrolment_officer_code == null)
+                intent.EnrolmentType = EnrolmentType.Renewal + 1;
 
-                var response = await _payment.SaveIntent(payment);
-                AssignedControlNumber data = (AssignedControlNumber)response.Data;
+            intent.SetDetails();
 
-                return Ok(new { success = !response.ErrorOccured, message = response.MessageValue, error_occured = response.ErrorOccured, error_message = response.MessageValue, internal_identifier =data.internal_identifier, control_number = data.control_number });
+            return await base.GetControlNumber(intent);
 
-            }
-            catch (Exception e)
-            {
-               
-                 return BadRequest(new { success = false, message = e.Message, error_occured = true, error_message = e.Message });
-            }   
         }
 
         [HttpPost]
@@ -99,7 +87,7 @@ namespace OpenImis.ePayment.Controllers
                 foreach (var bill in model.BillTrxInf)
                 {
 
-                    if (bill.TrxStsCode == "7101")
+                    if (bill.TrxStsCode == GepgCodeResponses.Successful.ToString())
                     {
                         ControlNumberResponse = new ControlNumberResp()
                         {
@@ -273,7 +261,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 foreach (String productSPCode in productsSPCodes)
                 {
-                    var result = imisPayment.RequestReconciliationReport(daysAgo, productSPCode);
+                    var result = imisPayment.RequestReconciliationReportAsync(daysAgo, productSPCode);
                     //check if we have done result - if no - then return 500
                     System.Reflection.PropertyInfo pi = result.GetType().GetProperty("resp");
                     done.Add(result);

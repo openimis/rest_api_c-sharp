@@ -32,7 +32,7 @@ namespace OpenImis.ePayment.Data
         }
 
 #if CHF
-        public object RequestReconciliationReport(int daysAgo, String productSPCode)
+        public async Task<object> RequestReconciliationReportAsync(int daysAgo, String productSPCode)
         {
             daysAgo = -1 * daysAgo;
 
@@ -51,7 +51,7 @@ namespace OpenImis.ePayment.Data
             string signature = gepg.GenerateSignature(requestString);
             var signedRequest = gepg.FinaliseSignedMsg(new ReconcRequest() { gepgSpReconcReq = request, gepgSignature = signature }, typeof(ReconcRequest));
 
-            var result = gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode, "default.sp.in");
+            var result = await gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode, "default.sp.in");
 
             var content = signedRequest + "********************" + result;
             var gepgFile = new GepgFoldersCreating(productSPCode, "GepGReconRequest", content, env);
@@ -93,14 +93,14 @@ namespace OpenImis.ePayment.Data
             return Math.Round(amount, 0);
         }
 
-        public override PostReqCNResponse PostReqControlNumber(string OfficerCode, string PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
+        public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, string PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
             var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, Math.Round(ExpectedAmount,2), InsureeProducts);
             var signature = gepg.GenerateSignature(bill);
 
             var signedMesg = gepg.FinaliseSignedMsg(signature);
-            var billAck = gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
+            var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
 
             string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
             string namepart = new Random().Next(100000, 999999).ToString();
@@ -112,7 +112,7 @@ namespace OpenImis.ePayment.Data
             var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
             gepgFile.putToTargetFolderPayment();
 
-            return base.PostReqControlNumber(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
+            return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
         }
 
         public string ControlNumberResp(int code)
@@ -129,7 +129,7 @@ namespace OpenImis.ePayment.Data
             return signedCnAck;
         }
 
-        public string GePGPostCancelPayment(int PaymentId)
+        public async Task<string> GePGPostCancelPayment(int PaymentId)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
             
@@ -137,7 +137,7 @@ namespace OpenImis.ePayment.Data
             string SPCode = gepg.GetAccountCodeByPaymentId(PaymentId);
 
 
-            var response = gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
+            var response = await gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
 
 
 
