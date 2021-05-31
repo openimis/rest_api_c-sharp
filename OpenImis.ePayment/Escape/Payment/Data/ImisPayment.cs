@@ -204,7 +204,6 @@ namespace OpenImis.ePayment.Data
                 throw e;
             }
         }
-
 #endif
     }
 }

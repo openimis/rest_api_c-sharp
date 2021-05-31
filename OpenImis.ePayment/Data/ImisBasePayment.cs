@@ -821,6 +821,68 @@ namespace OpenImis.ePayment.Data
             }
         }
 
+        public object GetPaymentToReconciliate(object payment)
+        {
+            object result = null;
+            double paidAmount = Convert.ToDouble(payment.GetType().GetProperty("paidAmount").GetValue(payment));
+            SqlParameter[] parameters = {
+                new SqlParameter("@Id", payment.GetType().GetProperty("billId").GetValue(payment)),
+                new SqlParameter("@paidAmount", paidAmount),
+            };
+           
+            var sSQL = @"SELECT PaymentId, ExpectedAmount, ReceivedAmount, PaymentStatus FROM tblPayment WHERE PaymentId=@Id And PaymentStatus<=5 And ExpectedAmount=@paidAmount And ValidityTo is Null";
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+                if (data.Rows.Count > 0)
+                {
+                    for (int i = 0; i < data.Rows.Count; i++)
+                    {
+                        var rw = data.Rows[i];
+                        var expectedAmount = rw["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ExpectedAmount"]) : 0;
+                        var receivedAmount = rw["ReceivedAmount"] != System.DBNull.Value ? Convert.ToDouble(rw["ReceivedAmount"]) : 0;
+                        if (paidAmount == expectedAmount && receivedAmount != 0)
+                        {
+                            result = new
+                            {
+                                paymentId = rw["PaymentID"].ToString(),
+                                expectedAmount = expectedAmount,
+                                receivedAmount = receivedAmount,
+                                paymentStatus = rw["PaymentStatus"],
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            { }
+
+            return result;
+        }
+
+        public void updateReconciliatedPayment(string billId)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET PaymentStatus = 5
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", billId),
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
 
     }
 }
