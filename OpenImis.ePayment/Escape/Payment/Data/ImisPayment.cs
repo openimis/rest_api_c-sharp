@@ -96,23 +96,34 @@ namespace OpenImis.ePayment.Data
         public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, string PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
-            var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, Math.Round(ExpectedAmount,2), InsureeProducts);
-            var signature = gepg.GenerateSignature(bill);
 
-            var signedMesg = gepg.FinaliseSignedMsg(signature);
-            var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
+            ExpectedAmount = Math.Round(ExpectedAmount, 2);
+            //send request only when we have amount <= 0
+            if (ExpectedAmount > 0)
+            {
+                var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, Math.Round(ExpectedAmount, 2), InsureeProducts);
+                var signature = gepg.GenerateSignature(bill);
 
-            string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
-            string namepart = new Random().Next(100000, 999999).ToString();
+                var signedMesg = gepg.FinaliseSignedMsg(signature);
+                var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
 
-            string reconc = JsonConvert.SerializeObject(billAck);
-            string sentbill = JsonConvert.SerializeObject(bill);
+                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
+                string namepart = new Random().Next(100000, 999999).ToString();
 
-            var content = sentbill + "********************" + reconc;
-            var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
-            gepgFile.putToTargetFolderPayment();
+                string reconc = JsonConvert.SerializeObject(billAck);
+                string sentbill = JsonConvert.SerializeObject(bill);
 
-            return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
+                var content = sentbill + "********************" + reconc;
+                var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
+                gepgFile.putToTargetFolderPayment();
+
+                return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
+            }
+            else
+            {
+                //do not send any request to GePG when we have 0 or negative amount
+                return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true); 
+            }
         }
 
         public string ControlNumberResp(int code)
