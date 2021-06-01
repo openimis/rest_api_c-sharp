@@ -107,9 +107,6 @@ namespace OpenImis.ePayment.Data
                 var signedMesg = gepg.FinaliseSignedMsg(signature);
                 var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
 
-                string mydocpath = System.IO.Path.Combine(env.WebRootPath, "controlNumberAck");
-                string namepart = new Random().Next(100000, 999999).ToString();
-
                 string reconc = JsonConvert.SerializeObject(billAck);
                 string sentbill = JsonConvert.SerializeObject(bill);
 
