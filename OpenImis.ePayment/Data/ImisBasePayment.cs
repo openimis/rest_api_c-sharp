@@ -895,30 +895,5 @@ namespace OpenImis.ePayment.Data
 
             return paymentExist;
         }
-
-
-        public void updatePaymentStatus(string billId, int paymentStatus)
-        {
-            var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = @PaymentStatus
-                         WHERE PaymentID = @PaymentID;";
-
-            SqlParameter[] parameters = {
-                new SqlParameter("@PaymentID", billId),
-                new SqlParameter("@PaymentStatus", paymentStatus)
-            };
-
-            try
-            {
-                dh.Execute(sSQL, parameters, CommandType.Text);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-
     }
 }
