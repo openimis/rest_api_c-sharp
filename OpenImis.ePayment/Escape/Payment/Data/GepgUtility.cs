@@ -68,7 +68,7 @@ namespace OpenImis.ePayment.Data
             }
             else
             {
-                return "-2: Error - no policies to create Bill";
+                return "-2: error - no policy";
             }
 
             BillTrxInf billTrxInf = new BillTrxInf()
