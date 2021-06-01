@@ -50,25 +50,10 @@ namespace OpenImis.ePayment.Data
 
             List<BillItem> items = new List<BillItem>();
 
-            if ( policies.Count==1 )
-            {
-                BillItem item = new BillItem()
-                {
-                    BillItemRef = "ImisPolicy",
-                    BillItemAmt = Convert.ToDouble(ExpectedAmount),
-                    BillItemEqvAmt = Convert.ToDouble(ExpectedAmount),
-                    BillItemMiscAmt = 0,
-                    UseItemRefOnPay = "N",
-                    GfsCode = Configuration["PaymentGateWay:GePG:GfsCode:0"]
-                };
-
-                items.Add(item);
-            }
-            else
+            if (policies.Count > 0)
             {
                 foreach (var policy in policies)
                 {
-
                     BillItem item = new BillItem()
                     {
                         BillItemRef = "ImisPolicy",
@@ -78,9 +63,12 @@ namespace OpenImis.ePayment.Data
                         UseItemRefOnPay = "N",
                         GfsCode = Configuration["PaymentGateWay:GePG:GfsCode:0"]
                     };
-
                     items.Add(item);
                 }
+            }
+            else
+            {
+                return "-2: Error - no policies to create Bill";
             }
 
             BillTrxInf billTrxInf = new BillTrxInf()

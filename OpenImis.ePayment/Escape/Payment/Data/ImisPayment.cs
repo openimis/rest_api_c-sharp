@@ -102,19 +102,29 @@ namespace OpenImis.ePayment.Data
             if (ExpectedAmount > 0)
             {
                 var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, ExpectedAmount, products);
-                var signature = gepg.GenerateSignature(bill);
 
-                var signedMesg = gepg.FinaliseSignedMsg(signature);
-                var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
+                if (bill != "-2: Error - no policies to create Bill")
+                {
+                    var signature = gepg.GenerateSignature(bill);
 
-                string reconc = JsonConvert.SerializeObject(billAck);
-                string sentbill = JsonConvert.SerializeObject(bill);
+                    var signedMesg = gepg.FinaliseSignedMsg(signature);
+                    var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
 
-                var content = sentbill + "********************" + reconc;
-                var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
-                gepgFile.putToTargetFolderPayment();
+                    string reconc = JsonConvert.SerializeObject(billAck);
+                    string sentbill = JsonConvert.SerializeObject(bill);
 
-                return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
+                    var content = sentbill + "********************" + reconc;
+                    var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
+                    gepgFile.putToTargetFolderPayment();
+
+                    return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
+                }
+                else 
+                {
+                    //update Payment status to -2
+                    return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true);
+
+                }
             }
             else
             {
