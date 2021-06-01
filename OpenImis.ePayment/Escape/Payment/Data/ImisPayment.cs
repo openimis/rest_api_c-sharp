@@ -98,7 +98,7 @@ namespace OpenImis.ePayment.Data
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
 
             ExpectedAmount = Math.Round(ExpectedAmount, 2);
-            //send request only when we have amount <= 0
+            //send request only when we have amount > 0
             if (ExpectedAmount > 0)
             {
                 var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, ExpectedAmount, InsureeProducts);
