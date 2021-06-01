@@ -8,7 +8,7 @@ namespace OpenImis.ePayment.Models.Payment
 {
     public class MatchModel
     {
-        public string internal_identifier { get; set; }
+        public int internal_identifier { get; set; }
         [Required]
         public int audit_user_id { get; set; }
     }

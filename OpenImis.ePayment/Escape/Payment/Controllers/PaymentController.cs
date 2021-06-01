@@ -77,39 +77,28 @@ namespace OpenImis.ePayment.Controllers
         [Route("api/GetReqControlNumber")]
         public IActionResult GetReqControlNumberChf([FromBody] gepgBillSubResp model)
         {
+            int billId;
             if (model.HasValidSignature)
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidRequestData));
 
-                var billId = String.Empty;
-                ControlNumberResp ControlNumberResponse = new ControlNumberResp();
+                ControlNumberResp ControlNumberResponse;
                 foreach (var bill in model.BillTrxInf)
                 {
-
-                    if (bill.TrxStsCode == GepgCodeResponses.Successful.ToString())
+                    ControlNumberResponse = new ControlNumberResp()
                     {
-                        ControlNumberResponse = new ControlNumberResp()
-                        {
-                            internal_identifier = bill.BillId,
-                            control_number = bill.PayCntrNum,
-                            error_occured = false,
-                            error_message = bill.TrxStsCode
-                        };
-
-                    }
-                    else
-                    {
-                        ControlNumberResponse = new ControlNumberResp()
-                        {
-                            internal_identifier = bill.BillId,
-                            control_number = bill.PayCntrNum,
-                            error_occured = true,
-                            error_message = bill.TrxStsCode
-                        };
-                    }
-
+                        internal_identifier = bill.BillId,
+                        control_number = bill.PayCntrNum,
+                        error_occured = bill.TrxStsCode == GepgCodeResponses.Successful.ToString()?false:true,
+                        error_message = bill.TrxStsCode
+                    };
+                
                     billId = bill.BillId;
+
+                    string reconc = JsonConvert.SerializeObject(ControlNumberResponse);
+                    var gepgFile = new GepgFoldersCreating(billId, "CN_Response", reconc, env);
+                    gepgFile.putToTargetFolderPayment();
 
                     try
                     {
@@ -121,23 +110,19 @@ namespace OpenImis.ePayment.Controllers
                     }
                 }
 
-                string reconc = JsonConvert.SerializeObject(ControlNumberResponse);
-                var gepgFile = new GepgFileLogger(billId, "CN_Response", reconc, env);
-                gepgFile.putToTargetFolderPayment();
-
                 return Ok(imisPayment.ControlNumberResp(GepgCodeResponses.Successful));
             }
             else
             {
-                var billId = String.Empty;
                 foreach (var bill in model.BillTrxInf)
                 {
                     billId = bill.BillId;
-                }
-                string reconc = JsonConvert.SerializeObject(model);
-                var gepgFile = new GepgFileLogger(billId, "CN_Response", reconc, env);
-                gepgFile.putToTargetFolderPayment();
 
+                    string reconc = JsonConvert.SerializeObject(model);
+                    var gepgFile = new GepgFoldersCreating(billId, "CN_Response_InvalidSignature", reconc, env);
+                    gepgFile.putToTargetFolderPayment();
+                }
+                
                 return Ok(imisPayment.ControlNumberResp(GepgCodeResponses.InvalidSignature));
             }
 
@@ -171,12 +156,64 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CHFCancelOnePayment([FromBody] PaymentCancelModel model)
         {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            DataMessage dt = new DataMessage();
 
-            return await base.CancelPayment(model);
+            if (model.control_number != null)
+            {
+                // todo: change string type to int
+                string paymentId = payment.GetPaymentId(model.control_number);
+
+                if (paymentId != null && paymentId != string.Empty)
+                {
+                    var ack = await payment.GePGPostCancelPayment(int.Parse(paymentId));
+
+                    if (ack.GetType() == typeof(DataMessage))
+                    {
+                        return Ok((DataMessage)ack);
+                    }
+
+                    GePGPaymentCancelResponse response = (GePGPaymentCancelResponse)ack;
+
+                    if (response.gepgBillCanclResp.BillCanclTrxDt.Count() > 0 && 
+                        response.gepgBillCanclResp.BillCanclTrxDt[0].TrxSts == TrxSts.Success)
+                    {
+                        return await base.CancelPayment(model);
+                    }
+                    else
+                    {
+                        return Ok(new DataMessage
+                        {
+                            Data = response,
+                            Code = 3,
+                            ErrorOccured = true,
+                            MessageValue = "CancelPayment:3:Failed to cancel"
+                        });
+                    }
+                }
+                else
+                {
+                    //Todo: move hardcoded message to translation file
+                    return Ok(new DataMessage
+                    {
+                        Code = 2,
+                        ErrorOccured = true,
+                        MessageValue = "CancelPayment:2:Control Number doesn't exists",
+                    });
+                }
+            }
+            
+            return Ok(new DataMessage
+                {
+                    Code = 1,
+                    ErrorOccured = true,
+                    MessageValue = "CancelPayment:1:Missing Control Number",
+                });
+            
         }
 
         [NonAction]
-        public override async Task<IActionResult> CancelPayment([FromBody] PaymentCancelModel model)
+        public override async Task<IActionResult> CancelPayment([FromBody] PaymentCancelBaseModel model)
         {
             return await base.CancelPayment(model);
         }
@@ -188,12 +225,12 @@ namespace OpenImis.ePayment.Controllers
         [Route("api/GetPaymentData")]
         public async Task<IActionResult> GetPaymentChf([FromBody] gepgPmtSpInfo model)
         {
+            int billId;
             if (model.HasValidSignature)
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.InvalidRequestData));
 
-                var billId = String.Empty;
                 object _response = null;
 
                 foreach (var payment in model.PymtTrxInf)
@@ -215,27 +252,28 @@ namespace OpenImis.ePayment.Controllers
 
                     billId = payment.BillId;
 
+                    string reconc = JsonConvert.SerializeObject(_response);
+                    var gepgFile = new GepgFoldersCreating(billId, "Payment", reconc, env);
+                    gepgFile.putToTargetFolderPayment();
+
                     _response = await base.GetPaymentData(pay);
 
-                }
-
-                string reconc = JsonConvert.SerializeObject(_response);
-                var gepgFile = new GepgFileLogger(billId, "Payment", reconc, env);
-                gepgFile.putToTargetFolderPayment();
+                }               
 
                 return Ok(imisPayment.PaymentResp(GepgCodeResponses.Successful));
             }
             else
             {
-                var billId = String.Empty;
                 foreach (var payment in model.PymtTrxInf)
                 {
                     billId = payment.BillId;
+
+                    string reconc = JsonConvert.SerializeObject(model);
+                    var gepgFile = new GepgFoldersCreating(billId, "PaymentInvalidSignature", reconc, env);
+                    gepgFile.putToTargetFolderPayment();
+
                 }
 
-                string reconc = JsonConvert.SerializeObject(model);
-                var gepgFile = new GepgFileLogger(billId, "PaymentInvalidSignature", reconc, env);
-                gepgFile.putToTargetFolderPayment();
 
                 return Ok(imisPayment.PaymentResp(GepgCodeResponses.InvalidSignature));
             }
@@ -285,7 +323,7 @@ namespace OpenImis.ePayment.Controllers
                     return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.InvalidRequestData));
 
                 string reconc = JsonConvert.SerializeObject(model);
-                var gepgFile = new GepgFileLogger("Reconc", "Data", reconc, env);
+                var gepgFile = new GepgFoldersCreating("Reconc_Data", reconc, env);
                 gepgFile.putToTargetFolderPayment();
 
                 foreach (var recon in model.ReconcTrxInf)
@@ -329,6 +367,7 @@ namespace OpenImis.ePayment.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = true, error_message = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage });
 
+            // Todo: remove api_key check because is checked by authentication layer
             if (model.api_key != "Xdfg8796021ff89Df4654jfjHeHidas987vsdg97e54ggdfHjdt")
                 return BadRequest(new { error_occured = true, error_message = "Unauthorized request" });
 

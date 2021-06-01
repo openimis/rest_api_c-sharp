@@ -8,7 +8,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
 {
     public class WebMatchModel
     {
-        public string internal_identifier { get; set; }
+        public int internal_identifier { get; set; }
         [Required]
         public int audit_user_id { get; set; }
         public string api_key { get; set; }

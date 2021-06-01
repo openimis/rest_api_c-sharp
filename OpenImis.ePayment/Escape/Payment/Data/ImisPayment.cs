@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Data.SqlClient;
 using System.Data;
+using OpenImis.ePayment.Responses;
 
 namespace OpenImis.ePayment.Data
 {
@@ -143,23 +144,50 @@ namespace OpenImis.ePayment.Data
             return signedCnAck;
         }
 
-        public async Task<string> GePGPostCancelPayment(int PaymentId)
+        public async Task<Object> GePGPostCancelPayment(int PaymentId)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
-            
-            var GePGCancelPaymentRequest = gepg.CreateGePGCancelPaymentRequest(Configuration, PaymentId);
-            string SPCode = gepg.GetAccountCodeByPaymentId(PaymentId);
+
+            try
+            {
+                var GePGCancelPaymentRequest = gepg.CreateGePGCancelPaymentRequest(Configuration, PaymentId);
+                string SPCode = gepg.GetAccountCodeByPaymentId(PaymentId);
 
 
-            var response = await gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
+                var response = await gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
 
 
 
-            var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
-            var gepgFile = new GepgFileLogger(PaymentId.ToString(), "CancelPayment", content, env);
-            gepgFile.putToTargetFolderPayment();
+                var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
+                var gepgFile = new GepgFoldersCreating(PaymentId.ToString(), "CancelPayment", content, env);
+                gepgFile.putToTargetFolderPayment();
 
-            return response;
+                return this.GetGePGObjectFromString(response, typeof(GePGPaymentCancelResponse));
+            }
+            catch (Exception ex)
+            {
+                return new DataMessage
+                {
+                    Code = -1,
+                    ErrorOccured = true,
+                    MessageValue = ex.ToString(),
+                }; 
+            }
+        }
+
+        public Object GetGePGObjectFromString(string input, Type type)
+        {
+            try
+            {
+                TextReader reader = new StringReader(input);
+                var serializer = new XmlSerializer(type);
+                return Convert.ChangeType(serializer.Deserialize(reader), type);
+            }
+            catch
+            {
+                return null;
+            }
+
         }
 
         public string PaymentResp(int code)

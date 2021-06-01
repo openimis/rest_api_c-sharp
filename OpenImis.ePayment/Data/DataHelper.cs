@@ -120,6 +120,34 @@ namespace OpenImis.ePayment.Data
             }
         }
 
+        public async Task ExecuteAsync(string SQL, SqlParameter[] parameters, CommandType commandType)
+        {
+            var sqlConnection = new SqlConnection(ConnectionString);
+
+            //if(SqlCommand.C)
+            // sqlConnection.Open
+            var command = new SqlCommand(SQL, sqlConnection)
+            {
+                CommandType = commandType
+            };
+
+            using (command)
+            {
+                if (command.Connection.State == 0)
+                {
+                    command.Connection.Open();
+
+                    if (parameters.Length > 0)
+                        command.Parameters.AddRange(parameters);
+
+                    await command.ExecuteNonQueryAsync();
+
+                    command.Connection.Close();
+                }
+
+            }
+        }
+
         public ProcedureOutPut Procedure(string StoredProcedure, SqlParameter[] parameters,int tableIndex = 0)
         {
             DataSet dt = new DataSet();

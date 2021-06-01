@@ -35,7 +35,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public string TrxId { get; set; }
         public string SpCode { get; set; }
         public string PayRefId { get; set; }
-        public string BillId { get; set; }
+        public int BillId { get; set; }
         public string PayCtrNum { get; set; }
         public decimal BillAmt { get; set; }
         public decimal PaidAmt { get; set; }

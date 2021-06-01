@@ -42,5 +42,12 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public string TrxStsCode { get; set; }
     }
 
-  
+    public static class TrxSts
+    {
+        public static string Success = "GS";
+        public static string Failure = "GF";
+    }
+
+
+
 }

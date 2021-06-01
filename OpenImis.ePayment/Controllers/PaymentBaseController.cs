@@ -173,26 +173,16 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(DataMessage), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual async Task<IActionResult> CancelPayment([FromBody] PaymentCancelModel model)
+        public virtual async Task<IActionResult> CancelPayment([FromBody] PaymentCancelBaseModel model)
         {
 
             try
             {
-                var response = await _payment.CancelPayment(model);
-
-                if (response.Code == 0)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(new PaymentDataBadResp() { error_message = response.MessageValue });
-                }
-
+                return Ok(await _payment.CancelPayment(model.payment_id));
             }
             catch (Exception e)
             {
-                return BadRequest(new PaymentDataBadResp() { error_message = "Unknown Error Occured" });
+                return BadRequest(new PaymentDataBadResp() { error_message = e.ToString() });
             }
         }
 

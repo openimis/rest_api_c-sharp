@@ -9,7 +9,7 @@ namespace OpenImis.ePayment.Models.Payment
     public class ControlNumberResp
     {
         [Required]
-        public string internal_identifier { get; set; }
+        public int internal_identifier { get; set; }
         public string control_number { get; set; }
         [Required]
         public bool error_occured { get; set; }

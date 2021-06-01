@@ -25,7 +25,7 @@ namespace OpenImis.ePayment.Data
 {
     public class ImisBasePayment
     {
-        public string PaymentId { get; set; }
+        public int PaymentId { get; set; }
         public decimal ExpectedAmount { get; set; }
         public string ControlNum { get; set; }
         public string PhoneNumber { get; set; }
@@ -49,7 +49,7 @@ namespace OpenImis.ePayment.Data
             dh = new DataHelper(configuration);
         }
 
-        public async Task<bool> SaveControlNumberRequest(string BillId,bool failed)
+        public async Task<bool> SaveControlNumberRequest(int BillId,bool failed)
         {
 
             SqlParameter[] sqlParameters = {
@@ -70,7 +70,7 @@ namespace OpenImis.ePayment.Data
             return true;
         }
 
-        public virtual async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, string PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
+        public virtual async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
         {
             bool result = await SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
@@ -212,7 +212,7 @@ namespace OpenImis.ePayment.Data
                 dt.Columns.Add("control_number");
 
                 DataRow rw = dt.NewRow();
-                var PaymentId = data[0].Value.ToString();
+                int PaymentId = (int)data[0].Value;
                 rw["internal_identifier"] = PaymentId;
                 
                 dt.Rows.Add(rw);
@@ -423,7 +423,7 @@ namespace OpenImis.ePayment.Data
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
                 // TODO: manage error messages from SP execution 
                 message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false, (int)Language).Message;
-                GetPaymentInfo(data[0].Value.ToString());
+                GetPaymentInfo((int)data[0].Value);
 
             }
             catch (Exception e)
@@ -476,7 +476,7 @@ namespace OpenImis.ePayment.Data
                 message = new MatchPayResponse(dh.ReturnValue,false,dt , (int)Language).Message;
                 if(model.internal_identifier != null && !message.ErrorOccured)
                 {
-                    GetPaymentInfo(model.internal_identifier.ToString());
+                    GetPaymentInfo(model.internal_identifier);
                 }
             }
             catch (Exception e)
@@ -544,7 +544,7 @@ namespace OpenImis.ePayment.Data
             return dt;
         }
 
-        public void GetPaymentInfo(string Id)
+        public void GetPaymentInfo(int Id)
         {
             var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount,tblPayment.LanguageName,tblPayment.TypeOfPayment,tblPayment.SmsRequired, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
                         tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
@@ -801,20 +801,19 @@ namespace OpenImis.ePayment.Data
             return result;
         }
 
-        public void CancelPayment(int payment_id)
+        public async Task CancelPayment(int payment_id)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = @PaymentStatus
+                         SET ValidityTo = CURRENT_TIMESTAMP
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
-                new SqlParameter("@PaymentID", payment_id),
-                new SqlParameter("@PaymentStatus", PaymentStatus.Cancelled)
+                new SqlParameter("@PaymentID", payment_id)
             };
 
             try
             {
-                dh.Execute(sSQL, parameters, CommandType.Text);
+                await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
             }
             catch (Exception)
             {
@@ -875,7 +874,6 @@ namespace OpenImis.ePayment.Data
                 new SqlParameter("@paymentId", id),
                 new SqlParameter("@PaymentStatus", PaymentStatus.FailedReconciliated)
             };
-            var paymentExist = false; 
             try
             {
                 var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
@@ -884,7 +882,7 @@ namespace OpenImis.ePayment.Data
                     var row = data.Rows[0];
                     if (row["PaymentID"].ToString()==id) 
                     {
-                        paymentExist = true;
+                        return true;
                     }
                 }
             }
@@ -893,7 +891,34 @@ namespace OpenImis.ePayment.Data
                 return false;
             }
 
-            return paymentExist;
+            return false;
+        }
+
+        public bool Exists()
+        {
+            var sSQL = @"SELECT PaymentID FROM tblPayment WHERE PaymentID = @paymentId And ValidityTo is Null";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@paymentId", this.PaymentId)
+            };
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    var row = data.Rows[0];
+                    if (int.Parse(row["PaymentID"].ToString()) == this.PaymentId)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return false;
         }
     }
 }

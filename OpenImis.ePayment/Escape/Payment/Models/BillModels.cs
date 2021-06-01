@@ -88,7 +88,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
 
     public class BillTrxRespInf
     {
-        public string BillId { get; set; }
+        public int BillId { get; set; }
         public string PayCntrNum { get; set; }
         public string TrxSts { get; set; }
         public string TrxStsCode { get; set; }

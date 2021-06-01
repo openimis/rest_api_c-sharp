@@ -10,7 +10,7 @@ namespace OpenImis.ePayment.Extensions
     public class GepgFileLogger
     {
 
-        private string paymentId;
+        private int paymentId;
         private string finality;
         private string content;
         IHostingEnvironment env;

@@ -12,7 +12,9 @@ using OpenImis.ePayment.Models.Sms;
 using OpenImis.ePayment.Escape.Sms;
 using Newtonsoft.Json;
 using OpenImis.ePayment.Models.Payment.Response;
-using System.Diagnostics;
+using System.IO;
+using System.Xml.Serialization;
+using OpenImis.ePayment.Escape.Payment.Models;
 
 namespace OpenImis.ePayment.Logic
 {
@@ -482,32 +484,25 @@ namespace OpenImis.ePayment.Logic
 
             var response = payment.ProvideReconciliationData(model);
 
-            ReconciliationMessage return_message = new ReconciliationMessage();
-
-            return_message.transactions = response;
-            return_message.error_occurred = false;
+            ReconciliationMessage return_message = new ReconciliationMessage
+            {
+                transactions = response,
+                error_occurred = false
+            };
 
             return return_message;
         }
 
-        public async Task<DataMessage> CancelPayment(PaymentCancelModel model)
+        // Todo: make this method generic
+        public async Task<DataMessage> CancelPayment(int payment_id)
         {
 
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            DataMessage dt = new DataMessage();
+                ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+                DataMessage dt = new DataMessage();
             
-            if (model.control_number != null)
-            {
-                // todo: change string type to int
-                string paymentId = payment.GetPaymentId(model.control_number);
-
-                if (paymentId != null && paymentId != string.Empty)
+                if (payment_id > 0)
                 {
-                    var response = payment.GePGPostCancelPayment(int.Parse(paymentId));
-
-                    dt.Data = response;
-
-                    payment.CancelPayment(int.Parse(paymentId));
+                    await payment.CancelPayment(payment_id);
                 }
                 else
                 {
@@ -521,21 +516,11 @@ namespace OpenImis.ePayment.Logic
 
                     return dm;
                 }
-            }
-            else
-            {
-                DataMessage dm = new DataMessage
-                {
-                    Code = 1,
-                    ErrorOccured = true,
-                    MessageValue = "CancelPayment:1:Missing Control Number",
-                };
-
-                return dm;
-            }
-
-
-            return dt;
+                
+                return dt;
         }
+
+        
+
     }
 }
