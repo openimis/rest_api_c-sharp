@@ -101,7 +101,7 @@ namespace OpenImis.ePayment.Data
             //send request only when we have amount <= 0
             if (ExpectedAmount > 0)
             {
-                var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, Math.Round(ExpectedAmount, 2), InsureeProducts);
+                var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, ExpectedAmount, InsureeProducts);
                 var signature = gepg.GenerateSignature(bill);
 
                 var signedMesg = gepg.FinaliseSignedMsg(signature);
