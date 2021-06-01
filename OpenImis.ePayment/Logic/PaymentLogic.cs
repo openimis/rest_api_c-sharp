@@ -83,7 +83,6 @@ namespace OpenImis.ePayment.Logic
                     {
                         return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
                         ControlNumberNotassignedSms(payment, response.ErrorMessage);
-
                     }
 
                 return_message.Data = ret_data;

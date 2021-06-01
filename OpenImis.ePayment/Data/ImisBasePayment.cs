@@ -83,8 +83,9 @@ namespace OpenImis.ePayment.Data
             PostReqCNResponse response = new PostReqCNResponse() {
                
                 ControlNumber = ctrlNumber,
-                Posted = true,
+                Posted = error == false ? true : false,
                 ErrorCode = 0,
+                ErrorOccured = error,
                 Assigned = error
             };
 
@@ -894,7 +895,5 @@ namespace OpenImis.ePayment.Data
 
             return paymentExist;
         }
-
-
     }
 }
