@@ -54,7 +54,7 @@ namespace OpenImis.ePayment.Data
             var result = await gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode, "default.sp.in");
 
             var content = signedRequest + "********************" + result;
-            var gepgFile = new GepgFoldersCreating(productSPCode, "GepGReconRequest", content, env);
+            var gepgFile = new GepgFileLogger(productSPCode, "GepGReconRequest", content, env);
             gepgFile.putToTargetFolderPayment();
 
             return new { reconcId = request.SpReconcReqId, resp = result };
@@ -113,9 +113,7 @@ namespace OpenImis.ePayment.Data
                     string reconc = JsonConvert.SerializeObject(billAck);
                     string sentbill = JsonConvert.SerializeObject(bill);
 
-                    var content = sentbill + "********************" + reconc;
-                    var gepgFile = new GepgFoldersCreating(PaymentId, "CN_Request", content, env);
-                    gepgFile.putToTargetFolderPayment();
+                    GepgFileLogger.log(PaymentId, "CN_Request", sentbill + "********************" + reconc, env);
 
                     return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
                 }
@@ -123,7 +121,6 @@ namespace OpenImis.ePayment.Data
                 {
                     //update Payment status to -2
                     return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true);
-
                 }
             }
             else
@@ -160,7 +157,7 @@ namespace OpenImis.ePayment.Data
 
 
             var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
-            var gepgFile = new GepgFoldersCreating(PaymentId.ToString(), "CancelPayment", content, env);
+            var gepgFile = new GepgFileLogger(PaymentId.ToString(), "CancelPayment", content, env);
             gepgFile.putToTargetFolderPayment();
 
             return response;

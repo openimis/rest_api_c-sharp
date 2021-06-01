@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace OpenImis.ePayment.Extensions
 {
-    public class GepgFoldersCreating
+    public class GepgFileLogger
     {
 
         private string paymentId;
@@ -16,7 +16,7 @@ namespace OpenImis.ePayment.Extensions
         IHostingEnvironment env;
         string basePath;
 
-        public GepgFoldersCreating(string paymentId, string finality, string content, IHostingEnvironment env)
+        public GepgFileLogger(string paymentId, string finality, string content, IHostingEnvironment env)
         {
             this.paymentId = paymentId;
             this.finality = finality;
@@ -24,11 +24,28 @@ namespace OpenImis.ePayment.Extensions
             this.env = env;
         }
 
-        public GepgFoldersCreating(string finality, string content, string basePath)
+        public GepgFileLogger(string finality, string content, string basePath)
         {
             this.finality = finality;
             this.content = content;
             this.basePath = basePath;
+        }
+
+        public static void log(string paymentId, string finality, string content, IHostingEnvironment env)
+        {
+            var currentDate = DateTime.Now.ToString("yyyy/M/d/");
+            var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
+            string targetPath = System.IO.Path.Combine(env.WebRootPath, "ePayment", currentDate);
+            //if no Directory with current date - then create folder
+            if (!Directory.Exists(targetPath))
+            {
+                System.IO.Directory.CreateDirectory(targetPath);
+            }
+            //we have target folder for current date - then we can save file
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, paymentId + "_" + finality + "_" + currentDateTime + ".json")))
+            {
+                outputFile.WriteLine(content);
+            }
         }
 
         public void putToTargetFolderPayment()
