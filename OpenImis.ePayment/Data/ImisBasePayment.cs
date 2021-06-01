@@ -83,8 +83,9 @@ namespace OpenImis.ePayment.Data
             PostReqCNResponse response = new PostReqCNResponse() {
                
                 ControlNumber = ctrlNumber,
-                Posted = true,
+                Posted = error == false ? true : false,
                 ErrorCode = 0,
+                ErrorOccured = error,
                 Assigned = error
             };
 
@@ -893,6 +894,29 @@ namespace OpenImis.ePayment.Data
             }
 
             return paymentExist;
+        }
+
+
+        public void updatePaymentStatus(string billId, int paymentStatus)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET PaymentStatus = @PaymentStatus
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", billId),
+                new SqlParameter("@PaymentStatus", paymentStatus)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
 

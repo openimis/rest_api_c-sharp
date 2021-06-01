@@ -119,7 +119,6 @@ namespace OpenImis.ePayment.Data
                 }
                 else 
                 {
-                    //update Payment status to -2
                     return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true);
                 }
             }
