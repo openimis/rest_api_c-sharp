@@ -103,7 +103,7 @@ namespace OpenImis.ePayment.Data
             {
                 var bill = gepg.CreateBill(Configuration, OfficerCode, PhoneNumber, PaymentId, ExpectedAmount, products);
 
-                if (bill != "-2: Error - no policies to create Bill")
+                if (bill != "-2: error - no policy")
                 {
                     var signature = gepg.GenerateSignature(bill);
 
