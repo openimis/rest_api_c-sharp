@@ -92,7 +92,7 @@ namespace OpenImis.ePayment.Data
             return response;
         }
 
-        public virtual bool UpdatePaymentTransferFee(string paymentId, decimal TransferFee, TypeOfPayment typeOfPayment) {
+        public virtual bool UpdatePaymentTransferFee(int paymentId, decimal TransferFee, TypeOfPayment typeOfPayment) {
 
             var sSQL = @"UPDATE tblPayment SET TypeOfPayment = @TypeOfPayment,TransferFee = @TransferFee WHERE PaymentID = @paymentId";
 
@@ -125,12 +125,12 @@ namespace OpenImis.ePayment.Data
             return 0;
         }
 
-        public virtual int GetReqControlNumberAck(string paymentId)
+        public virtual int GetReqControlNumberAck(int paymentId)
         {
             return 0;
         }
 
-        public virtual int GetPaymentDataAck(string paymentId, string controlNumber)
+        public virtual int GetPaymentDataAck(int paymentId, string controlNumber)
         {
             return 0;
         }
@@ -294,7 +294,7 @@ namespace OpenImis.ePayment.Data
             return message;
         }
 
-        public bool CheckControlNumber(string PaymentID, string ControlNumber)
+        public bool CheckControlNumber(int PaymentID, string ControlNumber)
         {
             var sSQL = @"SELECT * FROM tblControlNumber WHERE PaymentID != @PaymentID AND ControlNumber = @ControlNumber";
 
@@ -474,7 +474,7 @@ namespace OpenImis.ePayment.Data
                 }
                 
                 message = new MatchPayResponse(dh.ReturnValue,false,dt , (int)Language).Message;
-                if(model.internal_identifier != null && !message.ErrorOccured)
+                if(model.internal_identifier != 0 && !message.ErrorOccured)
                 {
                     GetPaymentInfo(model.internal_identifier);
                 }
@@ -728,31 +728,28 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public string GetPaymentId(string ControlNumber)
+        public int GetPaymentId(string ControlNumber)
         {
             var sSQL = @"SELECT PaymentID FROM tblControlNumber WHERE ControlNumber = @ControlNumber";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@ControlNumber", ControlNumber)
             };
-            string paymentId = string.Empty;
-
             try
             {
                 var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
                 if (data.Rows.Count > 0)
                 {
                     var row = data.Rows[0];
-                    paymentId = row["PaymentID"].ToString();
+                    return (int)row["PaymentID"];
                 }
                 //GetPaymentInfo(PaymentID);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return string.Empty;
+                return 0;
             }
-
-            return paymentId;
+            return 0;
         }
         public List<ReconciliationItem> ProvideReconciliationData(ReconciliationRequest model)
         {

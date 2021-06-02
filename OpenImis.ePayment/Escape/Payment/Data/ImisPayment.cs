@@ -55,9 +55,8 @@ namespace OpenImis.ePayment.Data
             var result = await gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode, "default.sp.in");
 
             var content = signedRequest + "********************" + result;
-            var gepgFile = new GepgFileLogger(productSPCode, "GepGReconRequest", content, env);
-            gepgFile.putToTargetFolderPayment();
-
+            GepgFileLogger.Log(productSPCode + "_GepGReconRequest", content, env);
+            
             return new { reconcId = request.SpReconcReqId, resp = result };
 
         }
@@ -94,7 +93,7 @@ namespace OpenImis.ePayment.Data
             return Math.Round(amount, 0);
         }
 
-        public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, string PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
+        public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
 
@@ -114,7 +113,7 @@ namespace OpenImis.ePayment.Data
                     string reconc = JsonConvert.SerializeObject(billAck);
                     string sentbill = JsonConvert.SerializeObject(bill);
 
-                    GepgFileLogger.log(PaymentId, "CN_Request", sentbill + "********************" + reconc, env);
+                    GepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + reconc, env);
 
                     return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
                 }
@@ -159,9 +158,8 @@ namespace OpenImis.ePayment.Data
 
 
                 var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
-                var gepgFile = new GepgFoldersCreating(PaymentId.ToString(), "CancelPayment", content, env);
-                gepgFile.putToTargetFolderPayment();
-
+                GepgFileLogger.Log(PaymentId, "CancelPayment", content, env);
+                
                 return this.GetGePGObjectFromString(response, typeof(GePGPaymentCancelResponse));
             }
             catch (Exception ex)

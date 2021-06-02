@@ -79,7 +79,7 @@ namespace OpenImis.ePayment.Formaters
                 // stream = reader;// Do something
             }
 
-            GePGSignatureValidator signatureValidator = new GePGSignatureValidator(this.hostingEnvironment, this.configuration);
+            GePGSignatureValidator signatureValidator = new GePGSignatureValidator(hostingEnvironment, configuration);
             content = this.getContent(body, this.type.Name);
             signature = this.getSignature(body, "gepgSignature");
 
@@ -91,29 +91,27 @@ namespace OpenImis.ePayment.Formaters
                 string billId = StringExtensions.Between(body, "<BillId>", "</BillId>");
                 if (!String.IsNullOrEmpty(billId))
                 {
-                    var gepgFile = new GepgFileLogger(billId + "_" + this.type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
-                    gepgFile.putRequestBody();
+                    GepgFileLogger.Log(billId + "_" + type.Name, body, hostingEnvironment);
                 }
                 else
                 {
-                    var gepgFile = new GepgFileLogger(this.type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
+                    var gepgFile = new GepgFileLogger(type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
                     gepgFile.putRequestBody();
                 }
             }
             else
             {
-                var gepgFile = new GepgFileLogger(this.type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
-                gepgFile.putRequestBody();
+                GepgFileLogger.Log(type.Name, body, hostingEnvironment);
             }
 
             TextReader writer = new StringReader(content);
 
             try
             {
-                var serializer = new XmlSerializer(this.type);
-                dynamic model = Convert.ChangeType(serializer.Deserialize(writer), this.type);
+                var serializer = new XmlSerializer(type);
+                dynamic model = Convert.ChangeType(serializer.Deserialize(writer), type);
                 model.HasValidSignature = hasValidSignature;
-                return await InputFormatterResult.SuccessAsync(Convert.ChangeType(model, this.type));
+                return await InputFormatterResult.SuccessAsync(Convert.ChangeType(model, type));
             }
             catch
             {

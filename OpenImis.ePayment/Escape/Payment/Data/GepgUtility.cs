@@ -43,7 +43,7 @@ namespace OpenImis.ePayment.Data
             
         }
 
-        public String CreateBill(IConfiguration Configuration, string OfficerCode, string PhoneNumber, string BillId, decimal ExpectedAmount, List<PaymentDetail> policies)
+        public String CreateBill(IConfiguration Configuration, string OfficerCode, string PhoneNumber, int BillId, decimal ExpectedAmount, List<PaymentDetail> policies)
         {
 
             DataHelper dh = new DataHelper(Configuration);

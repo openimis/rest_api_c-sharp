@@ -16,7 +16,7 @@ namespace OpenImis.ePayment.Extensions
         IHostingEnvironment env;
         string basePath;
 
-        public GepgFileLogger(string paymentId, string finality, string content, IHostingEnvironment env)
+        public GepgFileLogger(int paymentId, string finality, string content, IHostingEnvironment env)
         {
             this.paymentId = paymentId;
             this.finality = finality;
@@ -31,24 +31,12 @@ namespace OpenImis.ePayment.Extensions
             this.basePath = basePath;
         }
 
-        public static void log(string paymentId, string finality, string content, IHostingEnvironment env)
+        public static void Log(int paymentId, string finality, string content, IHostingEnvironment env)
         {
-            var currentDate = DateTime.Now.ToString("yyyy/M/d/");
-            var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
-            string targetPath = System.IO.Path.Combine(env.WebRootPath, "ePayment", currentDate);
-            //if no Directory with current date - then create folder
-            if (!Directory.Exists(targetPath))
-            {
-                System.IO.Directory.CreateDirectory(targetPath);
-            }
-            //we have target folder for current date - then we can save file
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, paymentId + "_" + finality + "_" + currentDateTime + ".json")))
-            {
-                outputFile.WriteLine(content);
-            }
+            Log(paymentId + "_" + finality, content, env);
         }
 
-        public void putToTargetFolderPayment()
+        public static void Log(string finality, string content, IHostingEnvironment env)
         {
             var currentDate = DateTime.Now.ToString("yyyy/M/d/");
             var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
@@ -59,7 +47,7 @@ namespace OpenImis.ePayment.Extensions
                 System.IO.Directory.CreateDirectory(targetPath);
             }
             //we have target folder for current date - then we can save file
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, paymentId + "_" + finality + "_" + currentDateTime + ".json")))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, finality + "_" + currentDateTime + ".json")))
             {
                 outputFile.WriteLine(content);
             }

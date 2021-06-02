@@ -43,7 +43,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
     }
 
     public class BillTrxInf {
-        public string BillId { get; set; }
+        public int BillId { get; set; }
         public int SubSpCode { get; set; }
         public string SpSysId { get; set; }
         public decimal BillAmt { get; set; }

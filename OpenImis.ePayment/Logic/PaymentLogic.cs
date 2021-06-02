@@ -104,7 +104,7 @@ namespace OpenImis.ePayment.Logic
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var response = payment.MatchPayment(model);
 
-            if (model.internal_identifier == null)
+            if (model.internal_identifier == 0)
             {
                 List<MatchSms> PaymentIds = new List<MatchSms>();
 
@@ -146,9 +146,9 @@ namespace OpenImis.ePayment.Logic
             {
                 model.type_of_payment = null;
 
-                var paymentId = payment.GetPaymentId(model.control_number);
+                int paymentId = payment.GetPaymentId(model.control_number);
 
-                if (paymentId != null && paymentId != string.Empty)
+                if (paymentId != 0)
                 {
                     payment.GetPaymentInfo(paymentId);
                 }
@@ -165,7 +165,6 @@ namespace OpenImis.ePayment.Logic
                 }
             }
 
-
             if (model.type_of_payment == null && payment.typeOfPayment != null)
             {
                 var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount), (TypeOfPayment)payment.typeOfPayment);
@@ -181,9 +180,7 @@ namespace OpenImis.ePayment.Logic
 
             var response = payment.SavePayment(model);
 
-
-
-            if (payment.PaymentId != null && !response.ErrorOccured)
+            if (payment.PaymentId != 0 && !response.ErrorOccured)
             {
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId, payment.ControlNum);
 
@@ -219,7 +216,7 @@ namespace OpenImis.ePayment.Logic
                 response.MessageValue = model.error_message;
             }
 
-            if (payment.PaymentId != null && payment.SmsRequired)
+            if (payment.PaymentId != 0 && payment.SmsRequired)
             {
                 var ackResponse = payment.GetReqControlNumberAck(payment.PaymentId);
 
@@ -434,12 +431,12 @@ namespace OpenImis.ePayment.Logic
                     string othersCount = string.Empty;
 
                     ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment);
-                    _pay.GetPaymentInfo(m.PaymentId.ToString());
+                    _pay.GetPaymentInfo(m.PaymentId);
 
                     //Language lang = _pay.Language.ToLower() == "en" || _pay.Language.ToLower() == "english" || _pay.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
                     ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, _pay.Language);
 
-                    if (_pay.PaymentId != null)
+                    if (_pay.PaymentId != 0)
                     {
                         if (_pay.InsureeProducts.Count > 1)
                         {
