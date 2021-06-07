@@ -81,9 +81,7 @@ namespace OpenImis.ePayment.Controllers
             if (model.HasValidSignature)
             {
                 if (!ModelState.IsValid)
-                {
                     return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
-                }
 
                 ControlNumberResp ControlNumberResponse;
                 foreach (var bill in model.BillTrxInf)
