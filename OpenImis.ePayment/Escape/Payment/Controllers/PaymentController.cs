@@ -81,7 +81,9 @@ namespace OpenImis.ePayment.Controllers
             if (model.HasValidSignature)
             {
                 if (!ModelState.IsValid)
+                {
                     return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
+                }
 
                 ControlNumberResp ControlNumberResponse;
                 foreach (var bill in model.BillTrxInf)
@@ -102,6 +104,11 @@ namespace OpenImis.ePayment.Controllers
                     try
                     {
                         var response = base.GetReqControlNumber(ControlNumberResponse);
+                        if (ControlNumberResponse.error_occured == true)
+                        {
+                            var rejectedReason = imisPayment.PrepareRejectedReason(billId, bill.TrxStsCode);
+                            imisPayment.setRejectedReason(billId, rejectedReason);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -119,6 +126,7 @@ namespace OpenImis.ePayment.Controllers
 
                     string reconc = JsonConvert.SerializeObject(model);
                     GepgFileLogger.Log(billId, "CN_Response_InvalidSignature", reconc, env);
+                    imisPayment.setRejectedReason(billId, GepgCodeResponses.GepgResponseCodes["Invalid Signature"] + ":Invalid Signature");
                 }
                 
                 return Ok(imisPayment.ControlNumberResp(GepgCodeResponses.GepgResponseCodes["Invalid Signature"]));
@@ -267,9 +275,9 @@ namespace OpenImis.ePayment.Controllers
 
                     string reconc = JsonConvert.SerializeObject(model);
                     GepgFileLogger.Log(billId, "PaymentInvalidSignature", reconc, env);
-                    
-                }
+                    imisPayment.setRejectedReason(billId, GepgCodeResponses.GepgResponseCodes["Invalid Signature"] + ":Invalid Signature");
 
+                }
 
                 return Ok(imisPayment.PaymentResp(GepgCodeResponses.GepgResponseCodes["Invalid Signature"]));
             }

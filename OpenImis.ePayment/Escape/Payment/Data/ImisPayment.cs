@@ -170,7 +170,14 @@ namespace OpenImis.ePayment.Data
 
                 var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
                 GepgFileLogger.Log(PaymentId, "CancelPayment", content, env);
-                
+
+                var errorCodes = LoadResponseCodeFromXmlAkn(response);
+                if (errorCodes != "7101")
+                {
+                    var rejectedReasonText = PrepareRejectedReason(PaymentId, errorCodes);
+                    setRejectedReason(PaymentId, rejectedReasonText);
+                }
+
                 return this.GetGePGObjectFromString(response, typeof(GePGPaymentCancelResponse));
             }
             catch (Exception ex)
@@ -312,13 +319,12 @@ namespace OpenImis.ePayment.Data
             }
             else
             {
-                // The tag could be found!
                 string errorCode = errorCodeTag[0].InnerText;
                 return errorCode;
             }
         }
 
-        private string PrepareRejectedReason(int billId, string errorCodes = "7101")
+        public string PrepareRejectedReason(int billId, string errorCodes = "7101")
         {
             //prepare to save RejectedReason column the error codes and short description of error from GePG
             var rejectedReason = "";

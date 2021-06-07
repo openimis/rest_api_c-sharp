@@ -13,7 +13,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
               { "Failure", 7201 },
               { "Header Not Given", 7202 },
               { "Unauthorized", 7203 },
-              { "Bill Not Exist", 7204 },
+              { "Bill does not exist", 7204 },
               { "Invalid Service Provider", 7205 },
               { "Service Provider Not Active", 7206 },
               { "Duplicate Payment", 7207 },
