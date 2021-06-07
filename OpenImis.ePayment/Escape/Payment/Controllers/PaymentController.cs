@@ -345,6 +345,7 @@ namespace OpenImis.ePayment.Controllers
                         if (imisPayment.CheckPaymentExistError(recon.SpBillId))
                         {
                             imisPayment.updateReconciliatedPaymentError(recon.SpBillId);
+                            imisPayment.setRejectedReason(int.Parse(recon.SpBillId), GepgCodeResponses.GepgResponseCodes["No payment(s) found for specified bill control number"] + ":No payment(s) found for specified bill control number");
                         }
                     }
 
@@ -355,6 +356,11 @@ namespace OpenImis.ePayment.Controllers
             {
                 string reconc = JsonConvert.SerializeObject(model);
                 GepgFileLogger.Log("Reconc_DataInvalidSig", reconc, env);
+
+                foreach (var recon in model.ReconcTrxInf)
+                {
+                    imisPayment.setRejectedReason(int.Parse(recon.SpBillId), GepgCodeResponses.GepgResponseCodes["Invalid Signature"] + ":Invalid Signature");
+                }
 
                 return Ok(imisPayment.ReconciliationResp(GepgCodeResponses.GepgResponseCodes["Invalid Signature"]));
             }
