@@ -59,7 +59,7 @@ namespace OpenImis.ePayment.Logic
                 var amountToBePaid = payment.GetToBePaidAmount(payment.ExpectedAmount, transferFee);
                 var response = await payment.PostReqControlNumberAsync(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid, intent.policies);
 
-                if (response.ControlNumber != null) // 
+                if (response.ControlNumber != null) 
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
                     return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
@@ -88,6 +88,13 @@ namespace OpenImis.ePayment.Logic
                     }
 
                 return_message.Data = ret_data;
+                //if we have an error then save this on db in RejectedReason column
+                if (response.ErrorMessage != "") 
+                {
+                    payment.setRejectedReason(payment.PaymentId, response.ErrorMessage);
+                    return_message.MessageValue = response.ErrorMessage;
+                    return_message.ErrorOccured = true;
+                }
 
             }
             else

@@ -70,7 +70,7 @@ namespace OpenImis.ePayment.Data
             return true;
         }
 
-        public virtual async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false)
+        public virtual async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false, string rejectedReason="")
         {
             bool result = await SaveControlNumberRequest(PaymentId,error);
             string ctrlNumber = null;
@@ -86,7 +86,8 @@ namespace OpenImis.ePayment.Data
                 Posted = error == false ? true : false,
                 ErrorCode = 0,
                 ErrorOccured = error,
-                Assigned = error
+                Assigned = error,
+                ErrorMessage = rejectedReason
             };
 
             return response;
@@ -916,6 +917,28 @@ namespace OpenImis.ePayment.Data
             }
 
             return false;
+        }
+
+        public void setRejectedReason(int billId, string rejectedReason)
+        {
+            var sSQL = @"UPDATE tblPayment
+                         SET RejectedReason = @RejectedReason
+                         WHERE PaymentID = @PaymentID;";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", billId),
+                new SqlParameter("@RejectedReason", rejectedReason)
+            };
+
+            try
+            {
+                dh.Execute(sSQL, parameters, CommandType.Text);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

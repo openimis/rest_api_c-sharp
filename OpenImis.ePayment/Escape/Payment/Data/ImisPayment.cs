@@ -93,7 +93,7 @@ namespace OpenImis.ePayment.Data
             return Math.Round(amount, 0);
         }
 
-        public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false)
+        public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false, string rejectedReason="")
         {
             GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
 
@@ -110,12 +110,23 @@ namespace OpenImis.ePayment.Data
                     var signedMesg = gepg.FinaliseSignedMsg(signature);
                     var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, gepg.GetAccountCodeByProductCode(InsureeProducts.FirstOrDefault().ProductCode), "default.sp.in");
 
-                    string reconc = JsonConvert.SerializeObject(billAck);
+                    string billAckRequest = JsonConvert.SerializeObject(billAck);
                     string sentbill = JsonConvert.SerializeObject(bill);
 
-                    GepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + reconc, env);
+                    GepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + billAckRequest, env);
 
-                    return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
+                    //get the error code from ackn GePG request
+                    var errorCodes = LoadResponseCodeFromXmlAkn(billAck);
+                    if (errorCodes == "7101")
+                    {
+                        return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
+                    }
+                    else 
+                    {
+                        //we have an error from GePG ackn - then save rejected reason
+                        var rejectedReasonText = PrepareRejectedReason(PaymentId, errorCodes);
+                        return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true, rejectedReasonText);
+                    }
                 }
                 else 
                 {
@@ -287,6 +298,47 @@ namespace OpenImis.ePayment.Data
             { }
 
             return result;
+        }
+
+        private string LoadResponseCodeFromXmlAkn(string xmlContent) 
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xmlContent);
+
+            XmlNodeList errorCodeTag = doc.GetElementsByTagName("TrxStsCode");
+            if (errorCodeTag.Count < 1)
+            {
+                return "";
+            }
+            else
+            {
+                // The tag could be found!
+                string errorCode = errorCodeTag[0].InnerText;
+                return errorCode;
+            }
+        }
+
+        private string PrepareRejectedReason(int billId, string errorCodes = "7101")
+        {
+            //prepare to save RejectedReason column the error codes and short description of error from GePG
+            var rejectedReason = "";
+            if (errorCodes != "7101")
+            {
+                //split error codes
+                var listOfErrors = errorCodes.Split(';');
+                for (var i = 0; i < listOfErrors.Length; i++)
+                {
+                    if (i != listOfErrors.Length - 1)
+                    {
+                        rejectedReason += listOfErrors[i] + ":" + GepgCodeResponses.GepgResponseCodes.FirstOrDefault(x => x.Value == int.Parse(listOfErrors[i])).Key + ";";
+                    }
+                    else
+                    {
+                        rejectedReason += listOfErrors[i] + ":" + GepgCodeResponses.GepgResponseCodes.FirstOrDefault(x => x.Value == int.Parse(listOfErrors[i])).Key;
+                    }
+                }
+            }
+            return rejectedReason;
         }
 #endif
     }
