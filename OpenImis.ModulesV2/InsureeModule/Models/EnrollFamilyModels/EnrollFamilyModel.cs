@@ -29,8 +29,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
                         ConfirmationNo = x.ConfirmationNo,
                         ConfirmationType = x.ConfirmationType,
                         isOffline = x.isOffline,
-                        ApprovalOfSMS = x.ApprovalOfSMS,
-                        LanguageOfSMS = x.LanguageOfSMS
+                        FamilySMS =  x.FamilySMS != null ? new FamilySMS() {
+                            FamilyId = x.FamilySMS.FamilyId,
+                            ApprovalOfSMS = x.FamilySMS.ApprovalOfSMS,
+                            LanguageOfSMS = x.FamilySMS.LanguageOfSMS
+                        } : null
                     }
                 }).FirstOrDefault(),
                 Insurees = Family.Select(x => x.Insurees).FirstOrDefault().ToList(),

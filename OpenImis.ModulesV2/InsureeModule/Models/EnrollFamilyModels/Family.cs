@@ -22,5 +22,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
         public List<Insuree> Insurees { get; set; }
         public List<Policy> Policies { get; set; }
         public List<InsureePolicy> InsureePolicy { get; set; }
+        public FamilySMS FamilySMS { get; set; }
     }
 }
