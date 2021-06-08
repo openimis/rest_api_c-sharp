@@ -261,8 +261,7 @@ namespace OpenImis.ePayment.Controllers
                     
                     _response = await base.GetPaymentData(pay);
 
-                    //TO-DO - get the error from response 
-                    if (!(_response is DataMessage)) 
+                    if (_response.GetType().GetProperty("error_message") != null) 
                     {
                         string errorMessage = (_response.GetType().GetProperty("error_message").GetValue(_response)).ToString();
                         string[] errorCodes = errorMessage.Split(':');
@@ -271,6 +270,7 @@ namespace OpenImis.ePayment.Controllers
                     }
 
                 }
+
                 if (errorCode == 0)
                 {
                     return Ok(imisPayment.PaymentResp(GepgCodeResponses.GepgResponseCodes["Successful"]));
