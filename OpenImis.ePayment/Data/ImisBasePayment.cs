@@ -424,7 +424,7 @@ namespace OpenImis.ePayment.Data
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
                 // TODO: manage error messages from SP execution 
                 message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false, (int)Language).Message;
-                GetPaymentInfo((int)data[0].Value);
+                GetPaymentInfo(int.Parse(data[0].Value.ToString()));
 
             }
             catch (Exception e)
@@ -742,7 +742,7 @@ namespace OpenImis.ePayment.Data
                 if (data.Rows.Count > 0)
                 {
                     var row = data.Rows[0];
-                    return (int)row["PaymentID"];
+                    return int.Parse(row["PaymentID"].ToString());
                 }
                 //GetPaymentInfo(PaymentID);
             }

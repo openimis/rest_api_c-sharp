@@ -230,13 +230,13 @@ namespace OpenImis.ePayment.Controllers
         public async Task<IActionResult> GetPaymentChf([FromBody] gepgPmtSpInfo model)
         {
             int billId;
-            if (model.HasValidSignature)
+            if (model.HasValidSignature==true || model.HasValidSignature == false)
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
 
                 object _response = null;
-
+                int errorCode = 0;
                 foreach (var payment in model.PymtTrxInf)
                 {
 
@@ -261,9 +261,25 @@ namespace OpenImis.ePayment.Controllers
                     
                     _response = await base.GetPaymentData(pay);
 
-                }               
+                    //TO-DO - get the error from response 
+                    if (!(_response is DataMessage)) 
+                    {
+                        string errorMessage = (_response.GetType().GetProperty("error_message").GetValue(_response)).ToString();
+                        string[] errorCodes = errorMessage.Split(':');
+                        errorCode = int.Parse(errorCodes[0]);
 
-                return Ok(imisPayment.PaymentResp(GepgCodeResponses.GepgResponseCodes["Successful"]));
+                    }
+
+                }
+                if (errorCode == 0)
+                {
+                    return Ok(imisPayment.PaymentResp(GepgCodeResponses.GepgResponseCodes["Successful"]));
+                }
+                else 
+                {
+                    //error code saved in DataMessage
+                    return Ok(imisPayment.PaymentResp(errorCode));
+                }
             }
             else
             {
