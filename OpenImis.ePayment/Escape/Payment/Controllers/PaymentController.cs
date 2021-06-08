@@ -230,7 +230,7 @@ namespace OpenImis.ePayment.Controllers
         public async Task<IActionResult> GetPaymentChf([FromBody] gepgPmtSpInfo model)
         {
             int billId;
-            if (model.HasValidSignature==true || model.HasValidSignature == false)
+            if (model.HasValidSignature)
             {
                 if (!ModelState.IsValid)
                     return BadRequest(imisPayment.PaymentResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
