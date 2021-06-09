@@ -271,11 +271,11 @@ namespace OpenImis.ePayment.Controllers
                             //get the error code returned after processing payment from GePG
                             errorCode = int.Parse(errorCodes[0]);
                         }
-                    }
-                    else 
-                    {
-                        //otherwise in case of another errors - raise '7201:Failure'
-                        errorCode = GepgCodeResponses.GepgResponseCodes["Failure"];
+                        else
+                        {
+                            //otherwise in case of another errors - raise '7201:Failure'
+                            errorCode = GepgCodeResponses.GepgResponseCodes["Failure"];
+                        }
                     }
                 }
 
