@@ -261,12 +261,13 @@ namespace OpenImis.ePayment.Controllers
                     
                     _response = await base.GetPaymentData(pay);
 
+                    //check if response contains 'error_message' property after processing payment from GePG
                     if (_response.GetType().GetProperty("error_message") != null) 
                     {
                         string errorMessage = (_response.GetType().GetProperty("error_message").GetValue(_response)).ToString();
                         string[] errorCodes = errorMessage.Split(':');
+                        //get the error code returned after processing payment from GePG
                         errorCode = int.Parse(errorCodes[0]);
-
                     }
 
                 }
