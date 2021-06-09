@@ -75,7 +75,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public IActionResult GetReqControlNumberChf([FromBody] gepgBillSubResp model)
+        public IActionResult GePGReceiveControlNumber([FromBody] gepgBillSubResp model)
         {
             int billId;
             if (model.HasValidSignature)
@@ -243,15 +243,15 @@ namespace OpenImis.ePayment.Controllers
                     PaymentData pay = new PaymentData()
                     {
                         control_number = payment.PayCtrNum,
-                        insurance_product_code = payment.PayRefId,
+                        //insurance_product_code = payment.PayRefId,
                         enrolment_officer_code = payment.PyrName,
                         transaction_identification = payment.TrxId,
-                        received_amount = Convert.ToDouble(payment.BillAmt),
+                        received_amount = Convert.ToDouble(payment.PaidAmt),
                         received_date = DateTime.UtcNow.ToString("yyyy/MM/dd"),
                         payment_date = payment.TrxDtTm,
-                        payment_origin = "GePG",
-                        receipt_identification = payment.PspReceiptNumber,
-                        insurance_number = payment.PyrCellNum.ToString()
+                        payment_origin = payment.PspName,
+                        receipt_identification = payment.PayRefId,
+                        payer_phone_number = payment.PyrCellNum
                     };
 
                     billId = payment.BillId;

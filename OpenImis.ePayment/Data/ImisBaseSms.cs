@@ -15,7 +15,7 @@ namespace OpenImis.ePayment.Data
 {
     public class ImisBaseSms
     {
-        private string SmsTampletes = string.Empty;
+        private string SmsTemplates = string.Empty;
         private IHostingEnvironment env;
 
         public ImisBaseSms(IConfiguration config,IHostingEnvironment environment,Language language = Language.Primary)
@@ -23,9 +23,9 @@ namespace OpenImis.ePayment.Data
             env = environment;
 
             if(language == Language.Primary)
-                SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\Strings\";
+                SmsTemplates = environment.ContentRootPath + @"\Escape\Sms\Strings\";
             else
-                SmsTampletes = environment.ContentRootPath + @"\Escape\Sms\StringsSecondaryLanguage\";
+                SmsTemplates = environment.ContentRootPath + @"\Escape\Sms\StringsSecondaryLanguage\";
         }
 
         public virtual async Task<string> SendSMS(List<SmsContainer> containers,string filename)
@@ -70,7 +70,7 @@ namespace OpenImis.ePayment.Data
 
         public virtual string GetMessage(string filename)
         {
-            string text = File.ReadAllText(SmsTampletes + filename +".txt", Encoding.UTF8);
+            string text = File.ReadAllText(SmsTemplates + filename +".txt", Encoding.UTF8);
             return text;
         }
 

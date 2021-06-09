@@ -1,0 +1,6 @@
+﻿Malipo yamepokelewa kwenda CHF-{0}
+Ankara Na: {1}
+Kiasi: {2} TZS
+Risiti Na: {3}
+Tarehe: {4}
+Kupitia: {5}

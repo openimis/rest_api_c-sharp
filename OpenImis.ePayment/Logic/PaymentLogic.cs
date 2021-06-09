@@ -118,16 +118,20 @@ namespace OpenImis.ePayment.Logic
                 PaymentIds = payment.GetPaymentIdsForSms();
 
                 if (PaymentIds != null)
-                    SendMatchSms(PaymentIds);
+                {
+                    // SendMatchSms(PaymentIds);
+                }
             }
             else
             {
+                // XML TO JSON
                 var matchdata = JsonConvert.SerializeObject(response.Data);
+                //
                 var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
 
                 if (matchedPayments.FirstOrDefault().PaymentMatched > 0)
                 {
-                    SendPaymentSms(payment);
+                    //SendPaymentSms(payment);
                 }
 
             }
@@ -190,12 +194,14 @@ namespace OpenImis.ePayment.Logic
 
             if (payment.PaymentId != 0 && !response.ErrorOccured)
             {
+                SendPaymentConfirmationSms(model, payment);
+
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId, payment.ControlNum);
 
                 MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
 
                 var matchresponse = await MatchPayment(matchModel);
-
+                /*
 #if DEBUG
                 var matchdata = JsonConvert.SerializeObject(matchresponse.Data);
                 var matchedPayments = JsonConvert.DeserializeObject<List<MatchedPayment>>(matchdata);
@@ -204,7 +210,7 @@ namespace OpenImis.ePayment.Logic
                 {
                     SendPaymentSms(payment);
                 }
-#endif
+#endif*/
 
             }
             else 
@@ -355,6 +361,32 @@ namespace OpenImis.ePayment.Logic
             string test = await sms.SendSMS(message, fileName);
         }
 
+        public async void SendPaymentConfirmationSms(PaymentData pd, ImisPayment payment)
+        {
+            // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
+            List<SmsContainer> message = new List<SmsContainer>();
+            
+                var txtmsg = string.Format(
+                    sms.GetMessage("PaymentConfirmationSMS"), // template
+                    payment.Location, // Product location 
+                    pd.control_number, // invoice number
+                    pd.received_amount, // amount paid
+                    pd.receipt_identification, // receipt number
+                    DateTime.Parse(pd.payment_date).ToString(), // payment date
+                    pd.transaction_identification // transaction number 
+                    );
+
+
+                message.Add(new SmsContainer() { Message = txtmsg, Recipient = pd.payer_phone_number });
+
+           
+            var fileName = "PaymentConfirmationSms_" + pd.payer_phone_number;
+
+            string test = await sms.SendSMS(message, fileName);
+            payment.UpdateLastSMSSentDate();
+        }
+
         public async void SendPaymentSms(ImisPayment payment)
         {
             // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
@@ -408,7 +440,7 @@ namespace OpenImis.ePayment.Logic
             var fileName = "PayStatSms_" + payment.PhoneNumber;
 
             string test = await sms.SendSMS(message, fileName);
-            payment.MatchedSmsSent();
+            payment.UpdateLastSMSSentDate();
         }
 
         public async void SendMatchSms(ImisPayment payment)
@@ -492,7 +524,7 @@ namespace OpenImis.ePayment.Logic
 
 
                         message.Add(new SmsContainer() { Message = txtmsg, Recipient = _pay.PhoneNumber });
-                        _pay.UnMatchedSmsSent(m.PaymentId);
+                        _pay.UpdateLastSMSSentDate();
                     }
                     else
                     {
