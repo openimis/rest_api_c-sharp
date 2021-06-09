@@ -36,6 +36,7 @@ namespace OpenImis.ePayment.Data
         public decimal? PaidAmount { get; set; }
         public decimal? OutStAmount { get; set; }
         public bool SmsRequired { get; set; }
+        public string Location { get; set; }
         public List<InsureeProduct> InsureeProducts { get; set; }
 
         protected IConfiguration Configuration;
@@ -381,11 +382,11 @@ namespace OpenImis.ePayment.Data
         }
 
 
-        public DataMessage SavePayment(PaymentData payment,bool failed = false)
+        public DataMessage SavePayment(PaymentData payment, bool failed = false)
         {
             int? isRenewal = null;
 
-            if((payment.renewal != null))
+            if (payment.renewal != null)
             {
                 isRenewal = (int)payment.renewal;
             }
@@ -400,7 +401,7 @@ namespace OpenImis.ePayment.Data
                 new XElement("Amount", payment.received_amount),
                 new XElement("ReceiptNo", payment.receipt_identification),
                 new XElement("TransactionNo", payment.transaction_identification),
-                new XElement("PhoneNumber", payment.payment_origin),
+                new XElement("PhoneNumber", payment.payer_phone_number),
                 new XElement("PaymentOrigin", payment.payment_origin),
                 new XElement("OfficerCode", payment.enrolment_officer_code),
                 new XElement("LanguageName",payment.language), // not used
@@ -424,7 +425,7 @@ namespace OpenImis.ePayment.Data
                 var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
                 // TODO: manage error messages from SP execution 
                 message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false, (int)Language).Message;
-                GetPaymentInfo((int)data[0].Value);
+                GetPaymentInfo(Convert.ToInt32(data[0].Value));
 
             }
             catch (Exception e)
@@ -547,26 +548,40 @@ namespace OpenImis.ePayment.Data
 
         public void GetPaymentInfo(int Id)
         {
-            var sSQL = @"SELECT tblPayment.PaymentID, tblPayment.ExpectedAmount,tblPayment.LanguageName,tblPayment.TypeOfPayment,tblPayment.SmsRequired, tblPaymentDetails.ExpectedAmount AS ExpectedDetailAmount,
-                        tblPayment.ReceivedAmount, tblPayment.PaymentDate, tblInsuree.LastName, tblInsuree.OtherNames,tblPaymentDetails.InsuranceNumber,tblPayment.PhoneNumber,
-                        tblProduct.ProductName, tblPaymentDetails.ProductCode, tblPolicy.ExpiryDate, tblPolicy.EffectiveDate,tblControlNumber.ControlNumber,tblPolicy.PolicyStatus, tblPolicy.PolicyValue - ISNULL(mp.PrPaid,0) Outstanding
-                        FROM tblControlNumber 
-                        RIGHT OUTER JOIN tblInsuree 
-                        RIGHT OUTER JOIN tblProduct 
-                        RIGHT OUTER JOIN tblPayment 
-                        INNER JOIN tblPaymentDetails 
-                        ON tblPayment.PaymentID = tblPaymentDetails.PaymentID 
-                        ON tblProduct.ProductCode = tblPaymentDetails.ProductCode 
-                        ON tblInsuree.CHFID = tblPaymentDetails.InsuranceNumber 
-                        ON tblControlNumber.PaymentID = tblPayment.PaymentID 
-                        LEFT OUTER JOIN tblPremium 
-                        LEFT OUTER JOIN tblPolicy
-						LEFT OUTER JOIN (
-						select P.PolicyID PolID, SUM(P.Amount) PrPaid from tblpremium P inner join tblPaymentDetails PD ON PD.PremiumID = P.PremiumId INNER JOIN tblPayment Pay ON Pay.PaymentID = PD.PaymentID  where P.ValidityTo IS NULL AND Pay.PaymentStatus  = 5 GROUP BY P.PolicyID
-						) MP ON MP.PolID = tblPolicy.PolicyID
-                        ON tblPremium.PolicyID = tblPolicy.PolicyID 
-                        ON tblPaymentDetails.PremiumID = tblPremium.PremiumId
-                        WHERE (tblPayment.PaymentID = @PaymentID) AND (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)";
+            var sSQL = @"DECLARE @MatchedPoliciesInPayment TABLE (PolicyId int)
+
+                        INSERT INTO @MatchedPoliciesInPayment
+                        SELECT DISTINCT(Premium.PolicyId)
+                        FROM tblPayment AS Payment
+                        INNER JOIN tblPaymentDetails AS PaymentDetails ON PaymentDetails.PaymentID=Payment.PaymentID
+                        INNER JOIN tblPremium AS Premium ON Premium.PremiumID=PaymentDetails.PremiumID
+                        WHERE (Payment.PaymentID = @PaymentID)
+
+                        SELECT Payment.PaymentID, Payment.ExpectedAmount, Payment.LanguageName, Payment.TypeOfPayment, 
+                        Payment.SmsRequired, PaymentDetails.ExpectedAmount AS ExpectedDetailAmount, Payment.ReceivedAmount, 
+                        Payment.PaymentDate, Insuree.LastName, Insuree.OtherNames, PaymentDetails.InsuranceNumber, 
+                        Payment.PhoneNumber, Payment.PayerPhoneNumber, Product.ProductName, PaymentDetails.ProductCode, 
+                        Policy.ExpiryDate, Policy.EffectiveDate, ControlNumber.ControlNumber, Policy.PolicyStatus, 
+                        Policy.PolicyValue - ISNULL(MatchPayments.PrPaid,0) Outstanding, 
+                        CASE WHEN Region.LocationId IS NULL THEN District.LocationName ELSE Region.LocationName END AS Location
+                        FROM tblPayment AS Payment
+                        LEFT JOIN tblPaymentDetails AS PaymentDetails ON PaymentDetails.PaymentID=Payment.PaymentID
+                        LEFT JOIN tblInsuree AS Insuree ON Insuree.CHFID=PaymentDetails.InsuranceNumber
+                        LEFT JOIN tblProduct AS Product ON Product.ProductCode=PaymentDetails.ProductCode
+                        LEFT JOIN tblLocations AS District ON Product.LocationId=District.LocationId AND District.LocationType='D'
+                        LEFT JOIN tblLocations AS Region ON Product.LocationId=Region.LocationId AND Region.LocationType='R'
+                        LEFT JOIN tblControlNumber AS ControlNumber ON ControlNumber.PaymentID=Payment.PaymentID
+                        LEFT JOIN tblPremium AS Premium ON Premium.PremiumID=PaymentDetails.PremiumID
+                        LEFT JOIN tblPolicy AS Policy ON Policy.PolicyID=Premium.PolicyID
+                        LEFT JOIN (SELECT P.PolicyID AS PolicyID, SUM(P.Amount) PrPaid 
+		                        FROM tblPremium P 
+		                        INNER JOIN tblPaymentDetails PD ON PD.PremiumID = P.PremiumId 
+		                        INNER JOIN tblPayment Pay ON Pay.PaymentID = PD.PaymentID  
+		                        WHERE P.PolicyID IN (SELECT PolicyId FROM @MatchedPoliciesInPayment) AND Pay.PaymentStatus = 5 AND P.ValidityTo IS NULL
+		                        GROUP BY P.PolicyID) AS MatchPayments 
+	                        ON MatchPayments.PolicyID=Policy.PolicyId
+                        WHERE (Payment.PaymentID = @PaymentID) AND (Product.ValidityTo IS NULL) AND (Insuree.ValidityTo IS NULL)
+                        ";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", Id)
@@ -583,6 +598,7 @@ namespace OpenImis.ePayment.Data
                     ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]):null;
                     ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]):0;
                     SmsRequired = row1["SmsRequired"] != System.DBNull.Value ? Convert.ToBoolean(row1["SmsRequired"]) : false;
+                    Location = row1["Location"] != System.DBNull.Value ? Convert.ToString(row1["Location"]) : null;
 
                     var language = row1["LanguageName"] != System.DBNull.Value ? Convert.ToString(row1["LanguageName"]) : "en";
                     var languages = LocalDefault.PrimaryLanguageRepresentations(Configuration);
@@ -685,37 +701,14 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public void UnMatchedSmsSent(int Id)
+        public void UpdateLastSMSSentDate()
         {
             var sSQL = @"UPDATE tblPayment
-                         SET DateLastSMS = @Today
+                         SET DateLastSMS = CURRENT_TIMESTAMP
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
-                new SqlParameter("@PaymentID", Id),
-                new SqlParameter("@Today",DateTime.UtcNow)
-            };
-
-            try
-            {
-                dh.Execute(sSQL, parameters, CommandType.Text);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        public void MatchedSmsSent()
-        {
-            var sSQL = @"UPDATE tblPayment
-                         SET DateLastSMS = @Today
-                         WHERE PaymentID = @PaymentID;";
-
-            SqlParameter[] parameters = {
-                new SqlParameter("@PaymentID", PaymentId),
-                new SqlParameter("@Today",DateTime.UtcNow)
+                new SqlParameter("@PaymentID", PaymentId)
             };
 
             try
@@ -742,7 +735,7 @@ namespace OpenImis.ePayment.Data
                 if (data.Rows.Count > 0)
                 {
                     var row = data.Rows[0];
-                    return (int)row["PaymentID"];
+                    return Convert.ToInt32(row["PaymentID"]);
                 }
                 //GetPaymentInfo(PaymentID);
             }

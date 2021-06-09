@@ -1,0 +1,6 @@
+﻿Payment has been made to CHF-{0}
+Invoice nu: {1}
+Amount: {2} TZS
+Receipt Nu: {3}
+Date: {4}
+Through:{5}
