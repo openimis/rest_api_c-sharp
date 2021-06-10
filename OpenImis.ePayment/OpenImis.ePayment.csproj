@@ -45,6 +45,9 @@
     <None Update="Escape\Sms\StringsSecondaryLanguage\PaidAndNotMatchedV2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\PaymentConfirmationSMS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Escape\Sms\Strings\CommissionInformSms.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -80,6 +83,9 @@
     </None>
     <None Update="Escape\Sms\Strings\PaidAndNotMatchedV2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\PaymentConfirmationSMS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Escape\Sms\Strings\RenewErrorSms.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
