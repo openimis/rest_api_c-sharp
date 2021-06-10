@@ -115,6 +115,13 @@ namespace OpenImis.ePayment.Data
 
                     GepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + billAckRequest, env);
 
+                    //check if timeout in GePG server
+                    if (billAck == "The operation has timed out.")
+                    {
+                        var rejectedReasonText = "Timeout when requesting control number";
+                        return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true, rejectedReasonText);
+                    }
+
                     //get the error code from ackn GePG request
                     var errorCodes = LoadResponseCodeFromXmlAkn(billAck);
                     if (errorCodes == "7101")
