@@ -163,10 +163,12 @@ namespace OpenImis.ePayment.Controllers
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             DataMessage dt = new DataMessage();
 
-            if (model.control_number != null)
+            if (model.payment_id !=0 || model.control_number != null)
             {
-                // todo: change string type to int
-                int paymentId = payment.GetPaymentId(model.control_number);
+                // if payment_id is in payload it will be used else it will be calculated from CN
+                int paymentId = model.payment_id != 0 ? model.payment_id : payment.GetPaymentId(model.control_number);
+
+                model.payment_id = paymentId;
 
                 if (paymentId != 0)
                 {
