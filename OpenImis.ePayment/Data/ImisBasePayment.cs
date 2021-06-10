@@ -169,6 +169,7 @@ namespace OpenImis.ePayment.Data
                                new XElement("Detail",
                                   new XElement("InsuranceNumber", x.insurance_number),
                                   new XElement("ProductCode", x.insurance_product_code),
+                                  new XElement("PolicyValue", x.amount),
                                   new XElement("EnrollmentDate", DateTime.UtcNow),
                                   new XElement("IsRenewal", x.IsRenewal())
                                   )
@@ -659,6 +660,50 @@ namespace OpenImis.ePayment.Data
 
         }
 
+        public List<PaymentDetail> GetPaymentDetails(int Id)
+        {
+            List<PaymentDetail> PaymentDetails = new List<PaymentDetail>();
+
+            var sSQL = @"SELECT PaymentDetails.PaymentDetailsID, PaymentDetails.ExpectedAmount, PaymentDetails.InsuranceNumber, PaymentDetails.ProductCode
+                            FROM tblPayment AS Payment
+                            LEFT JOIN tblPaymentDetails AS PaymentDetails ON PaymentDetails.PaymentID=Payment.PaymentID
+                            WHERE Payment.PaymentID = @PaymentID AND Payment.ValidityTo IS NULL
+                        ";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", Id)
+            };
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+                if (data.Rows.Count > 0)
+                {
+
+                    for (int i = 0; i < data.Rows.Count; i++)
+                    {
+                        var rw = data.Rows[i];
+
+                        PaymentDetails.Add(
+                                new PaymentDetail()
+                                {
+                                    payment_detail_id = rw["PaymentDetailsID"] != System.DBNull.Value ? Convert.ToInt32(rw["PaymentDetailsID"]) : 0,
+                                    insurance_number = rw["InsuranceNumber"] != System.DBNull.Value ? Convert.ToString(rw["InsuranceNumber"]) : null,
+                                    insurance_product_code = rw["ProductCode"] != System.DBNull.Value ? Convert.ToString(rw["ProductCode"]) : null,
+                                    amount = rw["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(rw["ExpectedAmount"]) : 0
+                                }
+                            );
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return PaymentDetails;
+        }
 
         public List<MatchSms> GetPaymentIdsForSms()
         {

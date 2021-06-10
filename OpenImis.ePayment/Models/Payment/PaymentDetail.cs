@@ -6,11 +6,12 @@ namespace OpenImis.ePayment.Models
 {
     public class PaymentDetail
     {
+        public int payment_detail_id { get; set; }
         [InsureeNumber]
         public string insurance_number { get; set; }
         [Required(ErrorMessage = "2:Not valid insurance or missing product code")]
         public string insurance_product_code { get; set; }
-        public string amount { get; set; }
+        public decimal amount { get; set; }
         [Required(ErrorMessage = "10:EnrolmentType was not provided")]
         [Range(0,2)]
         public EnrolmentType? renewal { get; set; }

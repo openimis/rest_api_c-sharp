@@ -56,7 +56,7 @@ namespace OpenImis.ePayment.Data
                 {
                     BillItem item = new BillItem()
                     {
-                        BillItemRef = "ImisPolicy",
+                        BillItemRef = policy.payment_detail_id.ToString(),
                         BillItemAmt = Convert.ToDouble(policy.amount),
                         BillItemEqvAmt = Convert.ToDouble(policy.amount),
                         BillItemMiscAmt = 0,
