@@ -960,7 +960,7 @@ namespace OpenImis.ePayment.Data
         public void setRejectedReason(int billId, string rejectedReason)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET RejectedReason = @RejectedReason
+                         SET RejectedReason = CASE WHEN ISNULL(RejectedReason, '') = '' Then @RejectedReason ELSE Concat(RejectedReason,Concat(';', @RejectedReason)) END
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
