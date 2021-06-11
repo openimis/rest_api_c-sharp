@@ -1,0 +1,1 @@
+﻿Ankara Namba: {0} Imesitishwa kufanya malipo ya CHF Tarehe: {1}

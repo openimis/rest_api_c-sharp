@@ -514,6 +514,25 @@ namespace OpenImis.ePayment.Logic
 
         }
 
+        public async void SendPaymentCancellationSms(ImisPayment payment, string payerPhoneNumber)
+        {
+            ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
+            List<SmsContainer> message = new List<SmsContainer>();
+
+            var txtmsg = string.Format(
+                sms.GetMessage("CancellationSms"), // template
+                payment.ControlNum, // invoice number
+                DateTime.UtcNow.ToString("dd-MM-yyyyTHH:mm:ss").ToString() // payment cancellation date  
+                );
+
+            message.Add(new SmsContainer() { Message = txtmsg, Recipient = payerPhoneNumber });
+
+            var fileName = "PaymentCancellationSms_" + payerPhoneNumber;
+
+            string test = await sms.SendSMS(message, fileName);
+            payment.UpdateLastSMSSentDate();
+        }
+
         public async Task<ReconciliationMessage> ProvideReconciliationData(ReconciliationRequest model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
@@ -538,7 +557,11 @@ namespace OpenImis.ePayment.Logic
             
                 if (payment_id > 0)
                 {
+                    payment.GetPaymentInfo(payment_id);
+                    var payerPhoneNumber = payment.GetPayerPhoneFromPaymentId(payment_id);
+                    payerPhoneNumber = payerPhoneNumber.StartsWith("255") ? '+' + payerPhoneNumber : payerPhoneNumber;
                     await payment.CancelPayment(payment_id);
+                    SendPaymentCancellationSms(payment, payerPhoneNumber);
                 }
                 else
                 {
