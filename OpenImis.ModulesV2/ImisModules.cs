@@ -10,7 +10,6 @@ using OpenImis.ModulesV2.LoginModule;
 using OpenImis.ModulesV2.ClaimModule;
 using OpenImis.ModulesV2.InsureeModule;
 using OpenImis.ModulesV2.CoverageModule;
-using OpenImis.ModulesV2.PaymentModule;
 using OpenImis.ModulesV2.MasterDataModule;
 using OpenImis.ModulesV2.MasterDataModule.Logic;
 using OpenImis.ModulesV2.FeedbackModule;
@@ -31,7 +30,6 @@ namespace OpenImis.ModulesV2
         private IInsureeModule insureeModule;
         private IClaimModule claimModule;
         private ICoverageModule coverageModule;
-        private IPaymentModule paymentModule;
         private IMasterDataModule masterDataModule;
         private IFeedbackModule feedbackModule;
         private IPremiumModule premiumModule;
@@ -128,24 +126,6 @@ namespace OpenImis.ModulesV2
                 coverageModule.SetCoverageLogic((CoverageModule.Logic.ICoverageLogic)ActivatorUtilities.CreateInstance(_serviceProvider, coverageLogicType));
             }
             return coverageModule;
-        }
-
-        /// <summary>
-        /// Creates and returns the payment module version 2.
-        /// </summary>
-        /// <returns>
-        /// The Payment module V2.
-        /// </returns>
-        public IPaymentModule GetPaymentModule()
-        {
-            if (paymentModule == null)
-            {
-                paymentModule = new PaymentModule.PaymentModule(_configuration);
-
-                Type paymentLogicType = CreateTypeFromConfiguration("PaymentModule", "PaymentLogic", "OpenImis.ModulesV2.PaymentModule.Logic.PaymentLogic");
-                paymentModule.SetPaymentLogic((PaymentModule.Logic.IPaymentLogic)ActivatorUtilities.CreateInstance(_serviceProvider, paymentLogicType));
-            }
-            return paymentModule;
         }
 
         /// <summary>
