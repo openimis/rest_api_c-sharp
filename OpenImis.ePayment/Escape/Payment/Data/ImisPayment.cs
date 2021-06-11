@@ -173,10 +173,21 @@ namespace OpenImis.ePayment.Data
 
                 var response = await gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
 
-
-
                 var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
                 GepgFileLogger.Log(PaymentId, "CancelPayment", content, env);
+
+                //check if timeout in GePG server
+                if (response == "The operation has timed out.")
+                {
+                    var rejectedReasonText = "Timeout when cancelling payment";
+                    setRejectedReason(PaymentId, rejectedReasonText);
+                    return new DataMessage
+                    {
+                        Code = -1,
+                        ErrorOccured = true,
+                        MessageValue = rejectedReasonText,
+                    };
+                }
 
                 var errorCodes = LoadResponseCodeFromXmlAkn(response);
                 if (errorCodes != "7101")

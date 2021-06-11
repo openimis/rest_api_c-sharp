@@ -790,6 +790,30 @@ namespace OpenImis.ePayment.Data
             }
             return 0;
         }
+
+        public string GetPayerPhoneFromPaymentId(int paymentId)
+        {
+            var sSQL = @"SELECT PayerPhoneNumber FROM tblPayment WHERE PaymentID = @PaymentID";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@PaymentID", paymentId)
+            };
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    var row = data.Rows[0];
+                    return row["PayerPhoneNumber"].ToString();
+                }
+            }
+            catch (Exception)
+            {
+                return "";
+            }
+            return "";
+        }
+
         public List<ReconciliationItem> ProvideReconciliationData(ReconciliationRequest model)
         {
             List<ReconciliationItem> result = new List<ReconciliationItem>();
