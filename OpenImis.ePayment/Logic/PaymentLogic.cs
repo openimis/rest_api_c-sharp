@@ -191,10 +191,14 @@ namespace OpenImis.ePayment.Logic
 
             var response = payment.SavePayment(model);
 
-            if (payment.PaymentId != 0 && !response.ErrorOccured)
+            if (payment.PaymentId != 0)
             {
                 SendPaymentConfirmationSms(model, payment);
+            }
 
+            if (payment.PaymentId != 0 && !response.ErrorOccured)
+            {
+             
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId, payment.ControlNum);
 
                 MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };

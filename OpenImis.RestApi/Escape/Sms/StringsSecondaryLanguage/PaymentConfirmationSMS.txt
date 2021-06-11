@@ -1,6 +1,1 @@
-﻿Payment has been made to CHF-{0}
-Invoice nu: {1}
-Amount: {2} TZS
-Receipt Nu: {3}
-Date: {4}
-Through:{5}
+﻿Malipo yamepokelewa kwenda CHF-{0} Ankara: {1} Kiasi: {2} TZS Risiti: {3} Tarehe: {4} Kupitia: {5}

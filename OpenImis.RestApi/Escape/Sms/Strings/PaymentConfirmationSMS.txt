@@ -1,6 +1,1 @@
-﻿Malipo yamepokelewa kwenda CHF-{0}
-Ankara Na: {1}
-Kiasi: {2} TZS
-Risiti Na: {3}
-Tarehe: {4}
-Kupitia: {5}
+﻿Payment has been made to CHF-{0} Invoice: {1} Amount: {2} TZS Receipt: {3} Date: {4} Through:{5}

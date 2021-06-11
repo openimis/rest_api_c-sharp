@@ -66,22 +66,28 @@ namespace OpenImis.ePayment.Escape.Sms
             {
                 string message = container.Message;
                 string recipients = container.Recipient;
-                
-                string json = GetRequestBody(message, sender, service, recipients);
+
+                string todayDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                string body = "{\"message\":\"" + message + 
+                              "\",\"datetime\":\"" + todayDate + 
+                              "\",\"sender_id\":\"" + sender + 
+                              "\",\"mobile_service_id\":\"" + service + 
+                              "\",\"recipients\":\"" + recipients + "\"}";
 
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri(URL);
 
                 var headers = client.DefaultRequestHeaders;
 
-                Headers _requiredheaders = new Headers(USER_ID, PRIVATE_KEY, json, REQUEST_TYPE);
+                Headers _requiredheaders = new Headers(USER_ID, PRIVATE_KEY, body, REQUEST_TYPE);
 
                 foreach (var _requiredheader in _requiredheaders.GetHeaders(configuredHeaders))
                 {
                     headers.Add(_requiredheader.Key, _requiredheader.Value);
                 }
 
-                var param = new { data = json, datetime = DateTime.Now.ToString() };
+                var param = new { data = body, datetime = todayDate };
 
                 var content = new StringContent(JsonConvert.SerializeObject(param), Encoding.ASCII, "application/json");
 
@@ -114,15 +120,5 @@ namespace OpenImis.ePayment.Escape.Sms
             return response_message;
         }
 
-
-        private static string GetRequestBody(string message, string sender, string service, string recipients)
-        {
-
-            string todayDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            string body = "{\"message\":\"" + message + "\",\"datetime\":\"" + todayDate + "\",\"sender_id\":\"" + sender + "\",\"mobile_service_id\":\"" + service + "\",\"recipients\":\"" + recipients + "\"}";
-            return body;
-        }
-       
     }
 }
