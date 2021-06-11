@@ -520,7 +520,7 @@ namespace OpenImis.ePayment.Logic
             List<SmsContainer> message = new List<SmsContainer>();
 
             var txtmsg = string.Format(
-                sms.GetMessage("CancellationSMS"), // template
+                sms.GetMessage("CancellationSms"), // template
                 payment.ControlNum, // invoice number
                 DateTime.UtcNow.ToString("dd-MM-yyyy").ToString() // payment cancellation date  
                 );
