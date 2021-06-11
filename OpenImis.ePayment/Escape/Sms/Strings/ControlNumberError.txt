@@ -1,1 +1,1 @@
-﻿Request for control number for CHFID:{3}, Product:{4} was not successfully. Please try after sometime. 
+﻿Request for Control Number for CHFID:{3}, Product:{4} has been unsuccessful. Please try again later.

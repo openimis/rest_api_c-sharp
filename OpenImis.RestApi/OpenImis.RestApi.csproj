@@ -112,6 +112,12 @@
     <None Update="Docs\ApiVersion1Description.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\PaymentConfirmationSMS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\PaymentConfirmationSMS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
