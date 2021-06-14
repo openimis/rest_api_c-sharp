@@ -17,8 +17,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Models.EnrollFamilyModels
         public string ConfirmationNo { get; set; }
         public string ConfirmationType { get; set; }
         public string isOffline { get; set; }
+        public string ApprovalOfSMS { get; set; }
+        public string LanguageOfSMS{ get; set; }
         public List<Insuree> Insurees { get; set; }
         public List<Policy> Policies { get; set; }
         public List<InsureePolicy> InsureePolicy { get; set; }
+        public FamilySMS FamilySMS { get; set; }
     }
 }
