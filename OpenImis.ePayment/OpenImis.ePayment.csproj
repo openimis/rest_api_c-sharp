@@ -2,11 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Configurations>Debug;Release;CHFDebug</Configurations>
+    <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFDebug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;CHF</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFRelease|AnyCPU'">
+    <DefineConstants>TRACE;CHF</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\CancellationSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Escape\Sms\StringsSecondaryLanguage\ControlNumberAssigned.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -47,6 +54,9 @@
     </None>
     <None Update="Escape\Sms\StringsSecondaryLanguage\PaymentConfirmationSMS.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\CancellationSms.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Escape\Sms\Strings\CommissionInformSms.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

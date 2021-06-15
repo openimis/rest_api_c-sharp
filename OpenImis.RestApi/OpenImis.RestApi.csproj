@@ -5,11 +5,12 @@
     <UserSecretsId>aspnet-ImisRestApi-0F650C61-A020-4549-AC0C-C49F0334E2D7</UserSecretsId>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ProjectGuid>{0F650C61-A020-4549-AC0C-C49F0334E2D7}</ProjectGuid>
-    <Configurations>Debug;Release;CHFDebug</Configurations>
+    <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp2.1\OpenImisOpenImis.ePayment.ePaymentxml</DocumentationFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFDebug|AnyCPU'">
@@ -20,6 +21,10 @@
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFRelease|AnyCPU'">
+    <DefineConstants>TRACE;CHF</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

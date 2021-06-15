@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <Configurations>Debug;Release;CHFDebug</Configurations>
+    <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
