@@ -24,7 +24,7 @@ using OpenImis.ePayment.Responses;
 
 namespace OpenImis.ePayment.Controllers
 {
-    [ApiVersion("2")]
+    [ApiVersion("3")]
     public class PaymentController : PaymentBaseController
     {
         private ImisPayment imisPayment;

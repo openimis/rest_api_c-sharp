@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.MasterDataModule.Models;
-using OpenImis.RestApi.Security;
+using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
 {

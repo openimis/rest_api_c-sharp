@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenImis.Security.Security;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.InsureeModule.Models;
-using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
 {

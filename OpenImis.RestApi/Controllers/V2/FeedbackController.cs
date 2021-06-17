@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenImis.Security.Security;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.FeedbackModule.Models;
 using OpenImis.ModulesV2.Utils;
-using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
 {

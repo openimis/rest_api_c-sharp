@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using OpenImis.RestApi.Security;
+using OpenImis.Security.Security;
 using OpenImis.RestApi.Docs;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Logging;
@@ -38,10 +38,12 @@ namespace OpenImis.RestApi
         public void ConfigureServices(IServiceCollection services)
         {
             var configImisModules = Configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
-            int lastApiVersion = configImisModules.Max(c => int.Parse(c.Version));
+            int lastApiVersion = 3; // configImisModules.Max(c => int.Parse(c.Version));
 
             services.AddSingleton<ModulesV1.IImisModules, ModulesV1.ImisModules>();
             services.AddSingleton<ModulesV2.IImisModules, ModulesV2.ImisModules>();
+            services.AddSingleton<ModulesV3.IImisModules, ModulesV3.ImisModules>();
+            services.AddSingleton<Security.ILoginModule, Security.LoginModule>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -60,10 +62,15 @@ namespace OpenImis.RestApi
 
                     options.SecurityTokenValidators.Clear();
                     //below line adds the custom validator class
+                    //options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(
+                    //    services.BuildServiceProvider().GetService<ModulesV1.IImisModules>(),
+                    //    services.BuildServiceProvider().GetService<ModulesV2.IImisModules>(),
+                    //    services.BuildServiceProvider().GetService<ModulesV3.IImisModules>(),
+                    //    services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
+
                     options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(
-                        services.BuildServiceProvider().GetService<ModulesV1.IImisModules>(),
-                        services.BuildServiceProvider().GetService<ModulesV2.IImisModules>(),
                         services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
+
                 });
 
             services.AddAuthorization();
