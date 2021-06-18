@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.ePayment.Models
+namespace OpenImis.ModulesV3.ClaimModule.Models
 {
     public class ClaimOutput
     {

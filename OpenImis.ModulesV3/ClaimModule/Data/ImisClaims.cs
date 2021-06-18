@@ -1,16 +1,14 @@
-﻿using OpenImis.ePayment.Models;
-//using OpenImis.ePayment.Responses;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using OpenImis.DB.SqlServer.DataHelper;
+using OpenImis.ModulesV3.ClaimModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-//using System.Threading.Tasks;
-//using OpenImis.ePayment.Models;
 
-namespace OpenImis.ePayment.Data
+namespace OpenImis.ModulesV3.ClaimModule.Data
 {
     public class ImisClaims
     {
@@ -136,7 +134,7 @@ namespace OpenImis.ePayment.Data
             return message;
         }
 
-        internal object GetClaims(ClaimsModel model)
+        public object GetClaims(ClaimsModel model)
         {
             string sSQL = @"exec uspAPIGetClaims @ClaimAdminCode,@StartDate,@EndDate,@DateProcessedFrom,@DateProcessedTo,@ClaimStatus";
 

@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenImis.DB.SqlServer.DataHelper
 {
@@ -165,5 +166,100 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
             return rv;
         }
+
+        public DataSet GetDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
+        {
+            DataSet ds = new DataSet();
+            var sqlConnection = new SqlConnection(ConnectionString);
+            var command = new SqlCommand(SQL, sqlConnection)
+            {
+                CommandType = commandType
+            };
+
+            var adapter = new SqlDataAdapter(command);
+
+            using (command)
+            {
+                if (parameters.Length > 0)
+                    command.Parameters.AddRange(parameters);
+                adapter.Fill(ds);
+            }
+
+            return ds;
+        }
+
+        public async Task ExecuteAsync(string SQL, SqlParameter[] parameters, CommandType commandType)
+        {
+            var sqlConnection = new SqlConnection(ConnectionString);
+
+            //if(SqlCommand.C)
+            // sqlConnection.Open
+            var command = new SqlCommand(SQL, sqlConnection)
+            {
+                CommandType = commandType
+            };
+
+            using (command)
+            {
+                if (command.Connection.State == 0)
+                {
+                    command.Connection.Open();
+
+                    if (parameters.Length > 0)
+                        command.Parameters.AddRange(parameters);
+
+                    await command.ExecuteNonQueryAsync();
+
+                    command.Connection.Close();
+                }
+
+            }
+        }
+
+        public async Task<IList<SqlParameter>> ExecProcedureAsync(string StoredProcedure, SqlParameter[] parameters)
+        {
+            SqlConnection sqlConnection = new SqlConnection(ConnectionString);
+            SqlCommand command = new SqlCommand();
+
+            SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
+            returnParameter.Direction = ParameterDirection.ReturnValue;
+
+            command.CommandText = StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
+            command.Connection = sqlConnection;
+            command.Parameters.Add(returnParameter);
+
+            if (parameters.Length > 0)
+                command.Parameters.AddRange(parameters);
+
+            sqlConnection.Open();
+
+            await command.ExecuteNonQueryAsync();
+
+            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output) || x.Direction.Equals(ParameterDirection.ReturnValue)).ToList();
+            rv.Add(returnParameter);
+
+            sqlConnection.Close();
+
+            return rv;
+        }
     }
+
+    public static class ExtensionMethods
+    {
+        public static decimal? ParseNullableDecimal(this string s)
+        {
+            if (decimal.TryParse(s, out decimal d))
+                return d;
+            return null;
+        }
+
+        public static string ToStringWithDBNull(this object o)
+        {
+            if (o is DBNull)
+                return null;
+            return o.ToString();
+        }
+    }
+
 }

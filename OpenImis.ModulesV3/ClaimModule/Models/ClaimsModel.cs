@@ -1,11 +1,11 @@
-﻿using OpenImis.ePayment.ImisAttributes;
+﻿using OpenImis.ModulesV3.Helpers.Validators;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.ePayment.Models
+namespace OpenImis.ModulesV3.ClaimModule.Models
 {
     public class ClaimsModel
     {
