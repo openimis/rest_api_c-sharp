@@ -28,7 +28,7 @@ namespace OpenImis.RestApi.Controllers.V3
 
         
         [HttpPost]
-        [Route("api/GetDiagnosesServicesItems")]
+        [Route("GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetDiagnosesServicesItems([FromBody]DsiInputModel model)
@@ -53,7 +53,7 @@ namespace OpenImis.RestApi.Controllers.V3
 
         [Authorize(Roles = "ClaimAdd")]
         [HttpPost]
-        [Route("api/GetPaymentLists")]
+        [Route("GetPaymentLists")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetPaymentLists([FromBody]PaymentListsInputModel model)
@@ -77,7 +77,7 @@ namespace OpenImis.RestApi.Controllers.V3
         }
 
         [HttpGet]
-        [Route("api/Claims/GetClaimAdmins")]
+        [Route("Claims/GetClaimAdmins")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult ValidateClaimAdmin()
@@ -98,7 +98,7 @@ namespace OpenImis.RestApi.Controllers.V3
         }
 
         [HttpGet]
-        [Route("api/Claims/Controls")]
+        [Route("Claims/Controls")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetControls()
@@ -121,7 +121,7 @@ namespace OpenImis.RestApi.Controllers.V3
         }
 
         [HttpPost]
-        [Route("api/GetClaims")]
+        [Route("GetClaims")]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetClaims([FromBody]ClaimsModel model)
