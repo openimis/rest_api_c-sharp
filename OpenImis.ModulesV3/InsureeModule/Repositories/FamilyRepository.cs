@@ -16,6 +16,7 @@ using System.Xml;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
+using OpenImis.ModulesV3.InsureeModule.Repositories;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
 {
@@ -44,14 +45,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                        select UD.LocationId)
                                        .ToList();
 
-                    var familyId = (from item in locationIds
-                                    from I in imisContext.TblInsuree
+                    var familyId = (from I in imisContext.TblInsuree
                                     join F in imisContext.TblFamilies on I.FamilyId equals F.FamilyId
                                     join V in imisContext.TblVillages on F.LocationId equals V.VillageId
                                     join W in imisContext.TblWards on V.WardId equals W.WardId
                                     join D in imisContext.TblDistricts on W.DistrictId equals D.DistrictId
                                     where (I.Chfid == chfid
-                                        && D.DistrictId == item
+                                        && locationIds.Contains(D.DistrictId)
                                         && F.ValidityTo == null
                                         && I.ValidityTo == null
                                         && V.ValidityTo == null
