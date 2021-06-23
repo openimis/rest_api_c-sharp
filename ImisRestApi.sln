@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenImis.ModulesV2", "OpenI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenImis.ePayment", "OpenImis.ePayment\OpenImis.ePayment.csproj", "{38141940-FC05-4DC4-B247-80C5E29FBD05}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenImis.ModulesV3", "OpenImis.ModulesV3\OpenImis.ModulesV3.csproj", "{45793BFB-04AB-4037-844E-C4CDCE43CAF5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenImis.Security", "OpenImis.Security\OpenImis.Security.csproj", "{A7011F41-79EC-464A-BC80-A28736ACCD2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CHFDebug|Any CPU = CHFDebug|Any CPU
@@ -81,6 +85,22 @@ Global
 		{38141940-FC05-4DC4-B247-80C5E29FBD05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38141940-FC05-4DC4-B247-80C5E29FBD05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38141940-FC05-4DC4-B247-80C5E29FBD05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.CHFDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.CHFDebug|Any CPU.Build.0 = Debug|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.CHFRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.CHFRelease|Any CPU.Build.0 = Release|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45793BFB-04AB-4037-844E-C4CDCE43CAF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.CHFDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.CHFDebug|Any CPU.Build.0 = Debug|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.CHFRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.CHFRelease|Any CPU.Build.0 = Release|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7011F41-79EC-464A-BC80-A28736ACCD2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

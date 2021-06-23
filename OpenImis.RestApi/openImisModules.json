@@ -51,6 +51,41 @@
       "ReportModule": {
         "ReportLogic": "OpenImis.ModulesV2.ReportModule.Logic.ReportLogic"
       }
+    },
+    {
+      "Version": "3",
+      "ClaimModule": {
+        "ClaimLogic": "OpenImis.ModulesV3.ClaimModule.Logic.CLaimLogic"
+      },
+      "LoginModule": {
+        "LoginLogic": "OpenImis.Security.Logic.LoginLogic"
+      },
+      "CoverageModule": {
+        "CoverageLogic": "OpenImis.ModulesV3.CoverageModule.Logic.CoverageLogic"
+      },
+      "InsureeModule": {
+        "FamilyLogic": "OpenImis.ModulesV3.InsureeModule.Logic.FamilyLogic",
+        "ContributionLogic": "OpenImis.ModulesV3.InsureeModule.Logic.ContributionLogic",
+        "InsureeLogic": "OpenImis.ModulesV3.InsureeModule.Logic.InsureeLogic"
+      },
+      "FeedbackModule": {
+        "FeedbackLogic": "OpenImis.ModulesV3.FeedbackModule.Logic.FeedbackLogic"
+      },
+      "PremiumModule": {
+        "PremiumLogic": "OpenImis.ModulesV3.PremiumModule.Logic.PremiumLogic"
+      },
+      "SystemModule": {
+        "SystemLogic": "OpenImis.ModulesV3.SystemModule.Logic.SystemLogic"
+      },
+      "MasterDataModule": {
+        "MasterDataLogic": "OpenImis.ModulesV3.MasterDataModule.Logic.MasterDataLogic"
+      },
+      "PolicyModule": {
+        "PolicyRenewalLogic": "OpenImis.ModulesV3.PolicyModule.Logic.PolicyRenewalLogic"
+      },
+      "ReportModule": {
+        "ReportLogic": "OpenImis.ModulesV3.ReportModule.Logic.ReportLogic"
+      }
     }
   ]
 }

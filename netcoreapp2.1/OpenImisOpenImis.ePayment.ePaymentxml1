@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenImis.ModulesV3</name>
+    </assembly>
+    <members>
+        <member name="T:OpenImis.ModulesV3.IImisModules">
+            <summary>
+            This interface serves to define a Service for the IMIS modules 
+            </summary>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetLoginModule">
+            <summary>
+            Creates and returns the login module version 2.
+            </summary>
+            <returns>
+            The Login module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetClaimModule">
+            <summary>
+            Creates and returns the claim module version 2.
+            </summary>
+            <returns>
+            The Claim module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetInsureeModule">
+            <summary>
+            Creates and returns the insuree module version 2.
+            </summary>
+            <returns>
+            The Insuree module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetCoverageModule">
+            <summary>
+            Creates and returns the payment module version 2.
+            </summary>
+            <returns>
+            The Payment module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetFeedbackModule">
+            <summary>
+            Creates and returns the feedback module version 2.
+            </summary>
+            <returns>
+            The Feedback module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetPremiumModule">
+            <summary>
+            Creates and returns the premium module version 2.
+            </summary>
+            <returns>
+            The Premium module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetSystemModule">
+            <summary>
+            Creates and returns the system module version 2.
+            </summary>
+            <returns>
+            The System module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetMasterDataModule">
+            <summary>
+            Creates and returns the master data module version 2.
+            </summary>
+            <returns>
+            The MasterData module V2.
+            </returns>
+        </member>
+        <member name="M:OpenImis.ModulesV3.ImisModules.GetPolicyModule">
+            <summary>
+            Creates and returns the policy module version 2.
+            </summary>
+            <returns>
+            The Policy module V2.
+            </returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:OpenImis.ModulesV3.ImisModules.GetReportModule" -->
+        <member name="M:OpenImis.ModulesV3.ImisModules.CreateTypeFromConfiguration(System.String,System.String,System.String)">
+            <summary>
+            Creates and returns the type based on the string from the configuration 
+            </summary>
+            <param name="moduleName">The module name</param>
+            <param name="sectionName">The section name</param>
+            <param name="defaultValue">The default section value</param>
+            <returns>Type represented by the section</returns>
+        </member>
+        <member name="T:OpenImis.ModulesV3.Utils.Models.PagerModel">
+            <summary>
+            This class allows to add pagination information to the responses getting list of Entities
+            </summary>
+            TODO: think if there should be a string NextPage field with URL for next page (same for PreviousPage)
+        </member>
+        <member name="M:OpenImis.RestApi.Controllers.V3.MasterDataController.GetMasterData">
+            <summary>
+            Get the Master Data
+            </summary>
+            <returns>The Master Data</returns>
+            <remarks>
+            ### REMARKS ###
+            The following codes are returned
+            - 200 - The Master Data 
+            - 401 - The token is invalid
+            </remarks>
+            <response code="200">Returns the list of Locations</response>
+            <response code="401">If the token is missing, is wrong or expired</response>      
+        </member>
+    </members>
+</doc>

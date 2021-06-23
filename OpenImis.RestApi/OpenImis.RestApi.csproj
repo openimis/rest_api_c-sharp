@@ -59,7 +59,6 @@
 
   <ItemGroup>
     <Content Include="appsettings.Production.json.dist" />
-    <Content Include="NuGet.Config.old" />
     <Content Include="openImisModules.json.dist" />
   </ItemGroup>
 
@@ -93,6 +92,7 @@
     <ProjectReference Include="..\OpenImis.Extensions.Configuration\OpenImis.Extensions.Configuration.csproj" />
     <ProjectReference Include="..\OpenImis.ModulesV1\OpenImis.ModulesV1.csproj" />
     <ProjectReference Include="..\OpenImis.ModulesV2\OpenImis.ModulesV2.csproj" />
+    <ProjectReference Include="..\OpenImis.ModulesV3\OpenImis.ModulesV3.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -111,6 +111,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Docs\ApiVersion3Description.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\ApiVersion2Description.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

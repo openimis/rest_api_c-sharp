@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using OpenImis.Security.Security;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.InsureeModule.Helpers;
 using OpenImis.ModulesV1.InsureeModule.Models;
-using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V1
 {

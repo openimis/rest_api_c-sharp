@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV1.CoverageModule.Helpers;
 using OpenImis.ModulesV1.CoverageModule.Models;
-using OpenImis.RestApi.Security;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.Helpers.Validators;
+using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V1
 {
