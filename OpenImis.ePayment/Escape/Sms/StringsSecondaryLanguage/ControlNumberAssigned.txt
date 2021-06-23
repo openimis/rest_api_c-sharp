@@ -1,1 +1,1 @@
-﻿Ankara Na:{0},Tarehe:{1},CHFID:{3},Bidhaa:{5},Kiasi:{7}
+﻿Ankara Na:{0},Tarehe:{1},CHFID:{3},Bidhaa:{5},Kiasi:{7} Lipa kupitia simu malipo ya serikali au Benki ya NMB
