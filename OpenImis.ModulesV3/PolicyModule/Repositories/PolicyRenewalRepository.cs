@@ -273,13 +273,13 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                                join P in imisContext.TblPolicy.Where(p => p.ValidityTo == null) on PR.PolicyId equals P.PolicyId
                                join R in imisContext.TblReporting on PR.ReportingCommissionID equals R.ReportingId
                                join O in imisContext.TblOfficer on P.OfficerId equals O.OfficerId
-                               where (PR.ReportingCommissionID == null
-                                    && (PR.PayDate >= minDate && PR.PayDate <= maxDate)
+                               where ((PR.PayDate >= minDate && PR.PayDate <= maxDate)
                                     && PR.ValidityTo == null
-                                    && O.Code == model.enrolment_officer_code)
+                                    && O.Code == model.enrolment_officer_code
+                                    && R.ReportMode == (int)model.mode)
                                select new
                                {
-                                   Commission = (R.CammissionRate == null ? 0.00M : R.CammissionRate) * PR.Amount,
+                                   Commission = (R.CommissionRate == null ? 0.00M : R.CommissionRate) * PR.Amount,
                                    PR.Amount
                                })
                                .ToList();
