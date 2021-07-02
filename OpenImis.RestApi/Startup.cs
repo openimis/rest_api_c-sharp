@@ -21,6 +21,12 @@ using System.Linq;
 using System.Diagnostics;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Quartz.Impl;
+using Quartz.Spi;
+using Quartz;
+using System;
+using OpenImis.ePayment.Scheduler;
+using OpenImis.RestApi.Scheduler;
 
 namespace OpenImis.RestApi
 {
@@ -111,6 +117,22 @@ namespace OpenImis.RestApi
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+
+
+            // Quartz scheduler
+            var scheduler = StdSchedulerFactory.GetDefaultScheduler().GetAwaiter().GetResult();
+            services.AddSingleton(scheduler);
+            services.AddHostedService<QuartzHostedService>();
+            services.AddSingleton<IJobFactory, CustomQuartzJobFactory>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton<MatchPaymentJob>();
+
+            var jobName = Configuration.GetSection("MatchPaymentSchedule").GetValue<string>("JobName");
+            var cronExpression = Configuration.GetSection("MatchPaymentSchedule").GetValue<string>("CronExpression");
+
+            services.AddSingleton(new JobMetaData(Guid.NewGuid(), typeof(MatchPaymentJob), jobName , cronExpression));
+            services.AddHostedService<CustomQuartzHostedService>();
+
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
