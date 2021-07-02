@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.ePayment.Scheduler
+namespace OpenImis.RestApi.Scheduler
 {
     public class JobMetaData
     {

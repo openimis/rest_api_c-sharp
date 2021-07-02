@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenImis.ePayment.Scheduler
+namespace OpenImis.RestApi.Scheduler
 {
     public class QuartzHostedService : IHostedService
     {

@@ -26,6 +26,7 @@ using Quartz.Spi;
 using Quartz;
 using System;
 using OpenImis.ePayment.Scheduler;
+using OpenImis.RestApi.Scheduler;
 
 namespace OpenImis.RestApi
 {
