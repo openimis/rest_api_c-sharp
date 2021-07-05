@@ -33,6 +33,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public string PhotoPath { get; set; }
         public string IdentificationTypes { get; set; }
         public bool IsOffline { get; set; }
+        public bool Vulnerability { get; set; }
 
         public static InsureeModel FromTblInsuree(TblInsuree tblInsuree)
         {
@@ -59,7 +60,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
                 Email = tblInsuree.Email,
                 CurrentAddress = tblInsuree.CurrentAddress,
                 GeoLocation = tblInsuree.GeoLocation,
-                IdentificationTypes = tblInsuree.TypeOfId
+                IdentificationTypes = tblInsuree.TypeOfId,
+                Vulnerability = tblInsuree.Vulnerability
             };
 
             if (tblInsuree.Relationship != null)

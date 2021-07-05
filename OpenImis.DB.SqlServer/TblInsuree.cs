@@ -46,6 +46,7 @@ namespace OpenImis.DB.SqlServer
         public string CurrentAddress { get; set; }
         public string GeoLocation { get; set; }
         public int? CurrentVillage { get; set; }
+        public bool Vulnerability { get; set; }
 
         public TblEducations EducationNavigation { get; set; }
         public TblFamilies Family { get; set; }
