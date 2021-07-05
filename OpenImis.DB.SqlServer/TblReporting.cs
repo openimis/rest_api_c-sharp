@@ -15,6 +15,7 @@ namespace OpenImis.DB.SqlServer
         public int RecordFound { get; set; }
         public int? OfficerID { get; set; }
         public int? ReportType { get; set; }
+        public int? ReportMode { get; set; }
         public decimal? CammissionRate { get; set; }
         public decimal? CommissionRate { get; set; }
     }

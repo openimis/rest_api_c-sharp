@@ -6,7 +6,6 @@ using OpenImis.ModulesV1.LoginModule;
 using OpenImis.ModulesV1.InsureeModule;
 using OpenImis.ModulesV1.ClaimModule;
 using OpenImis.ModulesV1.CoverageModule;
-using OpenImis.ModulesV1.PaymentModule;
 using Microsoft.Extensions.DependencyInjection;
 using OpenImis.ModulesV1.Helpers;
 using System.Collections.Generic;
@@ -21,7 +20,6 @@ namespace OpenImis.ModulesV1
         private IInsureeModule insureeModule;
         private IClaimModule claimModule;
         private ICoverageModule coverageModule;
-        private IPaymentModule paymentModule;
 
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
@@ -112,23 +110,7 @@ namespace OpenImis.ModulesV1
             return coverageModule;
         }
 
-        /// <summary>
-        /// Creates and returns the payment module version 1.
-        /// </summary>
-        /// <returns>
-        /// The Payment module V1.
-        /// </returns>
-        public IPaymentModule GetPaymentModule()
-        {
-            if (paymentModule == null)
-            {
-                paymentModule = new PaymentModule.PaymentModule(_configuration);
-
-                Type paymentLogicType = CreateTypeFromConfiguration("PaymentModule", "PaymentLogic", "OpenImis.ModulesV1.PaymentModule.Logic.PaymentLogic");
-                paymentModule.SetPaymentLogic((PaymentModule.Logic.IPaymentLogic)ActivatorUtilities.CreateInstance(_serviceProvider, paymentLogicType));
-            }
-            return paymentModule;
-        }
+        
 
         /// <summary>
 		/// Creates and returns the type based on the string from the configuration 

@@ -1,19 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <UserSecretsId>aspnet-ImisRestApi-0F650C61-A020-4549-AC0C-C49F0334E2D7</UserSecretsId>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ProjectGuid>{0F650C61-A020-4549-AC0C-C49F0334E2D7}</ProjectGuid>
+    <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.1\ImisRestApi.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\OpenImisOpenImis.ePayment.ePaymentxml</DocumentationFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFDebug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp2.1\OpenImisOpenImis.ePayment.ePaymentxml</DocumentationFile>
+    <DefineConstants>TRACE;DEBUG;CHF</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CHFRelease|AnyCPU'">
+    <DefineConstants>TRACE;CHF</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +47,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings.CHF.json" />
+    <Content Remove="appsettings.Development.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="appsettings.Production.json.dist" />
     <None Remove="NuGet.Config.old" />
     <None Remove="openImisModules.json.dist" />
@@ -43,7 +59,6 @@
 
   <ItemGroup>
     <Content Include="appsettings.Production.json.dist" />
-    <Content Include="NuGet.Config.old" />
     <Content Include="openImisModules.json.dist" />
   </ItemGroup>
 
@@ -54,9 +69,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.28" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="2.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.4" />
+    <PackageReference Include="Quartz" Version="3.3.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Examples" Version="2.9.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
@@ -68,9 +84,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="appsettings.CHF.json" />
+    <None Include="appsettings.Development.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenImis.ePayment\OpenImis.ePayment.csproj" />
     <ProjectReference Include="..\OpenImis.Extensions.Configuration\OpenImis.Extensions.Configuration.csproj" />
     <ProjectReference Include="..\OpenImis.ModulesV1\OpenImis.ModulesV1.csproj" />
     <ProjectReference Include="..\OpenImis.ModulesV2\OpenImis.ModulesV2.csproj" />
+    <ProjectReference Include="..\OpenImis.ModulesV3\OpenImis.ModulesV3.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -89,12 +112,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Docs\ApiVersion3Description.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\ApiVersion2Description.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Docs\ApiVersion1Description.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Escape\Sms\StringsSecondaryLanguage\PaymentConfirmationSMS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Escape\Sms\Strings\PaymentConfirmationSMS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

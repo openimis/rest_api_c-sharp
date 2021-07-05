@@ -16,9 +16,6 @@
         "PolicyLogic": "OpenImis.ModulesV1.InsureeModule.Logic.PolicyLogic",
         "ContributionLogic": "OpenImis.ModulesV1.InsureeModule.Logic.ContributionLogic"
       },
-      "PaymentModule": {
-        "PaymentLogic": "OpenImis.ModulesV1.PaymentModule.Logic.PaymentLogic"
-      }
     },
     {
       "Version": "2",
@@ -35,9 +32,6 @@
         "FamilyLogic": "OpenImis.ModulesV2.InsureeModule.Logic.FamilyLogic",
         "ContributionLogic": "OpenImis.ModulesV2.InsureeModule.Logic.ContributionLogic",
         "InsureeLogic": "OpenImis.ModulesV2.InsureeModule.Logic.InsureeLogic"
-      },
-      "PaymentModule": {
-        "PaymentLogic": "OpenImis.ModulesV2.PaymentModule.Logic.PaymentLogic"
       },
       "FeedbackModule": {
         "FeedbackLogic": "OpenImis.ModulesV2.FeedbackModule.Logic.FeedbackLogic"
@@ -56,6 +50,41 @@
       },
       "ReportModule": {
         "ReportLogic": "OpenImis.ModulesV2.ReportModule.Logic.ReportLogic"
+      }
+    },
+    {
+      "Version": "3",
+      "ClaimModule": {
+        "ClaimLogic": "OpenImis.ModulesV3.ClaimModule.Logic.CLaimLogic"
+      },
+      "LoginModule": {
+        "LoginLogic": "OpenImis.Security.Logic.LoginLogic"
+      },
+      "CoverageModule": {
+        "CoverageLogic": "OpenImis.ModulesV3.CoverageModule.Logic.CoverageLogic"
+      },
+      "InsureeModule": {
+        "FamilyLogic": "OpenImis.ModulesV3.InsureeModule.Logic.FamilyLogic",
+        "ContributionLogic": "OpenImis.ModulesV3.InsureeModule.Logic.ContributionLogic",
+        "InsureeLogic": "OpenImis.ModulesV3.InsureeModule.Logic.InsureeLogic"
+      },
+      "FeedbackModule": {
+        "FeedbackLogic": "OpenImis.ModulesV3.FeedbackModule.Logic.FeedbackLogic"
+      },
+      "PremiumModule": {
+        "PremiumLogic": "OpenImis.ModulesV3.PremiumModule.Logic.PremiumLogic"
+      },
+      "SystemModule": {
+        "SystemLogic": "OpenImis.ModulesV3.SystemModule.Logic.SystemLogic"
+      },
+      "MasterDataModule": {
+        "MasterDataLogic": "OpenImis.ModulesV3.MasterDataModule.Logic.MasterDataLogic"
+      },
+      "PolicyModule": {
+        "PolicyRenewalLogic": "OpenImis.ModulesV3.PolicyModule.Logic.PolicyRenewalLogic"
+      },
+      "ReportModule": {
+        "ReportLogic": "OpenImis.ModulesV3.ReportModule.Logic.ReportLogic"
       }
     }
   ]

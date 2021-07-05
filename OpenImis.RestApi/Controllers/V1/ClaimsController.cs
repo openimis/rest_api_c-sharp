@@ -2,9 +2,9 @@
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OpenImis.Security.Security;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.ClaimModule.Models;
-using OpenImis.RestApi.Security;
 
 namespace OpenImis.RestApi.Controllers.V1
 {

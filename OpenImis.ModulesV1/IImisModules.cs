@@ -2,7 +2,6 @@
 using OpenImis.ModulesV1.CoverageModule;
 using OpenImis.ModulesV1.InsureeModule;
 using OpenImis.ModulesV1.LoginModule;
-using OpenImis.ModulesV1.PaymentModule;
 
 namespace OpenImis.ModulesV1
 {
@@ -18,7 +17,5 @@ namespace OpenImis.ModulesV1
         IInsureeModule GetInsureeModule();
 
         ICoverageModule GetCoverageModule();
-
-        IPaymentModule GetPaymentModule();
     }
 }

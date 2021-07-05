@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.ReportModule.Models;
 using OpenImis.ModulesV2.Utils;
-using OpenImis.RestApi.Security;
+using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
 {

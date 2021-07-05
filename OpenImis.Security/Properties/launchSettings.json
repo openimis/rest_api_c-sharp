@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "OpenImis.Security": {
+      "commandName": "Executable"
+    }
+  }
+}
