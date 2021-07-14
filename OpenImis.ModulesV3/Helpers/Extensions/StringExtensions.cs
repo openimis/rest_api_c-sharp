@@ -6,7 +6,7 @@ namespace OpenImis.ModulesV3.PaymentModule.Helpers.Extensions
     {
         public static int? GetErrorNumber(this string str)
         {
-            if (String.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str))
             {
                 return null;
             }
@@ -27,7 +27,7 @@ namespace OpenImis.ModulesV3.PaymentModule.Helpers.Extensions
 
         public static string GetErrorMessage(this string str)
         {
-            if (String.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str))
             {
                 return str;
             }

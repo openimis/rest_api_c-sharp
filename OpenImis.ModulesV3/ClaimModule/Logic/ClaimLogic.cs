@@ -42,7 +42,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
 
         public List<ClaimAdminModel> GetClaimAdministrators()
         {
-            List<ClaimAdminModel> response = new List<ClaimAdminModel>();
+            List<ClaimAdminModel> response;
 
             response = claimRepository.GetClaimAdministrators();
 
@@ -51,7 +51,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
 
         public List<TblControls> GetControls()
         {
-            List<TblControls> response = new List<TblControls>();
+            List<TblControls> response;
 
             response = claimRepository.GetControls();
 
@@ -63,6 +63,15 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
             PaymentLists response;
 
             response = claimRepository.GetPaymentLists(model);
+
+            return response;
+        }
+
+        public List<ClaimOutput> GetClaims(ClaimsModel model)
+        {
+            List<ClaimOutput> response;
+
+            response = claimRepository.GetClaims(model);
 
             return response;
         }
