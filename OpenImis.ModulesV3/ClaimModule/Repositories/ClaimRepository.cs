@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
+using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ModulesV3.ClaimModule.Models;
 using OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim;
 using OpenImis.ModulesV3.Helpers;
@@ -318,6 +320,107 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
             {
                 throw e;
             }
+        }
+
+        public List<ClaimOutput> GetClaims(ClaimsModel model)
+        {
+            string sSQL = @"exec uspAPIGetClaims @ClaimAdminCode,@StartDate,@EndDate,@DateProcessedFrom,@DateProcessedTo,@ClaimStatus";
+
+            DataHelper helper = new DataHelper(_configuration);
+            int? claimStatus = null;
+
+            if (model.status_claim != 0)
+                claimStatus = (int)model.status_claim;
+
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@ClaimAdminCode", model.claim_administrator_code),
+                new SqlParameter("@StartDate",SqlDbType.DateTime){ Value = (model.visit_date_from != null)?model.visit_date_from:(object)DBNull.Value},
+                new SqlParameter("@EndDate",SqlDbType.DateTime){ Value = (model.visit_date_to != null)?model.visit_date_to:(object)DBNull.Value},
+                new SqlParameter("@DateProcessedFrom",SqlDbType.DateTime){ Value = (model.processed_date_from != null)?model.processed_date_from:(object)DBNull.Value},
+                new SqlParameter("@DateProcessedTo", SqlDbType.DateTime){ Value = (model.processed_date_to != null)?model.processed_date_to:(object)DBNull.Value},
+                new SqlParameter("@ClaimStatus", SqlDbType.Int){ Value = (claimStatus != null)?claimStatus:(object)DBNull.Value},
+            };
+
+            try
+            {
+                var response = helper.GetDataSet(sSQL, sqlParameters, CommandType.Text);
+
+                DataTable responseItems = response.Tables[0];
+                DataTable responseServices = response.Tables[1];
+                DataTable responseClaims = response.Tables[2];
+
+                Dictionary<string, ClaimOutput> admin_claims = (from DataRow dr in responseClaims.Rows
+                                                                select new ClaimOutput()
+                                                                {
+                                                                    claim_uuid = dr["claim_uuid"].ToStringWithDBNull(),
+                                                                    health_facility_code = dr["health_facility_code"].ToStringWithDBNull(),
+                                                                    health_facility_name = dr["health_facility_name"].ToStringWithDBNull(),
+                                                                    insurance_number = dr["insurance_number"].ToStringWithDBNull(),
+                                                                    patient_name = dr["patient_name"].ToStringWithDBNull(),
+                                                                    main_dg = dr["main_dg"].ToStringWithDBNull(),
+                                                                    claim_number = dr["claim_number"].ToStringWithDBNull(),
+                                                                    date_claimed = dr["date_claimed"].ToStringWithDBNull(),
+                                                                    visit_date_from = dr["visit_date_from"].ToStringWithDBNull(),
+                                                                    visit_type = dr["visit_type"].ToStringWithDBNull(),
+                                                                    claim_status = dr["claim_status"].ToStringWithDBNull(),
+                                                                    sec_dg_1 = dr["sec_dg_1"].ToStringWithDBNull(),
+                                                                    sec_dg_2 = dr["sec_dg_2"].ToStringWithDBNull(),
+                                                                    sec_dg_3 = dr["sec_dg_3"].ToStringWithDBNull(),
+                                                                    sec_dg_4 = dr["sec_dg_4"].ToStringWithDBNull(),
+                                                                    visit_date_to = dr["visit_date_to"].ToStringWithDBNull(),
+                                                                    claimed = dr["claimed"].ToString().ParseNullableDecimal(),
+                                                                    approved = dr["approved"].ToString().ParseNullableDecimal(),
+                                                                    adjusted = dr["adjusted"].ToString().ParseNullableDecimal(),
+                                                                    explanation = dr["explanation"].ToStringWithDBNull(),
+                                                                    adjustment = dr["adjustment"].ToStringWithDBNull(),
+                                                                    guarantee_number = dr["guarantee_number"].ToStringWithDBNull(),
+                                                                    services = new List<ClaimService>(),
+                                                                    items = new List<ClaimItem>()
+                                                                }).ToList().ToDictionary(x => x.claim_uuid, x => x, StringComparer.OrdinalIgnoreCase);
+
+                (from DataRow dr in responseItems.Rows
+                 select new ClaimItem()
+                 {
+                     claim_uuid = dr["claim_uuid"].ToStringWithDBNull(),
+                     claim_number = dr["claim_number"].ToStringWithDBNull(),
+                     item = dr["item"].ToStringWithDBNull(),
+                     item_code = dr["item_code"].ToStringWithDBNull(),
+                     item_qty = dr["item_qty"].ToString().ParseNullableDecimal(),
+                     item_price = dr["item_price"].ToString().ParseNullableDecimal(),
+                     item_adjusted_qty = dr["item_adjusted_qty"].ToString().ParseNullableDecimal(),
+                     item_adjusted_price = dr["item_adjusted_price"].ToString().ParseNullableDecimal(),
+                     item_explination = dr["item_explination"].ToStringWithDBNull(),
+                     item_justificaion = dr["item_justificaion"].ToStringWithDBNull(),
+                     item_valuated = dr["item_valuated"].ToString().ParseNullableDecimal(),
+                     item_result = dr["item_result"].ToStringWithDBNull(),
+                 }).ToList().ForEach((x) => { if (admin_claims.ContainsKey(x.claim_uuid)) admin_claims[x.claim_uuid].items.Add(x); });
+
+                (from DataRow dr in responseServices.Rows
+                 select new ClaimService()
+                 {
+                     claim_uuid = dr["claim_uuid"].ToStringWithDBNull(),
+                     claim_number = dr["claim_number"].ToStringWithDBNull(),
+                     service = dr["service"].ToStringWithDBNull(),
+                     service_code = dr["service_code"].ToStringWithDBNull(),
+                     service_qty = dr["service_qty"].ToString().ParseNullableDecimal(),
+                     service_price = dr["service_price"].ToString().ParseNullableDecimal(),
+                     service_adjusted_qty = dr["service_adjusted_qty"].ToString().ParseNullableDecimal(),
+                     service_adjusted_price = dr["service_adjusted_price"].ToString().ParseNullableDecimal(),
+                     service_explination = dr["service_explination"].ToStringWithDBNull(),
+                     service_justificaion = dr["service_justificaion"].ToStringWithDBNull(),
+                     service_valuated = dr["service_valuated"].ToString().ParseNullableDecimal(),
+                     service_result = dr["service_result"].ToStringWithDBNull(),
+                 }).ToList().ForEach((x) => { if (admin_claims.ContainsKey(x.claim_uuid)) admin_claims[x.claim_uuid].services.Add(x); });
+
+                List<ClaimOutput> output = admin_claims.Values.ToList();
+
+                return output;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
         }
     }
 }

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using OpenImis.ModulesV3.ClaimModule.Models;
-using OpenImis.ModulesV3.ClaimModule.Data;
+using OpenImis.ModulesV3;
+using OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim;
 
 namespace OpenImis.RestApi.Controllers.V3
 {
@@ -19,14 +16,36 @@ namespace OpenImis.RestApi.Controllers.V3
     [ApiController]
     public class ClaimController : Controller
     {
-        private ImisClaims imisClaims;
+        private IImisModules _imisModules;
 
-        public ClaimController(IConfiguration configuration)
+        public ClaimController(IImisModules imisModules)
         {
-            imisClaims = new ImisClaims(configuration);
+            _imisModules = imisModules;
         }
 
-        
+        [HttpPost]
+        [ProducesResponseType(typeof(void), 200)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public IActionResult Create([FromBody] Claim claim)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
+
+            try
+            {
+                var response = _imisModules.GetClaimModule().GetClaimLogic().Create(claim);
+
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { error_occured = true, error_message = e.Message });
+            }
+        }
+
         [HttpPost]
         [Route("GetDiagnosesServicesItems")]
         [ProducesResponseType(typeof(void), 200)]
@@ -41,17 +60,15 @@ namespace OpenImis.RestApi.Controllers.V3
 
             try
             {
-                var response = imisClaims.GetDsi(model);
+                var response = _imisModules.GetClaimModule().GetClaimLogic().GetDsi(model);
                 return Json(response);
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
             }
-            
         }
 
-        [Authorize(Roles = "ClaimAdd")]
         [HttpPost]
         [Route("GetPaymentLists")]
         [ProducesResponseType(typeof(void), 200)]
@@ -66,14 +83,14 @@ namespace OpenImis.RestApi.Controllers.V3
 
             try
             {
-               var response = imisClaims.GetPaymentLists(model);
-            return Json(response);
+               var response = _imisModules.GetClaimModule().GetClaimLogic().GetPaymentLists(model);
+
+               return Json(response);
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
             }
-            
         }
 
         [HttpGet]
@@ -82,13 +99,11 @@ namespace OpenImis.RestApi.Controllers.V3
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult ValidateClaimAdmin()
         {
-
             try
             {
+                var data = _imisModules.GetClaimModule().GetClaimLogic().GetClaimAdministrators();
 
-                var data = imisClaims.GetClaimAdministrators();
                 return Ok(new { error_occured = false, claim_admins = data });
-
             }
             catch (Exception e)
             {
@@ -103,19 +118,15 @@ namespace OpenImis.RestApi.Controllers.V3
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetControls()
         {
-
             try
             {
-
-                var data = imisClaims.GetControls();
+                var data = _imisModules.GetClaimModule().GetClaimLogic().GetControls();
 
                 return Ok(new { error_occured = false, controls = data });
-
             }
             catch (Exception e)
             {
                 return BadRequest(new { error_occured = true, error_message = e.Message });
-
             }
 
         }
@@ -128,7 +139,7 @@ namespace OpenImis.RestApi.Controllers.V3
         {
             try
             { 
-                var data = imisClaims.GetClaims(model);
+                var data = _imisModules.GetClaimModule().GetClaimLogic().GetClaims(model);
                
                 return Ok(new { error_occured = false, data = data });
             }
