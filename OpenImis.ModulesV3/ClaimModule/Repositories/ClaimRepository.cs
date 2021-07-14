@@ -71,8 +71,9 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                     {
                         var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
                         var returnParameter = new SqlParameter("@RV", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                        var claimRejectedParameter = new SqlParameter("@ClaimRejected", SqlDbType.Bit) { Direction = ParameterDirection.Output };
 
-                        var sql = "exec @RV = uspUpdateClaimFromPhone @XML";
+                        var sql = "exec @RV = uspUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
 
                         DbConnection connection = imisContext.Database.GetDbConnection();
 
@@ -80,13 +81,13 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                         {
                             cmd.CommandText = sql;
 
-                            cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter });
+                            cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, claimRejectedParameter });
 
                             if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
 
                             using (var reader = cmd.ExecuteReader())
                             {
-                                // Displaying errors in the Stored Procedure in Debug mode
+                                //Displaying errors in the Stored Procedure in Debug mode
                                 //do
                                 //{
                                 //    while (reader.Read())
@@ -98,16 +99,13 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                         }
 
                         int tempRV = (int)returnParameter.Value;
+                        bool? isClaimRejected = claimRejectedParameter.Value as bool?;
 
-                        if (tempRV == 0)
+                        if ((tempRV == 0) && (isClaimRejected == false))
                         {
                             RV = 1;
                         }
-                        else if (tempRV == -1)
-                        {
-                            RV = 2;
-                        }
-                        else
+                        else if (tempRV == 0 && (isClaimRejected == true || isClaimRejected == null))
                         {
                             if (File.Exists(fromPhoneClaimDir + fileName) && !File.Exists(fromPhoneClaimRejectedDir + fileName))
                             {
@@ -115,6 +113,15 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                             }
 
                             RV = 0;
+                        }
+                        else
+                        {
+                            if (File.Exists(fromPhoneClaimDir + fileName))
+                            {
+                                File.Delete(fromPhoneClaimDir + fileName);
+                            }
+
+                            RV = 2;
                         }
                     }
                 }
