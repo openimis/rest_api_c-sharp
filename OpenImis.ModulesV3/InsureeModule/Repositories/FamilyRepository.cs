@@ -87,7 +87,62 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             }
         }
 
-        public int Create(EnrollFamilyModel model, int userId, int officerId)
+        public NewFamilyResponse CreateEnrollResponse(string InsuranceNumber)
+        {
+            var response = new NewFamilyResponse();
+            try
+            {
+                using (var imisContext = new ImisDB())
+                {
+
+                    var familyId = imisContext.TblInsuree.Where(i => i.Chfid == InsuranceNumber && i.IsHead == true && i.ValidityTo == null).Select(i => i.FamilyId).FirstOrDefault();
+
+                    var family = imisContext.TblFamilies
+                                .Where(f => f.FamilyId == familyId && f.ValidityTo == null)
+                                .Include(f => f.TblInsuree)
+                                .Include(p => p.TblPolicy)
+                                    .ThenInclude(pr => pr.TblPremium)
+                                .FirstOrDefault();
+
+                    family.TblInsuree = family.TblInsuree.Where(i => i.ValidityTo == null).ToList();
+                    family.TblPolicy = family.TblPolicy.Where(p => p.ValidityTo == null).ToList();
+                    
+
+                    response.Response = 0;
+                    var familyVM = new FamilyVM { FamilyId = family.FamilyId, FamilyUUID = family.FamilyUUID };
+
+                    response.Family.Add(familyVM);
+
+                    foreach (var i in family.TblInsuree)
+                    {
+                        response.Insurees.Add(new InsureeVM { InsureeId = i.InsureeId, InsureeUUID = i.InsureeUUID });
+                    }
+
+                    foreach (var p in family.TblPolicy)
+                    {
+                        var premiums = new List<PremiumVM>();
+                        p.TblPremium = p.TblPremium.Where(prem => prem.ValidityTo == null).ToList();
+                        foreach (var pr in p.TblPremium)
+                        {
+                            
+                            premiums.Add(new PremiumVM { PremiumId = pr.PremiumId, PremiumUUID = pr.PremiumUUID });
+                        }
+                        response.Policies.Add(new PolicyVM { PolicyId = p.PolicyId, PolicyUUID = p.PolicyUUID, Premium = premiums});
+                        
+                    }
+
+                }
+
+                return response;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public NewFamilyResponse Create(EnrollFamilyModel model, int userId, int officerId)
         {
             try
             {
@@ -172,13 +227,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                         using (var reader = cmd.ExecuteReader())
                         {
                             // Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
+                            do
+                            {
+                                while (reader.Read())
+                                {
+                                    Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                }
+                            } while (reader.NextResult());
                         }
                     }
 
@@ -209,7 +264,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     }
                 }
 
-                return RV;
+                var newFamily = new NewFamilyResponse();
+                newFamily.Response = RV;
+                if (RV == 0)
+                    newFamily = CreateEnrollResponse(model.Family.Select(x => x.HOFCHFID).First());
+
+
+                return newFamily;
             }
             catch (SqlException e)
             {
