@@ -7,13 +7,22 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
 
     public class FamilyVM
     {
+        public FamilyVM()
+        {
+            Insurees = new List<InsureeVM>();
+            Policies = new List<PolicyVM>();
+        }
         public int FamilyId { get; set; }
+        public int FamilyDBId { get; set; }
         public Guid FamilyUUID { get; set; }
+        public List<InsureeVM> Insurees { get; set; }
+        public List<PolicyVM> Policies { get; set; }
     }
 
     public class InsureeVM
     {
         public int InsureeId { get; set; }
+        public int InsureeDBId { get; set; }
         public Guid InsureeUUID { get; set; }
     }
 
@@ -24,6 +33,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
             Premium = new List<PremiumVM>();
         }
         public int PolicyId { get; set; }
+        public int PolicyDBId { get; set; }
         public Guid PolicyUUID { get; set; }
         public List<PremiumVM> Premium { get; set; }
     }
@@ -31,6 +41,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
     public class PremiumVM
     {
         public int PremiumId { get; set; }
+        public int PremiumDBId { get; set; }
         public Guid PremiumUUID { get; set; }
     }
 
@@ -39,12 +50,9 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public NewFamilyResponse()
         {
             Family = new List<FamilyVM>();
-            Insurees = new List<InsureeVM>();
-            Policies = new List<PolicyVM>();
         }
         public int Response { get; set; }
         public List<FamilyVM> Family { get; set; }
-        public List<InsureeVM> Insurees { get; set; }
-        public List<PolicyVM> Policies { get; set; }
+        
     }
 }
