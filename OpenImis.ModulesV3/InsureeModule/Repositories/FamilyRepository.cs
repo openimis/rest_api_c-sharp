@@ -87,52 +87,57 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             }
         }
 
-        public NewFamilyResponse CreateEnrollResponse(string InsuranceNumber)
+        public NewFamilyResponse CreateEnrollResponse(string[] insuranceNumbers)
         {
             var response = new NewFamilyResponse();
             try
             {
                 using (var imisContext = new ImisDB())
                 {
-
-                    var familyId = imisContext.TblInsuree.Where(i => i.Chfid == InsuranceNumber && i.IsHead == true && i.ValidityTo == null).Select(i => i.FamilyId).FirstOrDefault();
-
-                    var family = imisContext.TblFamilies
-                                .Where(f => f.FamilyId == familyId && f.ValidityTo == null)
-                                .Include(f => f.TblInsuree)
-                                .Include(p => p.TblPolicy)
-                                    .ThenInclude(pr => pr.TblPremium)
-                                .FirstOrDefault();
-
-                    family.TblInsuree = family.TblInsuree.Where(i => i.ValidityTo == null).ToList();
-                    family.TblPolicy = family.TblPolicy.Where(p => p.ValidityTo == null).ToList();
-                    
-
-                    response.Response = 0;
-                    var familyVM = new FamilyVM { FamilyId = family.FamilyId, FamilyUUID = family.FamilyUUID };
-
-                    response.Family.Add(familyVM);
-
-                    foreach (var i in family.TblInsuree)
+                    foreach (var number in insuranceNumbers)
                     {
-                        response.Insurees.Add(new InsureeVM { InsureeId = i.InsureeId, InsureeUUID = i.InsureeUUID });
-                    }
 
-                    foreach (var p in family.TblPolicy)
-                    {
-                        var premiums = new List<PremiumVM>();
-                        p.TblPremium = p.TblPremium.Where(prem => prem.ValidityTo == null).ToList();
-                        foreach (var pr in p.TblPremium)
+                        var familyId = imisContext.TblInsuree.Where(i => i.Chfid == number && i.IsHead == true && i.ValidityTo == null).Select(i => i.FamilyId).FirstOrDefault();
+
+                        var family = imisContext.TblFamilies
+                                    .Where(f => f.FamilyId == familyId && f.ValidityTo == null)
+                                    .Include(f => f.TblInsuree)
+                                    .Include(p => p.TblPolicy)
+                                        .ThenInclude(pr => pr.TblPremium)
+                                    .FirstOrDefault();
+
+                        if (family == null)
+                            continue;
+
+                        family.TblInsuree = family.TblInsuree.Where(i => i.ValidityTo == null).ToList();
+                        family.TblPolicy = family.TblPolicy.Where(p => p.ValidityTo == null).ToList();
+
+
+                        response.Response = 0;
+                        var familyVM = new FamilyVM { FamilyId = family.FamilyId, FamilyUUID = family.FamilyUUID };
+
+                        response.Family.Add(familyVM);
+
+                        foreach (var i in family.TblInsuree)
                         {
-                            
-                            premiums.Add(new PremiumVM { PremiumId = pr.PremiumId, PremiumUUID = pr.PremiumUUID });
+                            response.Insurees.Add(new InsureeVM { InsureeId = i.InsureeId, InsureeUUID = i.InsureeUUID });
                         }
-                        response.Policies.Add(new PolicyVM { PolicyId = p.PolicyId, PolicyUUID = p.PolicyUUID, Premium = premiums});
-                        
+
+                        foreach (var p in family.TblPolicy)
+                        {
+                            var premiums = new List<PremiumVM>();
+                            p.TblPremium = p.TblPremium.Where(prem => prem.ValidityTo == null).ToList();
+                            foreach (var pr in p.TblPremium)
+                            {
+
+                                premiums.Add(new PremiumVM { PremiumId = pr.PremiumId, PremiumUUID = pr.PremiumUUID });
+                            }
+                            response.Policies.Add(new PolicyVM { PolicyId = p.PolicyId, PolicyUUID = p.PolicyUUID, Premium = premiums });
+
+                        }
+
                     }
-
                 }
-
                 return response;
             }
             catch (Exception)
@@ -267,7 +272,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 var newFamily = new NewFamilyResponse();
                 newFamily.Response = RV;
                 if (RV == 0)
-                    newFamily = CreateEnrollResponse(model.Family.Select(x => x.HOFCHFID).First());
+                    newFamily = CreateEnrollResponse(model.Family.Select(x => x.HOFCHFID).ToArray());
 
 
                 return newFamily;
