@@ -10,5 +10,6 @@ namespace OpenImis.ModulesV3.InsureeModule
         IInsureeModule SetFamilyLogic(IFamilyLogic familyLogic);
         IInsureeModule SetContributionLogic(IContributionLogic contributionLogic);
         IInsureeModule SetInsureeLogic(IInsureeLogic insureeLogic);
+
     }
 }

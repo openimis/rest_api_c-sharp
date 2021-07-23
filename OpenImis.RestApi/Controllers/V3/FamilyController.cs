@@ -30,13 +30,14 @@ namespace OpenImis.RestApi.Controllers.V3
         [Route("{chfid}")]
         public IActionResult GetByCHFID(string chfid)
         {
-            FamilyModel familyModel;
+            FamilyModel familyModel = new FamilyModel();
 
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
 
                 familyModel = _imisModules.GetInsureeModule().GetFamilyLogic().GetByCHFID(chfid, userUUID);
+
             }
             catch (ValidationException e)
             {
@@ -55,7 +56,7 @@ namespace OpenImis.RestApi.Controllers.V3
         [HttpPost]
         public IActionResult Create([FromBody] EnrollFamilyModel model)
         {
-            int response;
+            NewFamilyResponse response;
 
             if (!ModelState.IsValid)
             {

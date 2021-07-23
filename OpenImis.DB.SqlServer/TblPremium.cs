@@ -21,7 +21,7 @@ namespace OpenImis.DB.SqlServer
         public bool? IsOffline { get; set; }
         public int? ReportingId { get; set; }
         public int? ReportingCommissionID { get; set; }
-        public int? ReportingCommisionID { get; set; }
+        public Guid PremiumUUID { get; set; }
 
         public TblPayer Payer { get; set; }
         public TblPolicy Policy { get; set; }

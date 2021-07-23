@@ -30,6 +30,7 @@ namespace OpenImis.DB.SqlServer
         public int AuditUserId { get; set; }
         public byte[] RowId { get; set; }
         public bool? IsOffline { get; set; }
+        public Guid PolicyUUID { get; set; }
 
         public TblFamilies Family { get; set; }
         public TblOfficer Officer { get; set; }
