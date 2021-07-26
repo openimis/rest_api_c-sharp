@@ -48,6 +48,7 @@ namespace OpenImis.RestApi.Controllers.V3
 
         [HttpPost]
         [Route("GetDiagnosesServicesItems")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetDiagnosesServicesItems([FromBody]DsiInputModel model)
@@ -95,6 +96,7 @@ namespace OpenImis.RestApi.Controllers.V3
 
         [HttpGet]
         [Route("Claims/GetClaimAdmins")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult ValidateClaimAdmin()
@@ -114,6 +116,7 @@ namespace OpenImis.RestApi.Controllers.V3
 
         [HttpGet]
         [Route("Claims/Controls")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public IActionResult GetControls()
