@@ -107,7 +107,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult PostReqControlNumberAck([FromBody]Acknowledgement model)
+        public virtual async Task<IActionResult> PostReqControlNumberAck([FromBody]Acknowledgement model)
         {
             if (!ModelState.IsValid)
             {
@@ -117,7 +117,7 @@ namespace OpenImis.ePayment.Controllers
 
             try
             {
-                var response = _payment.SaveAcknowledgement(model);
+                var response = await _payment.SaveAcknowledgementAsync(model);
                 if (response.Code == 0)
                 {
                     return Ok();
@@ -140,7 +140,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult GetReqControlNumber([FromBody]ControlNumberResp model)
+        public virtual async Task<IActionResult> GetReqControlNumber([FromBody]ControlNumberResp model)
         {
             if (!ModelState.IsValid)
             {
@@ -150,7 +150,7 @@ namespace OpenImis.ePayment.Controllers
 
             try
             {
-                var response = _payment.SaveControlNumber(model);
+                var response = await _payment.SaveControlNumberAsync(model);
                 if (response.Code == 0)
                 {
                     return Ok();

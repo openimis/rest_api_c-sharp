@@ -290,7 +290,7 @@ namespace OpenImis.ePayment.Data
             SqlParameter[] parameters = {
                 new SqlParameter("@Id", payment.SpBillId),
                 new SqlParameter("@paidAmount", payment.PaidAmt),
-                new SqlParameter("@PaymentStatus", PaymentStatus.Reconciliated),
+                new SqlParameter("@PaymentStatus", PaymentStatus.Matched),
             };
 
             var sSQL = @"SELECT PaymentId, ExpectedAmount, ReceivedAmount, PaymentStatus FROM tblPayment WHERE PaymentId=@Id And PaymentStatus<=@PaymentStatus And ExpectedAmount=@paidAmount And ValidityTo is Null";

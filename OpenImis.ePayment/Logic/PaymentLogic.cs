@@ -34,7 +34,7 @@ namespace OpenImis.ePayment.Logic
         {
 
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var intentResponse = payment.SaveIntent(intent, errorNumber, errorMessage);
+            var intentResponse = await payment.SaveIntentAsync(intent, errorNumber, errorMessage);
 
             DataMessage return_message = new DataMessage();
             return_message.Code = intentResponse.Code;
@@ -52,7 +52,7 @@ namespace OpenImis.ePayment.Logic
                 {
                     transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)intent.type_of_payment);
 
-                    var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)intent.type_of_payment);
+                    var success = await payment.UpdatePaymentTransferFeeAsync(payment.PaymentId, transferFee, (TypeOfPayment)intent.type_of_payment);
 
                 }
 
@@ -62,7 +62,7 @@ namespace OpenImis.ePayment.Logic
                 if (response.ControlNumber != null) 
                 {
                     var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
-                    return_message = payment.SaveControlNumber(response.ControlNumber, controlNumberExists);
+                    return_message = await payment.SaveControlNumberAsync(response.ControlNumber, controlNumberExists);
                     if (payment.PaymentId != null && intent.SmsRequired)
                     {
                         if (!return_message.ErrorOccured && !controlNumberExists)
@@ -79,11 +79,11 @@ namespace OpenImis.ePayment.Logic
                 else 
                     if (response.Posted == true)
                     {
-                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
+                        return_message = await payment.SaveControlNumberAknAsync(response.ErrorOccured, response.ErrorMessage);
                     }
                     else if (response.ErrorOccured == true)
                     {
-                        return_message = payment.SaveControlNumberAkn(response.ErrorOccured, response.ErrorMessage);
+                        return_message = await payment.SaveControlNumberAknAsync(response.ErrorOccured, response.ErrorMessage);
                         ControlNumberNotassignedSms(payment, response.ErrorMessage);
                     }
 
@@ -139,10 +139,10 @@ namespace OpenImis.ePayment.Logic
             return response;
         }
 
-        public DataMessage SaveAcknowledgement(Acknowledgement model)
+        public async Task<DataMessage> SaveAcknowledgementAsync(Acknowledgement model)
         {
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.internal_identifier };
-            var response = payment.SaveControlNumberAkn(model.error_occured, model.error_message);
+            var response = await payment.SaveControlNumberAknAsync(model.error_occured, model.error_message);
 
             return response;
         }
@@ -179,17 +179,17 @@ namespace OpenImis.ePayment.Logic
             if (model.type_of_payment == null && payment.typeOfPayment != null)
             {
                 var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount), (TypeOfPayment)payment.typeOfPayment);
-                var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)payment.typeOfPayment);
+                var success = await payment.UpdatePaymentTransferFeeAsync(payment.PaymentId, transferFee, (TypeOfPayment)payment.typeOfPayment);
                 model.received_amount = model.received_amount + Convert.ToDouble(transferFee);
             }
             else if (model.type_of_payment != null && payment.typeOfPayment == null)
             {
                 var transferFee = payment.determineTransferFeeReverse(Convert.ToDecimal(model.received_amount), (TypeOfPayment)model.type_of_payment);
-                var success = payment.UpdatePaymentTransferFee(payment.PaymentId, transferFee, (TypeOfPayment)model.type_of_payment);
+                var success = await payment.UpdatePaymentTransferFeeAsync(payment.PaymentId, transferFee, (TypeOfPayment)model.type_of_payment);
                 model.received_amount = model.received_amount + Convert.ToDouble(transferFee);
             }
 
-            var response = payment.SavePayment(model);
+            var response = await payment.SavePaymentAsync(model);
 
             if (payment.PaymentId != 0)
             {
@@ -220,12 +220,12 @@ namespace OpenImis.ePayment.Logic
             return response;
         }
 
-        public DataMessage SaveControlNumber(ControlNumberResp model)
+        public async Task<DataMessage> SaveControlNumberAsync(ControlNumberResp model)
         {
 
             ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
             var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
-            var response = payment.SaveControlNumber(model, controlNumberExists);
+            var response = await payment.SaveControlNumberAsync(model, controlNumberExists);
 
             if (model.error_occured)
             {
@@ -363,7 +363,7 @@ namespace OpenImis.ePayment.Logic
             var fileName = "PaymentConfirmationSms_" + pd.payer_phone_number;
 
             string test = await sms.SendSMS(message, fileName);
-            payment.UpdateLastSMSSentDate();
+            payment.UpdateLastSMSSentDateAsync();
         }
 
         public async void SendPaymentSms(ImisPayment payment)
@@ -419,7 +419,7 @@ namespace OpenImis.ePayment.Logic
             var fileName = "PayStatSms_" + payment.PhoneNumber;
 
             string test = await sms.SendSMS(message, fileName);
-            payment.UpdateLastSMSSentDate();
+            payment.UpdateLastSMSSentDateAsync();
         }
 
         public async void SendMatchSms(ImisPayment payment)
@@ -503,7 +503,7 @@ namespace OpenImis.ePayment.Logic
 
 
                         message.Add(new SmsContainer() { Message = txtmsg, Recipient = _pay.PhoneNumber });
-                        _pay.UpdateLastSMSSentDate();
+                        _pay.UpdateLastSMSSentDateAsync();
                     }
                     else
                     {
@@ -534,7 +534,7 @@ namespace OpenImis.ePayment.Logic
             var fileName = "PaymentCancellationSms_" + payment.PhoneNumber;
 
             string test = await sms.SendSMS(message, fileName);
-            payment.UpdateLastSMSSentDate();
+            payment.UpdateLastSMSSentDateAsync();
         }
 
         public async Task<ReconciliationMessage> ProvideReconciliationData(ReconciliationRequest model)
