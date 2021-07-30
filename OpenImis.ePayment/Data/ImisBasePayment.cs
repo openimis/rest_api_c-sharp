@@ -94,7 +94,7 @@ namespace OpenImis.ePayment.Data
             return response;
         }
 
-        public virtual bool UpdatePaymentTransferFee(int paymentId, decimal TransferFee, TypeOfPayment typeOfPayment) {
+        public virtual async Task<bool> UpdatePaymentTransferFeeAsync(int paymentId, decimal TransferFee, TypeOfPayment typeOfPayment) {
 
             var sSQL = @"UPDATE tblPayment SET TypeOfPayment = @TypeOfPayment,TransferFee = @TransferFee WHERE PaymentID = @paymentId";
 
@@ -106,7 +106,7 @@ namespace OpenImis.ePayment.Data
              
             try
             {
-                dh.Execute(sSQL, parameters, CommandType.Text);
+                await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
                
                 return true;
             }
@@ -143,11 +143,11 @@ namespace OpenImis.ePayment.Data
             return Math.Round(amount,2);
         }
 
-        public DataMessage SaveIntent(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
+        public async Task<DataMessage> SaveIntentAsync(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
         {
             var Proxyfamily = LocalDefault.FamilyMembers(Configuration);
 
-            List<PaymentDetail> policies = new List<PaymentDetail>();
+            var policies = new List<PaymentDetail>();
 
             if (_intent.policies != null)
             {
@@ -200,7 +200,7 @@ namespace OpenImis.ePayment.Data
             try
             {
                 bool error = true;
-                var data = dh.ExecProcedure("uspInsertPaymentIntent", sqlParameters);
+                var data = await dh.ExecProcedureAsync("uspInsertPaymentIntent", sqlParameters);
 
                 var rv = int.Parse(data[2].Value.ToString());
 
@@ -245,7 +245,7 @@ namespace OpenImis.ePayment.Data
             return message;
         }
 
-        public DataMessage SaveControlNumber(string ControlNumber,bool failed)
+        public async Task<DataMessage> SaveControlNumberAsync(string ControlNumber,bool failed)
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", PaymentId),
@@ -258,7 +258,7 @@ namespace OpenImis.ePayment.Data
             try
             {
                 
-                var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
+                var data = await dh.ExecProcedureAsync("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(PaymentId);
             }
@@ -272,7 +272,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public DataMessage SaveControlNumber(ControlNumberResp model,bool failed)
+        public async Task<DataMessage> SaveControlNumberAsync(ControlNumberResp model,bool failed)
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", model.internal_identifier),
@@ -285,7 +285,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                var data = dh.ExecProcedure("uspReceiveControlNumber", sqlParameters);
+                var data = await dh.ExecProcedureAsync("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(model.internal_identifier);
             }
@@ -324,7 +324,7 @@ namespace OpenImis.ePayment.Data
             return result;
         }
 
-        public void UpdateControlNumberStatus(string ControlNumber, CnStatus status)
+        public async void UpdateControlNumberStatusAsync(string ControlNumber, CnStatus status)
         {
 
             SqlParameter[] sqlParameters = {
@@ -336,13 +336,13 @@ namespace OpenImis.ePayment.Data
                 case CnStatus.Sent:
                     break;
                 case CnStatus.Acknowledged:
-                    dh.ExecProcedure("uspAcknowledgeControlNumber", sqlParameters);
+                    await dh.ExecProcedureAsync("uspAcknowledgeControlNumber", sqlParameters);
                     break;
                 case CnStatus.Issued:
-                    dh.ExecProcedure("uspIssueControlNumber", sqlParameters);
+                    await dh.ExecProcedureAsync("uspIssueControlNumber", sqlParameters);
                     break;
                 case CnStatus.Paid:
-                    dh.ExecProcedure("uspPaidControlNumber", sqlParameters);
+                    await dh.ExecProcedureAsync("uspPaidControlNumber", sqlParameters);
                     break;
                 case CnStatus.Rejected:
                     break;
@@ -351,7 +351,7 @@ namespace OpenImis.ePayment.Data
             }
         }
       
-        public DataMessage SaveControlNumberAkn(bool error_occured, string Comment)
+        public async Task<DataMessage> SaveControlNumberAknAsync(bool error_occured, string Comment)
         {
             XElement CNAcknowledgement = new XElement("ControlNumberAcknowledge",
                   new XElement("PaymentID", PaymentId),
@@ -368,7 +368,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                var data = dh.ExecProcedure("uspAcknowledgeControlNumberRequest", sqlParameters);
+                var data = await dh.ExecProcedureAsync("uspAcknowledgeControlNumberRequest", sqlParameters);
                 message = new SaveAckResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(PaymentId);
             }
@@ -383,7 +383,7 @@ namespace OpenImis.ePayment.Data
         }
 
 
-        public DataMessage SavePayment(PaymentData payment, bool failed = false)
+        public async Task<DataMessage> SavePaymentAsync(PaymentData payment, bool failed = false)
         {
             int? isRenewal = null;
 
@@ -423,7 +423,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                var data = dh.ExecProcedure("uspReceivePayment", sqlParameters);
+                var data = await dh.ExecProcedureAsync("uspReceivePayment", sqlParameters);
                 // TODO: manage error messages from SP execution 
                 message = new SavePayResponse(int.Parse(data[1].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(Convert.ToInt32(data[0].Value));
@@ -746,7 +746,7 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public void UpdateLastSMSSentDate()
+        public async void UpdateLastSMSSentDateAsync()
         {
             var sSQL = @"UPDATE tblPayment
                          SET DateLastSMS = CURRENT_TIMESTAMP
@@ -758,7 +758,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                dh.Execute(sSQL, parameters, CommandType.Text);
+                await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
             }
             catch (Exception)
             {
@@ -859,7 +859,7 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public void updateReconciliatedPayment(string billId)
+        public async void updateReconciliatedPaymentAsync(string billId)
         {
             var sSQL = @"UPDATE tblPayment
                          SET PaymentStatus = @PaymentStatus
@@ -867,12 +867,12 @@ namespace OpenImis.ePayment.Data
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", billId),
-                new SqlParameter("@PaymentStatus", PaymentStatus.Reconciliated)
+                new SqlParameter("@PaymentStatus", PaymentStatus.Received)
             };
 
             try
             {
-                dh.Execute(sSQL, parameters, CommandType.Text);
+                await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
             }
             catch (Exception)
             {
@@ -881,7 +881,7 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public void updateReconciliatedPaymentError(string billId)
+        public async void updateReconciliatedPaymentError(string billId)
         {
             var sSQL = @"UPDATE tblPayment
                          SET PaymentStatus = @PaymentStatus
@@ -894,7 +894,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                dh.Execute(sSQL, parameters, CommandType.Text);
+                await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
             }
             catch (Exception)
             {
@@ -958,7 +958,7 @@ namespace OpenImis.ePayment.Data
             return false;
         }
 
-        public void setRejectedReason(int billId, string rejectedReason)
+        public async void setRejectedReason(int billId, string rejectedReason)
         {
             var sSQL = @"UPDATE tblPayment
                          SET RejectedReason = CASE WHEN ISNULL(RejectedReason, '') = '' Then @RejectedReason ELSE Concat(RejectedReason,Concat(';', @RejectedReason)) END
@@ -971,7 +971,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                dh.Execute(sSQL, parameters, CommandType.Text);
+                await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
             }
             catch (Exception)
             {
