@@ -122,7 +122,7 @@ namespace OpenImis.ePayment.Data
             else
             {
                 var sSQL = @"SELECT Code,LastName,OtherNames,DOB,Phone,EmailId
-                            FROM tblOfficer WHERE Code = @OfficerCode";
+                            FROM tblOfficer WHERE ValidityTo IS NULL AND Code = @OfficerCode";
                 SqlParameter[] parameters = {
                         new SqlParameter("@OfficerCode", OfficerCode),
                 };
