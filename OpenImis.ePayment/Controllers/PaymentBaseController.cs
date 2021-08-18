@@ -101,6 +101,35 @@ namespace OpenImis.ePayment.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/GetControlNumbers")]
+        [ProducesResponseType(typeof(GetControlNumberResp), 200)]
+        [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public virtual async Task<IActionResult> GetControlNumbers([FromBody]BulkControlNumbers model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+
+                if (model != null)
+                {
+                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = error });
+                }
+                else
+                {
+                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "10-Uknown type of payment" });
+                }
+            }
+
+            var product = _payment.GetProductInfo(model.ProductId);
+            var officer = _payment.GetOfficerInfo(model.OfficerId);
+
+            var result = await _payment.CreateBulkControlNumbers(model, product, officer);
+            
+            return Ok(result);
+        }
+
         //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/PostReqControlNumberAck")]

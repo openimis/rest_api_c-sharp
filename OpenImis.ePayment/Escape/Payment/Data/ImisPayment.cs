@@ -364,6 +364,26 @@ namespace OpenImis.ePayment.Data
             }
             return rejectedReason;
         }
+
+        public async Task<string> CreateBulkControlNumber(BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        {
+            var gepg = new GepgUtility(_hostingEnvironment, Configuration);
+            var bills =  gepg.CreateBulkBills(Configuration, model, product, officer);
+
+            // we need to remove <BillTrxInf> and </BillTrxInf> to comply with GePG format
+            var index = bills.IndexOf("<BillTrxInf>");
+            var billsCopy = bills.Remove(index, "<BillTrxInf>".Length);
+
+            index = billsCopy.LastIndexOf("</BillTrxInf>");
+            billsCopy = billsCopy.Remove(index, "</BillTrxInf>".Length);
+
+            var signature = gepg.GenerateSignature(billsCopy);
+            var signedMesg = gepg.FinaliseSignedMsg(signature, ControlNumberType.Bulk);
+
+            var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, product.AccCodePremiums, "default.sp.in");
+            return billAck;
+        }
+
 #endif
     }
 }

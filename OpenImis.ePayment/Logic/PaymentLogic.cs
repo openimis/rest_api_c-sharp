@@ -581,7 +581,23 @@ namespace OpenImis.ePayment.Logic
                 return dt;
         }
 
-        
+        public ProductDetailsVM GetProductInfo(int productId)
+        {
+            var imisPayment = new ImisBasePayment(_configuration, _hostingEnvironment);
+            return imisPayment.GetProductInfo(productId);
+        }
 
+        public OfficerDetailsVM GetOfficerInfo(int officerId)
+        {
+            var imisPayment = new ImisBasePayment(_configuration, _hostingEnvironment);
+            return imisPayment.GetOfficerInfo(officerId);
+        }
+
+        public async Task<string> CreateBulkControlNumbers(BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        {
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            return await imisPayment.CreateBulkControlNumber(model, product, officer);
+
+        }
     }
 }

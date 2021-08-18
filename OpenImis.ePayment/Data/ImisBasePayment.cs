@@ -50,7 +50,7 @@ namespace OpenImis.ePayment.Data
             dh = new DataHelper(configuration);
         }
 
-        public async Task<bool> SaveControlNumberRequest(int BillId,bool failed)
+        public async Task<bool> SaveControlNumberRequest(int BillId, bool failed)
         {
 
             SqlParameter[] sqlParameters = {
@@ -71,9 +71,9 @@ namespace OpenImis.ePayment.Data
             return true;
         }
 
-        public virtual async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId,string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products,string controlNumber = null,bool acknowledge = false,bool error = false, string rejectedReason="")
+        public virtual async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false, string rejectedReason = "")
         {
-            bool result = await SaveControlNumberRequest(PaymentId,error);
+            bool result = await SaveControlNumberRequest(PaymentId, error);
             string ctrlNumber = null;
 #if !CHF
             // BEGIN Temporary Control Number Generator(Simulation For Testing Only)
@@ -81,8 +81,9 @@ namespace OpenImis.ePayment.Data
             ctrlNumber = randomNumber.ToString();
             //END Temporary 
 #endif
-            PostReqCNResponse response = new PostReqCNResponse() {
-               
+            PostReqCNResponse response = new PostReqCNResponse()
+            {
+
                 ControlNumber = ctrlNumber,
                 Posted = error == false ? true : false,
                 ErrorCode = 0,
@@ -94,7 +95,8 @@ namespace OpenImis.ePayment.Data
             return response;
         }
 
-        public virtual async Task<bool> UpdatePaymentTransferFeeAsync(int paymentId, decimal TransferFee, TypeOfPayment typeOfPayment) {
+        public virtual async Task<bool> UpdatePaymentTransferFeeAsync(int paymentId, decimal TransferFee, TypeOfPayment typeOfPayment)
+        {
 
             var sSQL = @"UPDATE tblPayment SET TypeOfPayment = @TypeOfPayment,TransferFee = @TransferFee WHERE PaymentID = @paymentId";
 
@@ -103,11 +105,11 @@ namespace OpenImis.ePayment.Data
                 new SqlParameter("@TransferFee", TransferFee),
                 new SqlParameter("@TypeOfPayment", Enum.GetName(typeof(TypeOfPayment),typeOfPayment))
             };
-             
+
             try
             {
                 await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
-               
+
                 return true;
             }
             catch (Exception e)
@@ -140,7 +142,7 @@ namespace OpenImis.ePayment.Data
         public virtual decimal GetToBePaidAmount(decimal ExpectedAmount, decimal TransferFee)
         {
             decimal amount = ExpectedAmount - TransferFee;
-            return Math.Round(amount,2);
+            return Math.Round(amount, 2);
         }
 
         public async Task<DataMessage> SaveIntentAsync(IntentOfPay _intent, int? errorNumber = 0, string errorMessage = null)
@@ -157,9 +159,9 @@ namespace OpenImis.ePayment.Data
             XElement PaymentIntent = new XElement("PaymentIntent",
                     new XElement("Header",
                         new XElement("OfficerCode", _intent.enrolment_officer_code),
-                        new XElement("RequestDate",_intent.request_date),
+                        new XElement("RequestDate", _intent.request_date),
                         new XElement("PhoneNumber", _intent.phone_number),
-                        new XElement("LanguageName",_intent.language),
+                        new XElement("LanguageName", _intent.language),
                         new XElement("SmsRequired", Convert.ToInt32(_intent.SmsRequired)),
                         new XElement("AuditUserId", -1)
                     ),
@@ -205,7 +207,7 @@ namespace OpenImis.ePayment.Data
                 var rv = int.Parse(data[2].Value.ToString());
 
                 if (rv == 0)
-                { 
+                {
                     error = false;
                 }
 
@@ -217,7 +219,7 @@ namespace OpenImis.ePayment.Data
                 DataRow rw = dt.NewRow();
                 int PaymentId = (int)data[0].Value;
                 rw["internal_identifier"] = PaymentId;
-                
+
                 dt.Rows.Add(rw);
 
                 ExpectedAmount = decimal.Parse(data[1].Value.ToString());
@@ -233,7 +235,7 @@ namespace OpenImis.ePayment.Data
                     Language = Language.Secondary;
                 }
 
-                message = new SaveIntentResponse(rv, error,dt,(int)Language).Message;
+                message = new SaveIntentResponse(rv, error, dt, (int)Language).Message;
                 GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
@@ -245,7 +247,7 @@ namespace OpenImis.ePayment.Data
             return message;
         }
 
-        public async Task<DataMessage> SaveControlNumberAsync(string ControlNumber,bool failed)
+        public async Task<DataMessage> SaveControlNumberAsync(string ControlNumber, bool failed)
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", PaymentId),
@@ -257,7 +259,7 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-                
+
                 var data = await dh.ExecProcedureAsync("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(PaymentId);
@@ -272,7 +274,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public async Task<DataMessage> SaveControlNumberAsync(ControlNumberResp model,bool failed)
+        public async Task<DataMessage> SaveControlNumberAsync(ControlNumberResp model, bool failed)
         {
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@PaymentID", model.internal_identifier),
@@ -330,7 +332,7 @@ namespace OpenImis.ePayment.Data
             SqlParameter[] sqlParameters = {
                   new SqlParameter("@ControlNumber", ControlNumber)
             };
-             
+
             switch (status)
             {
                 case CnStatus.Sent:
@@ -350,7 +352,7 @@ namespace OpenImis.ePayment.Data
                     break;
             }
         }
-      
+
         public async Task<DataMessage> SaveControlNumberAknAsync(bool error_occured, string Comment)
         {
             XElement CNAcknowledgement = new XElement("ControlNumberAcknowledge",
@@ -405,7 +407,7 @@ namespace OpenImis.ePayment.Data
                 new XElement("PhoneNumber", payment.payer_phone_number),
                 new XElement("PaymentOrigin", payment.payment_origin),
                 new XElement("OfficerCode", payment.enrolment_officer_code),
-                new XElement("LanguageName",payment.language), // not used
+                new XElement("LanguageName", payment.language), // not used
                 new XElement("Detail",
                     new XElement("InsureeNumber", payment.insurance_number),
                     new XElement("ProductCode", payment.insurance_product_code),
@@ -418,7 +420,7 @@ namespace OpenImis.ePayment.Data
                 new SqlParameter("@Xml", PaymentIntent.ToString()),
                 new SqlParameter("@Payment_ID",SqlDbType.BigInt){Direction = ParameterDirection.Output }
              };
-            
+
             DataMessage message;
 
             try
@@ -458,26 +460,26 @@ namespace OpenImis.ePayment.Data
                 {
                     dt = data.Tables[data.Tables.Count - 1];
 
-                //    error = true;
+                    //    error = true;
 
-                //    if (dt.Rows.Count > 0)
-                //    {
-                //        var firstRow = dt.Rows[0];
+                    //    if (dt.Rows.Count > 0)
+                    //    {
+                    //        var firstRow = dt.Rows[0];
 
-                //        if (Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
-                //        {
-                //            error = false;
-                //        }
+                    //        if (Convert.ToInt32(firstRow["PaymentMatched"]) > 0)
+                    //        {
+                    //            error = false;
+                    //        }
 
-                //    }
-                //    else
-                //    {
-                //        error = true;
-                //    }
+                    //    }
+                    //    else
+                    //    {
+                    //        error = true;
+                    //    }
                 }
-                
-                message = new MatchPayResponse(dh.ReturnValue,false,dt , (int)Language).Message;
-                if(model.internal_identifier != 0 && !message.ErrorOccured)
+
+                message = new MatchPayResponse(dh.ReturnValue, false, dt, (int)Language).Message;
+                if (model.internal_identifier != 0 && !message.ErrorOccured)
                 {
                     GetPaymentInfo(model.internal_identifier);
                 }
@@ -493,12 +495,12 @@ namespace OpenImis.ePayment.Data
 
         public async Task<DataMessage> GetControlNumbers(string PaymentIds)
         {
-            
+
             var sSQL = String.Format(@"SELECT PaymentID,ControlNumber
                          FROM tblControlNumber WHERE PaymentID IN({0})", PaymentIds);
 
             SqlParameter[] sqlParameters = {
-               
+
              };
 
             DataMessage dt = new DataMessage();
@@ -533,11 +535,11 @@ namespace OpenImis.ePayment.Data
 
                         invalid.Rows.Add(rw);
                     }
-                   
+
 
                     dt = new RequestedCNResponse(2, true, invalid, (int)Language).Message;
                 }
-                
+
             }
             catch (Exception e)
             {
@@ -591,13 +593,13 @@ namespace OpenImis.ePayment.Data
             try
             {
                 var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
-               
+
                 if (data.Rows.Count > 0)
                 {
                     var row1 = data.Rows[0];
                     PaymentId = Id;
-                    ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]):null;
-                    ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]):0;
+                    ControlNum = row1["ControlNumber"] != System.DBNull.Value ? Convert.ToString(row1["ControlNumber"]) : null;
+                    ExpectedAmount = row1["ExpectedAmount"] != System.DBNull.Value ? Convert.ToDecimal(row1["ExpectedAmount"]) : 0;
                     SmsRequired = row1["SmsRequired"] != System.DBNull.Value ? Convert.ToBoolean(row1["SmsRequired"]) : false;
                     Location = row1["Location"] != System.DBNull.Value ? Convert.ToString(row1["Location"]) : null;
 
@@ -612,9 +614,9 @@ namespace OpenImis.ePayment.Data
                     {
                         Language = Language.Secondary;
                     }
-                    typeOfPayment = row1["TypeOfPayment"] != System.DBNull.Value ? (TypeOfPayment?)Enum.Parse(typeof(TypeOfPayment),Convert.ToString(row1["TypeOfPayment"]),true) : null;
+                    typeOfPayment = row1["TypeOfPayment"] != System.DBNull.Value ? (TypeOfPayment?)Enum.Parse(typeof(TypeOfPayment), Convert.ToString(row1["TypeOfPayment"]), true) : null;
 
-                    PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]):null;
+                    PhoneNumber = row1["PhoneNumber"] != System.DBNull.Value ? Convert.ToString(row1["PhoneNumber"]) : null;
                     PaymentDate = (DateTime?)(row1["PaymentDate"] != System.DBNull.Value ? row1["PaymentDate"] : null);
                     PaidAmount = (decimal?)(row1["ReceivedAmount"] != System.DBNull.Value ? row1["ReceivedAmount"] : null);
                     OutStAmount = (decimal?)(row1["Outstanding"] != System.DBNull.Value ? row1["Outstanding"] : null);
@@ -626,25 +628,26 @@ namespace OpenImis.ePayment.Data
 
                         bool active = false;
 
-                        if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 2) {
+                        if (rw["PolicyStatus"] != System.DBNull.Value && Convert.ToInt32(rw["PolicyStatus"]) == 2)
+                        {
                             active = true;
                         }
-                        var othernames = rw["OtherNames"] != System.DBNull.Value ? Convert.ToString(rw["OtherNames"]):null;
-                        var lastname = rw["LastName"] != System.DBNull.Value ? Convert.ToString(rw["LastName"]):null;
+                        var othernames = rw["OtherNames"] != System.DBNull.Value ? Convert.ToString(rw["OtherNames"]) : null;
+                        var lastname = rw["LastName"] != System.DBNull.Value ? Convert.ToString(rw["LastName"]) : null;
                         InsureeProducts.Add(
                                 new InsureeProduct()
                                 {
-                                    
-                                    InsureeNumber = rw["InsuranceNumber"] != System.DBNull.Value ? Convert.ToString(rw["InsuranceNumber"]):null,
-                                    InsureeName = othernames +" "+lastname,
-                                    ProductName = rw["ProductName"] != System.DBNull.Value ? Convert.ToString(rw["ProductName"]):null,
-                                    ProductCode = rw["ProductCode"] != System.DBNull.Value ? Convert.ToString(rw["ProductCode"]):null,
-                                    ExpiryDate = (DateTime?)(rw["ExpiryDate"] != System.DBNull.Value?rw["ExpiryDate"] :null),
+
+                                    InsureeNumber = rw["InsuranceNumber"] != System.DBNull.Value ? Convert.ToString(rw["InsuranceNumber"]) : null,
+                                    InsureeName = othernames + " " + lastname,
+                                    ProductName = rw["ProductName"] != System.DBNull.Value ? Convert.ToString(rw["ProductName"]) : null,
+                                    ProductCode = rw["ProductCode"] != System.DBNull.Value ? Convert.ToString(rw["ProductCode"]) : null,
+                                    ExpiryDate = (DateTime?)(rw["ExpiryDate"] != System.DBNull.Value ? rw["ExpiryDate"] : null),
                                     EffectiveDate = (DateTime?)(rw["EffectiveDate"] != System.DBNull.Value ? rw["EffectiveDate"] : null),
                                     PolicyActivated = active,
                                     ExpectedProductAmount = rw["ExpectedDetailAmount"] != System.DBNull.Value ? Convert.ToDecimal(rw["ExpectedDetailAmount"]) : 0
-                                 }
-                            );               
+                                }
+                            );
                     }
 
                 }
@@ -707,7 +710,7 @@ namespace OpenImis.ePayment.Data
 
         public List<MatchSms> GetPaymentIdsForSms()
         {
-            
+
             var sSQl = @"SELECT tblPayment.PaymentID,tblPayment.DateLastSMS,tblPayment.MatchedDate
                         FROM tblControlNumber 
                         RIGHT OUTER JOIN tblInsuree 
@@ -725,7 +728,7 @@ namespace OpenImis.ePayment.Data
                         WHERE (tblProduct.ValidityTo IS NULL) AND (tblInsuree.ValidityTo IS NULL)
 						AND tblPayment.PaymentStatus >= 4 AND tblPayment.PaymentStatus < 5";
 
-            SqlParameter[] parameters = {};
+            SqlParameter[] parameters = { };
 
             try
             {
@@ -734,7 +737,7 @@ namespace OpenImis.ePayment.Data
                 if (data.Rows.Count > 0)
                 {
                     var jsonString = JsonConvert.SerializeObject(data);
-                    Ids = JsonConvert.DeserializeObject<List<MatchSms>>(jsonString);                   
+                    Ids = JsonConvert.DeserializeObject<List<MatchSms>>(jsonString);
                 }
 
                 return Ids;
@@ -917,7 +920,7 @@ namespace OpenImis.ePayment.Data
                 if (data.Rows.Count > 0)
                 {
                     var row = data.Rows[0];
-                    if (row["PaymentID"].ToString()==id) 
+                    if (row["PaymentID"].ToString() == id)
                     {
                         return true;
                     }
@@ -978,6 +981,67 @@ namespace OpenImis.ePayment.Data
 
                 throw;
             }
+        }
+
+
+        public ProductDetailsVM GetProductInfo(int productId)
+        {
+            var product = new ProductDetailsVM();
+            var sSQL = "SELECT ProdID, ProductCode, LumpSum, AccCodePremiums FROM tblProduct WHERE ProdID = @ProductId";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@ProductId", productId)
+            };
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    product.ProductId = (int)data.Rows[0]["ProdId"];
+                    product.ProductCode = data.Rows[0]["ProductCode"].ToString();
+                    product.Lumpsum = (decimal)data.Rows[0]["Lumpsum"];
+                    product.AccCodePremiums = data.Rows[0]["AccCodePremiums"].ToString();
+                }
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+
+            return product;
+
+        }
+
+        public OfficerDetailsVM GetOfficerInfo(int officerId)
+        {
+            var officer = new OfficerDetailsVM();
+            var sSQL = @"SELECT OfficerId, Code,LastName,OtherNames,DOB,Phone,EmailId
+                            FROM tblOfficer WHERE ValidityTo IS NULL AND OfficerId = @OfficerId";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@OfficerId", officerId)
+            };
+
+            try
+            {
+                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+                if (data.Rows.Count > 0)
+                {
+                    officer.OfficerId = (int)data.Rows[0]["OfficerId"];
+                    officer.Code = data.Rows[0]["Code"].ToString();
+                    officer.LastName = data.Rows[0]["LastName"].ToString();
+                    officer.OtherNames = data.Rows[0]["OtherNames"].ToString();
+                    officer.Phone = data.Rows[0]["Phone"].ToString();
+                    officer.EmailId = data.Rows[0]["EmailId"].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return officer;
         }
     }
 }

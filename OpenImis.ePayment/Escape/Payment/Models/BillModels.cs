@@ -36,6 +36,13 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public BillTrxInf BillTrxInf { get; set; }
     }
 
+    [XmlRoot("gepgBillSubReq")]
+    public class GepgBulkBillSubReq
+    {
+        public BillHdr BillHdr { get; set; }
+        public List<BillTrxInf> BillTrxInf { get; set; }
+    }
+
     public class BillHdr
     {
         public string SpCode { get; set; }
@@ -97,6 +104,13 @@ namespace OpenImis.ePayment.Escape.Payment.Models
     public class gepgBillSubRespAck
     {
         public int TrxStsCode { get; set; }
+    }
+
+    [XmlRoot("Gepg")]
+    public class GepgBulkBillMessage
+    {
+        public GepgBulkBillSubReq gepgBillSubReq { get; set; }
+        public string gepgSignature { get; set; }
     }
 
 }

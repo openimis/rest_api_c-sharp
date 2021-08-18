@@ -16,9 +16,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using OpenImis.ePayment.Models.Payment;
 
 namespace OpenImis.ePayment.Data
 {
+    public enum ControlNumberType
+    {
+        Single,
+        Bulk
+    };
+
     public class GepgUtility
     {
         string PublicStorePath = string.Empty;
@@ -26,9 +33,10 @@ namespace OpenImis.ePayment.Data
         string GepgPayCertStorePath = string.Empty;
 
         string CertPass = string.Empty;
-        
+
         RSA rsaCrypto = null;
         gepgBillSubReq newBill = null;
+        GepgBulkBillSubReq newBills = null;
         private IConfiguration configuration;
 
         public GepgUtility(IHostingEnvironment hostingEnvironment, IConfiguration Configuration)
@@ -40,7 +48,7 @@ namespace OpenImis.ePayment.Data
             GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
 
             CertPass = Configuration["PaymentGateWay:GePG:CertPass"];
-            
+
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode, string PhoneNumber, int BillId, decimal ExpectedAmount, List<PaymentDetail> policies)
@@ -211,7 +219,7 @@ namespace OpenImis.ePayment.Data
                 {
                     OmitXmlDeclaration = true
                 };
-                
+
                 ns = new XmlSerializerNamespaces();
                 ns.Add("", "");
 
@@ -227,10 +235,10 @@ namespace OpenImis.ePayment.Data
 
                 var signature = this.GenerateSignature(outString);
 
-                GePGPaymentCancelRequest GePGPaymentCancelRequest = new GePGPaymentCancelRequest() 
-                { 
-                    gepgBillCanclReq = gepgBillCanclReq, 
-                    gepgSignature = signature 
+                GePGPaymentCancelRequest GePGPaymentCancelRequest = new GePGPaymentCancelRequest()
+                {
+                    gepgBillCanclReq = gepgBillCanclReq,
+                    gepgSignature = signature
                 };
 
                 settings = new XmlWriterSettings();
@@ -257,9 +265,23 @@ namespace OpenImis.ePayment.Data
             return outString;
         }
 
-        public string FinaliseSignedMsg(string sign)
+        public string FinaliseSignedMsg(string sign, ControlNumberType controlNumberType = ControlNumberType.Single)
         {
-            GepgBillMessage gepgBill = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
+
+            object gepgData = null;
+
+            switch (controlNumberType)
+            {
+                case ControlNumberType.Single:
+                    gepgData = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
+                    break;
+                case ControlNumberType.Bulk:
+                    gepgData = new GepgBulkBillMessage() { gepgBillSubReq = newBills, gepgSignature = sign };
+                    break;
+                default:
+                    break;
+            }
+
 
             XmlSerializer xs = null;
             XmlSerializerNamespaces ns = null;
@@ -274,12 +296,35 @@ namespace OpenImis.ePayment.Data
                 settings = new XmlWriterSettings();
                 //settings.Indent = true;
                 StringBuilder sb = new StringBuilder();
-                xs = new XmlSerializer(typeof(GepgBillMessage));
+
+                switch (controlNumberType)
+                {
+                    case ControlNumberType.Single:
+                        xs = new XmlSerializer(typeof(GepgBillMessage));
+                        break;
+                    case ControlNumberType.Bulk:
+                        xs = new XmlSerializer(typeof(GepgBulkBillMessage));
+                        break;
+                    default:
+                        break;
+                }
+
                 xw = XmlWriter.Create(sb, settings);
 
-                xs.Serialize(xw, gepgBill, ns);
+                xs.Serialize(xw, gepgData, ns);
                 xw.Flush();
                 outString = sb.ToString();
+
+                // we need to remove <BillTrxInf> and </BillTrxInf> to comply with GePG format
+                if (controlNumberType == ControlNumberType.Bulk)
+                {
+                    var index = outString.IndexOf("<BillTrxInf>");
+                    outString = outString.Remove(index, "<BillTrxInf>".Length);
+
+                    index = outString.LastIndexOf("</BillTrxInf>");
+                    outString = outString.Remove(index, "</BillTrxInf>".Length);
+                }
+
             }
             catch (Exception ex)
             {
@@ -564,5 +609,103 @@ namespace OpenImis.ePayment.Data
             return accountCode;
         }
 
+        public string CreateBulkBills(IConfiguration configuration, BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        {
+
+
+            var billTrxRefs = new List<BillTrxInf>();
+            var rand = new Random();
+
+            for (int i = 0; i < model.ControlNumberCount; i++)
+            {
+                var billItems = new List<BillItem>();
+                BillItem item = new BillItem()
+                {
+                    BillItemRef = product.ProductCode,
+                    BillItemAmt = Convert.ToDouble(product.Lumpsum),
+                    BillItemEqvAmt = Convert.ToDouble(product.Lumpsum),
+                    BillItemMiscAmt = 0,
+                    UseItemRefOnPay = "N",
+                    GfsCode = configuration["PaymentGateWay:GePG:GfsCode:0"]
+                };
+                billItems.Add(item);
+
+                // Generate unique billId
+                var now = DateTime.UtcNow;
+                var zeroDate = DateTime.MinValue.AddHours(now.Hour).AddMinutes(now.Minute).AddSeconds(now.Second).AddMilliseconds(now.Millisecond).AddTicks(rand.Next(1, 1000000));
+                var uniqueId = Math.Abs((int)(zeroDate.Ticks));
+
+                BillTrxInf billTrxInf = new BillTrxInf()
+                {
+                    BillId = uniqueId,
+                    SubSpCode = Convert.ToInt32(configuration["PaymentGateWay:GePG:SubSpCode"]),
+                    SpSysId = configuration["PaymentGateWay:GePG:SystemId"],
+                    Ccy = "TZS",
+                    BillPayOpt = 3,
+                    BillGenDt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    BillEqvAmt = Convert.ToDecimal(product.Lumpsum),
+                    RemFlag = true,
+                    BillExprDt = DateTime.Now.AddYears(3).ToString("yyyy-MM-ddTHH:mm:ss"),
+                    BillAmt = Convert.ToDecimal(product.Lumpsum),
+                    MiscAmt = 0,
+                    BillItems = billItems,
+                    BillDesc = "Bill",
+                    BillApprBy = "Imis",
+                    BillGenBy = "Imis"
+                };
+
+                billTrxInf.PyrId = officer.Code;
+                billTrxInf.PyrName = Convert.ToString(officer.OtherNames) + " " + Convert.ToString(officer.LastName);
+                billTrxInf.PyrEmail = officer.EmailId ?? "info@imis.co.tz"; // TODO: replace with officer's email 
+                billTrxInf.PyrCellNum = officer.Phone;
+
+                billTrxRefs.Add(billTrxInf);
+
+            }
+
+            string accountCode = GetAccountCodeByProductCode(product.ProductCode);
+
+            newBills = new GepgBulkBillSubReq();
+            newBills.BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true };
+            newBills.BillTrxInf = billTrxRefs;
+
+
+            XmlSerializer xs = null;
+            XmlSerializerNamespaces ns = null;
+            XmlWriterSettings settings = null;
+            String outString = String.Empty;
+
+            XmlWriter xw = null;
+
+            try
+            {
+                settings = new XmlWriterSettings();
+                settings.OmitXmlDeclaration = true;
+                //settings.Indent = true;
+                ns = new XmlSerializerNamespaces();
+                ns.Add("", "");
+
+                StringBuilder sb = new StringBuilder();
+                xs = new XmlSerializer(typeof(GepgBulkBillSubReq));
+
+                xw = XmlWriter.Create(sb, settings);
+
+                xs.Serialize(xw, newBills, ns);
+                xw.Flush();
+                outString = sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                if (xw != null)
+                {
+                    xw.Close();
+                }
+            }
+            return outString;
+        }
     }
 }
