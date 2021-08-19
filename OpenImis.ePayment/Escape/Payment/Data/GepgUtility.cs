@@ -609,7 +609,7 @@ namespace OpenImis.ePayment.Data
             return accountCode;
         }
 
-        public async Task<string> CreateBulkBills(IConfiguration configuration, BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        public async Task<string> CreateBulkBills(IConfiguration configuration, CreateBulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
         {
 
 

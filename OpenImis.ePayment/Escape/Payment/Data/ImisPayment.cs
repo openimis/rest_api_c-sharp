@@ -365,7 +365,7 @@ namespace OpenImis.ePayment.Data
             return rejectedReason;
         }
 
-        public async Task<string> CreateBulkControlNumber(BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        public async Task<string> CreateBulkControlNumber(CreateBulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
         {
             var gepg = new GepgUtility(_hostingEnvironment, Configuration);
             var bills =  await gepg.CreateBulkBills(Configuration, model, product, officer);

@@ -593,7 +593,7 @@ namespace OpenImis.ePayment.Logic
             return imisPayment.GetOfficerInfo(officerId);
         }
 
-        public async Task<string> CreateBulkControlNumbers(BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        public async Task<string> CreateBulkControlNumbers(CreateBulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
         {
             var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
             return await imisPayment.CreateBulkControlNumber(model, product, officer);

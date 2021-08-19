@@ -106,7 +106,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual async Task<IActionResult> GetControlNumbers([FromBody]BulkControlNumbers model)
+        public virtual async Task<IActionResult> GetControlNumbers([FromBody]CreateBulkControlNumbers model)
         {
             if (!ModelState.IsValid)
             {
