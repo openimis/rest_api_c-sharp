@@ -368,7 +368,7 @@ namespace OpenImis.ePayment.Data
         public async Task<string> CreateBulkControlNumber(BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
         {
             var gepg = new GepgUtility(_hostingEnvironment, Configuration);
-            var bills =  gepg.CreateBulkBills(Configuration, model, product, officer);
+            var bills =  await gepg.CreateBulkBills(Configuration, model, product, officer);
 
             // we need to remove <BillTrxInf> and </BillTrxInf> to comply with GePG format
             var index = bills.IndexOf("<BillTrxInf>");

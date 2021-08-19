@@ -609,12 +609,19 @@ namespace OpenImis.ePayment.Data
             return accountCode;
         }
 
-        public string CreateBulkBills(IConfiguration configuration, BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        public async Task<string> CreateBulkBills(IConfiguration configuration, BulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
         {
 
 
             var billTrxRefs = new List<BillTrxInf>();
             var rand = new Random();
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add("BillId", typeof(int));
+            dt.Columns.Add("ProdId", typeof(int));
+            dt.Columns.Add("OfficerId", typeof(int));
+            dt.Columns.Add("Amount", typeof(decimal));
+
 
             for (int i = 0; i < model.ControlNumberCount; i++)
             {
@@ -661,7 +668,26 @@ namespace OpenImis.ePayment.Data
 
                 billTrxRefs.Add(billTrxInf);
 
+                // Insert data in to datatable
+
+                dt.Rows.Add(new object[]{ uniqueId, product.ProductId, officer.OfficerId, product.Lumpsum });
+
+
             }
+
+            var sSQL = @"INSERT INTO tblBulkControlNumbers(BillId, ProdId, OfficerId, Amount)
+                        SELECT BillId, ProdId, OfficerId, Amount FROM @dt";
+
+            var parameter = new SqlParameter("@dt", dt);
+            parameter.SqlDbType = SqlDbType.Structured;
+            parameter.TypeName = "dbo.xBulkControlNumbers";
+
+            SqlParameter[] parameters = {
+                        parameter
+                };
+
+            var dh = new DataHelper(configuration);
+            await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
 
             string accountCode = GetAccountCodeByProductCode(product.ProductCode);
 
