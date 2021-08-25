@@ -386,21 +386,49 @@ namespace OpenImis.ePayment.Data
             return billAck;
         }
 
-        public List<BulkControlNumbersForEO> GetControlNumbersForEO(int officerId)
+        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
         {
             var bulkControlNumbers = new List<BulkControlNumbersForEO>();
 
-            var sSQL = @"SELECT [Id], [BillId], [ProdId], O.Code OfficerCode, [ControlNumber], [Amount] 
-                        FROM tblBulkControlNumbers CN
-                        INNER JOIN tblOfficer O ON CN.OfficerId = O.OfficerID
-                        WHERE ControlNumber IS NOT NULL
-                        AND FamilyId IS NULL
-                        AND O.ValidityTo IS NULL
-                        AND O.OfficerId = @OfficerId;";
+            var sSQL = @"DECLARE @dt TABLE
+                        (
+	                        ControlNumberId INT,
+	                        BillId INT,
+	                        ProductCode NVARCHAR(50),
+	                        OfficerCode NVARCHAR(50),
+	                        ControlNumber NVARCHAR(15),
+	                        Amount DECIMAL(18, 2)
+                        )
+                        INSERT INTO @dt(ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount)
+                        SELECT TOP 100 CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, CN.[ControlNumber], PD.ExpectedAmount Amount
+                        FROM tblControlNumber CN
+                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
+                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+                        WHERE CN.ControlNumber IS NOT NULL
+                        AND PD.ProductCode = @ProductCode
+                        AND P.OfficerCode IS NULL
+                        AND CN.ValidityTo IS NULL
+                        AND PD.ValidityTo IS NULL
+                        AND P.ValidityTo IS NULL;
+
+                        UPDATE P SET OfficerCode = @OfficerCode
+                        FROM @dt dt
+                        INNER JOIN tblControlNumber CN ON dt.ControlNumberId = CN.ControlNumberID
+                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
+                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+                        WHERE CN.ControlNumber IS NOT NULL
+                        AND PD.ProductCode = @ProductCode
+                        AND P.OfficerCode IS NULL
+                        AND CN.ValidityTo IS NULL
+                        AND PD.ValidityTo IS NULL
+                        AND P.ValidityTo IS NULL;
+
+                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount FROM @dt;";
 
             var dh = new DataHelper(config);
             SqlParameter[] parameters = {
-                new SqlParameter("@OfficerId", officerId)
+                new SqlParameter("@OfficerCode", officerCode),
+                new SqlParameter("@ProductCode", productCode)
             };
 
             var dt = dh.GetDataTable(sSQL, parameters, CommandType.Text);
@@ -409,9 +437,9 @@ namespace OpenImis.ePayment.Data
             {
                 var controlNumber = new BulkControlNumbersForEO
                 {
-                    Id = (int)dr["Id"],
-                    BillId = (int)dr["BillId"],
-                    ProdId = (int)dr["ProdId"],
+                    ControlNumberId = Convert.ToInt32(dr["ControlNumberID"]),
+                    BillId = Convert.ToInt32(dr["BillId"]),
+                    ProductCode = dr["ProductCode"].ToString(),
                     OfficerCode = dr["OfficerCode"].ToString(),
                     ControlNumber  = dr["ControlNumber"].ToString(),
                     Amount = (decimal)dr["Amount"],

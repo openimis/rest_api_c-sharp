@@ -310,20 +310,21 @@ namespace OpenImis.ePayment.Controllers
 
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("api/GetControlNumbersForEO")]
         [ProducesResponseType(typeof(BulkControlNumbersForEO), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult GetControlNumbersForEO()
+        public virtual IActionResult GetControlNumbersForEO(string productCode)
         {
             List<BulkControlNumbersForEO> response = null;
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
                 var officerId = new ValidationBase().GetOfficerIdByUserUUID(userUUID, _configuration);
+                var officerDetails = _payment.GetOfficerInfo(officerId);
 
-                response = _payment.GetControlNumbersForEO(officerId);
+                response = _payment.GetControlNumbersForEO(officerDetails.Code, productCode);
 
             }
             catch (Exception ex)
