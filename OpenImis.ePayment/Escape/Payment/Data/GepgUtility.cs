@@ -609,51 +609,51 @@ namespace OpenImis.ePayment.Data
             return accountCode;
         }
 
-        public async Task<string> CreateBulkBills(IConfiguration configuration, CreateBulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        public async Task<string> CreateBulkBills(IConfiguration configuration, CreateBulkControlNumbers model)
         {
 
 
             var billTrxRefs = new List<BillTrxInf>();
             var rand = new Random();
 
-            DataTable dt = new DataTable();
-            dt.Columns.Add("BillId", typeof(int));
-            dt.Columns.Add("ProdId", typeof(int));
-            dt.Columns.Add("OfficerId", typeof(int));
-            dt.Columns.Add("Amount", typeof(decimal));
+            var sSQL = "uspPrepareBulkControlNumberRequests";
+            SqlParameter[] parameters = {
+                new SqlParameter("@Count", model.ControlNumberCount),
+                new SqlParameter("@ProductCode", model.ProductCode),
+                new SqlParameter("@ErrorCode", SqlDbType.Int){Direction = ParameterDirection.Output}
+            };
 
+            var dh = new DataHelper(configuration);
 
-            for (int i = 0; i < model.ControlNumberCount; i++)
+            DataTable dt = dh.GetDataTable(sSQL, parameters, CommandType.StoredProcedure);
+
+            foreach(DataRow dr in dt.Rows)
             {
                 var billItems = new List<BillItem>();
                 BillItem item = new BillItem()
                 {
-                    BillItemRef = product.ProductCode,
-                    BillItemAmt = Convert.ToDouble(product.Lumpsum),
-                    BillItemEqvAmt = Convert.ToDouble(product.Lumpsum),
+                    BillItemRef = model.ProductCode,
+                    BillItemAmt = Convert.ToDouble(dr["Amount"]),
+                    BillItemEqvAmt = Convert.ToDouble(dr["Amount"]),
                     BillItemMiscAmt = 0,
                     UseItemRefOnPay = "N",
                     GfsCode = configuration["PaymentGateWay:GePG:GfsCode:0"]
                 };
                 billItems.Add(item);
 
-                // Generate unique billId
-                var now = DateTime.UtcNow;
-                var zeroDate = DateTime.MinValue.AddHours(now.Hour).AddMinutes(now.Minute).AddSeconds(now.Second).AddMilliseconds(now.Millisecond).AddTicks(rand.Next(1, 1000000));
-                var uniqueId = Math.Abs((int)(zeroDate.Ticks));
-
+                
                 BillTrxInf billTrxInf = new BillTrxInf()
                 {
-                    BillId = uniqueId,
+                    BillId = (int)dr["BillId"],
                     SubSpCode = Convert.ToInt32(configuration["PaymentGateWay:GePG:SubSpCode"]),
                     SpSysId = configuration["PaymentGateWay:GePG:SystemId"],
                     Ccy = "TZS",
                     BillPayOpt = 3,
                     BillGenDt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    BillEqvAmt = Convert.ToDecimal(product.Lumpsum),
+                    BillEqvAmt = Convert.ToDecimal(dr["Amount"]),
                     RemFlag = true,
                     BillExprDt = DateTime.Now.AddYears(3).ToString("yyyy-MM-ddTHH:mm:ss"),
-                    BillAmt = Convert.ToDecimal(product.Lumpsum),
+                    BillAmt = Convert.ToDecimal(dr["Amount"]),
                     MiscAmt = 0,
                     BillItems = billItems,
                     BillDesc = "Bill",
@@ -661,35 +661,17 @@ namespace OpenImis.ePayment.Data
                     BillGenBy = "Imis"
                 };
 
-                billTrxInf.PyrId = officer.Code;
-                billTrxInf.PyrName = Convert.ToString(officer.OtherNames) + " " + Convert.ToString(officer.LastName);
-                billTrxInf.PyrEmail = officer.EmailId ?? "info@imis.co.tz"; // TODO: replace with officer's email 
-                billTrxInf.PyrCellNum = officer.Phone;
+                billTrxInf.PyrId = dr["BillId"].ToString();
+                billTrxInf.PyrName = "CHF IMIS";
+                billTrxInf.PyrEmail = "info@imis.co.tz";  
+                billTrxInf.PyrCellNum = "";
 
                 billTrxRefs.Add(billTrxInf);
 
-                // Insert data in to datatable
-
-                dt.Rows.Add(new object[]{ uniqueId, product.ProductId, officer.OfficerId, product.Lumpsum });
-
-
             }
 
-            var sSQL = @"INSERT INTO tblBulkControlNumbers(BillId, ProdId, OfficerId, Amount)
-                        SELECT BillId, ProdId, OfficerId, Amount FROM @dt";
 
-            var parameter = new SqlParameter("@dt", dt);
-            parameter.SqlDbType = SqlDbType.Structured;
-            parameter.TypeName = "dbo.xBulkControlNumbers";
-
-            SqlParameter[] parameters = {
-                        parameter
-                };
-
-            var dh = new DataHelper(configuration);
-            await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
-
-            string accountCode = GetAccountCodeByProductCode(product.ProductCode);
+            string accountCode = GetAccountCodeByProductCode(model.ProductCode);
 
             newBills = new GepgBulkBillSubReq();
             newBills.BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true };

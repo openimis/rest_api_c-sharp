@@ -122,10 +122,9 @@ namespace OpenImis.ePayment.Controllers
                 }
             }
 
-            var product = _payment.GetProductInfo(model.ProductId);
-            var officer = _payment.GetOfficerInfo(model.OfficerId);
+            // var officer = _payment.GetOfficerInfo(model.OfficerId);
 
-            var result = await _payment.CreateBulkControlNumbers(model, product, officer);
+            var result = await _payment.CreateBulkControlNumbers(model);
             
             return Ok(result);
         }

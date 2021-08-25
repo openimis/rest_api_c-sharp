@@ -7,8 +7,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
     public class CreateBulkControlNumbers
     {
         public int ControlNumberCount { get; set; }
-        public int ProductId { get; set; }
-        public int OfficerId { get; set; }
+        public string ProductCode { get; set; }
 
     }
 }

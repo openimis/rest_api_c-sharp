@@ -984,35 +984,7 @@ namespace OpenImis.ePayment.Data
         }
 
 
-        public ProductDetailsVM GetProductInfo(int productId)
-        {
-            var product = new ProductDetailsVM();
-            var sSQL = "SELECT ProdID, ProductCode, LumpSum, AccCodePremiums FROM tblProduct WHERE ProdID = @ProductId";
-
-            SqlParameter[] parameters = {
-                new SqlParameter("@ProductId", productId)
-            };
-
-            try
-            {
-                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
-                if (data.Rows.Count > 0)
-                {
-                    product.ProductId = (int)data.Rows[0]["ProdId"];
-                    product.ProductCode = data.Rows[0]["ProductCode"].ToString();
-                    product.Lumpsum = (decimal)data.Rows[0]["Lumpsum"];
-                    product.AccCodePremiums = data.Rows[0]["AccCodePremiums"].ToString();
-                }
-            }
-            catch(Exception e)
-            {
-                throw e;
-            }
-
-            return product;
-
-        }
-
+        
         public OfficerDetailsVM GetOfficerInfo(int officerId)
         {
             var officer = new OfficerDetailsVM();

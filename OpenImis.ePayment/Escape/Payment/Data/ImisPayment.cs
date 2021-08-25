@@ -365,10 +365,10 @@ namespace OpenImis.ePayment.Data
             return rejectedReason;
         }
 
-        public async Task<string> CreateBulkControlNumber(CreateBulkControlNumbers model, ProductDetailsVM product, OfficerDetailsVM officer)
+        public async Task<string> CreateBulkControlNumber(CreateBulkControlNumbers model)
         {
             var gepg = new GepgUtility(_hostingEnvironment, Configuration);
-            var bills =  await gepg.CreateBulkBills(Configuration, model, product, officer);
+            var bills =  await gepg.CreateBulkBills(Configuration, model);
 
             // we need to remove <BillTrxInf> and </BillTrxInf> to comply with GePG format
             var index = bills.IndexOf("<BillTrxInf>");
@@ -380,7 +380,9 @@ namespace OpenImis.ePayment.Data
             var signature = gepg.GenerateSignature(billsCopy);
             var signedMesg = gepg.FinaliseSignedMsg(signature, ControlNumberType.Bulk);
 
-            var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, product.AccCodePremiums, "default.sp.in");
+            string accountCode = gepg.GetAccountCodeByProductCode(model.ProductCode);
+
+            var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, accountCode, "default.sp.in");
             return billAck;
         }
 
