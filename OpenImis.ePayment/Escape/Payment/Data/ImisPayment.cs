@@ -379,6 +379,45 @@ namespace OpenImis.ePayment.Data
             return billAck;
         }
 
+        public List<BulkControlNumbersForEO> GetControlNumbersForEO(int officerId)
+        {
+            var bulkControlNumbers = new List<BulkControlNumbersForEO>();
+
+            var sSQL = @"SELECT [Id], [BillId], [ProdId], O.Code OfficerCode, [ControlNumber], [Amount] 
+                        FROM tblBulkControlNumbers CN
+                        INNER JOIN tblOfficer O ON CN.OfficerId = O.OfficerID
+                        WHERE ControlNumber IS NOT NULL
+                        AND FamilyId IS NULL
+                        AND O.ValidityTo IS NULL
+                        AND O.OfficerId = @OfficerId;";
+
+            var dh = new DataHelper(config);
+            SqlParameter[] parameters = {
+                new SqlParameter("@OfficerId", officerId)
+            };
+
+            var dt = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                var controlNumber = new BulkControlNumbersForEO
+                {
+                    Id = (int)dr["Id"],
+                    BillId = (int)dr["BillId"],
+                    ProdId = (int)dr["ProdId"],
+                    OfficerCode = dr["OfficerCode"].ToString(),
+                    ControlNumber  = dr["ControlNumber"].ToString(),
+                    Amount = (decimal)dr["Amount"],
+                };
+
+                bulkControlNumbers.Add(controlNumber);
+            }
+
+            return bulkControlNumbers;
+
+        }
+
+
 #endif
     }
 }
