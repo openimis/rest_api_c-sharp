@@ -95,7 +95,7 @@ namespace OpenImis.RestApi.Controllers.V3
         }
 
         [HttpGet]
-        [Route("Claims/GetClaimAdmins")]
+        [Route("GetClaimAdmins")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
@@ -115,7 +115,7 @@ namespace OpenImis.RestApi.Controllers.V3
         }
 
         [HttpGet]
-        [Route("Claims/Controls")]
+        [Route("Controls")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
