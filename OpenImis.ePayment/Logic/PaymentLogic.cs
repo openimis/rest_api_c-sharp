@@ -601,5 +601,11 @@ namespace OpenImis.ePayment.Logic
             var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
             return imisPayment.GetControlNumbersForEO(officerId);
         }
+
+        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        {
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            return imisPayment.GetControlNumbersForEO(officerCode, productCode);
+        }
     }
 }
