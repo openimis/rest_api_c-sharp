@@ -20,12 +20,7 @@ using OpenImis.ePayment.Models.Payment;
 
 namespace OpenImis.ePayment.Data
 {
-    public enum ControlNumberType
-    {
-        Single,
-        Bulk
-    };
-
+    
     public class GepgUtility
     {
         string PublicStorePath = string.Empty;
@@ -36,7 +31,7 @@ namespace OpenImis.ePayment.Data
 
         RSA rsaCrypto = null;
         gepgBillSubReq newBill = null;
-        GepgBulkBillSubReq newBills = null;
+        
         private IConfiguration configuration;
 
         public GepgUtility(IHostingEnvironment hostingEnvironment, IConfiguration Configuration)
@@ -152,10 +147,15 @@ namespace OpenImis.ePayment.Data
 
             string accountCode = GetAccountCodeByProductCode(policies.FirstOrDefault().insurance_product_code);
 
+            var billTrxInfs = new List<BillTrxInf> { 
+                billTrxInf
+            };
+
+
             newBill = new gepgBillSubReq()
             {
                 BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true },
-                BillTrxInf = billTrxInf
+                BillTrxInf = billTrxInfs
             };
 
             XmlSerializer xs = null;
@@ -265,22 +265,11 @@ namespace OpenImis.ePayment.Data
             return outString;
         }
 
-        public string FinaliseSignedMsg(string sign, ControlNumberType controlNumberType = ControlNumberType.Single)
+        public string FinaliseSignedMsg(string sign)
         {
 
             object gepgData = null;
-
-            switch (controlNumberType)
-            {
-                case ControlNumberType.Single:
-                    gepgData = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
-                    break;
-                case ControlNumberType.Bulk:
-                    gepgData = new GepgBulkBillMessage() { gepgBillSubReq = newBills, gepgSignature = sign };
-                    break;
-                default:
-                    break;
-            }
+            gepgData = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
 
 
             XmlSerializer xs = null;
@@ -296,18 +285,7 @@ namespace OpenImis.ePayment.Data
                 settings = new XmlWriterSettings();
                 //settings.Indent = true;
                 StringBuilder sb = new StringBuilder();
-
-                switch (controlNumberType)
-                {
-                    case ControlNumberType.Single:
-                        xs = new XmlSerializer(typeof(GepgBillMessage));
-                        break;
-                    case ControlNumberType.Bulk:
-                        xs = new XmlSerializer(typeof(GepgBulkBillMessage));
-                        break;
-                    default:
-                        break;
-                }
+                xs = new XmlSerializer(typeof(GepgBillMessage));
 
                 xw = XmlWriter.Create(sb, settings);
 
@@ -315,16 +293,7 @@ namespace OpenImis.ePayment.Data
                 xw.Flush();
                 outString = sb.ToString();
 
-                // we need to remove <BillTrxInf> and </BillTrxInf> to comply with GePG format
-                if (controlNumberType == ControlNumberType.Bulk)
-                {
-                    var index = outString.IndexOf("<BillTrxInf>");
-                    outString = outString.Remove(index, "<BillTrxInf>".Length);
-
-                    index = outString.LastIndexOf("</BillTrxInf>");
-                    outString = outString.Remove(index, "</BillTrxInf>".Length);
-                }
-
+                
             }
             catch (Exception ex)
             {
@@ -609,7 +578,7 @@ namespace OpenImis.ePayment.Data
             return accountCode;
         }
 
-        public async Task<string> CreateBulkBills(IConfiguration configuration, CreateBulkControlNumbers model)
+        public async Task<string> CreateBulkBills(IConfiguration configuration, RequestBulkControlNumbersModel model)
         {
 
 
@@ -673,9 +642,9 @@ namespace OpenImis.ePayment.Data
 
             string accountCode = GetAccountCodeByProductCode(model.ProductCode);
 
-            newBills = new GepgBulkBillSubReq();
-            newBills.BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true };
-            newBills.BillTrxInf = billTrxRefs;
+            newBill = new gepgBillSubReq();
+            newBill.BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true };
+            newBill.BillTrxInf = billTrxRefs;
 
 
             XmlSerializer xs = null;
@@ -694,11 +663,11 @@ namespace OpenImis.ePayment.Data
                 ns.Add("", "");
 
                 StringBuilder sb = new StringBuilder();
-                xs = new XmlSerializer(typeof(GepgBulkBillSubReq));
+                xs = new XmlSerializer(typeof(gepgBillSubReq));
 
                 xw = XmlWriter.Create(sb, settings);
 
-                xs.Serialize(xw, newBills, ns);
+                xs.Serialize(xw, newBill, ns);
                 xw.Flush();
                 outString = sb.ToString();
             }

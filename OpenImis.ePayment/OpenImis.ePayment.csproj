@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenImis.DB.SqlServer\OpenImis.DB.SqlServer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Escape\Sms\StringsSecondaryLanguage\CancellationSms.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

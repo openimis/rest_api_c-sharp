@@ -20,6 +20,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using OpenImis.DB.SqlServer;
 
 namespace OpenImis.ePayment.Data
 {
@@ -985,35 +986,11 @@ namespace OpenImis.ePayment.Data
 
 
         
-        public OfficerDetailsVM GetOfficerInfo(int officerId)
+        public TblOfficer GetOfficerInfo(int officerId)
         {
-            var officer = new OfficerDetailsVM();
-            var sSQL = @"SELECT OfficerId, Code,LastName,OtherNames,DOB,Phone,EmailId
-                            FROM tblOfficer WHERE ValidityTo IS NULL AND OfficerId = @OfficerId";
+            var context = new ImisDB();
+            return context.TblOfficer.Where(o => o.OfficerId == officerId).FirstOrDefault();
 
-            SqlParameter[] parameters = {
-                new SqlParameter("@OfficerId", officerId)
-            };
-
-            try
-            {
-                var data = dh.GetDataTable(sSQL, parameters, CommandType.Text);
-                if (data.Rows.Count > 0)
-                {
-                    officer.OfficerId = (int)data.Rows[0]["OfficerId"];
-                    officer.Code = data.Rows[0]["Code"].ToString();
-                    officer.LastName = data.Rows[0]["LastName"].ToString();
-                    officer.OtherNames = data.Rows[0]["OtherNames"].ToString();
-                    officer.Phone = data.Rows[0]["Phone"].ToString();
-                    officer.EmailId = data.Rows[0]["EmailId"].ToString();
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-
-            return officer;
         }
     }
 }
