@@ -984,13 +984,24 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-
-        
         public TblOfficer GetOfficerInfo(int officerId)
         {
             var context = new ImisDB();
             return context.TblOfficer.Where(o => o.OfficerId == officerId).FirstOrDefault();
 
+        }
+
+        public async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
+        {
+            return await Task.Run(() =>
+            {
+                return "";
+            });
+        }
+
+        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        {
+            return new List<BulkControlNumbersForEO>();
         }
     }
 }
