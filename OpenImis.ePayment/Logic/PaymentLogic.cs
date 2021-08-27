@@ -15,6 +15,7 @@ using OpenImis.ePayment.Models.Payment.Response;
 using System.IO;
 using System.Xml.Serialization;
 using OpenImis.ePayment.Escape.Payment.Models;
+using OpenImis.DB.SqlServer;
 
 namespace OpenImis.ePayment.Logic
 {
@@ -582,6 +583,17 @@ namespace OpenImis.ePayment.Logic
         }
 
         
+        public TblOfficer GetOfficerInfo(int officerId)
+        {
+            var imisPayment = new ImisBasePayment(_configuration, _hostingEnvironment);
+            return imisPayment.GetOfficerInfo(officerId);
+        }
 
+        public async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
+        {
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            return await imisPayment.RequestBulkControlNumbers(model);
+
+        }
     }
 }

@@ -16,9 +16,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using OpenImis.ePayment.Models.Payment;
 
 namespace OpenImis.ePayment.Data
 {
+    
     public class GepgUtility
     {
         string PublicStorePath = string.Empty;
@@ -26,9 +28,10 @@ namespace OpenImis.ePayment.Data
         string GepgPayCertStorePath = string.Empty;
 
         string CertPass = string.Empty;
-        
+
         RSA rsaCrypto = null;
         gepgBillSubReq newBill = null;
+        
         private IConfiguration configuration;
 
         public GepgUtility(IHostingEnvironment hostingEnvironment, IConfiguration Configuration)
@@ -40,7 +43,7 @@ namespace OpenImis.ePayment.Data
             GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
 
             CertPass = Configuration["PaymentGateWay:GePG:CertPass"];
-            
+
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode, string PhoneNumber, int BillId, decimal ExpectedAmount, List<PaymentDetail> policies)
@@ -144,10 +147,15 @@ namespace OpenImis.ePayment.Data
 
             string accountCode = GetAccountCodeByProductCode(policies.FirstOrDefault().insurance_product_code);
 
+            var billTrxInfs = new List<BillTrxInf> { 
+                billTrxInf
+            };
+
+
             newBill = new gepgBillSubReq()
             {
                 BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true },
-                BillTrxInf = billTrxInf
+                BillTrxInf = billTrxInfs
             };
 
             XmlSerializer xs = null;
@@ -211,7 +219,7 @@ namespace OpenImis.ePayment.Data
                 {
                     OmitXmlDeclaration = true
                 };
-                
+
                 ns = new XmlSerializerNamespaces();
                 ns.Add("", "");
 
@@ -227,10 +235,10 @@ namespace OpenImis.ePayment.Data
 
                 var signature = this.GenerateSignature(outString);
 
-                GePGPaymentCancelRequest GePGPaymentCancelRequest = new GePGPaymentCancelRequest() 
-                { 
-                    gepgBillCanclReq = gepgBillCanclReq, 
-                    gepgSignature = signature 
+                GePGPaymentCancelRequest GePGPaymentCancelRequest = new GePGPaymentCancelRequest()
+                {
+                    gepgBillCanclReq = gepgBillCanclReq,
+                    gepgSignature = signature
                 };
 
                 settings = new XmlWriterSettings();
@@ -259,7 +267,10 @@ namespace OpenImis.ePayment.Data
 
         public string FinaliseSignedMsg(string sign)
         {
-            GepgBillMessage gepgBill = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
+
+            object gepgData = null;
+            gepgData = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
+
 
             XmlSerializer xs = null;
             XmlSerializerNamespaces ns = null;
@@ -275,11 +286,14 @@ namespace OpenImis.ePayment.Data
                 //settings.Indent = true;
                 StringBuilder sb = new StringBuilder();
                 xs = new XmlSerializer(typeof(GepgBillMessage));
+
                 xw = XmlWriter.Create(sb, settings);
 
-                xs.Serialize(xw, gepgBill, ns);
+                xs.Serialize(xw, gepgData, ns);
                 xw.Flush();
                 outString = sb.ToString();
+
+                
             }
             catch (Exception ex)
             {
@@ -564,5 +578,111 @@ namespace OpenImis.ePayment.Data
             return accountCode;
         }
 
+        public async Task<string> CreateBulkBills(IConfiguration configuration, RequestBulkControlNumbersModel model)
+        {
+
+
+            var billTrxRefs = new List<BillTrxInf>();
+            var rand = new Random();
+
+            var sSQL = "uspPrepareBulkControlNumberRequests";
+            SqlParameter[] parameters = {
+                new SqlParameter("@Count", model.ControlNumberCount),
+                new SqlParameter("@ProductCode", model.ProductCode),
+                new SqlParameter("@ErrorCode", SqlDbType.Int){Direction = ParameterDirection.Output}
+            };
+
+            var dh = new DataHelper(configuration);
+
+            DataTable dt = dh.GetDataTable(sSQL, parameters, CommandType.StoredProcedure);
+
+            foreach(DataRow dr in dt.Rows)
+            {
+                var billItems = new List<BillItem>();
+                BillItem item = new BillItem()
+                {
+                    BillItemRef = model.ProductCode,
+                    BillItemAmt = Convert.ToDouble(dr["Amount"]),
+                    BillItemEqvAmt = Convert.ToDouble(dr["Amount"]),
+                    BillItemMiscAmt = 0,
+                    UseItemRefOnPay = "N",
+                    GfsCode = configuration["PaymentGateWay:GePG:GfsCode:0"]
+                };
+                billItems.Add(item);
+
+                
+                BillTrxInf billTrxInf = new BillTrxInf()
+                {
+                    BillId = (int)dr["BillId"],
+                    SubSpCode = Convert.ToInt32(configuration["PaymentGateWay:GePG:SubSpCode"]),
+                    SpSysId = configuration["PaymentGateWay:GePG:SystemId"],
+                    Ccy = "TZS",
+                    BillPayOpt = 3,
+                    BillGenDt = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    BillEqvAmt = Convert.ToDecimal(dr["Amount"]),
+                    RemFlag = true,
+                    BillExprDt = DateTime.Now.AddYears(3).ToString("yyyy-MM-ddTHH:mm:ss"),
+                    BillAmt = Convert.ToDecimal(dr["Amount"]),
+                    MiscAmt = 0,
+                    BillItems = billItems,
+                    BillDesc = "Bill",
+                    BillApprBy = "Imis",
+                    BillGenBy = "Imis"
+                };
+
+                billTrxInf.PyrId = dr["BillId"].ToString();
+                billTrxInf.PyrName = "CHF IMIS";
+                billTrxInf.PyrEmail = "info@imis.co.tz";  
+                billTrxInf.PyrCellNum = "";
+
+                billTrxRefs.Add(billTrxInf);
+
+            }
+
+
+            string accountCode = GetAccountCodeByProductCode(model.ProductCode);
+
+            newBill = new gepgBillSubReq();
+            newBill.BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true };
+            newBill.BillTrxInf = billTrxRefs;
+
+
+            XmlSerializer xs = null;
+            XmlSerializerNamespaces ns = null;
+            XmlWriterSettings settings = null;
+            String outString = String.Empty;
+
+            XmlWriter xw = null;
+
+            try
+            {
+                settings = new XmlWriterSettings();
+                settings.OmitXmlDeclaration = true;
+                //settings.Indent = true;
+                ns = new XmlSerializerNamespaces();
+                ns.Add("", "");
+
+                StringBuilder sb = new StringBuilder();
+                xs = new XmlSerializer(typeof(gepgBillSubReq));
+
+                xw = XmlWriter.Create(sb, settings);
+
+                xs.Serialize(xw, newBill, ns);
+                xw.Flush();
+                outString = sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                if (xw != null)
+                {
+                    xw.Close();
+                }
+            }
+            return outString;
+        }
     }
 }
