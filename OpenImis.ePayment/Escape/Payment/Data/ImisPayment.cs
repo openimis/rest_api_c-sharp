@@ -383,40 +383,46 @@ namespace OpenImis.ePayment.Data
         {
             var bulkControlNumbers = new List<BulkControlNumbersForEO>();
 
-            var sSQL = @"DECLARE @dt TABLE
-                        (
-	                        ControlNumberId INT,
-	                        BillId INT,
-	                        ProductCode NVARCHAR(50),
-	                        OfficerCode NVARCHAR(50),
-	                        ControlNumber NVARCHAR(15),
-	                        Amount DECIMAL(18, 2)
-                        )
-                        INSERT INTO @dt(ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount)
-                        SELECT TOP 100 CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, CN.[ControlNumber], PD.ExpectedAmount Amount
-                        FROM tblControlNumber CN
-                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
-                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
-                        WHERE CN.ControlNumber IS NOT NULL
-                        AND PD.ProductCode = @ProductCode
-                        AND P.OfficerCode IS NULL
-                        AND CN.ValidityTo IS NULL
-                        AND PD.ValidityTo IS NULL
-                        AND P.ValidityTo IS NULL;
+            var sSQL = @"SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
-                        UPDATE P SET OfficerCode = @OfficerCode
-                        FROM @dt dt
-                        INNER JOIN tblControlNumber CN ON dt.ControlNumberId = CN.ControlNumberID
-                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
-                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
-                        WHERE CN.ControlNumber IS NOT NULL
-                        AND PD.ProductCode = @ProductCode
-                        AND P.OfficerCode IS NULL
-                        AND CN.ValidityTo IS NULL
-                        AND PD.ValidityTo IS NULL
-                        AND P.ValidityTo IS NULL;
+                        BEGIN TRANSACTION;
+	                        DECLARE @dt TABLE
+	                        (
+		                        ControlNumberId INT,
+		                        BillId INT,
+		                        ProductCode NVARCHAR(50),
+		                        OfficerCode NVARCHAR(50),
+		                        ControlNumber NVARCHAR(15),
+		                        Amount DECIMAL(18, 2)
+	                        )
+	                        INSERT INTO @dt(ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount)
 
-                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount FROM @dt;";
+	                        SELECT TOP 100 CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, CN.[ControlNumber], PD.ExpectedAmount Amount
+	                        FROM tblControlNumber CN
+	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
+	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+	                        WHERE CN.ControlNumber IS NOT NULL
+	                        AND PD.ProductCode = @ProductCode
+	                        AND P.OfficerCode IS NULL
+	                        AND CN.ValidityTo IS NULL
+	                        AND PD.ValidityTo IS NULL
+	                        AND P.ValidityTo IS NULL;
+
+	                        UPDATE P SET OfficerCode = @OfficerCode
+	                        FROM @dt dt
+	                        INNER JOIN tblControlNumber CN ON dt.ControlNumberId = CN.ControlNumberID
+	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
+	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+	                        WHERE CN.ControlNumber IS NOT NULL
+	                        AND PD.ProductCode = @ProductCode
+	                        AND P.OfficerCode IS NULL
+	                        AND CN.ValidityTo IS NULL
+	                        AND PD.ValidityTo IS NULL
+	                        AND P.ValidityTo IS NULL;
+
+	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount FROM @dt;
+
+                        COMMIT TRANSACTION;";
 
             var dh = new DataHelper(config);
             SqlParameter[] parameters = {
