@@ -315,7 +315,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(BulkControlNumbersForEO), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult GetControlNumbersForEO(string productCode)
+        public virtual IActionResult GetControlNumbersForEO(GetControlNumbersForEOModel model)
         {
             List<BulkControlNumbersForEO> response = null;
             try
@@ -324,7 +324,7 @@ namespace OpenImis.ePayment.Controllers
                 var officerId = new ValidationBase().GetOfficerIdByUserUUID(userUUID, _configuration);
                 var officerDetails = _payment.GetOfficerInfo(officerId);
 
-                response = _payment.GetControlNumbersForEO(officerDetails.Code, productCode);
+                response = _payment.GetControlNumbersForEO(officerDetails.Code, model.ProductCode);
 
             }
             catch (Exception ex)
