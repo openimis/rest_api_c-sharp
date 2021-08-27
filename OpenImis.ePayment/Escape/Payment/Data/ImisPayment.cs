@@ -379,6 +379,80 @@ namespace OpenImis.ePayment.Data
             return billAck;
         }
 
+        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        {
+            var bulkControlNumbers = new List<BulkControlNumbersForEO>();
+
+            var sSQL = @"SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+                        BEGIN TRANSACTION;
+	                        DECLARE @dt TABLE
+	                        (
+		                        ControlNumberId INT,
+		                        BillId INT,
+		                        ProductCode NVARCHAR(50),
+		                        OfficerCode NVARCHAR(50),
+		                        ControlNumber NVARCHAR(15),
+		                        Amount DECIMAL(18, 2)
+	                        )
+	                        INSERT INTO @dt(ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount)
+
+	                        SELECT TOP 100 CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, CN.[ControlNumber], PD.ExpectedAmount Amount
+	                        FROM tblControlNumber CN
+	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
+	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+	                        WHERE CN.ControlNumber IS NOT NULL
+	                        AND PD.ProductCode = @ProductCode
+	                        AND P.OfficerCode IS NULL
+	                        AND CN.ValidityTo IS NULL
+	                        AND PD.ValidityTo IS NULL
+	                        AND P.ValidityTo IS NULL;
+
+	                        UPDATE P SET OfficerCode = @OfficerCode
+	                        FROM @dt dt
+	                        INNER JOIN tblControlNumber CN ON dt.ControlNumberId = CN.ControlNumberID
+	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
+	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+	                        WHERE CN.ControlNumber IS NOT NULL
+	                        AND PD.ProductCode = @ProductCode
+	                        AND P.OfficerCode IS NULL
+	                        AND CN.ValidityTo IS NULL
+	                        AND PD.ValidityTo IS NULL
+	                        AND P.ValidityTo IS NULL;
+
+	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount FROM @dt;
+
+                        COMMIT TRANSACTION;";
+
+            var dh = new DataHelper(config);
+            SqlParameter[] parameters = {
+                new SqlParameter("@OfficerCode", officerCode),
+                new SqlParameter("@ProductCode", productCode)
+            };
+
+            var dt = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                var controlNumber = new BulkControlNumbersForEO
+                {
+                    ControlNumberId = Convert.ToInt32(dr["ControlNumberID"]),
+                    BillId = Convert.ToInt32(dr["BillId"]),
+                    ProductCode = dr["ProductCode"].ToString(),
+                    OfficerCode = dr["OfficerCode"].ToString(),
+                    ControlNumber  = dr["ControlNumber"].ToString(),
+                    Amount = (decimal)dr["Amount"],
+                };
+
+                bulkControlNumbers.Add(controlNumber);
+            }
+
+            return bulkControlNumbers;
+
+        }
+
+        
+
 #endif
     }
 }

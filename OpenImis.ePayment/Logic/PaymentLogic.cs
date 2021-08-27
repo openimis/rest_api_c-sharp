@@ -595,5 +595,13 @@ namespace OpenImis.ePayment.Logic
             return await imisPayment.RequestBulkControlNumbers(model);
 
         }
+
+        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        {
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            return imisPayment.GetControlNumbersForEO(officerCode, productCode);
+        }
+
+        
     }
 }
