@@ -315,7 +315,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(BulkControlNumbersForEO), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult GetControlNumbersForEO(GetControlNumbersForEOModel model)
+        public virtual IActionResult GetControlNumbersForEO([FromBody]GetControlNumbersForEOModel model)
         {
             List<BulkControlNumbersForEO> response = null;
             try
@@ -325,6 +325,23 @@ namespace OpenImis.ePayment.Controllers
                 var officerDetails = _payment.GetOfficerInfo(officerId);
 
                 response = _payment.GetControlNumbersForEO(officerDetails.Code, model.ProductCode);
+
+                // Check if the product requested has enough CNs left
+                try
+                {
+                    var count = _payment.ControlNumbersToBeRequested(model.ProductCode);
+                    if (count > 0)
+                    {
+                        // The following method is Async, but we do not await it since we don't want to wait for the result
+                        _ = RequestBulkControlNumbers(new RequestBulkControlNumbersModel { ControlNumberCount = count, ProductCode = model.ProductCode });
+                    }
+                }
+                catch (Exception)
+                {
+
+                    
+                }
+
 
             }
             catch (Exception ex)
