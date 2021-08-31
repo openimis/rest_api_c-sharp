@@ -29,6 +29,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public string GeoLocation { get; set; }
         public string CurVillage { get; set; }
         public string isOffline { get; set; }
+        public string Vulnerability { get; set; }
         public InsureeImage Picture { get; set; }
         public string Vulnerability { get; set; }
     }

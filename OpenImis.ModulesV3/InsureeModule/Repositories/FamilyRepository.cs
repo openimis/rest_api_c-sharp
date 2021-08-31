@@ -87,7 +87,88 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             }
         }
 
-        public int Create(EnrollFamilyModel model, int userId, int officerId)
+        public NewFamilyResponse CreateEnrollResponse(EnrollFamilyModel model)
+        {
+            var response = new NewFamilyResponse();
+            try
+            {
+                using (var imisContext = new ImisDB())
+                {
+                    foreach (var fam in model.Family)
+                    {
+
+                        var familyId = imisContext.TblInsuree.Where(i => i.Chfid == fam.HOFCHFID && i.IsHead == true && i.ValidityTo == null)
+                                        .Select(i => i.FamilyId)
+                                        .FirstOrDefault();
+
+                        var family = imisContext.TblFamilies
+                                    .Where(f => f.FamilyId == familyId && f.ValidityTo == null)
+                                    .Include(f => f.TblInsuree)
+                                    .Include(p => p.TblPolicy)
+                                        .ThenInclude(pr => pr.TblPremium)
+                                    .FirstOrDefault();
+
+                        // if the family is not found means it failed to insert
+                        if (family == null)
+                            continue;
+
+                        family.TblInsuree = family.TblInsuree.Where(i => i.ValidityTo == null).ToList();
+                        family.TblPolicy = family.TblPolicy.Where(p => p.ValidityTo == null).ToList();
+
+
+                        var familyVM = new FamilyVM
+                        {
+                            FamilyId = fam.FamilyId,
+                            FamilyDBId = family.FamilyId,
+                            FamilyUUID = family.FamilyUUID
+                        };
+
+                        foreach (var i in family.TblInsuree)
+                        {
+                            familyVM.Insurees.Add(new InsureeVM
+                            {
+                                InsureeId = fam.Insurees.Where(x => x.CHFID == i.Chfid).Select(x => x.InsureeId).FirstOrDefault(),
+                                InsureeDBId = i.InsureeId,
+                                InsureeUUID = i.InsureeUUID
+                            });
+                        }
+
+                        foreach (var p in family.TblPolicy)
+                        {
+                            var premiums = new List<PremiumVM>();
+                            p.TblPremium = p.TblPremium.Where(prem => prem.ValidityTo == null).ToList();
+                            foreach (var pr in p.TblPremium)
+                            {
+                                premiums.Add(new PremiumVM
+                                {
+                                    PremiumId = fam.Policies.Where(x => x.ProdId == p.ProdId).FirstOrDefault().Premium.Where(y => y.Receipt == pr.Receipt).Select(z => z.PremiumId).FirstOrDefault(),
+                                    PremiumDBId = pr.PremiumId,
+                                    PremiumUUID = pr.PremiumUUID
+                                });
+                            }
+                            familyVM.Policies.Add(new PolicyVM
+                            {
+                                PolicyId = fam.Policies.Where(x => x.ProdId == p.ProdId).Select(y => y.PolicyId).FirstOrDefault(),
+                                PolicyDBId = p.PolicyId,
+                                PolicyUUID = p.PolicyUUID,
+                                Premium = premiums
+                            });
+
+                        }
+
+                        response.Family.Add(familyVM);
+                    }
+                }
+                return response;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public NewFamilyResponse Create(EnrollFamilyModel model, int userId, int officerId)
         {
             try
             {
@@ -172,13 +253,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                         using (var reader = cmd.ExecuteReader())
                         {
                             // Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
+                            do
+                            {
+                                while (reader.Read())
+                                {
+                                    Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                }
+                            } while (reader.NextResult());
                         }
                     }
 
@@ -209,7 +290,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     }
                 }
 
-                return RV;
+                var newFamily = new NewFamilyResponse();
+                newFamily.Response = RV;
+                if (RV == 0)
+                    newFamily = CreateEnrollResponse(model);
+
+
+                return newFamily;
             }
             catch (SqlException e)
             {

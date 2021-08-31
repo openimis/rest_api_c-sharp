@@ -31,13 +31,11 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
             return response;
         }
 
-        public int Create(EnrollFamilyModel model, int userId, int officerId)
+        public NewFamilyResponse Create(EnrollFamilyModel model, int userId, int officerId)
         {
-            int response;
+            
+            return familyRepository.Create(model, userId, officerId);
 
-            response = familyRepository.Create(model, userId, officerId);
-
-            return response;
         }
 
         public int GetUserIdByUUID(Guid uuid)
