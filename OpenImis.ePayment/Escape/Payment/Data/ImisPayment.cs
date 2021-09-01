@@ -37,7 +37,7 @@ namespace OpenImis.ePayment.Data
         {
             daysAgo = -1 * daysAgo;
 
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
 
             ReconcRequest Reconciliation = new ReconcRequest();
 
@@ -56,21 +56,22 @@ namespace OpenImis.ePayment.Data
 
             var content = signedRequest + "********************" + result;
             GepgFileLogger.Log(productSPCode + "_GepGReconRequest", content, env);
-            
+
             return new { reconcId = request.SpReconcReqId, resp = result };
 
         }
 
         public override decimal determineTransferFee(decimal expectedAmount, TypeOfPayment typeOfPayment)
         {
-            if (typeOfPayment == TypeOfPayment.BankTransfer || typeOfPayment == TypeOfPayment.Cash) {
+            if (typeOfPayment == TypeOfPayment.BankTransfer || typeOfPayment == TypeOfPayment.Cash)
+            {
                 return 0;
             }
             else
             {
                 var fee = expectedAmount - (expectedAmount / Convert.ToDecimal(1.011));
 
-                return Math.Round(fee,0);
+                return Math.Round(fee, 0);
             }
         }
 
@@ -93,9 +94,9 @@ namespace OpenImis.ePayment.Data
             return Math.Round(amount, 0);
         }
 
-        public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false, string rejectedReason="")
+        public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false, string rejectedReason = "")
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
 
             ExpectedAmount = Math.Round(ExpectedAmount, 2);
             //send request only when we have amount > 0
@@ -128,14 +129,14 @@ namespace OpenImis.ePayment.Data
                     {
                         return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, false);
                     }
-                    else 
+                    else
                     {
                         //we have an error from GePG ackn - then save rejected reason
                         var rejectedReasonText = PrepareRejectedReason(PaymentId, errorCodes);
                         return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true, rejectedReasonText);
                     }
                 }
-                else 
+                else
                 {
                     return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true);
                 }
@@ -143,13 +144,13 @@ namespace OpenImis.ePayment.Data
             else
             {
                 //do not send any request to GePG when we have 0 or negative amount
-                return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true); 
+                return await base.PostReqControlNumberAsync(OfficerCode, PaymentId, PhoneNumber, ExpectedAmount, products, null, true, true);
             }
         }
 
         public string ControlNumberResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
 
             gepgBillSubRespAck CnAck = new gepgBillSubRespAck();
             CnAck.TrxStsCode = code;
@@ -205,7 +206,7 @@ namespace OpenImis.ePayment.Data
                     Code = -1,
                     ErrorOccured = true,
                     MessageValue = ex.ToString(),
-                }; 
+                };
             }
         }
 
@@ -226,7 +227,7 @@ namespace OpenImis.ePayment.Data
 
         public string PaymentResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
 
             gepgPmtSpInfoAck PayAck = new gepgPmtSpInfoAck();
             PayAck.TrxStsCode = code;
@@ -240,7 +241,7 @@ namespace OpenImis.ePayment.Data
 
         public string ReconciliationResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment,config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
 
             gepgSpReconcRespAck ReconcAck = new gepgSpReconcRespAck();
             ReconcAck.ReconcStsCode = code;
@@ -325,7 +326,7 @@ namespace OpenImis.ePayment.Data
             return result;
         }
 
-        private string LoadResponseCodeFromXmlAkn(string xmlContent) 
+        private string LoadResponseCodeFromXmlAkn(string xmlContent)
         {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(xmlContent);
@@ -368,7 +369,7 @@ namespace OpenImis.ePayment.Data
         public async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
         {
             var gepg = new GepgUtility(_hostingEnvironment, Configuration);
-            var bills =  await gepg.CreateBulkBills(Configuration, model);
+            var bills = await gepg.CreateBulkBills(Configuration, model);
 
             var signature = gepg.GenerateSignature(bills);
             var signedMesg = gepg.FinaliseSignedMsg(signature);
@@ -440,7 +441,7 @@ namespace OpenImis.ePayment.Data
                     BillId = Convert.ToInt32(dr["BillId"]),
                     ProductCode = dr["ProductCode"].ToString(),
                     OfficerCode = dr["OfficerCode"].ToString(),
-                    ControlNumber  = dr["ControlNumber"].ToString(),
+                    ControlNumber = dr["ControlNumber"].ToString(),
                     Amount = (decimal)dr["Amount"],
                 };
 
@@ -451,7 +452,47 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        
+        public int ControlNumbersToBeRequested(string productCode)
+        {
+            var sSQL = @";WITH TotalProductUsage
+                        AS
+                        (
+	                        SELECT CASE WHEN COUNT(1)/3 < 200 THEN 200 ELSE COUNT(1)/3 END  Last3MonthsEnrollment 
+	                        FROM tblPolicy PL
+	                        INNER JOIN tblProduct Prod ON PL.ProdID = Prod.ProdID
+	                        WHERE PL.ValidityTo IS NULL
+	                        AND Prod.ValidityTo IS NULL
+	                        AND Prod.ProductCode = @ProductCode
+	                        AND PL.EnrollDate BETWEEN DATEADD(MONTH, -3, GETDATE()) AND GETDATE()
+                        ), RemainingCNs AS
+                        (
+	                        SELECT COUNT(1) ControlNumbersLeft
+	                        FROM tblControlNumber CN
+	                        INNER JOIN tblPayment P ON CN.PaymentID = P.PaymentID
+	                        INNER JOIN tblPaymentDetails PD ON P.PaymentID = PD.PaymentID
+	                        WHERE CN.ValidityTo IS NULL
+	                        AND P.ValidityTo IS NULL
+	                        AND PD.ProductCode = @ProductCode
+	                        AND P.OfficerCode IS NULL
+	                        AND CN.ControlNumber IS NOT NULL
+                        )
+                        SELECT CASE WHEN Last3MonthsEnrollment > ControlNumbersLeft THEN Last3MonthsEnrollment - ControlNumbersLeft  ELSE 0 END NeedToRequest
+                        FROM RemainingCNs, TotalProductUsage";
+
+            SqlParameter[] parameters = {
+                new SqlParameter("@ProductCode", productCode)
+                };
+
+            var dh = new DataHelper(config);
+            var dt = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+            int needToRequest = 0;
+
+            if (dt.Rows.Count > 0)
+                needToRequest = (int)dt.Rows[0]["NeedToRequest"];
+
+            return needToRequest;
+        }
 
 #endif
     }
