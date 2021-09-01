@@ -1003,5 +1003,10 @@ namespace OpenImis.ePayment.Data
         {
             return new List<BulkControlNumbersForEO>();
         }
+
+        public int ControlNumbersToBeRequested(string productCode)
+        {
+            return 0;
+        }
     }
 }
