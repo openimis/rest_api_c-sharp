@@ -78,6 +78,7 @@ namespace OpenImis.RestApi.Controllers.V3
                 return BadRequest(new { error = new { message = e.Message, value = e.Value } });
             }
 
+            // If the response is 1001 then Family uploaded successfully but it failed to map control number entries
             return Ok(response);
         }
     }

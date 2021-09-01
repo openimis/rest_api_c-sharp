@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
 using OpenImis.ModulesV3.InsureeModule.Repositories;
+using OpenImis.DB.SqlServer.DataHelper;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
 {
@@ -290,10 +291,16 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     }
                 }
 
+
                 var newFamily = new NewFamilyResponse();
                 newFamily.Response = RV;
                 if (RV == 0)
+                {
                     newFamily = CreateEnrollResponse(model);
+                    // Update the control number
+                    newFamily.Response = UpdateControlNumber(model, newFamily);
+
+                }
 
 
                 return newFamily;
@@ -356,5 +363,47 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 throw e;
             }
         }
+
+        public int UpdateControlNumber(EnrollFamilyModel familyModel, NewFamilyResponse serverResponse)
+        {
+
+            foreach (var family in familyModel.Family)
+            {
+                foreach (var policy in family.Policies)
+                {
+                    var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
+
+                    var sSQL = @"UPDATE PD SET InsuranceNumber = I.CHFID, PremiumID = PR.PremiumId, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
+                            FROM tblControlNumber CN
+                            INNER JOIN tblPaymentDetails PD ON CN.PaymentId = PD.PaymentID
+                            INNER JOIN tblInsuree I ON IsHead = 1 
+                            INNER JOIN tblPolicy Pol ON Pol.PolicyID = @PolicyId AND Pol.FamilyID = I.FamilyId
+                            LEFT OUTER JOIN tblPremium PR ON Pol.PolicyID = PR.PolicyID
+                            WHERE CN.ValidityTo IS NULL
+                            AND I.ValidityTo IS NULL
+                            AND CN.ControlNumberID = @ControlNumberId;";
+
+                    SqlParameter[] parameters =
+                    {
+                        new SqlParameter("@ControlNumberId", policy.ControlNumberId),
+                        new SqlParameter("@PolicyId", policyId),
+                    };
+
+                    try
+                    {
+                        var dh = new DataHelper(_configuration);
+                        dh.Execute(sSQL, parameters, CommandType.Text);
+                    }
+                    catch (Exception)
+                    {
+
+                        return 1001;
+                    }
+
+                }
+            }
+            return 0;
+        }
+
     }
 }
