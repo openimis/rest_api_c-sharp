@@ -371,6 +371,9 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             {
                 foreach (var policy in family.Policies)
                 {
+                    if (policy.ControlNumberId == 0)
+                        continue;
+
                     var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
 
                     var sSQL = @"UPDATE PD SET InsuranceNumber = I.CHFID, PremiumID = PR.PremiumId, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
