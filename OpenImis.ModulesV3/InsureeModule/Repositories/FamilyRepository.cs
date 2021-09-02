@@ -371,7 +371,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             {
                 foreach (var policy in family.Policies)
                 {
-                    if (policy.ControlNumberId == 0)
+                    if (policy.ControlNumber.Length == 0)
                         continue;
 
                     var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
@@ -384,11 +384,11 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                             LEFT OUTER JOIN tblPremium PR ON Pol.PolicyID = PR.PolicyID
                             WHERE CN.ValidityTo IS NULL
                             AND I.ValidityTo IS NULL
-                            AND CN.ControlNumberID = @ControlNumberId;";
+                            AND CN.ControlNumber = @ControlNumber;";
 
                     SqlParameter[] parameters =
                     {
-                        new SqlParameter("@ControlNumberId", policy.ControlNumberId),
+                        new SqlParameter("@ControlNumber", policy.ControlNumber),
                         new SqlParameter("@PolicyId", policyId),
                     };
 
