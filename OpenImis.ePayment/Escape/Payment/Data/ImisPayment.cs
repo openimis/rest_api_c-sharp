@@ -393,15 +393,17 @@ namespace OpenImis.ePayment.Data
 		                        BillId INT,
 		                        ProductCode NVARCHAR(50),
 		                        OfficerCode NVARCHAR(50),
+                                PhoneNumber NVARCHAR(15),
 		                        ControlNumber NVARCHAR(15),
 		                        Amount DECIMAL(18, 2)
 	                        )
-	                        INSERT INTO @dt(ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount)
+	                        INSERT INTO @dt(ControlNumberId, BillId, ProductCode, OfficerCode, PhoneNumber, ControlNumber, Amount)
 
-	                        SELECT TOP 100 CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, CN.[ControlNumber], PD.ExpectedAmount Amount
+	                        SELECT TOP 100 CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, O.Phone PhoneNumber, CN.[ControlNumber], PD.ExpectedAmount Amount
 	                        FROM tblControlNumber CN
 	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
 	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+                            LEFT OUTER JOIN tblOfficer O ON Code = @OfficerCode
 	                        WHERE CN.ControlNumber IS NOT NULL
 	                        AND PD.ProductCode = @ProductCode
 	                        AND P.OfficerCode IS NULL
@@ -409,11 +411,12 @@ namespace OpenImis.ePayment.Data
 	                        AND PD.ValidityTo IS NULL
 	                        AND P.ValidityTo IS NULL;
 
-	                        UPDATE P SET OfficerCode = @OfficerCode
+	                        UPDATE P SET OfficerCode = @OfficerCode, PhoneNumber = O.Phone
 	                        FROM @dt dt
 	                        INNER JOIN tblControlNumber CN ON dt.ControlNumberId = CN.ControlNumberID
 	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
 	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+                            LEFT OUTER JOIN tblOfficer O ON Code = @OfficerCode
 	                        WHERE CN.ControlNumber IS NOT NULL
 	                        AND PD.ProductCode = @ProductCode
 	                        AND P.OfficerCode IS NULL
@@ -421,7 +424,7 @@ namespace OpenImis.ePayment.Data
 	                        AND PD.ValidityTo IS NULL
 	                        AND P.ValidityTo IS NULL;
 
-	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, ControlNumber, Amount FROM @dt;
+	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, PhoneNumber, ControlNumber, Amount FROM @dt;
 
                         COMMIT TRANSACTION;";
 
@@ -441,6 +444,7 @@ namespace OpenImis.ePayment.Data
                     BillId = Convert.ToInt32(dr["BillId"]),
                     ProductCode = dr["ProductCode"].ToString(),
                     OfficerCode = dr["OfficerCode"].ToString(),
+                    PhoneNumber = dr["PhoneNumber"].ToString(),
                     ControlNumber = dr["ControlNumber"].ToString(),
                     Amount = (decimal)dr["Amount"],
                 };
