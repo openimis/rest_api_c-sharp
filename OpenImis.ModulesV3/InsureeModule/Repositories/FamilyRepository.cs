@@ -64,9 +64,11 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     response = imisContext.TblInsuree
                                         .Where(i => i.ValidityTo == null && i.FamilyId == familyId)
                                         .Join(imisContext.TblFamilies, i => i.FamilyId, f => f.FamilyId, (i, f) => f)
+                                        .Join(imisContext.TblFamilySMS, f => f.FamilyId, fsms => fsms.FamilyId, (f, fsms) => f)
                                         .Where(f => f.ValidityTo == null)
                                         .Include(f => f.TblInsuree)
                                             .ThenInclude(f => f.Photo)
+                                        .Include(f => f.TblFamilySMS)
                                         .Select(f => FamilyModel.FromTblFamilies(f))
                                         .FirstOrDefault();
                 }
