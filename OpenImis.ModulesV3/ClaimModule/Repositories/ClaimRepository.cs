@@ -207,7 +207,8 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                         {
                             lastName = x.LastName,
                             otherNames = x.OtherNames,
-                            claimAdminCode = x.ClaimAdminCode
+                            claimAdminCode = x.ClaimAdminCode,
+                            HFCode = x.Hf.Hfcode
                         }).ToList();
                 }
 
