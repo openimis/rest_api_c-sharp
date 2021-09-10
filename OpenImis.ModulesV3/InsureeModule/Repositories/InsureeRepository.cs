@@ -58,7 +58,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                         response.InsureeName = String.Join(' ', reader["OtherNames"].ToString()) + ' ' + reader["LastName"].ToString();
                                         response.CHFID = reader["CHFID"].ToString();
                                         response.PhotoPath = reader["PhotoPath"].ToString();
-                                        response.DOB = reader["DOB"].ToString();
+                                        response.DOB = (DateTime)reader["DOB"];// .ToString();
                                         response.Gender = reader["Gender"].ToString();
 
                                         firstValue = false;
@@ -127,7 +127,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                 select new GetInsureeModel()
                                 {
                                     CHFID = I.Chfid,
-                                    DOB = I.Dob.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                                    DOB = I.Dob,  //.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
                                     Gender = G.Gender,
                                     InsureeName = I.LastName + " " + I.OtherNames,
                                     PhotoPath = P.PhotoFolder + P.PhotoFileName

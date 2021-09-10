@@ -13,13 +13,13 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
         public string claim_administrator_code { get; set; }
         public ClaimStatus status_claim { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public string visit_date_from { get; set; }
+        public DateTime visit_date_from { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public string visit_date_to { get; set; }
+        public DateTime visit_date_to { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public string processed_date_from { get; set; }
+        public DateTime processed_date_from { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public string processed_date_to { get; set; }
+        public DateTime processed_date_to { get; set; }
     }
 
     public enum ClaimStatus

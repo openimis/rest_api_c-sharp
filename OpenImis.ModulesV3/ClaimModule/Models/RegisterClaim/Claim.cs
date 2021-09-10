@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
 {
@@ -11,16 +12,16 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
 
     public class ClaimDetails
     {
-        public string ClaimDate { get; set; }
+        public DateTime ClaimDate { get; set; }
         public string HFCode { get; set; }
         public string ClaimAdmin { get; set; }
         public string ClaimCode { get; set; }
         public string CHFID { get; set; }
-        public string StartDate { get; set; }
-        public string EndDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public string ICDCode { get; set; }
         public string Comment { get; set; }
-        public string Total { get; set; }
+        public decimal Total { get; set; }
         public string ICDCode1 { get; set; }
         public string ICDCode2 { get; set; }
         public string ICDCode3 { get; set; }
@@ -31,14 +32,14 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
     public class Item
     {
         public string ItemCode { get; set; }
-        public string ItemPrice { get; set; }
-        public string ItemQuantity { get; set; }
+        public decimal ItemPrice { get; set; }
+        public decimal ItemQuantity { get; set; }
     }
 
     public class Service
     {
         public string ServiceCode { get; set; }
-        public string ServicePrice { get; set; }
-        public string ServiceQuantity { get; set; }
+        public decimal ServicePrice { get; set; }
+        public decimal ServiceQuantity { get; set; }
     }
 }
