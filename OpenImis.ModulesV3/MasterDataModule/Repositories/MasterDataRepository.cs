@@ -202,7 +202,7 @@ namespace OpenImis.ModulesV3.MasterDataModule.Repositories
                         Phone = x.Phone,
                         LocationId = x.LocationId,
                         OfficerIDSubst = x.OfficerIdsubst.ToString(),
-                        WorksTo = x.WorksTo.GetValueOrDefault().ToString("yyyy-MM-dd")
+                        WorksTo = x.WorksTo.GetValueOrDefault()
                     })
                     .ToList();
             }
