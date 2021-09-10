@@ -289,7 +289,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                             .Where(r => r.TblItems.ValidityTo == null)
                             .Where(r => r.TblPlitemsDetail.PlitemId == PLItemID
                                 && r.TblPlitemsDetail.ValidityTo == null
-                                && (r.TblPlitemsDetail.ValidityFrom >= Convert.ToDateTime(model.last_update_date) || model.last_update_date == null))
+                                && (r.TblPlitemsDetail.ValidityFrom >= model.last_update_date || model.last_update_date == null))
                             .Select(x => new CodeNamePrice()
                             {
                                 code = x.TblItems.ItemCode,
@@ -305,7 +305,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                             .Where(r => r.TblServices.ValidityTo == null)
                             .Where(r => r.TblPlservicesDetail.PlserviceId == PLServiceID
                                 && r.TblPlservicesDetail.ValidityTo == null
-                                && (r.TblPlservicesDetail.ValidityFrom >= Convert.ToDateTime(model.last_update_date) || model.last_update_date == null))
+                                && (r.TblPlservicesDetail.ValidityFrom >= model.last_update_date || model.last_update_date == null))
                             .Select(x => new CodeNamePrice()
                             {
                                 code = x.TblServices.ServCode,
