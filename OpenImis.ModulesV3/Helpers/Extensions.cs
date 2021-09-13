@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenImis.ModulesV3.Utils;
+using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -22,7 +23,7 @@ namespace OpenImis.ModulesV3.Helpers
                 settings.Indent = true;
                 settings.OmitXmlDeclaration = true;
 
-                using (var writer = XmlWriter.Create(stringWriter, settings))
+                using (var writer = new ImisSPXmlWriter(stringWriter))
                 {
                     xmlserializer.Serialize(writer, value, emptyNs);
                     return stringWriter.ToString();

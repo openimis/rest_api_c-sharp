@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OpenImis.ModulesV3.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,15 +16,18 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
         public string patient_name { get; set; }
         public string main_dg { get; set; }
         public string claim_number { get; set; }
-        public string date_claimed { get; set; }
-        public string visit_date_from { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime? date_claimed { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime? visit_date_from { get; set; }
         public string visit_type { get; set; }
         public string claim_status { get; set; }
         public string sec_dg_1 { get; set; }
         public string sec_dg_2 { get; set; }
         public string sec_dg_3 { get; set; }
         public string sec_dg_4 { get; set; }
-        public string visit_date_to { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime? visit_date_to { get; set; }
         public decimal? claimed { get; set; }
         public decimal? approved { get; set; }
         public decimal? adjusted { get; set; }

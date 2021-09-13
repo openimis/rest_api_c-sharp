@@ -58,7 +58,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                         response.InsureeName = String.Join(' ', reader["OtherNames"].ToString()) + ' ' + reader["LastName"].ToString();
                                         response.CHFID = reader["CHFID"].ToString();
                                         response.PhotoPath = reader["PhotoPath"].ToString();
-                                        response.DOB = (DateTime)reader["DOB"];// .ToString();
+                                        response.DOB = DateTime.Parse(reader["DOB"].ToString());
                                         response.Gender = reader["Gender"].ToString();
 
                                         firstValue = false;
@@ -79,10 +79,10 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                         TotalSurgeriesLeft = reader["TotalSurgeriesLeft"].ToString().ToNullableDecimal(),
                                         TotalVisitsLeft = reader["TotalVisitsLeft"].ToString().ToNullableDecimal(),
                                         PolicyValue = reader["PolicyValue"].ToString().ToNullableDecimal(),
-                                        EffectiveDate = reader["EffectiveDate"].ToString(),
+                                        EffectiveDate = DateTime.Parse(reader["EffectiveDate"].ToString()),
                                         ProductCode = reader["ProductCode"].ToString(),
                                         ProductName = reader["ProductName"].ToString(),
-                                        ExpiryDate = reader["ExpiryDate"].ToString(),
+                                        ExpiryDate = DateTime.Parse(reader["ExpiryDate"].ToString()),
                                         Status = reader["Status"].ToString(),
                                         DedType = reader["DedType"].ToString().ToNullableFloat(),
                                         Ded1 = reader["Ded1"].ToString().ToNullableDecimal(),
@@ -127,7 +127,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                 select new GetInsureeModel()
                                 {
                                     CHFID = I.Chfid,
-                                    DOB = I.Dob,  //.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                                    DOB = I.Dob,
                                     Gender = G.Gender,
                                     InsureeName = I.LastName + " " + I.OtherNames,
                                     PhotoPath = P.PhotoFolder + P.PhotoFileName
