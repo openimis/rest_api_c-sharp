@@ -409,7 +409,8 @@ namespace OpenImis.ePayment.Data
 	                        AND P.OfficerCode IS NULL
 	                        AND CN.ValidityTo IS NULL
 	                        AND PD.ValidityTo IS NULL
-	                        AND P.ValidityTo IS NULL;
+	                        AND P.ValidityTo IS NULL
+                            AND O.ValidityTo IS NULL;
 
 	                        UPDATE P SET OfficerCode = @OfficerCode, PhoneNumber = O.Phone
 	                        FROM @dt dt
@@ -422,7 +423,8 @@ namespace OpenImis.ePayment.Data
 	                        AND P.OfficerCode IS NULL
 	                        AND CN.ValidityTo IS NULL
 	                        AND PD.ValidityTo IS NULL
-	                        AND P.ValidityTo IS NULL;
+	                        AND P.ValidityTo IS NULL
+                            AND O.ValidityTo IS NULL;
 
 	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, PhoneNumber, ControlNumber, Amount FROM @dt;
 
