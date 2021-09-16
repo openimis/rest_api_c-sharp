@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OpenImis.ModulesV3.Utils;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +9,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
     public class DetailModel
     {
         public string ProductName { get; set; }
-        public string ExpiryDate { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime ExpiryDate { get; set; }
         public string Status { get; set; }
         public float? DedType { get; set; }
         public decimal? Ded1 { get; set; }
@@ -28,6 +31,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public decimal? TotalSurgeriesLeft { get; set; }
         public decimal? TotalVisitsLeft { get; set; }
         public decimal? PolicyValue { get; set; }
-        public string EffectiveDate { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime EffectiveDate { get; set; }
     }
 }

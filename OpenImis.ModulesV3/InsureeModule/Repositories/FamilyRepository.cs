@@ -256,13 +256,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                         using (var reader = cmd.ExecuteReader())
                         {
                             // Displaying errors in the Stored Procedure in Debug mode
-                            do
-                            {
-                                while (reader.Read())
-                                {
-                                    Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                                }
-                            } while (reader.NextResult());
+                            //do
+                            //{
+                            //    while (reader.Read())
+                            //    {
+                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                            //    }
+                            //} while (reader.NextResult());
                         }
                     }
 

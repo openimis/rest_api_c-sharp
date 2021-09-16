@@ -1,4 +1,6 @@
-﻿using OpenImis.ModulesV3.Helpers.Validators;
+﻿using Newtonsoft.Json;
+using OpenImis.ModulesV3.Helpers.Validators;
+using OpenImis.ModulesV3.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,13 +15,17 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
         public string claim_administrator_code { get; set; }
         public ClaimStatus status_claim { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public DateTime visit_date_from { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime? visit_date_from { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public DateTime visit_date_to { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime? visit_date_to { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public DateTime processed_date_from { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime? processed_date_from { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        public DateTime processed_date_to { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        public DateTime? processed_date_to { get; set; }
     }
 
     public enum ClaimStatus
