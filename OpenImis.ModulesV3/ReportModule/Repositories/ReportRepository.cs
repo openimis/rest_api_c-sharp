@@ -163,7 +163,7 @@ namespace OpenImis.ModulesV3.ReportModule.Repositories
             {
                 using (var imisContext = new ImisDB())
                 {
-                    var snapshotDateParameter = new SqlParameter("@SnapshotDate", snapshotRequestModel.SnapshotDate) { SqlDbType = SqlDbType.NVarChar, Size = 50 };
+                    var snapshotDateParameter = new SqlParameter("@SnapshotDate", snapshotRequestModel.SnapshotDate) { SqlDbType = SqlDbType.Date };
                     var officerIdParameter = new SqlParameter("@OfficerId", officerId);
 
                     var sql = "SELECT Active, Expired, Idle, Suspended FROM udfGetSnapshotIndicators(@SnapshotDate,@OfficerId)";
@@ -225,8 +225,8 @@ namespace OpenImis.ModulesV3.ReportModule.Repositories
             {
                 using (var imisContext = new ImisDB())
                 {
-                    var dateFromParameter = new SqlParameter("@DateFrom", cumulativeIndicatorsRequestModel.FromDate) { SqlDbType = SqlDbType.NVarChar, Size = 50 };
-                    var dateToParameter = new SqlParameter("@DateTo", cumulativeIndicatorsRequestModel.ToDate) { SqlDbType = SqlDbType.NVarChar, Size = 50 };
+                    var dateFromParameter = new SqlParameter("@DateFrom", cumulativeIndicatorsRequestModel.FromDate) { SqlDbType = SqlDbType.Date};
+                    var dateToParameter = new SqlParameter("@DateTo", cumulativeIndicatorsRequestModel.ToDate) { SqlDbType = SqlDbType.Date};
                     var officerIdParameter = new SqlParameter("@OfficerId", officerId);
 
                     var sql = "SELECT " +

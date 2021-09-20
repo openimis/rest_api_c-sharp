@@ -16,7 +16,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
         public string VillageName { get; set; }
-        public string RenewalPromptDate { get; set; }
+        public DateTime RenewalPromptDate { get; set; }
         public string Phone { get; set; }
         public Guid RenewalUUID { get; set; }
     }

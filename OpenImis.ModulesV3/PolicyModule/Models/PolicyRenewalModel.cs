@@ -12,7 +12,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
         public string ReceiptNo { get; set; }
         public string ProductCode { get; set; }
         public float Amount { get; set; }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         public bool Discontinue { get; set; }
         public int PayerId { get; set; }
 

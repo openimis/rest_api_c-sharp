@@ -69,7 +69,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                                         ProductCode = reader["ProductCode"].ToString(),
                                         ProductName = reader["ProductName"].ToString(),
                                         VillageName = reader["VillageName"].ToString(),
-                                        RenewalPromptDate = reader["RenewalPromptDate"].ToString(),
+                                        RenewalPromptDate = (DateTime)reader["RenewalPromptDate"],
                                         Phone = reader["Phone"].ToString(),
                                         RenewalUUID = GetRenewalUUIDById(int.Parse(reader["RenewalId"].ToString()))
                                     });
