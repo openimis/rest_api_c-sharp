@@ -6,6 +6,6 @@ namespace OpenImis.ModulesV3.ReportModule.Models
 {
     public class SnapshotRequestModel
     {
-        public string SnapshotDate { get; set; }
+        public DateTime SnapshotDate { get; set; }
     }
 }
