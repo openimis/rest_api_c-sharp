@@ -6,7 +6,7 @@ namespace OpenImis.ModulesV3.ReportModule.Models
 {
     public class IndicatorRequestModel
     {
-        public string FromDate { get; set; }
-        public string ToDate { get; set; }
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
     }
 }
