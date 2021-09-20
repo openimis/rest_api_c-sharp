@@ -10,6 +10,6 @@ namespace OpenImis.ModulesV3.FeedbackModule.Models
         public int ClaimID { get; set; }
         public string CHFID { get; set; }
         public string Answers { get; set; }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
     }
 }
