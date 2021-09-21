@@ -377,8 +377,77 @@ namespace OpenImis.ePayment.Data
             string accountCode = gepg.GetAccountCodeByProductCode(model.ProductCode);
 
             var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, accountCode, "default.sp.in");
+
+            // if the response is not 7101(SUCCESS) then delete all the entries from DB
+            if (!billAck.Contains("7101"))
+            {
+                _ = DeleteFailedControlNumberRequests(bills);
+            }
+
             return billAck;
         }
+
+        private async Task<bool> DeleteFailedControlNumberRequests(string generatedBills)
+        {
+            try
+            {
+                var xmlSerializer = new XmlSerializer(typeof(gepgBillSubReq));
+                using (var textReader = new StringReader(generatedBills))
+                {
+                    var bills = (gepgBillSubReq)xmlSerializer.Deserialize(textReader);
+
+                    var dt = new DataTable();
+                    dt.Columns.Add("BillId");
+                    dt.Columns.Add("ProdId");
+                    dt.Columns.Add("OfficerId");
+                    dt.Columns.Add("Amount");
+
+
+                    foreach (var bill in bills.BillTrxInf)
+                    {
+                        dt.Rows.Add(new object[] { bill.BillId, 0, 0, 0 });
+                    }
+
+                    var sSQL = @"DELETE CN 
+                                    FROM tblControlNumber CN
+                                    INNER JOIN @dtBills dt ON CN.PaymentID = dt.BillId
+                                    WHERE ControlNumber IS NULL;
+
+                                    DELETE PD
+                                    FROM tblPaymentDetails PD 
+                                    LEFT OUTER JOIN tblControlNumber CN ON PD.PaymentId = CN.PaymentId
+                                    INNER JOIN @dtBills dt ON PD.PaymentID = dt.BillId
+                                    WHERE CN.ControlNumber IS NULL 
+
+                                    DELETE P
+                                    FROM tblPayment P 
+                                    LEFT OUTER JOIN tblControlNumber CN ON P.PaymentId = CN.PaymentId
+                                    INNER JOIN @dtBills dt ON P.PaymentID = dt.BillId
+                                    WHERE CN.ControlNumber IS NULL;";
+
+                    var dh = new DataHelper(config);
+
+                    SqlParameter[] parameters = {
+                        new SqlParameter("@dtBills", dt)
+                        {
+                            SqlDbType = SqlDbType.Structured,
+                            TypeName = "dbo.xBulkControlNumbers"
+                        }
+                    };
+
+                    await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
+
+
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
 
         public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
         {
