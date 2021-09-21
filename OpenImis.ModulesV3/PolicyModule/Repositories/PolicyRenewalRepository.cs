@@ -13,6 +13,7 @@ using System.Linq;
 using System.Xml;
 using System;
 using System.Diagnostics;
+using OpenImis.ePayment.Data;
 
 namespace OpenImis.ModulesV3.PolicyModule.Repositories
 {
@@ -69,7 +70,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                                         ProductCode = reader["ProductCode"].ToString(),
                                         ProductName = reader["ProductName"].ToString(),
                                         VillageName = reader["VillageName"].ToString(),
-                                        RenewalPromptDate = (DateTime)reader["RenewalPromptDate"],
+                                        RenewalPromptDate = DateTime.Parse(reader["RenewalPromptDate"].ToStringWithDBNull()),
                                         Phone = reader["Phone"].ToString(),
                                         RenewalUUID = GetRenewalUUIDById(int.Parse(reader["RenewalId"].ToString()))
                                     });
@@ -104,7 +105,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                 var fromPhoneRenewalDir = _configuration["AppSettings:FromPhone_Renewal"] + Path.DirectorySeparatorChar;
                 var fromPhoneRenewalRejectedDir = _configuration["AppSettings:FromPhone_Renewal_Rejected"] + Path.DirectorySeparatorChar;
 
-                var fileName = "RenPol_" + policy.Date + "_" + policy.CHFID + "_" + policy.ReceiptNo + ".xml";
+                var fileName = "RenPol_" + policy.Date.ToString() + "_" + policy.CHFID + "_" + policy.ReceiptNo + ".xml";
 
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
