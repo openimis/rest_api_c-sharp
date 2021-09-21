@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenImis.DB.SqlServer\OpenImis.DB.SqlServer.csproj" />
+    <ProjectReference Include="..\OpenImis.ePayment\OpenImis.ePayment.csproj" />
     <ProjectReference Include="..\OpenImis.Security\OpenImis.Security.csproj" />
   </ItemGroup>
 

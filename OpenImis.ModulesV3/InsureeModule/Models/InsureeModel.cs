@@ -1,4 +1,5 @@
-﻿using OpenImis.DB.SqlServer;
+﻿using Newtonsoft.Json;
+using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV3.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public string CHFID { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
         public DateTime DOB { get; set; }
         public string Gender { get; set; }
         public string Marital { get; set; }
@@ -50,7 +52,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
                 CHFID = tblInsuree.Chfid,
                 LastName = tblInsuree.LastName,
                 OtherNames = tblInsuree.OtherNames,
-                DOB = tblInsuree.Dob,
+                DOB = (DateTime)tblInsuree.Dob,
                 IsHead = tblInsuree.IsHead,
                 Phone = tblInsuree.Phone,
                 Gender = tblInsuree.Gender,

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OpenImis.ModulesV3.Utils;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,6 +13,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public string CHFID { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
+
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
         public DateTime? DOB { get; set; }
         public string Gender { get; set; }
         public string Marital { get; set; }
