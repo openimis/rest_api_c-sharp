@@ -14,5 +14,6 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
         public DateTime DOB { get; set; }
         public string Gender { get; set; }
+        public string PhotoBase64 { get; set; }
     }
 }
