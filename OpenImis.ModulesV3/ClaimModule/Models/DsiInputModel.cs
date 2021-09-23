@@ -1,5 +1,7 @@
 ﻿
+using Newtonsoft.Json;
 using OpenImis.ModulesV3.Helpers.Validators;
+using OpenImis.ModulesV3.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,6 +12,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
 {
     public class DsiInputModel
     {
+        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
         public DateTime last_update_date { get; set; }
     }
 }
