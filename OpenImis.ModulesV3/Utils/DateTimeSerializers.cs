@@ -11,7 +11,6 @@ namespace OpenImis.ModulesV3.Utils
     {
         public static CultureInfo cultureInfo = CultureInfo.InvariantCulture;
         public const string IsoDateOnlyFormat = "yyyy-MM-dd";
-        public const string ImisSPFormat = "dd/MM/yyyy";
     }
 
     public class CustomFormatDatetimeSerializer : JsonConverter<DateTime>
@@ -53,7 +52,7 @@ namespace OpenImis.ModulesV3.Utils
             DateTime dt;
 
             if (DateTime.TryParse(data, out dt))
-                base.WriteRaw(dt.ToString(DateTimeFormats.ImisSPFormat, DateTimeFormats.cultureInfo));
+                base.WriteRaw(dt.ToString(DateTimeFormats.IsoDateOnlyFormat, DateTimeFormats.cultureInfo));
             else
                 base.WriteRaw(data);
         }
