@@ -14,6 +14,7 @@ using System.Xml;
 using System;
 using System.Diagnostics;
 using OpenImis.ePayment.Data;
+using OpenImis.ModulesV3.Utils;
 
 namespace OpenImis.ModulesV3.PolicyModule.Repositories
 {
@@ -105,7 +106,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                 var fromPhoneRenewalDir = _configuration["AppSettings:FromPhone_Renewal"] + Path.DirectorySeparatorChar;
                 var fromPhoneRenewalRejectedDir = _configuration["AppSettings:FromPhone_Renewal_Rejected"] + Path.DirectorySeparatorChar;
 
-                var fileName = "RenPol_" + policy.Date.ToString() + "_" + policy.CHFID + "_" + policy.ReceiptNo + ".xml";
+                var fileName = "RenPol_" + policy.Date.ToString(DateTimeFormats.FileNameDateTimeFormat) + "_" + policy.CHFID + "_" + policy.ReceiptNo + ".xml";
 
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
