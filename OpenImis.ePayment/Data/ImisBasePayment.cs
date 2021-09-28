@@ -1008,5 +1008,11 @@ namespace OpenImis.ePayment.Data
         {
             return 0;
         }
+
+
+        public int CreatePremium(int paymentId)
+        {
+            return 0;
+        }
     }
 }

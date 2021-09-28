@@ -83,7 +83,7 @@ namespace OpenImis.ePayment.Formaters
             content = this.getContent(body, this.type.Name);
             signature = this.getSignature(body, "gepgSignature");
 
-            hasValidSignature = signatureValidator.VerifyData(content, signature);
+            // hasValidSignature = signatureValidator.VerifyData(content, signature);
             
             //get the billId/paymentId from request body - from <BillId> node
             if (this.type.Name != "gepgSpReconcResp")

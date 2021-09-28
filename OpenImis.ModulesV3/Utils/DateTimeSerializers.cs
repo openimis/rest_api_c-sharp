@@ -53,7 +53,7 @@ namespace OpenImis.ModulesV3.Utils
             DateTime dt;
 
             if (DateTime.TryParse(data, out dt))
-                base.WriteRaw(dt.ToString(DateTimeFormats.ImisSPFormat, DateTimeFormats.cultureInfo));
+                base.WriteRaw(dt.ToString(DateTimeFormats.IsoDateOnlyFormat, DateTimeFormats.cultureInfo));
             else
                 base.WriteRaw(data);
         }
