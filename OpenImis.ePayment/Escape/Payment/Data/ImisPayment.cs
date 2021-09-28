@@ -610,7 +610,7 @@ namespace OpenImis.ePayment.Data
 	                        UPDATE PL SET PolicyStatus = 2, EffectiveDate = dt.PayDate
 	                        FROM tblPolicy PL 
 	                        INNER JOIN @tblPremiums dt ON PL.PolicyID = dt.PolicyId
-	                        WHERE PL.ValidityTo IS NULL
+	                        WHERE PL.ValidityTo IS NULL;
 
 	                        INSERT INTO tblInsureePolicy(InsureeId, PolicyId, EnrollmentDate, StartDate, EffectiveDate,ExpiryDate, ValidityFrom, AuditUserId, isOffline)
 	                        SELECT I.InsureeID, PL.PolicyID, PL.EnrollDate, PL.StartDate, PL.EffectiveDate, PL.ExpiryDate, GETDATE() ValidityFrom, -1 AuditUserId, 0 IsOffline 
@@ -618,7 +618,13 @@ namespace OpenImis.ePayment.Data
 	                        INNER JOIN @tblPremiums dt ON PL.PolicyID = dt.PolicyId
 	                        INNER JOIN tblInsuree I ON PL.FamilyID = I.FamilyID
 	                        WHERE PL.ValidityTo IS NULL
-	                        AND I.ValidityTo IS NULL
+	                        AND I.ValidityTo IS NULL;
+
+
+                            UPDATE tblPaymentDetails 
+	                        SET PremiumID = (SELECT TOP 1 PremiumID FROM @tblPremiums)
+	                        WHERE PaymentID = @PaymentId;
+
                         END
                         
                         SELECT PremiumId FROM @tblPremiums";
