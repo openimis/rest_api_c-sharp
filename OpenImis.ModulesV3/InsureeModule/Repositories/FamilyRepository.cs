@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Text;
 using OpenImis.ModulesV3.InsureeModule.Repositories;
 using OpenImis.DB.SqlServer.DataHelper;
+using OpenImis.ModulesV3.Utils;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
 {
@@ -190,8 +191,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                 var hof = enrollFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
-                var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
-                var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
+                var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
+                var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
 
                 var xmldoc = new XmlDocument();
                 xmldoc.InnerXml = XML;
