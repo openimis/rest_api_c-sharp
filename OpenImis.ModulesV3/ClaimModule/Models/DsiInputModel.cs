@@ -13,6 +13,6 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
     public class DsiInputModel
     {
         [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
-        public DateTime last_update_date { get; set; }
+        public DateTime? last_update_date { get; set; }
     }
 }
