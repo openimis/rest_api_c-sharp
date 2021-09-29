@@ -10,8 +10,10 @@ namespace OpenImis.ModulesV3.Utils
     public static class DateTimeFormats
     {
         public static CultureInfo cultureInfo = CultureInfo.InvariantCulture;
-        public const string IsoDateOnlyFormat = "yyyy-MM-dd";
-        public const string ImisSPFormat = "dd/MM/yyyy";
+        public const string IsoDateFormat = "yyyy-MM-dd";
+        public const string IsoDateTimeFormat = "yyyy-MM-ddTHH:mm:ss";
+        public const string FileNameDateTimeFormat = "yyyy-MM-ddTHH-mm-ss";
+
     }
 
     public class CustomFormatDatetimeSerializer : JsonConverter<DateTime>
@@ -36,7 +38,7 @@ namespace OpenImis.ModulesV3.Utils
 
     public class IsoDateOnlyDatetimeSerializer : CustomFormatDatetimeSerializer
     {
-        public IsoDateOnlyDatetimeSerializer() : base(DateTimeFormats.IsoDateOnlyFormat)
+        public IsoDateOnlyDatetimeSerializer() : base(DateTimeFormats.IsoDateFormat)
         {
         }
     }
