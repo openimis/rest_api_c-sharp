@@ -573,7 +573,11 @@ namespace OpenImis.ePayment.Data
             var sSQL = @"IF EXISTS(SELECT 1 
 			            FROM tblInsuree I
 			            INNER JOIN tblPaymentDetails PD ON I.CHFID = PD.InsuranceNumber
-			            WHERE PaymentId = @PaymentId) 
+						INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+			            WHERE P.PaymentId = @PaymentId
+						AND P.PaymentStatus = 4
+						AND PD.Amount > 0
+						AND I.ValidityTo IS NULL) 
                         BEGIN
                             DECLARE @tblPremiums TABLE(PremiumId INT, PolicyId INT, PayDate DATETIME)
 
