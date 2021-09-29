@@ -604,7 +604,7 @@ namespace OpenImis.ePayment.Data
 		                            @PolicyValue DECIMAL(18, 2),
                                     @PremiumId INT = 0;
 
-                            SELECT TOP 1 @PremiumId PremiumID FROM @tblPremiums;
+                            SELECT TOP 1 @PremiumId = PremiumID FROM @tblPremiums;
 
                             SELECT @TotalPremium = SUM(PR.Amount) OVER(ORDER BY Pr.Amount), @PolicyValue = PL.PolicyValue
                             FROM tblPremium PR
@@ -632,9 +632,11 @@ namespace OpenImis.ePayment.Data
 
 
 
-                                UPDATE tblPaymentDetails 
-	                            SET PremiumID = @PremiumId
-	                            WHERE PaymentID = @PaymentId;
+                                UPDATE PD
+	                            SET PremiumID = @PremiumId, Amount = P.ReceivedAmount
+	                            FROM tblPaymentDetails PD 
+	                            INNER JOIN tblPayment P ON PD.PaymentID = PD.PaymentID
+	                            WHERE PD.PaymentID = @PaymentId;
 
                                 UPDATE tblPayment 
                                 SET MatchedDate = GETDATE()
