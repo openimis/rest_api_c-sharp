@@ -570,64 +570,78 @@ namespace OpenImis.ePayment.Data
 
         public int CreatePremium(int paymentId)
         {
-            var sSQL = @"DECLARE @tblPremiums TABLE(PremiumId INT, PolicyId INT, PayDate DATETIME)
-
-                        INSERT INTO tblPremium(PolicyID, PayerID, Amount, Receipt, PayDate, PayType, ValidityFrom, AuditUserID, isOffline, isPhotoFee)
-                        OUTPUT inserted.PremiumID, inserted.PolicyID, inserted.PayDate INTO @tblPremiums(PremiumId, PolicyId, PayDate)
-                        SELECT PL.PolicyID, NULL PayerId, P.ReceivedAmount Amount, P.ReceiptNo Receipt, P.PaymentDate PayDate, N'M' PayType, GETDATE() ValidityFrom, -1 AuditUserId, 0 IsOffline, 0 IsPhotoFee
-                        FROM tblControlNumber CN
-                        INNER JOIN tblPayment P ON CN.PaymentID = P.PaymentID
-                        INNER JOIN tblPaymentDetails PD ON P.PaymentID  = PD.PaymentID
-                        INNER JOIN tblInsuree I ON I.CHFID = PD.InsuranceNumber
-                        INNER JOIN tblOfficer O ON P.OfficerCode = O.Code
-                        INNER JOIN tblPolicy PL ON PL.FamilyID = I.FamilyID 
-						                        AND PD.PolicyStage = PL.PolicyStage
-                        INNER JOIN tblProduct Prod ON PL.ProdID = Prod.ProdID 
-						                        AND PD.ProductCode = Prod.ProductCode
-                        WHERE P.PaymentID = @PaymentId
-                        AND PL.PolicyStatus = 1
-                        AND PD.PremiumID IS NULL
-                        AND CN.ValidityTo IS NULL
-                        AND P.ValidityTo IS NULL
-                        AND PD.ValidityTo IS NULL
-                        AND I.ValidityTo IS NULL
-                        AND PL.ValidityTo IS NULL
-                        AND Prod.ValidityTo IS NULL
-                        AND O.ValidityTo IS NULL;
-
-                        DECLARE @TotalPremium DECIMAL(18, 2),
-		                        @PolicyValue DECIMAL(18, 2)
-
-                        SELECT @TotalPremium = SUM(PR.Amount) OVER(ORDER BY Pr.Amount), @PolicyValue = PL.PolicyValue
-                        FROM tblPremium PR
-                        INNER JOIN @tblPremiums dt ON PR.PolicyID = dt.PolicyID
-                        INNER JOIN tblPolicy PL ON PR.PolicyID = PL.PolicyID
-                        WHERE PR.ValidityTo IS NULL
-                        AND PL.ValidityTo IS NULL
-
-                        IF @TotalPremium >= @PolicyValue
+            var sSQL = @"IF EXISTS(SELECT 1 
+			            FROM tblInsuree I
+			            INNER JOIN tblPaymentDetails PD ON I.CHFID = PD.InsuranceNumber
+			            WHERE PaymentId = @PaymentId) 
                         BEGIN
-	                        UPDATE PL SET PolicyStatus = 2, EffectiveDate = dt.PayDate
-	                        FROM tblPolicy PL 
-	                        INNER JOIN @tblPremiums dt ON PL.PolicyID = dt.PolicyId
-	                        WHERE PL.ValidityTo IS NULL;
+                            DECLARE @tblPremiums TABLE(PremiumId INT, PolicyId INT, PayDate DATETIME)
 
-	                        INSERT INTO tblInsureePolicy(InsureeId, PolicyId, EnrollmentDate, StartDate, EffectiveDate,ExpiryDate, ValidityFrom, AuditUserId, isOffline)
-	                        SELECT I.InsureeID, PL.PolicyID, PL.EnrollDate, PL.StartDate, PL.EffectiveDate, PL.ExpiryDate, GETDATE() ValidityFrom, -1 AuditUserId, 0 IsOffline 
-	                        FROM tblPolicy PL
-	                        INNER JOIN @tblPremiums dt ON PL.PolicyID = dt.PolicyId
-	                        INNER JOIN tblInsuree I ON PL.FamilyID = I.FamilyID
-	                        WHERE PL.ValidityTo IS NULL
-	                        AND I.ValidityTo IS NULL;
+                            INSERT INTO tblPremium(PolicyID, PayerID, Amount, Receipt, PayDate, PayType, ValidityFrom, AuditUserID, isOffline, isPhotoFee)
+                            OUTPUT inserted.PremiumID, inserted.PolicyID, inserted.PayDate INTO @tblPremiums(PremiumId, PolicyId, PayDate)
+                            SELECT PL.PolicyID, NULL PayerId, P.ReceivedAmount Amount, P.ReceiptNo Receipt, P.PaymentDate PayDate, N'M' PayType, GETDATE() ValidityFrom, -1 AuditUserId, 0 IsOffline, 0 IsPhotoFee
+                            FROM tblControlNumber CN
+                            INNER JOIN tblPayment P ON CN.PaymentID = P.PaymentID
+                            INNER JOIN tblPaymentDetails PD ON P.PaymentID  = PD.PaymentID
+                            INNER JOIN tblInsuree I ON I.CHFID = PD.InsuranceNumber
+                            INNER JOIN tblOfficer O ON P.OfficerCode = O.Code
+                            INNER JOIN tblPolicy PL ON PL.FamilyID = I.FamilyID 
+						                            AND PD.PolicyStage = PL.PolicyStage
+                            INNER JOIN tblProduct Prod ON PL.ProdID = Prod.ProdID 
+						                            AND PD.ProductCode = Prod.ProductCode
+                            WHERE P.PaymentID = @PaymentId
+                            AND PL.PolicyStatus = 1
+                            AND PD.PremiumID IS NULL
+                            AND CN.ValidityTo IS NULL
+                            AND P.ValidityTo IS NULL
+                            AND PD.ValidityTo IS NULL
+                            AND I.ValidityTo IS NULL
+                            AND PL.ValidityTo IS NULL
+                            AND Prod.ValidityTo IS NULL
+                            AND O.ValidityTo IS NULL;
+
+                            DECLARE @TotalPremium DECIMAL(18, 2),
+		                            @PolicyValue DECIMAL(18, 2),
+                                    @PremiumId INT = 0;
+
+                            SELECT TOP 1 @PremiumId PremiumID FROM @tblPremiums;
+
+                            SELECT @TotalPremium = SUM(PR.Amount) OVER(ORDER BY Pr.Amount), @PolicyValue = PL.PolicyValue
+                            FROM tblPremium PR
+                            INNER JOIN @tblPremiums dt ON PR.PolicyID = dt.PolicyID
+                            INNER JOIN tblPolicy PL ON PR.PolicyID = PL.PolicyID
+                            WHERE PR.ValidityTo IS NULL
+                            AND PL.ValidityTo IS NULL
+
+                            IF @TotalPremium >= @PolicyValue
+                            BEGIN
+	                            UPDATE PL SET PolicyStatus = 2, EffectiveDate = dt.PayDate
+	                            FROM tblPolicy PL 
+	                            INNER JOIN @tblPremiums dt ON PL.PolicyID = dt.PolicyId
+	                            WHERE PL.ValidityTo IS NULL;
+
+	                            INSERT INTO tblInsureePolicy(InsureeId, PolicyId, EnrollmentDate, StartDate, EffectiveDate,ExpiryDate, ValidityFrom, AuditUserId, isOffline)
+	                            SELECT I.InsureeID, PL.PolicyID, PL.EnrollDate, PL.StartDate, PL.EffectiveDate, PL.ExpiryDate, GETDATE() ValidityFrom, -1 AuditUserId, 0 IsOffline 
+	                            FROM tblPolicy PL
+	                            INNER JOIN @tblPremiums dt ON PL.PolicyID = dt.PolicyId
+	                            INNER JOIN tblInsuree I ON PL.FamilyID = I.FamilyID
+	                            WHERE PL.ValidityTo IS NULL
+	                            AND I.ValidityTo IS NULL;
 
 
-                            UPDATE tblPaymentDetails 
-	                        SET PremiumID = (SELECT TOP 1 PremiumID FROM @tblPremiums)
-	                        WHERE PaymentID = @PaymentId;
+                                UPDATE tblPaymentDetails 
+	                            SET PremiumID = @PremiumId
+	                            WHERE PaymentID = @PaymentId;
 
-                        END
+                                UPDATE tblPayment 
+                                SET MatchedDate = GETDATE()
+                                WHERE PaymentID = @PaymentId;
+
+                            END
                         
-                        SELECT PremiumId FROM @tblPremiums";
+                            SELECT PremiumId FROM @tblPremiums
+
+                        END";
 
             var dh = new DataHelper(config);
 
@@ -637,7 +651,7 @@ namespace OpenImis.ePayment.Data
 
             var dt = dh.GetDataTable(sSQL, parameters, CommandType.Text);
 
-            if (dt.Rows.Count > 0)
+            if (dt != null && dt.Rows.Count > 0)
                 return (int)dt.Rows[0]["PremiumId"];
 
             return 0;
