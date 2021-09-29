@@ -194,6 +194,10 @@ namespace OpenImis.ePayment.Logic
 
             if (payment.PaymentId != 0)
             {
+
+                if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived") & response.Code == 0)
+                    CreatePremium(payment.PaymentId);
+
                 SendPaymentConfirmationSms(model, payment);
             }
 
@@ -608,6 +612,10 @@ namespace OpenImis.ePayment.Logic
             return imisPayment.ControlNumbersToBeRequested(productCode);
         }
 
-
+        public int CreatePremium(int paymentId)
+        {
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            return imisPayment.CreatePremium(paymentId);
+        }
     }
 }

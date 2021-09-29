@@ -18,6 +18,8 @@ using System.Diagnostics;
 using System.Text;
 using OpenImis.ModulesV3.InsureeModule.Repositories;
 using OpenImis.DB.SqlServer.DataHelper;
+using OpenImis.ePayment.Logic;
+using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
@@ -295,13 +297,19 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 }
 
 
+                
                 var newFamily = new NewFamilyResponse();
                 newFamily.Response = RV;
                 if (RV == 0)
                 {
                     newFamily = CreateEnrollResponse(model);
+
                     // Update the control number
                     newFamily.Response = UpdateControlNumber(model, newFamily);
+
+                    // Create Premium
+                    CreatePremium(model);
+
 
                 }
 
@@ -397,7 +405,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                     try
                     {
-                        var dh = new DataHelper(_configuration);
+                        var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
                         dh.Execute(sSQL, parameters, CommandType.Text);
                     }
                     catch (Exception)
@@ -409,6 +417,25 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 }
             }
             return 0;
+        }
+
+        public void CreatePremium(EnrollFamilyModel model)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            PaymentLogic paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+
+            if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
+            {
+                foreach (var family in model.Family)
+                {
+                    foreach (var policy in family.Policies)
+                    {
+                        int paymentId = payment.GetPaymentId(policy.ControlNumber);
+                        _ = paymentLogic.CreatePremium(paymentId);
+                    }
+                }
+
+            }
         }
 
     }
