@@ -20,7 +20,8 @@ namespace OpenImis.RestApi
             InvalidICDCode,
             InvalidItem,
             InvalidService,
-            InvalidClaimAdmin
+            InvalidClaimAdmin,
+            UnexpectedException = 2999
         }
     }
 }
