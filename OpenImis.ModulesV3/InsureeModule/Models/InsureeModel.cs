@@ -36,6 +36,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public string IdentificationTypes { get; set; }
         public bool IsOffline { get; set; }
         public bool Vulnerability { get; set; }
+        public string PhotoBase64 { get; set; }
 
         public static InsureeModel FromTblInsuree(TblInsuree tblInsuree)
         {
