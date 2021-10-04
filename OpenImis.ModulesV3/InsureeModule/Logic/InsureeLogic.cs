@@ -24,20 +24,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
 
             response = insureeRepository.GetEnquire(chfid);
 
-            if (!String.IsNullOrEmpty(response.PhotoPath))
-            {
-                var photoFolder = _configuration.GetValue<string>("AppSettings:UpdatedFolder");
-
-                var startIndex = response.PhotoPath.LastIndexOf("\\");
-                var fileName = response.PhotoPath.Substring(startIndex);
-                var fileFullPath = Path.Join(photoFolder, fileName);
-
-                if (File.Exists(fileFullPath))
-                {
-                    var base64 = Convert.ToBase64String(File.ReadAllBytes(fileFullPath));
-                    response.PhotoBase64 = base64;
-                }
-            }
+            response.PhotoBase64 = CreateBase64ImageFromFilepath(response.PhotoPath);
 
             return response;
         }
@@ -49,6 +36,25 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
             response = insureeRepository.Get(chfid);
 
             return response;
+        }
+
+        public string CreateBase64ImageFromFilepath(string path)
+        {
+            var base64 = "";
+            if (!String.IsNullOrEmpty(path))
+            {
+                var photoFolder = _configuration.GetValue<string>("AppSettings:UpdatedFolder");
+
+                var startIndex = path.LastIndexOf("\\") ==  -1 ? 0 : path.LastIndexOf("\\");
+                var fileName = path.Substring(startIndex);
+                var fileFullPath = Path.Join(photoFolder, fileName);
+
+                if (File.Exists(fileFullPath))
+                {
+                    base64 = Convert.ToBase64String(File.ReadAllBytes(fileFullPath));
+                }
+            }
+            return base64;
         }
     }
 }

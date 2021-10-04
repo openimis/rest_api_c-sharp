@@ -21,6 +21,7 @@ using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ePayment.Logic;
 using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
+using OpenImis.ModulesV3.InsureeModule.Logic;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
 {
@@ -79,6 +80,12 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 if (response == null)
                 {
                     return null;
+                }
+
+                foreach (var insure in response.Insurees)
+                {
+                    var insureeLogic = new InsureeLogic(_configuration);
+                    insure.PhotoBase64 = insureeLogic.CreateBase64ImageFromFilepath(insure.PhotoPath);
                 }
 
                 return response;
