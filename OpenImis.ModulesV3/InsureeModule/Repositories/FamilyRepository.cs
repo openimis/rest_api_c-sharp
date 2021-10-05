@@ -21,6 +21,7 @@ using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ePayment.Logic;
 using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
+using OpenImis.ModulesV3.InsureeModule.Logic;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
 {
@@ -72,11 +73,6 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                     .Include(f => f.TblFamilySMS)
                                     .Select(f => FamilyModel.FromTblFamilies(f))
                                     .FirstOrDefault();
-            }
-
-            if (response == null)
-            {
-                return null;
             }
 
             return response;

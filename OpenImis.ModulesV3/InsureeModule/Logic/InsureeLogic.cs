@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using OpenImis.ModulesV3.InsureeModule.Models;
 using OpenImis.ModulesV3.InsureeModule.Repositories;
+using OpenImis.ModulesV3.Utils;
 using System;
 using System.IO;
 
@@ -24,20 +25,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
 
             response = insureeRepository.GetEnquire(chfid);
 
-            if (!String.IsNullOrEmpty(response.PhotoPath))
-            {
-                var photoFolder = _configuration.GetValue<string>("AppSettings:UpdatedFolder");
-
-                var startIndex = response.PhotoPath.LastIndexOf("\\");
-                var fileName = response.PhotoPath.Substring(startIndex);
-                var fileFullPath = Path.Join(photoFolder, fileName);
-
-                if (File.Exists(fileFullPath))
-                {
-                    var base64 = Convert.ToBase64String(File.ReadAllBytes(fileFullPath));
-                    response.PhotoBase64 = base64;
-                }
-            }
+            response.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(_configuration.GetValue<string>("AppSettings:UpdatedFolder"), response.PhotoPath);
 
             return response;
         }

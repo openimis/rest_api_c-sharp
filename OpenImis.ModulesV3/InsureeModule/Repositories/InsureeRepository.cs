@@ -118,8 +118,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                 Gender = G.Gender,
                                 InsureeName = I.LastName + " " + I.OtherNames,
                                 PhotoPath = P.PhotoFolder + P.PhotoFileName
-                            })
-                         .FirstOrDefault();
+                            }).FirstOrDefault();
             }
 
             return response;
