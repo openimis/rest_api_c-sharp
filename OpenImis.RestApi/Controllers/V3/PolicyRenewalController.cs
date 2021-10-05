@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.PolicyModule.Models;
 using OpenImis.ModulesV3.Utils;
+using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V3
@@ -18,10 +20,12 @@ namespace OpenImis.RestApi.Controllers.V3
     public class PolicyRenewalController : Controller
     {
         private readonly IImisModules _imisModules;
+        private readonly ILogger _logger;
 
-        public PolicyRenewalController(IImisModules imisModules)
+        public PolicyRenewalController(IImisModules imisModules, ILoggerFactory loggerFactory)
         {
             _imisModules = imisModules;
+            _logger = loggerFactory.CreateLogger<PolicyRenewalController>();
         }
 
         [HasRights(Rights.PolicySearch)]
@@ -41,7 +45,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             return Ok(response);
@@ -50,7 +54,7 @@ namespace OpenImis.RestApi.Controllers.V3
         [HasRights(Rights.PolicyRenew)]
         [HttpPost]
         [Route("renew")]
-        public IActionResult Post([FromBody]PolicyRenewalModel model)
+        public IActionResult Post([FromBody] PolicyRenewalModel model)
         {
             int response;
 
@@ -60,7 +64,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             return Ok(response);
@@ -79,7 +83,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             return Ok(response);
@@ -88,7 +92,7 @@ namespace OpenImis.RestApi.Controllers.V3
         [HasRights(Rights.PolicySearch)]
         [HttpPost]
         [Route("commissions")]
-        public virtual IActionResult GetCommissions([FromBody]GetCommissionInputs model)
+        public virtual IActionResult GetCommissions([FromBody] GetCommissionInputs model)
         {
             if (!ModelState.IsValid)
             {

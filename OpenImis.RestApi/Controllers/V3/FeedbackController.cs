@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.FeedbackModule.Models;
 using OpenImis.ModulesV3.Utils;
+using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V3
@@ -18,25 +20,32 @@ namespace OpenImis.RestApi.Controllers.V3
     public class FeedbackController : Controller
     {
         private readonly IImisModules _imisModules;
+        private readonly ILogger _logger;
 
-        public FeedbackController(IImisModules imisModules)
+        public FeedbackController(IImisModules imisModules, ILoggerFactory loggerFactory)
         {
             _imisModules = imisModules;
+            _logger = loggerFactory.CreateLogger<FeedbackController>();
         }
 
         [HasRights(Rights.ClaimFeedback)]
         [HttpPost]
-        public IActionResult Post([FromBody]FeedbackRequest model)
+        public IActionResult Post([FromBody] FeedbackRequest model)
         {
-            int response;
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
+            }
 
+            int response;
             try
             {
                 response = _imisModules.GetFeedbackModule().GetFeedbackLogic().Post(model);
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             return Ok(response);
@@ -59,7 +68,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             return Ok(response);

@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.InsureeModule.Models;
+using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V3
@@ -18,10 +20,12 @@ namespace OpenImis.RestApi.Controllers.V3
     public class InsureeController : Controller
     {
         private readonly IImisModules _imisModules;
+        private readonly ILogger _logger;
 
-        public InsureeController(IImisModules imisModules)
+        public InsureeController(IImisModules imisModules, ILoggerFactory loggerFactory)
         {
             _imisModules = imisModules;
+            _logger = loggerFactory.CreateLogger<InsureeController>();
         }
 
         [HasRights(Rights.InsureeEnquire)]
@@ -37,7 +41,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             if (getInsureeModel == null)
@@ -61,7 +65,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             if (getEnquireModel == null)

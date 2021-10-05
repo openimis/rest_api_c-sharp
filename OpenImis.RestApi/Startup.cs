@@ -10,16 +10,9 @@ using OpenImis.Security.Security;
 using OpenImis.RestApi.Docs;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Logging;
-using OpenImis.RestApi.Controllers;
-using OpenImis.ModulesV1;
-using OpenImis.ModulesV2;
-using OpenImis.ePayment.Formaters;
 using Microsoft.AspNetCore.Http;
 using OpenImis.ModulesV1.Helpers;
 using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
-using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Quartz.Impl;
 using Quartz.Spi;
@@ -27,6 +20,7 @@ using Quartz;
 using System;
 using OpenImis.ePayment.Scheduler;
 using OpenImis.RestApi.Scheduler;
+using OpenImis.RestApi.Util.ErrorHandling;
 
 namespace OpenImis.RestApi
 {
@@ -89,7 +83,7 @@ namespace OpenImis.RestApi
 #if CHF
                 options.InputFormatters.Add(new GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration));
 #else
-                options.InputFormatters.Add(new XmlSerializerInputFormatter());
+                options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
 #endif
                 options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
             })
@@ -137,9 +131,11 @@ namespace OpenImis.RestApi
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddLog4Net();
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 loggerFactory.AddConsole(Configuration.GetSection("Logging"));
                 loggerFactory.AddDebug();
             }
