@@ -35,8 +35,9 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
             try
             {
                 var XML = claim.XMLSerialize();
-                var RV = 2;
 
+                var RV = 0;
+                
                 bool ifSaved = false;
 
                 var fromPhoneClaimDir = _configuration["AppSettings:FromPhone_Claim"] + Path.DirectorySeparatorChar;
@@ -62,7 +63,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                 }
                 catch (Exception e)
                 {
-                    return 2;
+                    return (int)Errors.Claim.UnexpectedException;
                 }
 
                 if (ifSaved)
@@ -98,21 +99,21 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                             }
                         }
 
-                        int tempRV = (int)returnParameter.Value;
+                        RV = (int)returnParameter.Value;
                         bool? isClaimRejected = claimRejectedParameter.Value as bool?;
 
-                        if ((tempRV == 0) && (isClaimRejected == false))
+                        if ((RV== 0) && (isClaimRejected == false))
                         {
-                            RV = 1;
+                            // RV = 1;
                         }
-                        else if (tempRV == 0 && (isClaimRejected == true || isClaimRejected == null))
+                        else if (RV == 0 && (isClaimRejected == true || isClaimRejected == null))
                         {
                             if (File.Exists(fromPhoneClaimDir + fileName) && !File.Exists(fromPhoneClaimRejectedDir + fileName))
                             {
                                 File.Move(fromPhoneClaimDir + fileName, fromPhoneClaimRejectedDir + fileName);
                             }
 
-                            RV = 0;
+                            // RV = 0;
                         }
                         else
                         {
@@ -121,7 +122,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                                 File.Delete(fromPhoneClaimDir + fileName);
                             }
 
-                            RV = 2;
+                            // RV = 2;
                         }
                     }
                 }

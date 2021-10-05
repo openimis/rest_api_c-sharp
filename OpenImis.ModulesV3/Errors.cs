@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenImis.RestApi
+namespace OpenImis.ModulesV3
 {
-    public class Errors
+    public static class Errors
     {
         // Enrolment Errors
 
         // Claim Errors
-        enum Claim
+        public enum Claim
         {
             Success = 2001,
             InvalidHFCode,
