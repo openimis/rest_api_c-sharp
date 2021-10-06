@@ -15,16 +15,16 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
         public string claim_administrator_code { get; set; }
         public ClaimStatus status_claim { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime? visit_date_from { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime? visit_date_to { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime? processed_date_from { get; set; }
         [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime? processed_date_to { get; set; }
     }
 

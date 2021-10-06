@@ -36,9 +36,9 @@ namespace OpenImis.ModulesV3.Utils
         }
     }
 
-    public class IsoDateOnlyDatetimeSerializer : CustomFormatDatetimeSerializer
+    public class IsoDateSerializer : CustomFormatDatetimeSerializer
     {
-        public IsoDateOnlyDatetimeSerializer() : base(DateTimeFormats.IsoDateFormat)
+        public IsoDateSerializer() : base(DateTimeFormats.IsoDateFormat)
         {
         }
     }

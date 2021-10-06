@@ -13,9 +13,9 @@ namespace OpenImis.ModulesV3.MasterDataModule.Models
         public string ProductName { get; set; }
         public int? LocationId { get; set; }
         public int InsurancePeriod { get; set; }
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime DateFrom { get; set; }
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime DateTo { get; set; }
         public int? ConversionProdId { get; set; }
         public decimal Lumpsum { get; set; }

@@ -8,10 +8,10 @@ namespace OpenImis.ModulesV3.ReportModule.Models
 {
     public class IndicatorRequestModel
     {
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime FromDate { get; set; }
 
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime ToDate { get; set; }
     }
 }
