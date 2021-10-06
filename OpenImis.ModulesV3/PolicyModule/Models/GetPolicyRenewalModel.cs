@@ -19,7 +19,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
         public string ProductName { get; set; }
         public string VillageName { get; set; }
         
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime RenewalPromptDate { get; set; }
         public string Phone { get; set; }
         public Guid RenewalUUID { get; set; }

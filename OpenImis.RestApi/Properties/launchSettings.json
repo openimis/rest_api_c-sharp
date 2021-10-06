@@ -3,14 +3,13 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:35787/",
+      "applicationUrl": "http://127.0.0.1:35787/",
       "sslPort": 0
     }
   },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
-      "launchBrowser": true,
       "launchUrl": "http://localhost:35787/api-docs",
       "environmentVariables": {
         "REGISTRY_CONFIG_FILE": "appsettings.json",

@@ -39,28 +39,21 @@ namespace OpenImis.Security.Repositories
         {
             List<UserData> response = new List<UserData>();
 
-            try
+            using (var imisContext = new ImisDB())
             {
-                using (var imisContext = new ImisDB())
-                {
-                    response = imisContext.TblUsers
-                                    .Where(u => u.LoginName == UserName && u.ValidityTo == null)
-                                    .Select(x => new UserData()
-                                    {
-                                        UserUUID = x.UserUUID,
-                                        LoginName = Convert.ToString(x.LoginName),
-                                        PrivateKey = Convert.ToString(x.PrivateKey),
-                                        StoredPassword = Convert.ToString(x.StoredPassword)
-                                    })
-                                    .ToList();
-                }
+                response = imisContext.TblUsers
+                                .Where(u => u.LoginName == UserName && u.ValidityTo == null)
+                                .Select(x => new UserData()
+                                {
+                                    UserUUID = x.UserUUID,
+                                    LoginName = Convert.ToString(x.LoginName),
+                                    PrivateKey = Convert.ToString(x.PrivateKey),
+                                    StoredPassword = Convert.ToString(x.StoredPassword)
+                                })
+                                .ToList();
+            }
 
-                return response;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            return response;
         }
     }
 }

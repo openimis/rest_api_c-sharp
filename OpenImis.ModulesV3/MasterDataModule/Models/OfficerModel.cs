@@ -16,7 +16,7 @@ namespace OpenImis.ModulesV3.MasterDataModule.Models
         public string Phone { get; set; }
         public int? LocationId { get; set; }
         public string OfficerIDSubst { get; set; }
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime WorksTo { get; set; }
     }
 }

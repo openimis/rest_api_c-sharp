@@ -13,7 +13,7 @@ namespace OpenImis.RestApi.Util {
 		/// Generates a random password
 		/// </summary>
 		/// <param name="length">The length of the password</param>
-		/// <param name="numberOfNonAlphanumericCharacters">Number of non alphanumeric characters "!@#$%^&*()_-+=[{]};:>|./?"</param>
+		/// <param name="numberOfNonAlphanumericCharacters">Number of non alphanumeric characters "!@#$%^&amp;*()_-+=[{]};:>|./?"</param>
 		/// <returns></returns>
 		public static string Generate(int length, int numberOfNonAlphanumericCharacters)
 		{

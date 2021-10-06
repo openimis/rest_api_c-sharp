@@ -14,7 +14,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public string LastName { get; set; }
         public string OtherNames { get; set; }
 
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime? DOB { get; set; }
         public string Gender { get; set; }
         public string Marital { get; set; }

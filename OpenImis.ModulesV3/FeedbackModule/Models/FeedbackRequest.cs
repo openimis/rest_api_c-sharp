@@ -13,7 +13,7 @@ namespace OpenImis.ModulesV3.FeedbackModule.Models
         public string CHFID { get; set; }
         public string Answers { get; set; }
 
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime Date { get; set; }
     }
 }
