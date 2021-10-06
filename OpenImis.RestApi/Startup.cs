@@ -131,7 +131,9 @@ namespace OpenImis.RestApi
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddLog4Net();
+            var loggingOptions = Configuration.GetSection("Log4NetCore").Get<Log4NetProviderOptions>();
+            loggerFactory.AddLog4Net(loggingOptions);
+
             app.UseMiddleware<ErrorHandlerMiddleware>();
 
             if (env.IsDevelopment())
