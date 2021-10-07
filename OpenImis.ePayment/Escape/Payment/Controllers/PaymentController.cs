@@ -337,10 +337,10 @@ namespace OpenImis.ePayment.Controllers
                         int paymentStatus = (int)paymentToCompare.GetType().GetProperty("paymentStatus").GetValue(paymentToCompare);
                         if (paymentStatus < PaymentStatus.Received)
                         {
-                            imisPayment.updateReconciliatedPayment(recon.SpBillId, model.ReconcBatchInfo.SpReconcReqId);
+                            imisPayment.updateReconciliatedPaymentAsync(recon.SpBillId, model.ReconcBatchInfo.SpReconcReqId);
                             //TODO update policy
                         }
-                        else if (paymentStatus == PaymentStatus.Matched)
+                        else if (paymentStatus == PaymentStatus.Reconciliated)
                         {
                             imisPayment.MatchPayment(new MatchModel
                             {
@@ -354,7 +354,7 @@ namespace OpenImis.ePayment.Controllers
                         //send error if payment from GePG not found in IMIS
                         if (imisPayment.CheckPaymentExistError(recon.SpBillId))
                         {
-                            imisPayment.updateReconciliatedPaymentError(recon.SpBillId);
+                            imisPayment.updateReconciliatedPaymentError(recon.SpBillId, model.ReconcBatchInfo.SpReconcReqId);
                             imisPayment.setRejectedReason(int.Parse(recon.SpBillId), GepgCodeResponses.GepgResponseCodes["No payment(s) found for specified bill control number"] + ":No payment(s) found for specified bill control number");
                         }
                     }

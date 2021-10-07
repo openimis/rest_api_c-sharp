@@ -863,7 +863,7 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public async void updateReconciliatedPaymentAsync(string billId)
+        public async void updateReconciliatedPaymentAsync(string billId, int reconId)
         {
             var sSQL = @"UPDATE tblPayment
                          SET PaymentStatus = @PaymentStatus,
@@ -888,15 +888,18 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public async void updateReconciliatedPaymentError(string billId)
+        public async void updateReconciliatedPaymentError(string billId, int reconId)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = @PaymentStatus
+                         SET PaymentStatus = @PaymentStatus,
+                         SpReconcReqId = @SpReconcReqId,
+                         ReconciliationDate = GETDATE()
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", billId),
-                new SqlParameter("@PaymentStatus", PaymentStatus.FailedReconciliated)
+                new SqlParameter("@PaymentStatus", PaymentStatus.FailedReconciliated),
+                new SqlParameter("@SpReconcReqId", reconId)
             };
 
             try
