@@ -10,6 +10,6 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
         [Required]
         public string claim_administrator_code { get; set; }
         //[ValidDate]
-        public string last_update_date { get; set; }
+        public DateTime? last_update_date { get; set; }
     }
 }

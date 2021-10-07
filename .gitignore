@@ -280,3 +280,4 @@ __pycache__/
 **/Certificates/
 **/controlNumberAck/
 **/wwwroot/ePayment/
+**/wwwroot/SendMessages/

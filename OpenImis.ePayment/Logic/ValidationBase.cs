@@ -1,7 +1,10 @@
-﻿using OpenImis.ePayment.Models.Payment;
+﻿using Microsoft.Extensions.Configuration;
+using OpenImis.ePayment.Data;
+using OpenImis.ePayment.Models.Payment;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -70,6 +73,33 @@ namespace OpenImis.ePayment.Logic
 
             }
             return ValidationResult.Success;
+        }
+
+        public int GetOfficerIdByUserUUID(Guid userUUID, IConfiguration configuration)
+        {
+            try
+            {
+                var sSQL = @"SELECT O.OfficerID
+                            FROM tblUsers U
+                            INNER JOIN tblOfficer O ON U.LoginName = O.Code
+                            WHERE U.ValidityTo IS NULL
+                            AND O.ValidityTo IS NULL
+                            AND U.UserUUID = @UserUUID";
+
+                var dh = new DataHelper(configuration);
+                SqlParameter[] parameters = { new SqlParameter("@UserUUID", userUUID) };
+                var dt = dh.GetDataTable(sSQL, parameters, System.Data.CommandType.Text);
+
+                if (dt.Rows.Count > 0)
+                    return (int)dt.Rows[0]["OfficerId"];
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return 0;
         }
     }
 }

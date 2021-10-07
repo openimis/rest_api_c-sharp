@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.MasterDataModule.Models;
 using OpenImis.Security.Security;
@@ -17,11 +18,13 @@ namespace OpenImis.RestApi.Controllers.V3
     {
         private readonly IConfiguration _configuration;
         private readonly IImisModules _imisModules;
+        private readonly ILogger _logger;
 
-        public MasterDataController(IConfiguration configuration, IImisModules imisModules)
+        public MasterDataController(IConfiguration configuration, IImisModules imisModules, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _imisModules = imisModules;
+            _logger = loggerFactory.CreateLogger<MasterDataController>();
         }
 
         /// <summary>

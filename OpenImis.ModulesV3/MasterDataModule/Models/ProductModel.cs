@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OpenImis.ModulesV3.Utils;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,8 +13,10 @@ namespace OpenImis.ModulesV3.MasterDataModule.Models
         public string ProductName { get; set; }
         public int? LocationId { get; set; }
         public int InsurancePeriod { get; set; }
-        public string DateFrom { get; set; }
-        public string DateTo { get; set; }
+        [JsonConverter(typeof(IsoDateSerializer))]
+        public DateTime DateFrom { get; set; }
+        [JsonConverter(typeof(IsoDateSerializer))]
+        public DateTime DateTo { get; set; }
         public int? ConversionProdId { get; set; }
         public decimal Lumpsum { get; set; }
         public int MemberCount { get; set; }

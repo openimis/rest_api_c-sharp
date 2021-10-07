@@ -202,7 +202,7 @@ namespace OpenImis.ModulesV3.MasterDataModule.Repositories
                         Phone = x.Phone,
                         LocationId = x.LocationId,
                         OfficerIDSubst = x.OfficerIdsubst.ToString(),
-                        WorksTo = x.WorksTo.GetValueOrDefault().ToString("yyyy-MM-dd")
+                        WorksTo = x.WorksTo.GetValueOrDefault()
                     })
                     .ToList();
             }
@@ -245,8 +245,8 @@ namespace OpenImis.ModulesV3.MasterDataModule.Repositories
                         ProductName = x.ProductName,
                         LocationId = x.LocationId,
                         InsurancePeriod = x.InsurancePeriod,
-                        DateFrom = x.DateFrom.ToString("yyyy-MM-dd"),
-                        DateTo = x.DateTo.ToString("yyyy-MM-dd"),
+                        DateFrom = x.DateFrom,
+                        DateTo = x.DateTo,
                         ConversionProdId = x.ConversionProdId,
                         Lumpsum = x.LumpSum,
                         MemberCount = x.MemberCount,

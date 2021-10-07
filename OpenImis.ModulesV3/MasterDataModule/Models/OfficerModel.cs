@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OpenImis.ModulesV3.Utils;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,6 +16,7 @@ namespace OpenImis.ModulesV3.MasterDataModule.Models
         public string Phone { get; set; }
         public int? LocationId { get; set; }
         public string OfficerIDSubst { get; set; }
-        public string WorksTo { get; set; }
+        [JsonConverter(typeof(IsoDateSerializer))]
+        public DateTime WorksTo { get; set; }
     }
 }

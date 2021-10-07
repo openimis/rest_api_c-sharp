@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OpenImis.ModulesV3.Utils;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,7 +18,9 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
         public string VillageName { get; set; }
-        public string RenewalPromptDate { get; set; }
+        
+        [JsonConverter(typeof(IsoDateSerializer))]
+        public DateTime RenewalPromptDate { get; set; }
         public string Phone { get; set; }
         public Guid RenewalUUID { get; set; }
     }

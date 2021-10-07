@@ -75,7 +75,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
-        public IActionResult GePGReceiveControlNumber([FromBody] gepgBillSubResp model)
+        public async Task<IActionResult> GePGReceiveControlNumber([FromBody] gepgBillSubResp model)
         {
             int billId;
             if (model.HasValidSignature)
@@ -139,13 +139,13 @@ namespace OpenImis.ePayment.Controllers
         }
 
         [NonAction]
-        public override IActionResult GetReqControlNumber([FromBody] ControlNumberResp model)
+        public override Task<IActionResult> GetReqControlNumber([FromBody] ControlNumberResp model)
         {
             return base.GetReqControlNumber(model);
         }
 
         [NonAction]
-        public override IActionResult PostReqControlNumberAck([FromBody] Acknowledgement model)
+        public override Task<IActionResult> PostReqControlNumberAck([FromBody] Acknowledgement model)
         {
             return base.PostReqControlNumberAck(model);
         }
@@ -335,10 +335,18 @@ namespace OpenImis.ePayment.Controllers
                     if (paymentToCompare != null)
                     {
                         int paymentStatus = (int)paymentToCompare.GetType().GetProperty("paymentStatus").GetValue(paymentToCompare);
-                        if (paymentStatus < PaymentStatus.Reconciliated)
+                        if (paymentStatus < PaymentStatus.Received)
                         {
                             imisPayment.updateReconciliatedPayment(recon.SpBillId, model.ReconcBatchInfo.SpReconcReqId);
                             //TODO update policy
+                        }
+                        else if (paymentStatus == PaymentStatus.Matched)
+                        {
+                            imisPayment.MatchPayment(new MatchModel
+                            {
+                                internal_identifier = Convert.ToInt32(recon.SpBillId),
+                                audit_user_id = 0
+                            });
                         }
                     }
                     else
@@ -397,6 +405,8 @@ namespace OpenImis.ePayment.Controllers
 
         }
         #endregion
+
+        
 #endif
     }
 }

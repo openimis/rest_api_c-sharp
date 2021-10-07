@@ -26,7 +26,7 @@ using OpenImis.ePayment.Responses;
 
 namespace OpenImis.ePayment.Controllers
 {
-    
+
     public abstract class PaymentBaseController : Controller
     {
         public PaymentLogic _payment;
@@ -40,12 +40,12 @@ namespace OpenImis.ePayment.Controllers
             _payment = new PaymentLogic(configuration, hostingEnvironment);
         }
 
-        
+
 
         //[Authorize(Roles = "PaymentAdd")]
         [HttpPost]
         [Route("api/MatchPayment")]
-        public virtual async Task<IActionResult> MatchPayment([FromBody]MatchModel model)
+        public virtual async Task<IActionResult> MatchPayment([FromBody] MatchModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { error_occured = true, error_message = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage });
@@ -57,9 +57,9 @@ namespace OpenImis.ePayment.Controllers
             }
             catch (Exception)
             {
-                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured"});
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
             }
-            
+
         }
 
         //Recieve Payment from Operator/
@@ -69,20 +69,20 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual async Task<IActionResult> GetControlNumber([FromBody]IntentOfPay intent)
+        public virtual async Task<IActionResult> GetControlNumber([FromBody] IntentOfPay intent)
         {
             if (!ModelState.IsValid)
-            {           
+            {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
 
-                if(intent != null)
+                if (intent != null)
                 {
                     var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
                     return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = error });
                 }
                 else
-                {           
-                   return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "10-Uknown type of payment" });
+                {
+                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "10-Uknown type of payment" });
                 }
             }
 
@@ -91,14 +91,42 @@ namespace OpenImis.ePayment.Controllers
                 var response = await _payment.SaveIntent(intent);
 
                 AssignedControlNumber data = (AssignedControlNumber)response.Data;
-              
-                return Ok(new GetControlNumberResp(){ error_occured = response.ErrorOccured, error_message = response.MessageValue,internal_identifier = data.internal_identifier, control_number = data.control_number });
+
+                return Ok(new GetControlNumberResp() { error_occured = response.ErrorOccured, error_message = response.MessageValue, internal_identifier = data.internal_identifier, control_number = data.control_number });
 
             }
             catch (Exception e)
             {
-                return BadRequest(new ErrorResponseV2 (){ error_occured = true, error_message = e.Message });
+                return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = e.Message });
             }
+        }
+
+        [HttpPost]
+        [Route("api/RequestBulkControlNumbers")]
+        [ProducesResponseType(typeof(GetControlNumberResp), 200)]
+        [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public virtual async Task<IActionResult> RequestBulkControlNumbers([FromBody]RequestBulkControlNumbersModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+
+                if (model != null)
+                {
+                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = error });
+                }
+                else
+                {
+                    return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "10-Uknown type of payment" });
+                }
+            }
+
+            // var officer = _payment.GetOfficerInfo(model.OfficerId);
+
+            var result = await _payment.RequestBulkControlNumbers(model);
+            
+            return Ok(result);
         }
 
         //[Authorize(Roles = "PaymentAdd")]
@@ -107,17 +135,17 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult PostReqControlNumberAck([FromBody]Acknowledgement model)
+        public virtual async Task<IActionResult> PostReqControlNumberAck([FromBody] Acknowledgement model)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new ErrorResponse(){ error_message = error });
+                return BadRequest(new ErrorResponse() { error_message = error });
             }
 
             try
             {
-                var response = _payment.SaveAcknowledgement(model);
+                var response = await _payment.SaveAcknowledgementAsync(model);
                 if (response.Code == 0)
                 {
                     return Ok();
@@ -126,7 +154,7 @@ namespace OpenImis.ePayment.Controllers
                 {
                     return BadRequest(new ErrorResponse() { error_message = response.MessageValue });
                 }
-             
+
             }
             catch (Exception)
             {
@@ -140,17 +168,17 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult GetReqControlNumber([FromBody]ControlNumberResp model)
+        public virtual async Task<IActionResult> GetReqControlNumber([FromBody] ControlNumberResp model)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new ErrorResponse (){ error_message = error });
+                return BadRequest(new ErrorResponse() { error_message = error });
             }
 
             try
             {
-                var response = _payment.SaveControlNumber(model);
+                var response = await _payment.SaveControlNumberAsync(model);
                 if (response.Code == 0)
                 {
                     return Ok();
@@ -159,7 +187,7 @@ namespace OpenImis.ePayment.Controllers
                 {
                     return BadRequest(new ErrorResponse() { error_message = response.MessageValue });
                 }
-               
+
             }
             catch (Exception)
             {
@@ -192,7 +220,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(PaymentDataBadResp), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual async Task<IActionResult> GetPaymentData([FromBody]PaymentData model)
+        public virtual async Task<IActionResult> GetPaymentData([FromBody] PaymentData model)
         {
             if (!ModelState.IsValid)
             {
@@ -204,7 +232,8 @@ namespace OpenImis.ePayment.Controllers
             {
                 var response = await _payment.SavePayment(model);
 
-                if (response.Code == 0) {
+                if (response.Code == 0)
+                {
                     return Ok(response);
                 }
                 else
@@ -226,12 +255,12 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(AsignedControlNumbersResponse), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual async Task<IActionResult> GetAssignedControlNumbers([FromBody]PaymentRequest requests)
+        public virtual async Task<IActionResult> GetAssignedControlNumbers([FromBody] PaymentRequest requests)
         {
             if (!ModelState.IsValid)
             {
                 var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
-                return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = error });
+                return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = error });
             }
 
             try
@@ -247,12 +276,12 @@ namespace OpenImis.ePayment.Controllers
                 {
                     return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = response.MessageValue });
                 }
-                
+
 
             }
             catch (Exception)
             {
-                return BadRequest(new ErrorResponseV2(){ error_occured = true, error_message = "Unknown Error Occured" });
+                return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = "Unknown Error Occured" });
             }
         }
 
@@ -279,6 +308,49 @@ namespace OpenImis.ePayment.Controllers
             }
 
 
+        }
+
+        [HttpPost]
+        [Route("api/GetControlNumbersForEO")]
+        [ProducesResponseType(typeof(BulkControlNumbersForEO), 200)]
+        [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public virtual IActionResult GetControlNumbersForEO([FromBody]GetControlNumbersForEOModel model)
+        {
+            List<BulkControlNumbersForEO> response = null;
+            try
+            {
+                Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
+                var officerId = new ValidationBase().GetOfficerIdByUserUUID(userUUID, _configuration);
+                var officerDetails = _payment.GetOfficerInfo(officerId);
+
+                response = _payment.GetControlNumbersForEO(officerDetails.Code, model.ProductCode);
+
+                // Check if the product requested has enough CNs left
+                try
+                {
+                    var count = _payment.ControlNumbersToBeRequested(model.ProductCode);
+                    if (count > 0)
+                    {
+                        // The following method is Async, but we do not await it since we don't want to wait for the result
+                        _ = RequestBulkControlNumbers(new RequestBulkControlNumbersModel { ControlNumberCount = count, ProductCode = model.ProductCode });
+                    }
+                }
+                catch (Exception)
+                {
+
+                    
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+            }
+
+            return Ok(response);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using OpenImis.ModulesV3.InsureeModule.Models;
 using OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels;
 using OpenImis.ModulesV3.InsureeModule.Repositories;
+using OpenImis.ModulesV3.Utils;
 using System;
 
 namespace OpenImis.ModulesV3.InsureeModule.Logic
@@ -28,16 +29,22 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
 
             response = familyRepository.GetByCHFID(chfid, userUUID);
 
+            if (response != null)
+            {
+                foreach (var insure in response.Insurees)
+                {
+                    insure.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(_configuration.GetValue<string>("AppSettings:UpdatedFolder"), insure.PhotoPath);
+                }
+            }
+
             return response;
         }
 
-        public int Create(EnrollFamilyModel model, int userId, int officerId)
+        public NewFamilyResponse Create(EnrollFamilyModel model, int userId, int officerId)
         {
-            int response;
+            
+            return familyRepository.Create(model, userId, officerId);
 
-            response = familyRepository.Create(model, userId, officerId);
-
-            return response;
         }
 
         public int GetUserIdByUUID(Guid uuid)

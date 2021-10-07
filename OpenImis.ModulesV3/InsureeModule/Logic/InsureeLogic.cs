@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using OpenImis.ModulesV3.InsureeModule.Models;
 using OpenImis.ModulesV3.InsureeModule.Repositories;
+using OpenImis.ModulesV3.Utils;
+using System;
+using System.IO;
 
 namespace OpenImis.ModulesV3.InsureeModule.Logic
 {
@@ -21,6 +24,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
             GetEnquireModel response;
 
             response = insureeRepository.GetEnquire(chfid);
+
+            response.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(_configuration.GetValue<string>("AppSettings:UpdatedFolder"), response.PhotoPath);
 
             return response;
         }

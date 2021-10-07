@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.PremiumModule.Models;
+using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V3
@@ -18,16 +20,18 @@ namespace OpenImis.RestApi.Controllers.V3
     public class PremiumController : Controller
     {
         private readonly IImisModules _imisModules;
+        private readonly ILogger _logger;
 
-        public PremiumController(IImisModules imisModules)
+        public PremiumController(IImisModules imisModules, ILoggerFactory loggerFactory)
         {
             _imisModules = imisModules;
+            _logger = loggerFactory.CreateLogger<PremiumController>();
         }
 
         [HasRights(Rights.PolicySearch)]
         [Route("receipt/")]
         [HttpPost]
-        public IActionResult Get([FromBody]ReceiptRequestModel receipt)
+        public IActionResult Get([FromBody] ReceiptRequestModel receipt)
         {
             bool response;
 
@@ -37,7 +41,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             return Ok(response);

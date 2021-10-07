@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.ReportModule.Models;
 using OpenImis.ModulesV3.Utils;
+using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V3
@@ -17,10 +19,12 @@ namespace OpenImis.RestApi.Controllers.V3
     public class ReportController : Controller
     {
         private readonly IImisModules _imisModules;
+        private readonly ILogger _logger;
 
-        public ReportController(IImisModules imisModules)
+        public ReportController(IImisModules imisModules, ILoggerFactory loggerFactory)
         {
             _imisModules = imisModules;
+            _logger = loggerFactory.CreateLogger<ReportController>();
         }
 
         [HasRights(Rights.ReportsEnrolmentPerformanceIndicators)]
@@ -30,7 +34,8 @@ namespace OpenImis.RestApi.Controllers.V3
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                var error = ModelState.Values.FirstOrDefault().Errors.FirstOrDefault().ErrorMessage;
+                return BadRequest(new { error_occured = true, error_message = error });
             }
 
             EnrolmentReportModel enrolmentModel;
@@ -46,7 +51,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             if (enrolmentModel == null)
@@ -80,7 +85,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             if (feedbackModel == null)
@@ -114,7 +119,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             if (renewalModel == null)
@@ -148,7 +153,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (ValidationException e)
             {
-                return BadRequest(new { error = new { message = e.Message, value = e.Value } });
+                throw new BusinessException(e.Message);
             }
 
             if (snapshotResponseModel == null)

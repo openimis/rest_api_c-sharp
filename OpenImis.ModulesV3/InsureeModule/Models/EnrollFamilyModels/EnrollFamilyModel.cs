@@ -11,10 +11,12 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
 
         public Enrolment GetEnrolmentFromModel()
         {
-            return new Enrolment()
-            {
-                FileInfo = new FileInfo(),
-                Families = Family.Select(x => new List<Family>()
+
+            var enrollment = new Enrolment();
+            enrollment.FileInfo = new FileInfo();
+
+
+            var families = Family.Select(x => new List<Family>()
                 {
                     new Family()
                     {
@@ -28,14 +30,47 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
                         Ethnicity = x.Ethnicity,
                         ConfirmationNo = x.ConfirmationNo,
                         ConfirmationType = x.ConfirmationType,
-                        isOffline = x.isOffline
+                        isOffline = x.isOffline,
+                        FamilySMS =  x.FamilySMS != null ? new FamilySMS() {
+                            FamilyId = x.FamilySMS.FamilyId,
+                            ApprovalOfSMS = x.FamilySMS.ApprovalOfSMS,
+                            LanguageOfSMS = x.FamilySMS.LanguageOfSMS
+                        } : null
                     }
-                }).FirstOrDefault(),
-                Insurees = Family.Select(x => x.Insurees).FirstOrDefault().ToList(),
-                Policies = Family.Select(x => x.Policies).FirstOrDefault().ToList(),
-                Premiums = Family.Select(x => x.Policies.Select(s => s.Premium)).FirstOrDefault().ToList(),
-                InsureePolicies = Family.Select(x => x.InsureePolicy).FirstOrDefault().ToList(),
-            };
+                });
+
+            foreach (var f in families)
+            {
+                enrollment.Families.Add(f.First());
+            }
+
+            var insurees = Family.Select(x => x.Insurees);
+            foreach (var i in insurees)
+            {
+                enrollment.Insurees.Add(i.First());
+            }
+
+            var policies = Family.Select(x => x.Policies);
+            foreach (var p in policies)
+            {
+                enrollment.Policies.Add(p.First());
+                if (p.First().Premium != null)
+                {
+                    foreach (var pr in p.First().Premium)
+                    {
+                        enrollment.Premiums.Add(pr);
+                    }
+                }
+            }
+
+            var iPolicy = Family.Select(x => x.InsureePolicy);
+            foreach (var ip in iPolicy)
+            {
+                enrollment.InsureePolicies.Add(ip.First());
+            }
+
+            return enrollment;
         }
     }
 }
+

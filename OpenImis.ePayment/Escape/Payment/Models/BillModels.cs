@@ -30,10 +30,19 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public string gepgSignature { get; set; }
     }
 
+    //public class gepgBillSubReq
+    //{
+    //    public BillHdr BillHdr { get; set; }
+    //    public BillTrxInf BillTrxInf { get; set; }
+    //}
+
+    [XmlRoot("gepgBillSubReq")]
     public class gepgBillSubReq
     {
         public BillHdr BillHdr { get; set; }
-        public BillTrxInf BillTrxInf { get; set; }
+
+        [XmlElement("BillTrxInf")]
+        public List<BillTrxInf> BillTrxInf { get; set; }
     }
 
     public class BillHdr

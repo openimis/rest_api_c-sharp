@@ -1,4 +1,5 @@
-﻿using OpenImis.DB.SqlServer;
+﻿using Newtonsoft.Json;
+using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV3.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public string CHFID { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
-        public string DOB { get; set; }
+        [JsonConverter(typeof(IsoDateSerializer))]
+        public DateTime DOB { get; set; }
         public string Gender { get; set; }
         public string Marital { get; set; }
         public bool IsHead { get; set; }
@@ -34,6 +36,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public string IdentificationTypes { get; set; }
         public bool IsOffline { get; set; }
         public bool Vulnerability { get; set; }
+        public string PhotoBase64 { get; set; }
 
         public static InsureeModel FromTblInsuree(TblInsuree tblInsuree)
         {
@@ -50,7 +53,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
                 CHFID = tblInsuree.Chfid,
                 LastName = tblInsuree.LastName,
                 OtherNames = tblInsuree.OtherNames,
-                DOB = tblInsuree.Dob.ToString("yyyy-MM-dd"),
+                DOB = (DateTime)tblInsuree.Dob,
                 IsHead = tblInsuree.IsHead,
                 Phone = tblInsuree.Phone,
                 Gender = tblInsuree.Gender,
