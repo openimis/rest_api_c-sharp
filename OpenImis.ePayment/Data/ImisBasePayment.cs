@@ -859,15 +859,18 @@ namespace OpenImis.ePayment.Data
             }
         }
 
-        public void updateReconciliatedPayment(string billId)
+        public void updateReconciliatedPayment(string billId, int reconId)
         {
             var sSQL = @"UPDATE tblPayment
-                         SET PaymentStatus = @PaymentStatus
+                         SET PaymentStatus = @PaymentStatus,
+                         SpReconcReqId = @SpReconcReqId,
+                         ReconciliationDate = GETDATE(),
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {
                 new SqlParameter("@PaymentID", billId),
-                new SqlParameter("@PaymentStatus", PaymentStatus.Reconciliated)
+                new SqlParameter("@PaymentStatus", PaymentStatus.Reconciliated),
+                new SqlParameter("@SpReconcReqId", reconId)
             };
 
             try

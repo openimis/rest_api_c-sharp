@@ -294,7 +294,7 @@ namespace OpenImis.ePayment.Controllers
         #region Step 4: Payments Reconciliation Managent
         [HttpGet]
         [Route("api/Reconciliation")]
-        public IActionResult Reconciliation(int daysAgo)
+        public async Task<IActionResult> Reconciliation(int daysAgo)
         {
             List<object> done = new List<object>();
             // Make loop for all product from database that have account follow SP[0-9]{3} and do the function for all sp codes
@@ -303,7 +303,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 foreach (String productSPCode in productsSPCodes)
                 {
-                    var result = imisPayment.RequestReconciliationReportAsync(daysAgo, productSPCode);
+                    var result = await imisPayment.RequestReconciliationReportAsync(daysAgo, productSPCode);
                     //check if we have done result - if no - then return 500
                     System.Reflection.PropertyInfo pi = result.GetType().GetProperty("resp");
                     done.Add(result);
@@ -337,7 +337,7 @@ namespace OpenImis.ePayment.Controllers
                         int paymentStatus = (int)paymentToCompare.GetType().GetProperty("paymentStatus").GetValue(paymentToCompare);
                         if (paymentStatus < PaymentStatus.Reconciliated)
                         {
-                            imisPayment.updateReconciliatedPayment(recon.SpBillId);
+                            imisPayment.updateReconciliatedPayment(recon.SpBillId, model.ReconcBatchInfo.SpReconcReqId);
                             //TODO update policy
                         }
                     }
