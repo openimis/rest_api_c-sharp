@@ -21,6 +21,7 @@ using System;
 using OpenImis.ePayment.Scheduler;
 using OpenImis.RestApi.Scheduler;
 using OpenImis.RestApi.Util.ErrorHandling;
+// using OpenImis.ePayment.Formaters;
 
 namespace OpenImis.RestApi
 {
@@ -81,7 +82,7 @@ namespace OpenImis.RestApi
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
 #if CHF
-                options.InputFormatters.Add(new GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration));
+                options.InputFormatters.Add(new ePayment.Formaters.GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration));
 #else
                 options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
 #endif
