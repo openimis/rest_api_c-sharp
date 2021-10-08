@@ -281,3 +281,4 @@ __pycache__/
 **/controlNumberAck/
 **/wwwroot/ePayment/
 **/wwwroot/SendMessages/
+/OpenImis.RestApi/wwwroot/SentMessages

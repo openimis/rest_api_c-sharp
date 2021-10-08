@@ -32,98 +32,111 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
         // TODO Change the RV assignment codes. It should be on the list for better understanding
         public int Create(Claim claim)
         {
-            var XML = claim.XMLSerialize();
-            var RV = 2;
-
-            bool ifSaved;
-
-            var fromPhoneClaimDir = _configuration["AppSettings:FromPhone_Claim"] + Path.DirectorySeparatorChar;
-            var fromPhoneClaimRejectedDir = _configuration["AppSettings:FromPhone_Claim_Rejected"] + Path.DirectorySeparatorChar;
-
-            var fileName = "Claim_" + claim.Details.HFCode + "_" + claim.Details.CHFID + "_" + claim.Details.ClaimCode + ".xml";
-
-            var xmldoc = new XmlDocument { InnerXml = XML };
-
             try
             {
+                var XML = claim.XMLSerialize();
 
-                if (!Directory.Exists(fromPhoneClaimDir)) Directory.CreateDirectory(fromPhoneClaimDir);
-                if (!Directory.Exists(fromPhoneClaimRejectedDir)) Directory.CreateDirectory(fromPhoneClaimRejectedDir);
+                var RV = 0;
 
-                if (!File.Exists(fromPhoneClaimDir + fileName))
+                bool ifSaved = false;
+
+                var fromPhoneClaimDir = _configuration["AppSettings:FromPhone_Claim"] + Path.DirectorySeparatorChar;
+                var fromPhoneClaimRejectedDir = _configuration["AppSettings:FromPhone_Claim_Rejected"] + Path.DirectorySeparatorChar;
+
+                var fileName = "Claim_" + claim.Details.HFCode + "_" + claim.Details.CHFID + "_" + claim.Details.ClaimCode + ".xml";
+
+                var xmldoc = new XmlDocument();
+                xmldoc.InnerXml = XML;
+
+                try
                 {
-                    xmldoc.Save(fromPhoneClaimDir + fileName);
+
+                    if (!Directory.Exists(fromPhoneClaimDir)) Directory.CreateDirectory(fromPhoneClaimDir);
+                    if (!Directory.Exists(fromPhoneClaimRejectedDir)) Directory.CreateDirectory(fromPhoneClaimRejectedDir);
+
+                    if (!File.Exists(fromPhoneClaimDir + fileName))
+                    {
+                        xmldoc.Save(fromPhoneClaimDir + fileName);
+                    }
+
+                    ifSaved = true;
+                }
+                catch (Exception e)
+                {
+                    return (int)Errors.Claim.UnexpectedException;
                 }
 
-                ifSaved = true;
-            }
-            catch
-            {
-                return 2;
-            }
-
-            if (ifSaved)
-            {
-                using (var imisContext = new ImisDB())
+                if (ifSaved)
                 {
-                    var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
-                    var returnParameter = new SqlParameter("@RV", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                    var claimRejectedParameter = new SqlParameter("@ClaimRejected", SqlDbType.Bit) { Direction = ParameterDirection.Output };
-
-                    var sql = "exec @RV = uspUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
-
-                    DbConnection connection = imisContext.Database.GetDbConnection();
-
-                    using (DbCommand cmd = connection.CreateCommand())
+                    using (var imisContext = new ImisDB())
                     {
-                        cmd.CommandText = sql;
+                        var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                        var returnParameter = new SqlParameter("@RV", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                        var claimRejectedParameter = new SqlParameter("@ClaimRejected", SqlDbType.Bit) { Direction = ParameterDirection.Output };
 
-                        cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, claimRejectedParameter });
+                        var sql = "exec @RV = uspUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
 
-                        if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                        DbConnection connection = imisContext.Database.GetDbConnection();
 
-                        using (var reader = cmd.ExecuteReader())
+                        using (DbCommand cmd = connection.CreateCommand())
                         {
-                            //Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
-                        }
-                    }
+                            cmd.CommandText = sql;
 
-                    int tempRV = (int)returnParameter.Value;
-                    bool? isClaimRejected = claimRejectedParameter.Value as bool?;
+                            cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, claimRejectedParameter });
 
-                    if ((tempRV == 0) && (isClaimRejected == false))
-                    {
-                        RV = 1;
-                    }
-                    else if (tempRV == 0 && (isClaimRejected == true || isClaimRejected == null))
-                    {
-                        if (File.Exists(fromPhoneClaimDir + fileName) && !File.Exists(fromPhoneClaimRejectedDir + fileName))
-                        {
-                            File.Move(fromPhoneClaimDir + fileName, fromPhoneClaimRejectedDir + fileName);
+                            if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                //Displaying errors in the Stored Procedure in Debug mode
+                                do
+                                {
+                                    while (reader.Read())
+                                    {
+                                        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                    }
+                                } while (reader.NextResult());
+                            }
                         }
 
-                        RV = 0;
-                    }
-                    else
-                    {
-                        if (File.Exists(fromPhoneClaimDir + fileName))
-                        {
-                            File.Delete(fromPhoneClaimDir + fileName);
-                        }
+                        RV = (int)returnParameter.Value;
+                        bool? isClaimRejected = claimRejectedParameter.Value as bool?;
 
-                        RV = 2;
+                        if ((RV == 0) && (isClaimRejected == false))
+                        {
+                             RV = 0;
+                        }
+                        else if (RV == 0 && (isClaimRejected == true || isClaimRejected == null))
+                        {
+                            if (File.Exists(fromPhoneClaimDir + fileName) && !File.Exists(fromPhoneClaimRejectedDir + fileName))
+                            {
+                                File.Move(fromPhoneClaimDir + fileName, fromPhoneClaimRejectedDir + fileName);
+                            }
+
+                             RV = (int)Errors.Claim.Rejected;
+                        }
+                        else
+                        {
+                            if (File.Exists(fromPhoneClaimDir + fileName))
+                            {
+                                File.Delete(fromPhoneClaimDir + fileName);
+                            }
+
+                            // RV = 2;
+                        }
                     }
                 }
-            }
 
-            return RV;
+                return RV;
+            }
+            catch (SqlException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         public DiagnosisServiceItem GetDsi(DsiInputModel model)
