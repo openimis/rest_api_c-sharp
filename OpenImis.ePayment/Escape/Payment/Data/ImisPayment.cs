@@ -378,6 +378,9 @@ namespace OpenImis.ePayment.Data
 
             var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, accountCode, "default.sp.in");
 
+            string sentbill = JsonConvert.SerializeObject(bills);
+            GepgFileLogger.Log("Bulk_CN_Request", sentbill + "********************" + billAck, env);
+
             // if the response is not 7101(SUCCESS) then delete all the entries from DB
             if (!billAck.Contains("7101"))
             {
