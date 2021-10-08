@@ -868,7 +868,7 @@ namespace OpenImis.ePayment.Data
             var sSQL = @"UPDATE tblPayment
                          SET PaymentStatus = @PaymentStatus,
                          SpReconcReqId = @SpReconcReqId,
-                         ReconciliationDate = GETDATE(),
+                         ReconciliationDate = GETDATE()
                          WHERE PaymentID = @PaymentID;";
 
             SqlParameter[] parameters = {

@@ -335,7 +335,7 @@ namespace OpenImis.ePayment.Controllers
                     if (paymentToCompare != null)
                     {
                         int paymentStatus = (int)paymentToCompare.GetType().GetProperty("paymentStatus").GetValue(paymentToCompare);
-                        if (paymentStatus < PaymentStatus.Received)
+                        if (paymentStatus <= PaymentStatus.Received)
                         {
                             imisPayment.updateReconciliatedPaymentAsync(recon.SpBillId, model.ReconcBatchInfo.SpReconcReqId);
                             //TODO update policy
