@@ -37,26 +37,27 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                 var XML = claim.XMLSerialize();
 
                 var RV = 0;
-                
+
                 bool ifSaved = false;
 
-            var fromPhoneClaimDir = _configuration["AppSettings:FromPhone_Claim"] + Path.DirectorySeparatorChar;
-            var fromPhoneClaimRejectedDir = _configuration["AppSettings:FromPhone_Claim_Rejected"] + Path.DirectorySeparatorChar;
+                var fromPhoneClaimDir = _configuration["AppSettings:FromPhone_Claim"] + Path.DirectorySeparatorChar;
+                var fromPhoneClaimRejectedDir = _configuration["AppSettings:FromPhone_Claim_Rejected"] + Path.DirectorySeparatorChar;
 
-            var fileName = "Claim_" + claim.Details.HFCode + "_" + claim.Details.CHFID + "_" + claim.Details.ClaimCode + ".xml";
+                var fileName = "Claim_" + claim.Details.HFCode + "_" + claim.Details.CHFID + "_" + claim.Details.ClaimCode + ".xml";
 
-            var xmldoc = new XmlDocument { InnerXml = XML };
+                var xmldoc = new XmlDocument();
+                xmldoc.InnerXml = XML;
 
-            try
-            {
-
-                if (!Directory.Exists(fromPhoneClaimDir)) Directory.CreateDirectory(fromPhoneClaimDir);
-                if (!Directory.Exists(fromPhoneClaimRejectedDir)) Directory.CreateDirectory(fromPhoneClaimRejectedDir);
-
-                if (!File.Exists(fromPhoneClaimDir + fileName))
+                try
                 {
-                    xmldoc.Save(fromPhoneClaimDir + fileName);
-                }
+
+                    if (!Directory.Exists(fromPhoneClaimDir)) Directory.CreateDirectory(fromPhoneClaimDir);
+                    if (!Directory.Exists(fromPhoneClaimRejectedDir)) Directory.CreateDirectory(fromPhoneClaimRejectedDir);
+
+                    if (!File.Exists(fromPhoneClaimDir + fileName))
+                    {
+                        xmldoc.Save(fromPhoneClaimDir + fileName);
+                    }
 
                     ifSaved = true;
                 }
@@ -65,45 +66,45 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                     return (int)Errors.Claim.UnexpectedException;
                 }
 
-            if (ifSaved)
-            {
-                using (var imisContext = new ImisDB())
+                if (ifSaved)
                 {
-                    var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
-                    var returnParameter = new SqlParameter("@RV", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                    var claimRejectedParameter = new SqlParameter("@ClaimRejected", SqlDbType.Bit) { Direction = ParameterDirection.Output };
-
-                    var sql = "exec @RV = uspUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
-
-                    DbConnection connection = imisContext.Database.GetDbConnection();
-
-                    using (DbCommand cmd = connection.CreateCommand())
+                    using (var imisContext = new ImisDB())
                     {
-                        cmd.CommandText = sql;
+                        var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                        var returnParameter = new SqlParameter("@RV", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                        var claimRejectedParameter = new SqlParameter("@ClaimRejected", SqlDbType.Bit) { Direction = ParameterDirection.Output };
 
-                        cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, claimRejectedParameter });
+                        var sql = "exec @RV = uspUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
 
-                        if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                        DbConnection connection = imisContext.Database.GetDbConnection();
 
-                        using (var reader = cmd.ExecuteReader())
+                        using (DbCommand cmd = connection.CreateCommand())
                         {
-                            //Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
+                            cmd.CommandText = sql;
+
+                            cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, claimRejectedParameter });
+
+                            if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                //Displaying errors in the Stored Procedure in Debug mode
+                                do
+                                {
+                                    while (reader.Read())
+                                    {
+                                        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                    }
+                                } while (reader.NextResult());
+                            }
                         }
-                    }
 
                         RV = (int)returnParameter.Value;
                         bool? isClaimRejected = claimRejectedParameter.Value as bool?;
 
-                        if ((RV== 0) && (isClaimRejected == false))
+                        if ((RV == 0) && (isClaimRejected == false))
                         {
-                            // RV = 1;
+                             RV = 0;
                         }
                         else if (RV == 0 && (isClaimRejected == true || isClaimRejected == null))
                         {
@@ -112,7 +113,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                                 File.Move(fromPhoneClaimDir + fileName, fromPhoneClaimRejectedDir + fileName);
                             }
 
-                            // RV = 0;
+                             RV = (int)Errors.Claim.Rejected;
                         }
                         else
                         {
@@ -126,7 +127,16 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                     }
                 }
 
-            return RV;
+                return RV;
+            }
+            catch (SqlException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         public DiagnosisServiceItem GetDsi(DsiInputModel model)

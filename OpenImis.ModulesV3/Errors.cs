@@ -21,6 +21,7 @@ namespace OpenImis.ModulesV3
             InvalidItem,
             InvalidService,
             InvalidClaimAdmin,
+            Rejected,
             UnexpectedException = 2999
         }
     }

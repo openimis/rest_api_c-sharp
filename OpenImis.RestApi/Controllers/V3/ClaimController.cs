@@ -9,6 +9,7 @@ using OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim;
 using Microsoft.Extensions.Logging;
 using OpenImis.RestApi.Util.ErrorHandling;
 using System.Net;
+using System.Collections.Generic;
 
 namespace OpenImis.RestApi.Controllers.V3
 {
@@ -31,7 +32,7 @@ namespace OpenImis.RestApi.Controllers.V3
         [HttpPost]
         [ProducesResponseType(typeof(void), 200)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public IActionResult Create([FromBody] Claim claim)
+        public IActionResult Create([FromBody] List<Claim> claims)
         {
             if (!ModelState.IsValid)
             {
@@ -41,14 +42,14 @@ namespace OpenImis.RestApi.Controllers.V3
 
             try
             {
-                var response = _imisModules.GetClaimModule().GetClaimLogic().Create(claim);
+                var response = _imisModules.GetClaimModule().GetClaimLogic().Create(claims);
                 return Ok(response);
             }
             catch (Exception e)
             {
                 return BadRequest(new SubmitClaimResponse
                 {
-                    ClaimCode = claim.Details.ClaimCode,
+                    ClaimCode = "",
                     Response = (int)Errors.Claim.UnexpectedException,
                     Message = e.Message
                 });
