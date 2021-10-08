@@ -13,6 +13,8 @@ using Microsoft.IdentityModel.Tokens;
 using OpenImis.Security.Models;
 using OpenImis.ModulesV3;
 using OpenImis.Security;
+using Microsoft.Extensions.Logging;
+using OpenImis.RestApi.Util.ErrorHandling;
 
 namespace OpenImis.RestApi.Controllers.V3
 {
@@ -25,11 +27,13 @@ namespace OpenImis.RestApi.Controllers.V3
     {
         private readonly IConfiguration _configuration;
         private readonly ILoginModule _loginModule;
+        private readonly ILogger _logger;
 
-        public LoginController(IConfiguration configuration, Security.ILoginModule loginModule)
+        public LoginController(IConfiguration configuration, ILoginModule loginModule, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _loginModule = loginModule;
+            _logger = loggerFactory.CreateLogger<LoginController>();
         }
 
         [AllowAnonymous]
@@ -37,7 +41,7 @@ namespace OpenImis.RestApi.Controllers.V3
         [Route("login")]
         public IActionResult Index([FromBody] LoginModel model)
         {
-            
+
             var user = _loginModule.GetLoginLogic().FindUser(model.UserName, model.Password);
 
             if (user != null)
@@ -72,7 +76,7 @@ namespace OpenImis.RestApi.Controllers.V3
         [AllowAnonymous]
         [HttpPost]
         [Route("validate/credentials")]
-        public virtual IActionResult Validate_Credentials([FromBody]UserLogin userlogin)
+        public virtual IActionResult Validate_Credentials([FromBody] UserLogin userlogin)
         {
             if (!ModelState.IsValid)
             {
@@ -80,26 +84,14 @@ namespace OpenImis.RestApi.Controllers.V3
                 return BadRequest(new { error_occured = true, error_message = error });
             }
 
-            ValidateCredentialsResponse response = new ValidateCredentialsResponse();
+            ValidateCredentialsResponse response = new ValidateCredentialsResponse() { success = false };
 
-            try
-            {
-                var user = _loginModule.GetLoginLogic().FindUser(userlogin.UserID, userlogin.Password);
+            var user = _loginModule.GetLoginLogic().FindUser(userlogin.UserID, userlogin.Password);
 
-                if (user != null)
-                {
-                    response.success = true;
-                    response.ErrorOccured = false;
-                }
-                else
-                {
-                    throw new Exception();
-                }
-            }
-            catch (Exception)
+            if (user != null)
             {
-                response.success = false;
-                response.ErrorOccured = true;
+                response.success = true;
+                response.ErrorOccured = false;
             }
 
             return Json(response);

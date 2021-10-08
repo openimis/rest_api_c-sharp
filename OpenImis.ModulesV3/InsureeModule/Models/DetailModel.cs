@@ -9,7 +9,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
     public class DetailModel
     {
         public string ProductName { get; set; }
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime ExpiryDate { get; set; }
         public string Status { get; set; }
         public float? DedType { get; set; }
@@ -31,7 +31,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public decimal? TotalSurgeriesLeft { get; set; }
         public decimal? TotalVisitsLeft { get; set; }
         public decimal? PolicyValue { get; set; }
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime EffectiveDate { get; set; }
     }
 }

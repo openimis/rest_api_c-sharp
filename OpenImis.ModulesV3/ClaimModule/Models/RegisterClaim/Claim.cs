@@ -14,15 +14,15 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
 
     public class ClaimDetails
     {
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime ClaimDate { get; set; }
         public string HFCode { get; set; }
         public string ClaimAdmin { get; set; }
         public string ClaimCode { get; set; }
         public string CHFID { get; set; }
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime StartDate { get; set; }
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime EndDate { get; set; }
         public string ICDCode { get; set; }
         public string Comment { get; set; }

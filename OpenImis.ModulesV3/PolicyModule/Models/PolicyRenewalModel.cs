@@ -15,7 +15,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
         public string ProductCode { get; set; }
         public float Amount { get; set; }
 
-        [JsonConverter(typeof(IsoDateOnlyDatetimeSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime Date { get; set; }
         public bool Discontinue { get; set; }
         public int PayerId { get; set; }

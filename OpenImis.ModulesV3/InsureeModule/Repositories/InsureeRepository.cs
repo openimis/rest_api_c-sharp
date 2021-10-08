@@ -27,124 +27,101 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             GetEnquireModel response = new GetEnquireModel();
             List<DetailModel> details = new List<DetailModel>();
 
-            try
+            using (var imisContext = new ImisDB())
             {
-                using (var imisContext = new ImisDB())
+                var chfidParameter = new SqlParameter("@CHFID", chfid) { SqlDbType = SqlDbType.VarChar, Size = 12 };
+
+                var sql = "exec uspAPIGetCoverage @CHFID";
+
+                DbConnection connection = imisContext.Database.GetDbConnection();
+
+                using (DbCommand cmd = connection.CreateCommand())
                 {
-                    var chfidParameter = new SqlParameter("@CHFID", chfid) { SqlDbType = SqlDbType.VarChar, Size = 12 };
 
-                    var sql = "exec uspAPIGetCoverage @CHFID";
+                    cmd.CommandText = sql;
 
-                    DbConnection connection = imisContext.Database.GetDbConnection();
+                    cmd.Parameters.AddRange(new[] { chfidParameter });
 
-                    using (DbCommand cmd = connection.CreateCommand())
+                    if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+
+                    using (var reader = cmd.ExecuteReader())
                     {
-
-                        cmd.CommandText = sql;
-
-                        cmd.Parameters.AddRange(new[] { chfidParameter });
-
-                        if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
-
-                        using (var reader = cmd.ExecuteReader())
+                        do
                         {
-                            do
+                            bool firstValue = true;
+                            while (reader.Read())
                             {
-                                bool firstValue = true;
-                                while (reader.Read())
+                                if (firstValue)
                                 {
-                                    if (firstValue)
-                                    {
-                                        response.InsureeName = String.Join(' ', reader["OtherNames"].ToString()) + ' ' + reader["LastName"].ToString();
-                                        response.CHFID = reader["CHFID"].ToString();
-                                        response.PhotoPath = reader["PhotoPath"].ToString();
-                                        response.DOB = DateTime.Parse(reader["DOB"].ToString());
-                                        response.Gender = reader["Gender"].ToString();
+                                    response.InsureeName = string.Join(' ', reader["OtherNames"].ToString()) + ' ' + reader["LastName"].ToString();
+                                    response.CHFID = reader["CHFID"].ToString();
+                                    response.PhotoPath = reader["PhotoPath"].ToString();
+                                    response.DOB = DateTime.Parse(reader["DOB"].ToString());
+                                    response.Gender = reader["Gender"].ToString();
 
-                                        firstValue = false;
-                                    }
-                                    
-
-                                    details.Add(new DetailModel
-                                    {
-                                        AntenatalAmountLeft = reader["AntenatalAmountLeft"].ToString().ToNullableDecimal(),
-                                        ConsultationAmountLeft = reader["ConsultationAmountLeft"].ToString().ToNullableDecimal(),
-                                        DeliveryAmountLeft = reader["DeliveryAmountLeft"].ToString().ToNullableDecimal(),
-                                        HospitalizationAmountLeft = reader["HospitalizationAmountLeft"].ToString().ToNullableDecimal(),
-                                        SurgeryAmountLeft = reader["SurgeryAmountLeft"].ToString().ToNullableDecimal(),
-                                        TotalAdmissionsLeft = reader["TotalAdmissionsLeft"].ToString().ToNullableDecimal(),
-                                        TotalAntenatalLeft = reader["TotalAntenatalLeft"].ToString().ToNullableDecimal(),
-                                        TotalConsultationsLeft = reader["TotalConsultationsLeft"].ToString().ToNullableDecimal(),
-                                        TotalDelivieriesLeft = reader["TotalDelivieriesLeft"].ToString().ToNullableDecimal(),
-                                        TotalSurgeriesLeft = reader["TotalSurgeriesLeft"].ToString().ToNullableDecimal(),
-                                        TotalVisitsLeft = reader["TotalVisitsLeft"].ToString().ToNullableDecimal(),
-                                        PolicyValue = reader["PolicyValue"].ToString().ToNullableDecimal(),
-                                        EffectiveDate = DateTime.Parse(reader["EffectiveDate"].ToString()),
-                                        ProductCode = reader["ProductCode"].ToString(),
-                                        ProductName = reader["ProductName"].ToString(),
-                                        ExpiryDate = DateTime.Parse(reader["ExpiryDate"].ToString()),
-                                        Status = reader["Status"].ToString(),
-                                        DedType = reader["DedType"].ToString().ToNullableFloat(),
-                                        Ded1 = reader["Ded1"].ToString().ToNullableDecimal(),
-                                        Ded2 = reader["Ded2"].ToString().ToNullableDecimal(),
-                                        Ceiling1 = reader["Ceiling1"].ToString().ToNullableDecimal(),
-                                        Ceiling2 = reader["Ceiling2"].ToString().ToNullableDecimal(),
-                                    });
+                                    firstValue = false;
                                 }
-                            } while (reader.NextResult());
-                        }
+
+
+                                details.Add(new DetailModel
+                                {
+                                    AntenatalAmountLeft = reader["AntenatalAmountLeft"].ToString().ToNullableDecimal(),
+                                    ConsultationAmountLeft = reader["ConsultationAmountLeft"].ToString().ToNullableDecimal(),
+                                    DeliveryAmountLeft = reader["DeliveryAmountLeft"].ToString().ToNullableDecimal(),
+                                    HospitalizationAmountLeft = reader["HospitalizationAmountLeft"].ToString().ToNullableDecimal(),
+                                    SurgeryAmountLeft = reader["SurgeryAmountLeft"].ToString().ToNullableDecimal(),
+                                    TotalAdmissionsLeft = reader["TotalAdmissionsLeft"].ToString().ToNullableDecimal(),
+                                    TotalAntenatalLeft = reader["TotalAntenatalLeft"].ToString().ToNullableDecimal(),
+                                    TotalConsultationsLeft = reader["TotalConsultationsLeft"].ToString().ToNullableDecimal(),
+                                    TotalDelivieriesLeft = reader["TotalDelivieriesLeft"].ToString().ToNullableDecimal(),
+                                    TotalSurgeriesLeft = reader["TotalSurgeriesLeft"].ToString().ToNullableDecimal(),
+                                    TotalVisitsLeft = reader["TotalVisitsLeft"].ToString().ToNullableDecimal(),
+                                    PolicyValue = reader["PolicyValue"].ToString().ToNullableDecimal(),
+                                    EffectiveDate = DateTime.Parse(reader["EffectiveDate"].ToString()),
+                                    ProductCode = reader["ProductCode"].ToString(),
+                                    ProductName = reader["ProductName"].ToString(),
+                                    ExpiryDate = DateTime.Parse(reader["ExpiryDate"].ToString()),
+                                    Status = reader["Status"].ToString(),
+                                    DedType = reader["DedType"].ToString().ToNullableFloat(),
+                                    Ded1 = reader["Ded1"].ToString().ToNullableDecimal(),
+                                    Ded2 = reader["Ded2"].ToString().ToNullableDecimal(),
+                                    Ceiling1 = reader["Ceiling1"].ToString().ToNullableDecimal(),
+                                    Ceiling2 = reader["Ceiling2"].ToString().ToNullableDecimal(),
+                                });
+                            }
+                        } while (reader.NextResult());
                     }
                 }
+            }
 
-                response.Details = details;
+            response.Details = details;
 
-                return response;
-            }
-            catch (SqlException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            return response;
         }
 
         public GetInsureeModel Get(string chfid)
         {
             GetInsureeModel response = new GetInsureeModel();
 
-            try
+            using (var imisContext = new ImisDB())
             {
-                using (var imisContext = new ImisDB())
-                {
-                    response = (from I in imisContext.TblInsuree
-                                join P in imisContext.TblPhotos on I.Chfid equals P.Chfid
-                                join G in imisContext.TblGender on I.Gender equals G.Code
-                                where I.Chfid == chfid
-                                && I.ValidityTo == null
-                                && P.ValidityTo == null
-                                select new GetInsureeModel()
-                                {
-                                    CHFID = I.Chfid,
-                                    DOB = I.Dob,
-                                    Gender = G.Gender,
-                                    InsureeName = I.LastName + " " + I.OtherNames,
-                                    PhotoPath = P.PhotoFolder + P.PhotoFileName
-                                })
-                             .FirstOrDefault();
-                }
+                response = (from I in imisContext.TblInsuree
+                            join P in imisContext.TblPhotos on I.Chfid equals P.Chfid
+                            join G in imisContext.TblGender on I.Gender equals G.Code
+                            where I.Chfid == chfid
+                            && I.ValidityTo == null
+                            && P.ValidityTo == null
+                            select new GetInsureeModel()
+                            {
+                                CHFID = I.Chfid,
+                                DOB = I.Dob,
+                                Gender = G.Gender,
+                                InsureeName = I.LastName + " " + I.OtherNames,
+                                PhotoPath = P.PhotoFolder + P.PhotoFileName
+                            }).FirstOrDefault();
+            }
 
-                return response;
-            }
-            catch (SqlException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
+            return response;
         }
     }
 }

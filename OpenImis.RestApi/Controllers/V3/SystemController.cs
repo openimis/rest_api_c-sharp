@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV2;
 
 namespace OpenImis.RestApi.Controllers.V3
@@ -15,11 +16,13 @@ namespace OpenImis.RestApi.Controllers.V3
     [ApiController]
     public class SystemController : Controller
     {
+        private readonly ILogger _logger;
         private readonly IImisModules _imisModules;
 
-        public SystemController(IImisModules imisModules)
+        public SystemController(IImisModules imisModules, ILoggerFactory loggerFactory)
         {
             _imisModules = imisModules;
+            _logger = loggerFactory.CreateLogger<SystemController>();
         }
 
         [AllowAnonymous]
