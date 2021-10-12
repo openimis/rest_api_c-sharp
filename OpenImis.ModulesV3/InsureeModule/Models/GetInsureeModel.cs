@@ -12,7 +12,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public string PhotoPath { get; set; }
         public string InsureeName { get; set; }
         [JsonConverter(typeof(IsoDateSerializer))]
-        public DateTime DOB { get; set; }
+        public DateTime? DOB { get; set; }
         public string Gender { get; set; }
         public string PhotoBase64 { get; set; }
     }
