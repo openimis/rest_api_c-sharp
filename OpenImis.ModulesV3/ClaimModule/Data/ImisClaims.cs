@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ModulesV3.ClaimModule.Models;
+using OpenImis.ModulesV3.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -171,15 +172,15 @@ namespace OpenImis.ModulesV3.ClaimModule.Data
                                                                     patient_name = dr["patient_name"].ToStringWithDBNull(),
                                                                     main_dg = dr["main_dg"].ToStringWithDBNull(),
                                                                     claim_number = dr["claim_number"].ToStringWithDBNull(),
-                                                                    date_claimed = DateTime.Parse(dr["date_claimed"].ToStringWithDBNull()),
-                                                                    visit_date_from = DateTime.Parse(dr["visit_date_from"].ToStringWithDBNull()),
+                                                                    date_claimed = dr["date_claimed"].ToString().ToNullableDatetime(),
+                                                                    visit_date_from = dr["visit_date_from"].ToString().ToNullableDatetime(),
                                                                     visit_type = dr["visit_type"].ToStringWithDBNull(),
                                                                     claim_status = dr["claim_status"].ToStringWithDBNull(),
                                                                     sec_dg_1 = dr["sec_dg_1"].ToStringWithDBNull(),
                                                                     sec_dg_2 = dr["sec_dg_2"].ToStringWithDBNull(),
                                                                     sec_dg_3 = dr["sec_dg_3"].ToStringWithDBNull(),
                                                                     sec_dg_4 = dr["sec_dg_4"].ToStringWithDBNull(),
-                                                                    visit_date_to = DateTime.Parse(dr["visit_date_to"].ToStringWithDBNull()),
+                                                                    visit_date_to = dr["visit_date_to"].ToString().ToNullableDatetime(),
                                                                     claimed = dr["claimed"].ToString().ParseNullableDecimal(),
                                                                     approved = dr["approved"].ToString().ParseNullableDecimal(),
                                                                     adjusted = dr["adjusted"].ToString().ParseNullableDecimal(),

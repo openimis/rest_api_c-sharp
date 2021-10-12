@@ -24,8 +24,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
         public GetEnquireModel GetEnquire(string chfid)
         {
-            GetEnquireModel response = new GetEnquireModel();
-            List<DetailModel> details = new List<DetailModel>();
+            GetEnquireModel response = null;
+            List<DetailModel> details = null;
 
             using (var imisContext = new ImisDB())
             {
@@ -48,20 +48,19 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     {
                         do
                         {
-                            bool firstValue = true;
                             while (reader.Read())
                             {
-                                if (firstValue)
+                                if (response == null)
                                 {
+                                    response = new GetEnquireModel();
+                                    details = new List<DetailModel>();
+
                                     response.InsureeName = string.Join(' ', reader["OtherNames"].ToString()) + ' ' + reader["LastName"].ToString();
                                     response.CHFID = reader["CHFID"].ToString();
                                     response.PhotoPath = reader["PhotoPath"].ToString();
-                                    response.DOB = DateTime.Parse(reader["DOB"].ToString());
+                                    response.DOB = reader["DOB"].ToString().ToNullableDatetime();
                                     response.Gender = reader["Gender"].ToString();
-
-                                    firstValue = false;
                                 }
-
 
                                 details.Add(new DetailModel
                                 {
@@ -77,10 +76,10 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                     TotalSurgeriesLeft = reader["TotalSurgeriesLeft"].ToString().ToNullableDecimal(),
                                     TotalVisitsLeft = reader["TotalVisitsLeft"].ToString().ToNullableDecimal(),
                                     PolicyValue = reader["PolicyValue"].ToString().ToNullableDecimal(),
-                                    EffectiveDate = DateTime.Parse(reader["EffectiveDate"].ToString()),
+                                    EffectiveDate = reader["EffectiveDate"].ToString().ToNullableDatetime(),
                                     ProductCode = reader["ProductCode"].ToString(),
                                     ProductName = reader["ProductName"].ToString(),
-                                    ExpiryDate = DateTime.Parse(reader["ExpiryDate"].ToString()),
+                                    ExpiryDate = reader["ExpiryDate"].ToString().ToNullableDatetime(),
                                     Status = reader["Status"].ToString(),
                                     DedType = reader["DedType"].ToString().ToNullableFloat(),
                                     Ded1 = reader["Ded1"].ToString().ToNullableDecimal(),
@@ -94,7 +93,10 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 }
             }
 
-            response.Details = details;
+            if (response != null)
+            {
+                response.Details = details;
+            }
 
             return response;
         }

@@ -48,5 +48,12 @@ namespace OpenImis.ModulesV3.Helpers
             if (float.TryParse(s, out f)) return f;
             return null;
         }
+
+        public static DateTime? ToNullableDatetime(this string s)
+        {
+            DateTime d;
+            if (DateTime.TryParse(s, out d)) return d;
+            return null;
+        }
     }
 }
