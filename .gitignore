@@ -282,3 +282,4 @@ __pycache__/
 **/wwwroot/ePayment/
 **/wwwroot/SendMessages/
 /OpenImis.RestApi/wwwroot/SentMessages
+**/Published/

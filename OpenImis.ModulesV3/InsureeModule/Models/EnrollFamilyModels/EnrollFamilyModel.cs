@@ -15,58 +15,52 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
             var enrollment = new Enrolment();
             enrollment.FileInfo = new FileInfo();
 
-
-            var families = Family.Select(x => new List<Family>()
+            foreach (Family f in Family) {
+                // add the Family
+                Family family = new Family()
                 {
-                    new Family()
+                    FamilyId = f.FamilyId,
+                    InsureeId = f.InsureeId,
+                    LocationId = f.LocationId,
+                    HOFCHFID = f.HOFCHFID,
+                    Poverty = f.Poverty,
+                    FamilyType = f.FamilyType,
+                    FamilyAddress = f.FamilyAddress,
+                    Ethnicity = f.Ethnicity,
+                    ConfirmationNo = f.ConfirmationNo,
+                    ConfirmationType = f.ConfirmationType,
+                    isOffline = f.isOffline,
+                    FamilySMS = f.FamilySMS != null ? new FamilySMS()
                     {
-                        FamilyId = x.FamilyId,
-                        InsureeId = x.InsureeId,
-                        LocationId = x.LocationId,
-                        HOFCHFID = x.HOFCHFID,
-                        Poverty = x.Poverty,
-                        FamilyType = x.FamilyType,
-                        FamilyAddress = x.FamilyAddress,
-                        Ethnicity = x.Ethnicity,
-                        ConfirmationNo = x.ConfirmationNo,
-                        ConfirmationType = x.ConfirmationType,
-                        isOffline = x.isOffline,
-                        FamilySMS =  x.FamilySMS != null ? new FamilySMS() {
-                            FamilyId = x.FamilySMS.FamilyId,
-                            ApprovalOfSMS = x.FamilySMS.ApprovalOfSMS,
-                            LanguageOfSMS = x.FamilySMS.LanguageOfSMS
-                        } : null
-                    }
-                });
-
-            foreach (var f in families)
-            {
-                enrollment.Families.Add(f.First());
-            }
-
-            var insurees = Family.Select(x => x.Insurees);
-            foreach (var i in insurees)
-            {
-                enrollment.Insurees.Add(i.First());
-            }
-
-            var policies = Family.Select(x => x.Policies);
-            foreach (var p in policies)
-            {
-                enrollment.Policies.Add(p.First());
-                if (p.First().Premium != null)
+                        FamilyId = f.FamilySMS.FamilyId,
+                        ApprovalOfSMS = f.FamilySMS.ApprovalOfSMS,
+                        LanguageOfSMS = f.FamilySMS.LanguageOfSMS
+                    } : null
+                };
+                enrollment.Families.Add(family);
+                // add the Insurees
+                foreach (var i in f.Insurees)
                 {
-                    foreach (var pr in p.First().Premium)
+                    enrollment.Insurees.Add(i);
+                }
+                // add the Policies
+                foreach (var p in f.Policies)
+                {
+                    enrollment.Policies.Add(p);
+                    if (p.Premium != null)
                     {
-                        enrollment.Premiums.Add(pr);
+                        foreach (var pr in p.Premium)
+                        {
+                            enrollment.Premiums.Add(pr);
+                        }
                     }
                 }
-            }
+                // add PolicyInsuree
+                foreach (var ip in f.InsureePolicy)
+                {
+                    enrollment.InsureePolicies.Add(ip);
+                }
 
-            var iPolicy = Family.Select(x => x.InsureePolicy);
-            foreach (var ip in iPolicy)
-            {
-                enrollment.InsureePolicies.Add(ip.First());
             }
 
             return enrollment;

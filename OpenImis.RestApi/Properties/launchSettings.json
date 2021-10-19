@@ -10,6 +10,7 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
+      "launchBrowser": true,
       "launchUrl": "http://localhost:35787/api-docs",
       "environmentVariables": {
         "REGISTRY_CONFIG_FILE": "appsettings.json",
