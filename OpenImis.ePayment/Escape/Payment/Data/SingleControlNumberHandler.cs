@@ -169,6 +169,7 @@ namespace OpenImis.ePayment.Escape.Payment.Data
 		                        AND P.PaymentStatus = 3
 		                        AND CN.ControlNumber IS NOT NULL
 		                        AND PD.InsuranceNumber IS NULL
+                                ORDER BY P.PaymentId;
 		                        
 		                        --Update Phone number and Officer code
 		                        UPDATE tblPayment SET OfficerCode = @OfficerCode,  PhoneNumber = @Phone, LanguageName = @LanguageName, SmsRequired = @SmsRequired
