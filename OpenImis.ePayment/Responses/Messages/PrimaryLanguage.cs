@@ -95,6 +95,7 @@ namespace OpenImis.ePayment.Responses.Messages
         public static string DuplicateCNAssigned = "8-Duplicated control number assigned";
         public static string CantAssignCn2 = "9-Control number cannot be assigned";
         public static string UnknownPaymentType = "10-Uknown type of payment";
+        public static string NoControlNumberAvailable = "11-No Control number available. Try again";
 
         //SavePayResponse
         public static string WrongOrMissingRecDate = "1-Wrong or missing receiving date";

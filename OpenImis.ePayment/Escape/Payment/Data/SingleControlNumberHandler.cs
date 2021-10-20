@@ -4,6 +4,7 @@ using OpenImis.DB.SqlServer;
 using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ePayment.Logic;
 using OpenImis.ePayment.Models;
+using OpenImis.ePayment.Models.Payment.Response;
 using OpenImis.ePayment.Responses;
 using OpenImis.ePayment.Responses.Messages;
 using System;
@@ -65,6 +66,7 @@ namespace OpenImis.ePayment.Escape.Payment.Data
 
             foreach (var policy in intent.policies)
             {
+                
                 // Check if the Insurance number is not blank or null
                 if (String.IsNullOrEmpty(policy.insurance_number))
                 {
@@ -104,8 +106,16 @@ namespace OpenImis.ePayment.Escape.Payment.Data
                     dataMessage.Code = 5;
                     dataMessage.MessageValue = new Responses.Messages.Language().GetMessage((int)UserLanguage, "NoRenewalProduct");
                 }
+                // Check if requested product has any free control number left in pool
+                else if(!ControlNumberAvailable(policy.insurance_product_code))
+                {
+                    dataMessage.Code = 11;
+                    dataMessage.MessageValue = new Responses.Messages.Language().GetMessage((int)UserLanguage, "NoControlNumberAvailable");
+                }
 
             }
+            dataMessage.ErrorOccured = dataMessage.Code != 0;
+            dataMessage.Data = new AssignedControlNumber();
             return dataMessage;
         }
 
@@ -198,6 +208,30 @@ namespace OpenImis.ePayment.Escape.Payment.Data
 
                 dataMessage = new SaveIntentResponse(0, false, dt, (int)UserLanguage).Message;
             }
+        }
+
+        private bool ControlNumberAvailable(string productCode)
+        {
+            var sSQL = @"SELECT 1
+                        FROM tblControlNumber CN
+                        INNER JOIN tblPayment P ON CN.PaymentID = P.PaymentID
+                        INNER JOIN tblPaymentDetails PD ON P.PaymentID = PD.PaymentID
+                        WHERE CN.ValidityTo IS NULL
+                        AND P.ValidityTo IS NULL
+                        AND PD.ProductCode = @ProductCode
+                        AND P.OfficerCode IS NULL
+                        AND CN.ControlNumber IS NOT NULL";
+
+
+            SqlParameter[] parameters =
+            {
+                new SqlParameter("@ProductCode", productCode)
+            };
+
+            var dh = new DataHelper(_configuration);
+            var dt = dh.GetDataTable(sSQL, parameters, System.Data.CommandType.Text);
+
+            return dt.Rows.Count > 0;
         }
 
     }

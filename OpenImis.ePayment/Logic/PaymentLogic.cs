@@ -34,19 +34,38 @@ namespace OpenImis.ePayment.Logic
         }
         public async Task<DataMessage> SaveIntent(IntentOfPay intent, int? errorNumber = 0, string errorMessage = null)
         {
-
+            var payment = new ImisPayment(_configuration, _hostingEnvironment);
             var cnHandler = new SingleControlNumberHandler(_configuration, _hostingEnvironment);
             var return_message = cnHandler.GetControlNumber(intent);
+            var data = new AssignedControlNumber();
+            if (return_message.ErrorOccured == true)
+                data = (AssignedControlNumber)return_message.Data;
 
-            var objstring = return_message.Data.ToString();
-            var data = (JsonConvert.DeserializeObject<List<AssignedControlNumber>>(objstring)).FirstOrDefault();
-            return_message.Data = data;
+            if (return_message.ErrorOccured == false)
+            {
+                var objstring = return_message.Data.ToString();
+                data = (JsonConvert.DeserializeObject<List<AssignedControlNumber>>(objstring)).FirstOrDefault();
+                return_message.Data = data;
+            }
+            
 
             if (data.control_number != null & data.internal_identifier != null && intent.SmsRequired & !return_message.ErrorOccured)
             {
-                var payment = new ImisPayment(_configuration, _hostingEnvironment);
                 payment.GetPaymentInfo(Convert.ToInt32(data.internal_identifier));
                 ControlNumberAssignedSms(payment);
+            }
+            else
+            {
+                payment.ControlNum = null;
+                payment.InsureeProducts = new List<InsureeProduct>();
+                payment.InsureeProducts.Add(
+                    new InsureeProduct { 
+                        InsureeNumber = intent.policies.FirstOrDefault().insurance_number,
+                        ProductCode = intent.policies.FirstOrDefault().insurance_product_code
+                    }
+                );
+                payment.PhoneNumber = intent.phone_number;
+                ControlNumberNotassignedSms(payment, return_message.MessageValue);
             }
 
             return return_message;
