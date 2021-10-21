@@ -1,0 +1,33 @@
+name: .NET
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1.28
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: |
+        cp appsettings.CHF.json.dist appsettings.CHF.json
+        cp appsettings.Development.json.dist appsettings.Development.json
+        dotnet build --no-restore --configuration Debug
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+    - name: Publish artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: webapp
+        path: bin/Debug/netcoreapp2.1/publish

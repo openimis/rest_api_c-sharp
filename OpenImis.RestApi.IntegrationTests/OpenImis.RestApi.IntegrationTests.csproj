@@ -51,4 +51,6 @@
     <ProjectReference Include="..\OpenImis.RestApi\OpenImis.RestApi.csproj" />
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties BuildVersion_StartDate="2000/1/1" /></VisualStudio></ProjectExtensions>
+
 </Project>
