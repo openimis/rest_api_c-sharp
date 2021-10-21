@@ -24,8 +24,6 @@ jobs:
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json
         dotnet build --no-restore --configuration Debug
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
     - name: Publish artifact
       uses: actions/upload-artifact@master
       with:
