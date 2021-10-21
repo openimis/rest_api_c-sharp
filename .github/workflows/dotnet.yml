@@ -28,5 +28,5 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@master
       with:
-        name: restapi-debug
+        name: restapi-debug-${{github.run_number}}-${{github.sha}}
         path: /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/bin/Debug/netcoreapp2.1/publish

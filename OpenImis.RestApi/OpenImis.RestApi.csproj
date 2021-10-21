@@ -18,6 +18,7 @@
     <DocumentationFile>bin\Debug\netcoreapp2.1\OpenImisOpenImis.ePayment.ePaymentxml</DocumentationFile>
     <DefineConstants>TRACE;DEBUG;CHF</DefineConstants>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup>
