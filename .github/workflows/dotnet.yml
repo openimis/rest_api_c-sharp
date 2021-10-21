@@ -21,8 +21,8 @@ jobs:
       run: dotnet restore
     - name: Build
       run: |
-        cp appsettings.CHF.json.dist appsettings.CHF.json
-        cp appsettings.Development.json.dist appsettings.Development.json
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json
         dotnet build --no-restore --configuration Debug
     - name: Test
       run: dotnet test --no-build --verbosity normal
