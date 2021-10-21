@@ -579,7 +579,7 @@ namespace OpenImis.ePayment.Data
 						INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
 			            WHERE P.PaymentId = @PaymentId
 						AND P.PaymentStatus = 4
-						AND PD.Amount > 0
+						AND P.ReceivedAmount > 0
 						AND I.ValidityTo IS NULL) 
                         BEGIN
                             DECLARE @tblPremiums TABLE(PremiumId INT, PolicyId INT, PayDate DATETIME)
