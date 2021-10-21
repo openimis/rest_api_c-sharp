@@ -23,9 +23,10 @@ jobs:
       run: |
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json
-        dotnet build --no-restore --configuration Debug
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json
+        dotnet publish --no-restore --configuration Debug    
     - name: Publish artifact
       uses: actions/upload-artifact@master
       with:
         name: webapp
-        path: bin/Debug/netcoreapp2.1/publish
+        path: /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/bin/Debug/netcoreapp2.1/publish
