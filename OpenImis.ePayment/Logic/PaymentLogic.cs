@@ -16,6 +16,7 @@ using System.IO;
 using System.Xml.Serialization;
 using OpenImis.ePayment.Escape.Payment.Models;
 using OpenImis.DB.SqlServer;
+using OpenImis.ePayment.Escape.Payment.Data;
 
 namespace OpenImis.ePayment.Logic
 {
@@ -33,75 +34,38 @@ namespace OpenImis.ePayment.Logic
         }
         public async Task<DataMessage> SaveIntent(IntentOfPay intent, int? errorNumber = 0, string errorMessage = null)
         {
+            var payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var cnHandler = new SingleControlNumberHandler(_configuration, _hostingEnvironment);
+            var return_message = cnHandler.GetControlNumber(intent);
+            var data = new AssignedControlNumber();
+            if (return_message.ErrorOccured == true)
+                data = (AssignedControlNumber)return_message.Data;
 
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var intentResponse = await payment.SaveIntentAsync(intent, errorNumber, errorMessage);
-
-            DataMessage return_message = new DataMessage();
-            return_message.Code = intentResponse.Code;
-            return_message.MessageValue = intentResponse.MessageValue;
-
-            if (intentResponse.Code == 0)
+            if (return_message.ErrorOccured == false)
             {
-                var objstring = intentResponse.Data.ToString();
-                List<AssignedControlNumber> data = JsonConvert.DeserializeObject<List<AssignedControlNumber>>(objstring);
-                var ret_data = data.FirstOrDefault();
+                var objstring = return_message.Data.ToString();
+                data = (JsonConvert.DeserializeObject<List<AssignedControlNumber>>(objstring)).FirstOrDefault();
+                return_message.Data = data;
+            }
+            
 
-                decimal transferFee = 0;
-                //Get the transfer Fee
-                if (intent.type_of_payment != null)
-                {
-                    transferFee = payment.determineTransferFee(payment.ExpectedAmount, (TypeOfPayment)intent.type_of_payment);
-
-                    var success = await payment.UpdatePaymentTransferFeeAsync(payment.PaymentId, transferFee, (TypeOfPayment)intent.type_of_payment);
-
-                }
-
-                var amountToBePaid = payment.GetToBePaidAmount(payment.ExpectedAmount, transferFee);
-                var response = await payment.PostReqControlNumberAsync(intent.enrolment_officer_code, payment.PaymentId, intent.phone_number, amountToBePaid, intent.policies);
-
-                if (response.ControlNumber != null) 
-                {
-                    var controlNumberExists = payment.CheckControlNumber(payment.PaymentId, response.ControlNumber);
-                    return_message = await payment.SaveControlNumberAsync(response.ControlNumber, controlNumberExists);
-                    if (payment.PaymentId != null && intent.SmsRequired)
-                    {
-                        if (!return_message.ErrorOccured && !controlNumberExists)
-                        {
-                            ret_data.control_number = response.ControlNumber;
-                            ControlNumberAssignedSms(payment);
-                        }
-                        else
-                        {
-                            ControlNumberNotassignedSms(payment, return_message.MessageValue);
-                        }
-                    }
-                }
-                else 
-                    if (response.Posted == true)
-                    {
-                        return_message = await payment.SaveControlNumberAknAsync(response.ErrorOccured, response.ErrorMessage);
-                    }
-                    else if (response.ErrorOccured == true)
-                    {
-                        return_message = await payment.SaveControlNumberAknAsync(response.ErrorOccured, response.ErrorMessage);
-                        ControlNumberNotassignedSms(payment, response.ErrorMessage);
-                    }
-
-                return_message.Data = ret_data;
-                //if we have an error then save this on db in RejectedReason column
-                if (response.ErrorMessage != "") 
-                {
-                    payment.setRejectedReason(payment.PaymentId, response.ErrorMessage);
-                    return_message.MessageValue = response.ErrorMessage;
-                    return_message.ErrorOccured = true;
-                }
-
+            if (data.control_number != null & data.internal_identifier != null && intent.SmsRequired & !return_message.ErrorOccured)
+            {
+                payment.GetPaymentInfo(Convert.ToInt32(data.internal_identifier));
+                ControlNumberAssignedSms(payment);
             }
             else
             {
-                return_message = intentResponse;
-                return_message.Data = new AssignedControlNumber();
+                payment.ControlNum = null;
+                payment.InsureeProducts = new List<InsureeProduct>();
+                payment.InsureeProducts.Add(
+                    new InsureeProduct { 
+                        InsureeNumber = intent.policies.FirstOrDefault().insurance_number,
+                        ProductCode = intent.policies.FirstOrDefault().insurance_product_code
+                    }
+                );
+                payment.PhoneNumber = intent.phone_number;
+                ControlNumberNotassignedSms(payment, return_message.MessageValue);
             }
 
             return return_message;
@@ -203,7 +167,7 @@ namespace OpenImis.ePayment.Logic
 
             if (payment.PaymentId != 0 && !response.ErrorOccured)
             {
-             
+
                 var ackResponse = payment.GetPaymentDataAck(payment.PaymentId, payment.ControlNum);
 
                 MatchModel matchModel = new MatchModel() { internal_identifier = payment.PaymentId, audit_user_id = -3 };
@@ -350,21 +314,21 @@ namespace OpenImis.ePayment.Logic
             // Language lang = payment.Language.ToLower() == "en" || payment.Language.ToLower() == "english" || payment.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
             ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, payment.Language);
             List<SmsContainer> message = new List<SmsContainer>();
-            
-                var txtmsg = string.Format(
-                    sms.GetMessage("PaymentConfirmationSMS"), // template
-                    payment.Location, // Product location 
-                    pd.control_number, // invoice number
-                    pd.received_amount, // amount paid
-                    pd.receipt_identification, // receipt number
-                    DateTime.Parse(pd.payment_date).ToString(), // payment date
-                    pd.transaction_identification // transaction number 
-                    );
+
+            var txtmsg = string.Format(
+                sms.GetMessage("PaymentConfirmationSMS"), // template
+                payment.Location, // Product location 
+                pd.control_number, // invoice number
+                pd.received_amount, // amount paid
+                pd.receipt_identification, // receipt number
+                DateTime.Parse(pd.payment_date).ToString(), // payment date
+                pd.transaction_identification // transaction number 
+                );
 
 
-                message.Add(new SmsContainer() { Message = txtmsg, Recipient = pd.payer_phone_number });
+            message.Add(new SmsContainer() { Message = txtmsg, Recipient = pd.payer_phone_number });
 
-           
+
             var fileName = "PaymentConfirmationSms_" + pd.payer_phone_number;
 
             string test = await sms.SendSMS(message, fileName);
@@ -415,7 +379,7 @@ namespace OpenImis.ePayment.Logic
                     familyproduct.InsureeName,
                     familyproduct.ProductCode,
                     familyproduct.ProductName,
-                    payment.GetToBePaidAmount(payment.ExpectedAmount,transferFee),
+                    payment.GetToBePaidAmount(payment.ExpectedAmount, transferFee),
                     payment.OutStAmount);
 
                 message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
@@ -534,7 +498,7 @@ namespace OpenImis.ePayment.Logic
                 DateTime.Now.ToString() // payment cancellation date  
                 );
 
-            message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber});
+            message.Add(new SmsContainer() { Message = txtmsg, Recipient = payment.PhoneNumber });
 
             var fileName = "PaymentCancellationSms_" + payment.PhoneNumber;
 
@@ -561,32 +525,32 @@ namespace OpenImis.ePayment.Logic
         public async Task<DataMessage> CancelPayment(int payment_id)
         {
 
-                ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-                DataMessage dt = new DataMessage();
-            
-                if (payment_id > 0)
-                {
-                    payment.GetPaymentInfo(payment_id);
-                    await payment.CancelPayment(payment_id);
-                    SendPaymentCancellationSms(payment);
-                }
-                else
-                {
-                    //Todo: move hardcoded message to translation file
-                    DataMessage dm = new DataMessage
-                    {
-                        Code = 2,
-                        ErrorOccured = true,
-                        MessageValue = "CancelPayment:2:Control Number doesn't exists",
-                    };
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            DataMessage dt = new DataMessage();
 
-                    return dm;
-                }
-                
-                return dt;
+            if (payment_id > 0)
+            {
+                payment.GetPaymentInfo(payment_id);
+                await payment.CancelPayment(payment_id);
+                SendPaymentCancellationSms(payment);
+            }
+            else
+            {
+                //Todo: move hardcoded message to translation file
+                DataMessage dm = new DataMessage
+                {
+                    Code = 2,
+                    ErrorOccured = true,
+                    MessageValue = "CancelPayment:2:Control Number doesn't exists",
+                };
+
+                return dm;
+            }
+
+            return dt;
         }
 
-        
+
         public TblOfficer GetOfficerInfo(int officerId)
         {
             var imisPayment = new ImisBasePayment(_configuration, _hostingEnvironment);
@@ -617,5 +581,7 @@ namespace OpenImis.ePayment.Logic
             var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
             return imisPayment.CreatePremium(paymentId);
         }
+
+
     }
 }

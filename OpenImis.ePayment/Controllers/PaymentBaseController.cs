@@ -77,7 +77,7 @@ namespace OpenImis.ePayment.Controllers
 
                 if (intent != null)
                 {
-                    var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
+                    // var resp = await _payment.SaveIntent(intent, error.GetErrorNumber(), error.GetErrorMessage());
                     return BadRequest(new ErrorResponseV2() { error_occured = true, error_message = error });
                 }
                 else
@@ -90,6 +90,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 var response = await _payment.SaveIntent(intent);
 
+                
                 AssignedControlNumber data = (AssignedControlNumber)response.Data;
 
                 return Ok(new GetControlNumberResp() { error_occured = response.ErrorOccured, error_message = response.MessageValue, internal_identifier = data.internal_identifier, control_number = data.control_number });

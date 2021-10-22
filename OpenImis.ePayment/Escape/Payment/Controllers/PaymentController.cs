@@ -69,7 +69,25 @@ namespace OpenImis.ePayment.Controllers
 
             intent.SetDetails();
 
-            return await base.GetControlNumber(intent);
+            var result = await base.GetControlNumber(intent);
+
+            // Check if the product requested has enough CNs left
+            try
+            {
+                var count = _payment.ControlNumbersToBeRequested(intent.ProductCode);
+                if (count > 0)
+                {
+                    // The following method is Async, but we do not await it since we don't want to wait for the result
+                     _ = RequestBulkControlNumbers(new RequestBulkControlNumbersModel { ControlNumberCount = count, ProductCode = intent.ProductCode });
+                }
+            }
+            catch (Exception)
+            {
+
+
+            }
+
+            return result;
 
         }
 

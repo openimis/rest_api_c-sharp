@@ -78,6 +78,7 @@ namespace OpenImis.ePayment.Responses.Messages
         public static string DuplicateCNAssigned = "8-Umepatiwa namba ya ankara iliyojirudia, jaribu tena";
         public static string CantAssignCn2 = "9-Na. ya ankara imeshishindikana kutolewa, jaribu tena";
         public static string UnknownPaymentType = "10-Aina ya malipo uliyochagua hayapo";
+        public static string NoControlNumberAvailable = "11-Hakuna control number inayopatikana. Jaribu tena";
 
         public static string WrongOrMissingRecDate = "1-Umekosea tarehe ya kupokea";
         public static string WrongFormatInputData = "2-Umekosea taarifa uliyojaza";
