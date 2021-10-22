@@ -46,6 +46,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
                 // add the Policies
                 foreach (var p in f.Policies)
                 {
+                    var pol = p;
                     enrollment.Policies.Add(p);
                     if (p.Premium != null)
                     {

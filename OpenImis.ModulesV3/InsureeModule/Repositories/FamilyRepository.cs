@@ -130,7 +130,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                         {
                             premiums.Add(new PremiumVM
                             {
-                                PremiumId = fam.Policies.Where(x => x.ProdId == p.ProdId).FirstOrDefault().Premium.Where(y => y.Receipt == pr.Receipt).Select(z => z.PremiumId).FirstOrDefault(),
+                                PremiumId = fam.Policies.Count > 0 ? fam.Policies.Where(x => x.ProdId == p.ProdId).FirstOrDefault().Premium.Where(y => y.Receipt == pr.Receipt).Select(z => z.PremiumId).FirstOrDefault() : 0,
                                 PremiumDBId = pr.PremiumId,
                                 PremiumUUID = pr.PremiumUUID
                             });
@@ -227,13 +227,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     using (var reader = cmd.ExecuteReader())
                     {
                         // Displaying errors in the Stored Procedure in Debug mode
-                        //do
-                        //{
-                        //    while (reader.Read())
-                        //    {
-                        //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                        //    }
-                        //} while (reader.NextResult());
+                        do
+                        {
+                            while (reader.Read())
+                            {
+                                Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                            }
+                        } while (reader.NextResult());
                     }
                 }
 
