@@ -138,13 +138,13 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                         using (var reader = cmd.ExecuteReader())
                         {
                             // Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
+                            do
+                            {
+                                while (reader.Read())
+                                {
+                                    Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                }
+                            } while (reader.NextResult());
                         }
                     }
 
@@ -273,7 +273,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                     {
                         new SqlParameter("@ControlNumber", renewal.ControlNumber),
                         new SqlParameter("@PolicyId", policyId),
-                        new SqlParameter("@@InsuranceNumber", renewal.CHFID)
+                        new SqlParameter("@InsuranceNumber", renewal.CHFID)
                     };
 
                     try
@@ -281,7 +281,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                         var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
                         dh.Execute(sSQL, parameters, CommandType.Text);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
 
                         return (int)Errors.Renewal.CouldNotUpdateControlNumber;
