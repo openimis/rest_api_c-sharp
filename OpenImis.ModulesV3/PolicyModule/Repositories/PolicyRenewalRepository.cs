@@ -15,6 +15,7 @@ using System;
 using System.Diagnostics;
 using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
+using OpenImis.ePayment.Logic;
 
 namespace OpenImis.ModulesV3.PolicyModule.Repositories
 {
@@ -85,7 +86,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
         // TODO Change the RV assignment codes. It should be on the list for better understanding
         public int Post(PolicyRenewalModel policy)
         {
-            int RV = 2;
+            int RV = (int)Errors.Renewal.Rejected;
 
             var policyRenew = policy.GetPolicy();
             var XML = policyRenew.XMLSerialize();
@@ -110,7 +111,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             }
             catch
             {
-                return RV;
+                return (int)Errors.Renewal.UnexpectedException;
             }
 
             if (ifSaved)
@@ -151,7 +152,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
 
                     if (tempRV == 0 || tempRV == -4)
                     {
-                        RV = 1;
+                        RV = (int)Errors.Renewal.Accepted;
                     }
                     else if (tempRV == -1 || tempRV == -2 || tempRV == -3)
                     {
@@ -159,13 +160,20 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                         {
                             File.Move(fromPhoneRenewalDir + fileName, fromPhoneRenewalRejectedDir + fileName);
                         }
-                        RV = 0;
+                        RV = (int)Errors.Renewal.Rejected;
                     }
                     else
                     {
-                        RV = 2;
+                        RV = (int)Errors.Renewal.Rejected;
                     }
                 }
+            }
+
+            if(RV == (int)Errors.Renewal.Accepted)
+            {
+                RV = UpdateControlNumber(policy);
+
+                CreatePremium(policy);
             }
 
             return RV;
@@ -244,6 +252,59 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             }
 
             return message;
+        }
+
+        public int UpdateControlNumber(PolicyRenewalModel renewal)
+        {
+            if(!String.IsNullOrEmpty(renewal.ControlNumber))
+            {
+                var context = new ImisDB();
+                var policyId = context.TblPolicyRenewals.Where(r => r.RenewalId == renewal.RenewalId).Select(r => r.PolicyId).FirstOrDefault();
+                if (policyId > 0)
+                {
+                    var sSQL = @"UPDATE PD SET InsuranceNumber = @InsuranceNumber, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
+                                FROM tblControlNumber CN
+                                INNER JOIN tblPaymentDetails PD ON CN.PaymentId = PD.PaymentID
+                                INNER JOIN tblPolicy Pol ON Pol.PolicyID = @PolicyId
+                                WHERE CN.ValidityTo IS NULL
+                                AND CN.ControlNumber = @ControlNumber;";
+
+                    SqlParameter[] parameters =
+                    {
+                        new SqlParameter("@ControlNumber", renewal.ControlNumber),
+                        new SqlParameter("@PolicyId", policyId),
+                        new SqlParameter("@@InsuranceNumber", renewal.CHFID)
+                    };
+
+                    try
+                    {
+                        var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
+                        dh.Execute(sSQL, parameters, CommandType.Text);
+                    }
+                    catch (Exception)
+                    {
+
+                        return (int)Errors.Renewal.CouldNotUpdateControlNumber;
+                    }
+
+                }
+            }
+
+            return (int)Errors.Renewal.Accepted;
+        }
+
+
+        public void CreatePremium(PolicyRenewalModel renewal)
+        {
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+
+            if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
+            {
+                int paymentId = payment.GetPaymentId(renewal.ControlNumber);
+                _ = paymentLogic.CreatePremium(paymentId);
+            }
+
         }
     }
 }
