@@ -24,5 +24,18 @@ namespace OpenImis.ModulesV3
             Rejected,
             UnexpectedException = 2999
         }
+
+        // Renewal Erros
+        public enum Renewal
+        {
+            Accepted = 3001,
+            AlreadyAccepted = 3002,
+            Rejected = 3003,
+            DuplicateReceiptFound = 3004,
+            GracePeriodExpired = 3005,
+            CouldNotUpdateControlNumber = 3006,
+            UnexpectedException = 3999
+
+        }
     }
 }

@@ -20,6 +20,8 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
         public bool Discontinue { get; set; }
         public int PayerId { get; set; }
 
+        public string ControlNumber { get; set; }
+
 
         public Policy GetPolicy()
         {
@@ -33,7 +35,8 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
                 Amount = Amount,
                 Date = Date,
                 Discontinue = Discontinue,
-                PayerId = PayerId
+                PayerId = PayerId,
+                ControlNumber = ControlNumber
             };
         }
     }
