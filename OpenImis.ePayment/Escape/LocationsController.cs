@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace OpenImis.ePayment.Escape
 {
-    [ApiVersion("2")]
+    [ApiVersion("3")]
     public class LocationsController : LocationsBaseController
     {
         public LocationsController(IConfiguration configuration) : base(configuration)

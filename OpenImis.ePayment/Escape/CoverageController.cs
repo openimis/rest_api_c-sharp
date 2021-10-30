@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 
 namespace OpenImis.ePayment.Controllers
 {
-    [ApiVersion("2")]
+    [ApiVersion("3")]
     public class CoverageController : CoverageBaseController
     {
         private IConfiguration _configuration;
