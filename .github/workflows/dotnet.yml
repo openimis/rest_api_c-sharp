@@ -1,0 +1,32 @@
+name: .NET
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: |
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json
+        dotnet publish --no-restore --configuration Debug --verbosity quiet
+    - name: Publish artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: restapi-debug-${{github.run_number}}-${{github.sha}}
+        path: /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/bin/Debug/netcoreapp2.1/publish

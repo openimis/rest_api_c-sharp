@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenImis.ModulesV2;
 using OpenImis.ModulesV2.PremiumModule.Models;
-using OpenImis.RestApi.Security;
+using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V2
 {

@@ -44,14 +44,13 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                                        select UD.LocationId)
                                        .ToList();
 
-                    var familyId = (from item in locationIds
-                                    from I in imisContext.TblInsuree
+                    var familyId = (from I in imisContext.TblInsuree
                                     join F in imisContext.TblFamilies on I.FamilyId equals F.FamilyId
                                     join V in imisContext.TblVillages on F.LocationId equals V.VillageId
                                     join W in imisContext.TblWards on V.WardId equals W.WardId
                                     join D in imisContext.TblDistricts on W.DistrictId equals D.DistrictId
                                     where (I.Chfid == chfid
-                                        && D.DistrictId == item
+                                        && locationIds.Contains(D.DistrictId)
                                         && F.ValidityTo == null
                                         && I.ValidityTo == null
                                         && V.ValidityTo == null
@@ -63,9 +62,11 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                     response = imisContext.TblInsuree
                                         .Where(i => i.ValidityTo == null && i.FamilyId == familyId)
                                         .Join(imisContext.TblFamilies, i => i.FamilyId, f => f.FamilyId, (i, f) => f)
+                                        .Join(imisContext.TblFamilySMS, f => f.FamilyId, fsms => fsms.FamilyId, (f, fsms) => f)
                                         .Where(f => f.ValidityTo == null)
                                         .Include(f => f.TblInsuree)
                                             .ThenInclude(f => f.Photo)
+                                        .Include(f => f.TblFamilySMS)
                                         .Select(f => FamilyModel.FromTblFamilies(f))
                                         .FirstOrDefault();
                 }
@@ -91,8 +92,6 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
         {
             try
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-
                 var enrollFamily = model.GetEnrolmentFromModel();
 
                 enrollFamily.FileInfo.UserId = userId;
@@ -101,10 +100,10 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                 var XML = enrollFamily.XMLSerialize();
                 var JSON = JsonConvert.SerializeObject(enrollFamily);
 
-                var EnrollmentDir = _configuration["AppSettings:Enrollment_Phone"];
-                var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"];
-                var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"];
-                var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"];
+                var EnrollmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
+                var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar;
+                var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
+                var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
 
                 var hof = enrollFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
@@ -116,13 +115,13 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                 try
                 {
-                    if (!Directory.Exists(webRootPath + EnrollmentDir)) Directory.CreateDirectory(webRootPath + EnrollmentDir);
+                    if (!Directory.Exists(EnrollmentDir)) Directory.CreateDirectory(EnrollmentDir);
 
-                    xmldoc.Save(webRootPath + EnrollmentDir + FileName);
+                    xmldoc.Save(EnrollmentDir + FileName);
 
-                    if (!Directory.Exists(webRootPath + JsonDebugFolder)) Directory.CreateDirectory(webRootPath + JsonDebugFolder);
+                    if (!Directory.Exists(JsonDebugFolder)) Directory.CreateDirectory(JsonDebugFolder);
 
-                    File.WriteAllText(webRootPath + JsonDebugFolder + JsonFileName, JSON);
+                    File.WriteAllText(JsonDebugFolder + JsonFileName, JSON);
                 }
                 catch (Exception e)
                 {
@@ -190,9 +189,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                     if (RV == 0 && (InsureeImported > 0 || InsureeUpd > 0))
                     {
-                        if (!Directory.Exists(webRootPath + UpdatedFolder))
+                        if (!Directory.Exists(UpdatedFolder))
                         {
-                            Directory.CreateDirectory(webRootPath + UpdatedFolder);
+                            Directory.CreateDirectory(UpdatedFolder);
                         }
 
                         foreach (var picture in model.Family.Select(x => x.Insurees.Select(s => s.Picture)).FirstOrDefault().ToList())
@@ -203,7 +202,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                                 {
                                     if (picture.ImageContent.Length != 0)
                                     {
-                                        File.WriteAllBytes(webRootPath + UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, Convert.FromBase64String(picture.ImageContent));
+                                        File.WriteAllBytes(UpdatedFolder + Path.DirectorySeparatorChar + picture.ImageName, Convert.FromBase64String(picture.ImageContent));
                                     }
                                 }
                             }

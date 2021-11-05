@@ -1,1 +1,1 @@
-﻿fr The control number {0} cannot be assigned for the request issued on {1} at {2} for payment of the set of policies containing the family/group {3} with the insurance product {4}.The reason is {5}
+﻿Maombi ya Ankara Na. ya CHFID:{3}, Bidhaa:{4} hayajafanikiwa. Tafadhali, jaribu tena baadae.

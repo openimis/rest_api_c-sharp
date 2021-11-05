@@ -34,8 +34,6 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
 
             try
             {
-                string webRootPath = _hostingEnvironment.WebRootPath;
-
                 dynamic claimData;
 
                 using (var imisContext = new ImisDB())
@@ -66,8 +64,8 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
 
                 XML = tempDoc.OuterXml;
 
-                var fromPhoneFeedbackDir = _configuration["AppSettings:FromPhone_Feedback"];
-                var fromPhoneFeedbackRejectedDir = _configuration["AppSettings:FromPhone_Feedback_Rejected"];
+                var fromPhoneFeedbackDir = _configuration["AppSettings:FromPhone_Feedback"] + Path.DirectorySeparatorChar;
+                var fromPhoneFeedbackRejectedDir = _configuration["AppSettings:FromPhone_Feedback_Rejected"] + Path.DirectorySeparatorChar;
 
                 var fileName = "feedback_" + claimCode + ".xml";
 
@@ -78,9 +76,10 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
 
                 try
                 {
-                    if (!Directory.Exists(webRootPath + fromPhoneFeedbackDir)) Directory.CreateDirectory(webRootPath + fromPhoneFeedbackDir);
+                    if (!Directory.Exists(fromPhoneFeedbackDir)) Directory.CreateDirectory(fromPhoneFeedbackDir);
+                    if (!Directory.Exists(fromPhoneFeedbackRejectedDir)) Directory.CreateDirectory(fromPhoneFeedbackRejectedDir);
 
-                    xmldoc.Save(webRootPath + fromPhoneFeedbackDir + fileName);
+                    xmldoc.Save(fromPhoneFeedbackDir + fileName);
                     ifSaved = true;
                 }
                 catch (Exception e)
@@ -128,9 +127,9 @@ namespace OpenImis.ModulesV2.FeedbackModule.Repositories
                         }
                         else if (tempRV == 1 || tempRV == 2 || tempRV == 3)
                         {
-                            if (File.Exists(webRootPath + fromPhoneFeedbackDir + fileName))
+                            if (File.Exists(fromPhoneFeedbackDir + fileName))
                             {
-                                File.Move(webRootPath + fromPhoneFeedbackDir + fileName, webRootPath + fromPhoneFeedbackRejectedDir + fileName);
+                                File.Move(fromPhoneFeedbackDir + fileName, fromPhoneFeedbackRejectedDir + fileName);
                             }
                             RV = 0;
                         }
