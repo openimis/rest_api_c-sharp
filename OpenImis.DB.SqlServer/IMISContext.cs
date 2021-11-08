@@ -27,6 +27,7 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblEducations> TblEducations { get; set; }
         public virtual DbSet<TblExtracts> TblExtracts { get; set; }
         public virtual DbSet<TblFamilies> TblFamilies { get; set; }
+        public virtual DbSet<TblFamilySMS> TblFamilySMS { get; set; }
         public virtual DbSet<TblFamilyTypes> TblFamilyTypes { get; set; }
         public virtual DbSet<TblFeedback> TblFeedback { get; set; }
         public virtual DbSet<TblFeedbackPrompt> TblFeedbackPrompt { get; set; }
@@ -663,6 +664,29 @@ namespace OpenImis.DB.SqlServer
                     .WithMany(p => p.TblFamilies)
                     .HasForeignKey(d => d.LocationId)
                     .HasConstraintName("FK_tblFamilies_tblLocations");
+            });
+
+            modelBuilder.Entity<TblFamilySMS>(entity =>
+            {
+                entity.HasKey(e => e.FamilyId);
+
+                entity.ToTable("tblFamilySMS");
+                entity.Property(e => e.FamilyId).HasColumnName("FamilyID");
+
+                entity.Property(e => e.LanguageOfSMS).HasColumnName("LanguageOfSMS")
+                    .HasMaxLength(5);
+
+                entity.Property(e => e.ApprovalOfSMS).HasColumnName("ApprovalOfSMS");
+
+                entity.Property(e => e.ValidityFrom).HasColumnType("datetime").HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.ValidityTo).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Family)
+                    .WithMany(p => p.TblFamilySMS)
+                    .HasForeignKey(d => d.FamilyId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_tblFamilySMS_tblFamily-FamilyID");
             });
 
             modelBuilder.Entity<TblFamilyTypes>(entity =>

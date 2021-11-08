@@ -39,7 +39,9 @@ namespace OpenImis.RestApi.Docs
             var apiVersionDescriptions = new ApiVersionDescriptions();
             apiVersionDescriptions.AddDescription("1", File.ReadAllText("Docs\\ApiVersion1Description.md"));
             apiVersionDescriptions.AddDescription("2", File.ReadAllText("Docs\\ApiVersion2Description.md"));
-			var apiVersions = GetApiVersions(webApiAssembly);
+            apiVersionDescriptions.AddDescription("3", File.ReadAllText("Docs\\ApiVersion3Description.md"));
+
+            var apiVersions = GetApiVersions(webApiAssembly);
             foreach (var apiVersion in apiVersions)
             {
                 swaggerGenOptions.SwaggerDoc($"v{apiVersion}",

@@ -1,0 +1,1 @@
+﻿Payment has been made to CHF-{0} Invoice: {1} Amount: {2} TZS Receipt: {3} Date: {4} Through:{5}

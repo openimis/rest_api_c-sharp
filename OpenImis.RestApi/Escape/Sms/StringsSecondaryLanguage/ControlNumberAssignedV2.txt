@@ -1,1 +1,1 @@
-﻿fr The control number {0} was assigned for the request issued on {1} at {2} for payment of the set of policies containing the family/group {3}-{4} with the insurance product {5}-{6} and {8} others. The amount of payment associated with the request is {7}.
+﻿Ankara Na:{0},Tarehe:{1},CHFID:{3},Bidhaa:{5},Kiasi:{7} Lipa kupitia simu malipo ya serikali au Benki

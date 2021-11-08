@@ -6,38 +6,45 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using OpenImis.RestApi.Security;
+using OpenImis.Security.Security;
 using OpenImis.RestApi.Docs;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Logging;
-using OpenImis.RestApi.Controllers;
-using OpenImis.ModulesV1;
-using OpenImis.ModulesV2;
 using Microsoft.AspNetCore.Http;
 using OpenImis.ModulesV1.Helpers;
 using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
-using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Quartz.Impl;
+using Quartz.Spi;
+using Quartz;
+using System;
+using OpenImis.ePayment.Scheduler;
+using OpenImis.RestApi.Scheduler;
+using OpenImis.RestApi.Util.ErrorHandling;
+// using OpenImis.ePayment.Formaters;
 
 namespace OpenImis.RestApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             Configuration = configuration;
+            HostingEnvironment = hostingEnvironment;
         }
 
         private IConfiguration Configuration { get; }
+        private IHostingEnvironment HostingEnvironment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
             var configImisModules = Configuration.GetSection("ImisModules").Get<List<ConfigImisModules>>();
-            int lastApiVersion = configImisModules.Max(c => int.Parse(c.Version));
+            int lastApiVersion = 3; // configImisModules.Max(c => int.Parse(c.Version));
 
             services.AddSingleton<ModulesV1.IImisModules, ModulesV1.ImisModules>();
             services.AddSingleton<ModulesV2.IImisModules, ModulesV2.ImisModules>();
+            services.AddSingleton<ModulesV3.IImisModules, ModulesV3.ImisModules>();
+            services.AddSingleton<Security.ILoginModule, Security.LoginModule>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -56,10 +63,15 @@ namespace OpenImis.RestApi
 
                     options.SecurityTokenValidators.Clear();
                     //below line adds the custom validator class
+                    //options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(
+                    //    services.BuildServiceProvider().GetService<ModulesV1.IImisModules>(),
+                    //    services.BuildServiceProvider().GetService<ModulesV2.IImisModules>(),
+                    //    services.BuildServiceProvider().GetService<ModulesV3.IImisModules>(),
+                    //    services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
+
                     options.SecurityTokenValidators.Add(new IMISJwtSecurityTokenHandler(
-                        services.BuildServiceProvider().GetService<ModulesV1.IImisModules>(),
-                        services.BuildServiceProvider().GetService<ModulesV2.IImisModules>(),
                         services.BuildServiceProvider().GetService<IHttpContextAccessor>()));
+
                 });
 
             services.AddAuthorization();
@@ -67,6 +79,14 @@ namespace OpenImis.RestApi
             services.AddMvc(options =>
             {
                 options.AllowCombiningAuthorizeFilters = false;
+                options.RespectBrowserAcceptHeader = true;
+                options.ReturnHttpNotAcceptable = true;
+#if CHF
+                options.InputFormatters.Add(new ePayment.Formaters.GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration));
+#else
+                options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
+#endif
+                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
             .AddControllersAsServices();
@@ -92,13 +112,33 @@ namespace OpenImis.RestApi
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+
+
+            // Quartz scheduler
+            var scheduler = StdSchedulerFactory.GetDefaultScheduler().GetAwaiter().GetResult();
+            services.AddSingleton(scheduler);
+            services.AddHostedService<QuartzHostedService>();
+            services.AddSingleton<IJobFactory, CustomQuartzJobFactory>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton<MatchPaymentJob>();
+
+            var jobName = Configuration.GetSection("MatchPaymentSchedule").GetValue<string>("JobName");
+            var cronExpression = Configuration.GetSection("MatchPaymentSchedule").GetValue<string>("CronExpression");
+
+            services.AddSingleton(new JobMetaData(Guid.NewGuid(), typeof(MatchPaymentJob), jobName , cronExpression));
+            services.AddHostedService<CustomQuartzHostedService>();
+
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            var loggingOptions = Configuration.GetSection("Log4NetCore").Get<Log4NetProviderOptions>();
+            loggerFactory.AddLog4Net(loggingOptions);
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 loggerFactory.AddConsole(Configuration.GetSection("Logging"));
                 loggerFactory.AddDebug();
             }

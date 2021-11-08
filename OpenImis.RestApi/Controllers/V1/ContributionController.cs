@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OpenImis.Security.Security;
 using OpenImis.ModulesV1;
 using OpenImis.ModulesV1.InsureeModule.Models;
-using OpenImis.RestApi.Security;
+
 
 namespace OpenImis.RestApi.Controllers.V1
 {

@@ -1,0 +1,1 @@
+﻿Invoice number {0} has been cancelled for CHF payment on {1}

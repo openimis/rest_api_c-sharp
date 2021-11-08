@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <Configurations>Debug;Release;CHFDebug;CHFRelease</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -48,5 +50,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OpenImis.RestApi\OpenImis.RestApi.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties BuildVersion_StartDate="2000/1/1" /></VisualStudio></ProjectExtensions>
 
 </Project>

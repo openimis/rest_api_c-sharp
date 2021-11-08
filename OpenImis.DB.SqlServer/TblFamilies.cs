@@ -9,6 +9,7 @@ namespace OpenImis.DB.SqlServer
         {
             TblInsuree = new HashSet<TblInsuree>();
             TblPolicy = new HashSet<TblPolicy>();
+            TblFamilySMS = new HashSet<TblFamilySMS>();
         }
 
         public int FamilyId { get; set; }
@@ -32,7 +33,9 @@ namespace OpenImis.DB.SqlServer
         public TblFamilyTypes FamilyTypeNavigation { get; set; }
         public TblInsuree Insuree { get; set; }
         public TblLocations Location { get; set; }
+
         public ICollection<TblInsuree> TblInsuree { get; set; }
         public ICollection<TblPolicy> TblPolicy { get; set; }
+        public ICollection<TblFamilySMS> TblFamilySMS { get; set; }
     }
 }

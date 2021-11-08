@@ -272,7 +272,14 @@ __pycache__/
 **/appsettings.Development.json
 **/appsettings.Production.json
 **/appsettings.Test.json
+**/appsettings.CHF.json
 *.old
 /OpenImis.DB.SqlServer/importDBStructure.bat
 /OpenImis.Modules/PaymentModule/CHF
 /OpenImis.RestApi/ControllersForChf
+**/Certificates/
+**/controlNumberAck/
+**/wwwroot/ePayment/
+**/wwwroot/SendMessages/
+/OpenImis.RestApi/wwwroot/SentMessages
+**/Published/
