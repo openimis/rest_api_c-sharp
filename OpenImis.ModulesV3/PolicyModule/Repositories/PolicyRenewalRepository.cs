@@ -169,7 +169,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                 }
             }
 
-            if(RV == (int)Errors.Renewal.Accepted)
+            if (RV == (int)Errors.Renewal.Accepted)
             {
                 RV = UpdateControlNumber(policy);
 
@@ -256,38 +256,33 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
 
         public int UpdateControlNumber(PolicyRenewalModel renewal)
         {
-            if(!String.IsNullOrEmpty(renewal.ControlNumber))
+            if (!String.IsNullOrEmpty(renewal.ControlNumber))
             {
-                var context = new ImisDB();
-                var policyId = context.TblPolicyRenewals.Where(r => r.RenewalId == renewal.RenewalId).Select(r => r.PolicyId).FirstOrDefault();
-                if (policyId > 0)
-                {
-                    var sSQL = @"UPDATE PD SET InsuranceNumber = @InsuranceNumber, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
+
+                var sSQL = @"UPDATE PD SET InsuranceNumber = @InsuranceNumber, PolicyStage = N'R', ValidityFrom = GETDATE()
                                 FROM tblControlNumber CN
                                 INNER JOIN tblPaymentDetails PD ON CN.PaymentId = PD.PaymentID
-                                INNER JOIN tblPolicy Pol ON Pol.PolicyID = @PolicyId
                                 WHERE CN.ValidityTo IS NULL
                                 AND CN.ControlNumber = @ControlNumber;";
 
-                    SqlParameter[] parameters =
-                    {
+                SqlParameter[] parameters =
+                {
                         new SqlParameter("@ControlNumber", renewal.ControlNumber),
-                        new SqlParameter("@PolicyId", policyId),
                         new SqlParameter("@InsuranceNumber", renewal.CHFID)
                     };
 
-                    try
-                    {
-                        var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
-                        dh.Execute(sSQL, parameters, CommandType.Text);
-                    }
-                    catch (Exception ex)
-                    {
-
-                        return (int)Errors.Renewal.CouldNotUpdateControlNumber;
-                    }
-
+                try
+                {
+                    var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
+                    dh.Execute(sSQL, parameters, CommandType.Text);
                 }
+                catch (Exception ex)
+                {
+
+                    return (int)Errors.Renewal.CouldNotUpdateControlNumber;
+                }
+
+                //}
             }
 
             return (int)Errors.Renewal.Accepted;
