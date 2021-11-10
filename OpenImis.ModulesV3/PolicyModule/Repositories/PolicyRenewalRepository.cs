@@ -164,9 +164,12 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                             RV = (int)Errors.Renewal.AlreadyAccepted;
                             break;
                         case -1:
-                        case -5:
                             moveToRejected = true;
                             RV = (int)Errors.Renewal.UnexpectedException;
+                            break;
+                        case -5:
+                            moveToRejected = true;
+                            RV = (int)Errors.Renewal.Rejected;
                             break;
                         default:
                             moveToRejected = true;
