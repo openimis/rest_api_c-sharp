@@ -83,7 +83,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             return response;
         }
 
-        // TODO Change the RV assignment codes. It should be on the list for better understanding
+        // TODO Add a RV for missing EO or previous policy (currently -5)
         public int Post(PolicyRenewalModel policy)
         {
             int RV = (int)Errors.Renewal.Rejected;
@@ -149,22 +149,37 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                     }
 
                     int tempRV = (int)returnParameter.Value;
+                    bool moveToRejected = false;
 
-                    if (tempRV == 0 || tempRV == -4)
+                    switch (tempRV) 
                     {
-                        RV = (int)Errors.Renewal.Accepted;
+                        case 0:
+                            RV = (int)Errors.Renewal.Accepted;
+                            break;
+                        case -2:
+                            moveToRejected = true;
+                            RV = (int)Errors.Renewal.GracePeriodExpired;
+                            break;
+                        case -4:
+                            RV = (int)Errors.Renewal.AlreadyAccepted;
+                            break;
+                        case -1:
+                        case -5:
+                            moveToRejected = true;
+                            RV = (int)Errors.Renewal.UnexpectedException;
+                            break;
+                        default:
+                            moveToRejected = true;
+                            RV = (int)Errors.Renewal.Rejected;
+                            break;
                     }
-                    else if (tempRV == -1 || tempRV == -2 || tempRV == -3)
+
+                    if(moveToRejected)
                     {
                         if (File.Exists(fromPhoneRenewalDir + fileName))
                         {
                             File.Move(fromPhoneRenewalDir + fileName, fromPhoneRenewalRejectedDir + fileName);
                         }
-                        RV = (int)Errors.Renewal.Rejected;
-                    }
-                    else
-                    {
-                        RV = (int)Errors.Renewal.Rejected;
                     }
                 }
             }
