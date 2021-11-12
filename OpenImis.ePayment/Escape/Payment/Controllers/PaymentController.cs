@@ -358,7 +358,7 @@ namespace OpenImis.ePayment.Controllers
                             imisPayment.updateReconciliatedPaymentAsync(recon.SpBillId, model.ReconcBatchInfo.SpReconcReqId);
                             //TODO update policy
                         }
-                        else if (paymentStatus == PaymentStatus.Reconciliated)
+                        else if (paymentStatus == PaymentStatus.Matched)
                         {
                             imisPayment.MatchPayment(new MatchModel
                             {
