@@ -4,11 +4,13 @@ using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV3.FeedbackModule.Models;
 using OpenImis.ModulesV3.Helpers;
+using OpenImis.ModulesV3.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -107,13 +109,13 @@ namespace OpenImis.ModulesV3.FeedbackModule.Repositories
                         using (var reader = cmd.ExecuteReader())
                         {
                             // Displaying errors in the Stored Procedure in Debug mode
-                            //do
-                            //{
-                            //    while (reader.Read())
-                            //    {
-                            //        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
-                            //    }
-                            //} while (reader.NextResult());
+                            do
+                            {
+                                while (reader.Read())
+                                {
+                                    Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                }
+                            } while (reader.NextResult());
                         }
                     }
 
@@ -167,10 +169,10 @@ namespace OpenImis.ModulesV3.FeedbackModule.Repositories
                                 HFCode = HF.Hfcode,
                                 HFName = HF.Hfname,
                                 ClaimCode = C.ClaimCode,
-                                DateFrom = C.DateFrom.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
-                                DateTo = C.DateTo.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+                                DateFrom = C.DateFrom.ToString(DateTimeFormats.IsoDateFormat, CultureInfo.InvariantCulture),
+                                DateTo = C.DateTo.Value.ToString(DateTimeFormats.IsoDateFormat, CultureInfo.InvariantCulture),
                                 Phone = O.Phone,
-                                FeedbackPromptDate = F.FeedbackPromptDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)
+                                FeedbackPromptDate = F.FeedbackPromptDate.ToString(DateTimeFormats.IsoDateFormat, CultureInfo.InvariantCulture)
                             })
                           .ToList();
             }
