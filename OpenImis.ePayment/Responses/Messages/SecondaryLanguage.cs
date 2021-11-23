@@ -31,7 +31,7 @@ namespace OpenImis.ePayment.Responses.Messages
         public static string NotFountINMember = "Numéro d’assuré de membre introuvable.";
         public static string WrongVillageCode = "Code du village erroné.";
         public static string WrongRelationship = "Relation erronée.";
-        public static string WrongOrMissingPC = "Code du paquet de bénéfices erroné ou manquant (non existant ou sans objet pour la famille\/groupe)";
+        public static string WrongOrMissingPC = "Code du paquet de bénéfices erroné ou manquant (non existant ou sans objet pour la famille/groupe)";
         public static string WrongOrMissingPayDate = "Date de paiement erroné ou manquante.";
         public static string WrongContributionCat = "Catégorie de contribution erronée.";
         public static string WrongOrMissingPayType = "Type de paiement erroné ou manquant.";
@@ -46,8 +46,8 @@ namespace OpenImis.ePayment.Responses.Messages
         public static string MissingOtherName = "Autre nom manquant.";
         public static string DuplicatedMemberIN = "Numéro d'assurance du membre déjà utilisé.";
         public static string WrongOrMissingEnrolDate = "Date d’inscription incorrecte ou absente.";
-        public static string WrongOrMissingEOcode = "Code d’agent d'adhésion incorrecte ou absente (non existant ou non applicable à la famille\/groupe)";
-        public static string NoMemberOfOrder = "Aucun membre de l'ordre spécifié est dans cette famille\/groupe.";
+        public static string WrongOrMissingEOcode = "Code d’agent d'adhésion incorrecte ou absente (non existant ou non applicable à la famille/groupe)";
+        public static string NoMemberOfOrder = "Aucun membre de l'ordre spécifié est dans cette famille/groupe.";
         public static string PayIdDoesntExist = "1. L'identifiant de payement n’existe pas.";
         public static string WrongOrMissingRenDate = "Date de renouvellement erroné ou manquante.";
         public static string WrongInternalIdFormat = "1. Mauvais format de l'identificateur interne.";
@@ -71,7 +71,7 @@ namespace OpenImis.ePayment.Responses.Messages
         public static string DoesntExistEO = "6. Le code de l'agent d'inscription n’existe pas.";
         public static string DoesntExistPC = "7. Le code du panier de soin n’existe pas.";
         public static string NoPolicyForRenewal = "8. Le bénéficiaire n’a aucune police d'assurance spécifiée pour le renouvellement du produit.";
-        public static string UnknownTypeOfPay = "9. Type de paiement inconnu."
+        public static string UnknownTypeOfPay = "9. Type de paiement inconnu.";
 
 
     }
