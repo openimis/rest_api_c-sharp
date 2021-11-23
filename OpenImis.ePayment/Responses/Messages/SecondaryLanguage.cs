@@ -7,87 +7,72 @@ namespace OpenImis.ePayment.Responses.Messages
 {
     public static class SecondaryLanguage
     {
-        public static string Success = "Imefanikiwa";
 
-        public static string InvalidCred = "Taarifa za mtumiaji sio sahihi";
-        public static string PolicyNotActivated = "Sera hii haijawa activated";
 
-        public static string CantAssignCN = "1-Na. ya ankara imeshindikana kutotelewa na mfumo wa malipo";
-        public static string DuplicateCN = "2-Na. ya ankara imejirudia";
+        public static string Success = "Succès";
+        public static string CantAssignCN = "1. Le numéro de contrôle ne peut être assigné par le portail de paiement externe.";
+        public static string DuplicateCN = "2. Le numéro de contrôle déjà utilisé.";
+        public static string WrongFormatMissingIN = "Le numéro d’assuré a un format incorrect ou est manquant.";
+        public static string INNotFount = "Numéro d’assuré du membre introuvable.";
+        public static string MemberNotHead = "Le membre n'est pas le chef de famille.";
+        public static string WrongOrMissingHeadIN = "Numéro d’assuré du chef de famille a un mauvais format ou est manquant.";
+        public static string HeadINNotFound = "Numéro d’assuré du chef de famille est introuvable.";
+        public static string WrongPVillageCode = "Le code du village permanent  incorrect.";
+        public static string WrongCVillageCode = "Le code du village incorrect.";
+        public static string WrongGender = "Mauvais genre.";
+        public static string WrongConfirmationType = "Type de confirmation incorrect.";
+        public static string WrongGroupType = "Type de groupe incorrect.";
+        public static string WrongMaritalStatus = "Statut matrimonial incorrect.";
+        public static string WrongEducation = "Éducation incorrecte.";
+        public static string WrongProfession = "Profession incorrecte.";
+        public static string FSPCodeNotFound = "Code FSP introuvable.";
+        public static string WrongIdentificationType = "Type d’Identification incorrect.";
+        public static string WrongINMember = "Mauvais format du numéro d’assuré du membre.";
+        public static string NotFountINMember = "Numéro d’assuré de membre introuvable.";
+        public static string WrongVillageCode = "Code du village erroné.";
+        public static string WrongRelationship = "Relation erronée.";
+        public static string WrongOrMissingPC = "Code du paquet de bénéfices erroné ou manquant (non existant ou sans objet pour la famille/groupe)";
+        public static string WrongOrMissingPayDate = "Date de paiement erroné ou manquante.";
+        public static string WrongContributionCat = "Catégorie de contribution erronée.";
+        public static string WrongOrMissingPayType = "Type de paiement erroné ou manquant.";
+        public static string WrongOrMissingPayer = "Donneur d’ordre erroné ou manquant.";
+        public static string MissingReceiptNumber = "Numéro de reçu manquant.";
+        public static string DuplicateReceiptNumber = "Numéro de reçu déjà utilisé.";
+        public static string DuplicateINHead = "Numéro d'assuré du chef de famille déjà utilisé.";
+        public static string WrongOrMissingPVC = "Code permanent du village manquant.";
+        public static string WrongOrMissingGender = "Genre erroné ou manquant.";
+        public static string WrongFrOrMissingBd = "Format de la date de naissance incorrect ou manquant.";
+        public static string MissingLastName = "Nom de famille manquant.";
+        public static string MissingOtherName = "Autre nom manquant.";
+        public static string DuplicatedMemberIN = "Numéro d'assurance du membre déjà utilisé.";
+        public static string WrongOrMissingEnrolDate = "Date d’inscription incorrecte ou absente.";
+        public static string WrongOrMissingEOcode = "Code d’agent d'adhésion incorrecte ou absente (non existant ou non applicable à la famille/groupe)";
+        public static string NoMemberOfOrder = "Aucun membre de l'ordre spécifié est dans cette famille/groupe.";
+        public static string PayIdDoesntExist = "1. L'identifiant de payement n’existe pas.";
+        public static string WrongOrMissingRenDate = "Date de renouvellement erroné ou manquante.";
+        public static string WrongInternalIdFormat = "1. Mauvais format de l'identificateur interne.";
+        public static string InvalidInternalId = "2. L'identificateur interne n’est pas valide.";
+        public static string CantPostReq = "1. La demande de numéro de contrôle ne pas pu être envoyée à la passerelle de paiement externe.";
+        public static string WrongFormatInsureeNo = "1. Mauvais format de numéro d’assurance.";
+        public static string InValidINmissingPC = "2. Panier de soin non valide ou manquant.";
+        public static string InValidEOC = "3. Code d'agent d'adhésion non valide.";
+        public static string IncompatibleEO_PC = "4. Le code d'agent d'adhésion et le code du panier de soin ne sont pas compatibles.";
+        public static string NoRenewalProduct = "5. Le bénéficiaire n’a aucune police d'assurance.pour le produit spécifié lors de la demande de renouvellement.";
+        public static string InsureeNoMissing = "6. Numéro d’assuré manquant.";
+        public static string InsureeNotEnrolled = "7. Inscription préalable de l'assuré obligatoire.";
+        public static string DuplicateCNAssigned = "8. Numéro de contrôle attribué déjà utilisé.";
+        public static string CantAssignCn2 = "9. Numéro de contrôle ne peut pas être assigné.";
+        public static string UnknownPaymentType = "10. Type de paiement inconnue.";
+        public static string WrongOrMissingRecDate = "1. Date de réception fausse ou manquante.";
+        public static string WrongFormatInputData = "2. Mauvais format des données d'entrée.";
+        public static string WrongControlNumber = "3. Numéro de contrôle incorrect.";
+        public static string WrongAmount = "4. Montant incorrect.";
+        public static string DuplicatePayAmount = "5. Montant du paiement en double.";
+        public static string DoesntExistEO = "6. Le code de l'agent d'inscription n’existe pas.";
+        public static string DoesntExistPC = "7. Le code du panier de soin n’existe pas.";
+        public static string NoPolicyForRenewal = "8. Le bénéficiaire n’a aucune police d'assurance spécifiée pour le renouvellement du produit.";
+        public static string UnknownTypeOfPay = "9. Type de paiement inconnu.";
 
-        public static string WrongFormatMissingIN = "Umekosea namba ya mwanachama au namba haipo";
-        public static string INNotFount = "Namba ya mwanachama haipo";
-        public static string MemberNotHead = "Mwanachama ni mkuu wa kaya";
 
-        public static string WrongOrMissingHeadIN = "Umekosea namba ya mkuu wa kaya au namba haipo";
-        public static string HeadINNotFound = "Namba ya mkuu wa kaya haipo";
-        public static string WrongPVillageCode = "Umekosea namba ya kijiji";
-        public static string WrongCVillageCode = "Umekosea namba ya kijiji";
-        public static string WrongGender = "Umekosea jinsia";
-        public static string WrongConfirmationType = "Wrong confirmation type";
-        public static string WrongGroupType = "Umekosea aina ya kundi";
-        public static string WrongMaritalStatus = "Umekosea hali ya ndoa";
-        public static string WrongEducation = "Umekosea elimu";
-        public static string WrongProfession = "Umekosea elimu";
-        public static string FSPCodeNotFound = "Na. ya FSP haipo";
-        public static string WrongIdentificationType = "Umekosea aina ya kitambulisho";
-
-        public static string WrongINMember = "Umekosea namba ya mwanachama";
-        public static string NotFountINMember = "Namba ya mwanachama haipo kwenye kompuyta kuu";
-        public static string WrongVillageCode = "Umekosea namba ya kijiji";
-        public static string WrongRelationship = "Umekosea uhusiano";
-
-        public static string WrongOrMissingPC = "Umekosea namba ya bidhaa au haitumiki kwenye familia husika";
-        public static string WrongOrMissingPayDate = "Umekosea tarehe ya malipo";
-        public static string WrongContributionCat = "Umekosea kundi la malipo";
-        public static string WrongOrMissingPayType = "Umekosea aina ya malipo";
-        public static string WrongOrMissingPayer = "Umekosea mlipaji";
-        public static string MissingReceiptNumber = "Jaza namba ya risiti";
-        public static string DuplicateReceiptNumber = "Namba ya risiti imejirudia";
-
-        public static string DuplicateINHead = "Namba ya mwachama imejirudia";
-        public static string WrongOrMissingPVC = "Umekosea/Jaza namba ya kijiji";
-        public static string WrongOrMissingGender = "Umekosea/Jaza Jinsia";
-        public static string WrongFrOrMissingBd = "Jaza/Umekosea tarehe";
-        public static string MissingLastName = "Jaza jina la ukoo";
-        public static string MissingOtherName = "Jaza majina mengine";
-
-        public static string DuplicatedMemberIN = "Namba ya mwanachama imejirudia";
-
-        public static string WrongOrMissingEnrolDate = "Jaza/Umekosea tarehe ya kujiunga";
-        public static string WrongOrMissingEOcode = "Jaza/Umekosea namba ya msimbo ya afisa mwandikishaji";
-
-        public static string NoMemberOfOrder = "Na ya mwanchama kwenye familia haipo";
-        public static string PayIdDoesntExist = "1-Namba ya malipo haipo";
-
-        public static string WrongOrMissingRenDate = "Jaza/Umekosea tarehe ya kuhuisha";
-
-        public static string WrongInternalIdFormat = "1-Wrong format of internal identifier";
-        public static string InvalidInternalId = "2-Not valid internal identifier ";
-
-        public static string CantPostReq = "1-Maombi ya Na. ya ankara yameshindikana, jaribu tena";
-
-        public static string WrongFormatInsureeNo = "1-Namba ya mwanachama imekosewa";
-        public static string InValidINmissingPC = "2-Umekosea namba ya mwanachama au namba ya bidhaa";
-        public static string InValidEOC = "3-Umekosea namba ya msimbo ya afisa mwandikishaji";
-        public static string IncompatibleEO_PC = "4-Namba ya mwanachama na namba ya bidhaa haviendani";
-        public static string NoRenewalProduct = "5-Mwanachama hajajiunga na bidhaa husika";
-
-        public static string InsureeNoMissing = "6-Jaza namba ya mwanachama";
-        public static string InsureeNotEnrolled = "7-Insuree not enrolled while prior enrolment mandatory.";
-        public static string DuplicateCNAssigned = "8-Umepatiwa namba ya ankara iliyojirudia, jaribu tena";
-        public static string CantAssignCn2 = "9-Na. ya ankara imeshishindikana kutolewa, jaribu tena";
-        public static string UnknownPaymentType = "10-Aina ya malipo uliyochagua hayapo";
-        public static string NoControlNumberAvailable = "11-Hakuna control number inayopatikana. Jaribu tena";
-
-        public static string WrongOrMissingRecDate = "1-Umekosea tarehe ya kupokea";
-        public static string WrongFormatInputData = "2-Umekosea taarifa uliyojaza";
-        public static string WrongControlNumber = "3-Umekosea Na. ya ankara";
-        public static string WrongAmount = "4-Umekosea kiasi";
-        public static string DuplicatePayAmount = "5-Umerudia malipo";
-        public static string DoesntExistEO = "6-Namba ya msimbo ya afisa mwandikishaji haipo";
-        public static string DoesntExistPC = "7-Namba ya bidhaa haipo";
-        public static string NoPolicyForRenewal = "8-Mwanachama hajajiunga na bidhaa husika";
-        public static string UnknownTypeOfPay = "9-Aina ya malipo uliyochagua haipo";
     }
 }

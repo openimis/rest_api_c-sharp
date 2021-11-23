@@ -3,7 +3,7 @@ namespace OpenImis.ePayment.Escape.Payment.Models
 {
     public static class PaymentStatus
     {
-        public static int FailedReconciliated  = -5;
+        public static int FailedMatchPayment  = -5;
         public static int FailedReceived = -4;
         public static int FailedControlNumberReceived = -3;
         public static int FailedControlNumberRequested = -2;
@@ -13,6 +13,6 @@ namespace OpenImis.ePayment.Escape.Payment.Models
         public static int ControlNumberRequested = 2;
         public static int ControlNumberReceived = 3;
         public static int Received = 4;
-        public static int Reconciliated = 5;
+        public static int Matched = 5;
     }
 }
