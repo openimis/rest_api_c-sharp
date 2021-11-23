@@ -2,16 +2,7 @@
 	"ConnectionStrings": {
 		"IMISDatabase": "Server=Server;Database=IMIS;User ID=User;Password=Password"
 	},
-	"JWT": {
-		"key": "Y2Xwq43YHiHqwkLi912J8E32SHFIHJB",
-		"issuer": "http://196.192.73.26",
-		"audience": "http://196.192.73.26",
-		"validdays": 3
-	},
-	"Language": {
-		"Primary": "english,en,primary,0,1",
-		"Languages": [ "en", "fr" ]
-
+	
 	"Log4NetCore": {
 		"PropertyOverrides": [
 			{
