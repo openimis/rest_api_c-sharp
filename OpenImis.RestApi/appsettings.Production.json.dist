@@ -2,9 +2,7 @@
 	"ConnectionStrings": {
 		"IMISDatabase": "Server=Server;Database=IMIS;User ID=User;Password=Password"
 	},
-	"JwtIssuer": "http://openimis.org",
-	"JwtAudience": "http://openimis.org",
-	"JwtExpireDays": 5,
+	
 	"Log4NetCore": {
 		"PropertyOverrides": [
 			{
