@@ -552,6 +552,7 @@ namespace OpenImis.ePayment.Data
 	                        AND P.ValidityTo IS NULL
 	                        AND PD.ProductCode = @ProductCode
 	                        AND P.OfficerCode IS NULL
+                            AND ISNULL(P.PaymentStatus, 0) IN (0, 1, 2, 3)
                         )
                         SELECT CASE WHEN Last3MonthsEnrollment > ControlNumbersLeft THEN Last3MonthsEnrollment - ControlNumbersLeft  ELSE 0 END NeedToRequest
                         FROM RemainingCNs, TotalProductUsage";
