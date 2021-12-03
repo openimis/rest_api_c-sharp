@@ -581,7 +581,8 @@ namespace OpenImis.ePayment.Data
 			            WHERE P.PaymentId = @PaymentId
 						AND P.PaymentStatus = 4
 						AND P.ReceivedAmount > 0
-						AND I.ValidityTo IS NULL) 
+						AND I.ValidityTo IS NULL
+                        AND PD.ValidityTo IS NULL) 
                         BEGIN
                             DECLARE @tblPremiums TABLE(PremiumId INT, PolicyId INT, PayDate DATETIME)
 
@@ -647,7 +648,7 @@ namespace OpenImis.ePayment.Data
 	                            WHERE PD.PaymentID = @PaymentId;
 
                                 UPDATE tblPayment 
-                                SET MatchedDate = GETDATE()
+                                SET PaymentStatus = 5, MatchedDate = GETDATE()
                                 WHERE PaymentID = @PaymentId;
 
                             END
