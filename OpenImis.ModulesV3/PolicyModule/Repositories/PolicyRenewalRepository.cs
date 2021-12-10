@@ -319,5 +319,12 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             }
 
         }
+
+        public DataMessage SelfRenewal(SelfRenewal renewal)
+        {
+            var response = new DataMessage();
+            response.Data = renewal;
+            return response;
+        }
     }
 }

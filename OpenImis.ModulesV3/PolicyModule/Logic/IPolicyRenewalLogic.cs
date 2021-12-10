@@ -11,5 +11,6 @@ namespace OpenImis.ModulesV3.PolicyModule.Logic
         int Post(PolicyRenewalModel policy);
         int Delete(Guid uuid);
         DataMessage GetCommissions(GetCommissionInputs model);
+        DataMessage SelfRenewal(SelfRenewal renewal);
     }
 }

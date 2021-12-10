@@ -104,5 +104,23 @@ namespace OpenImis.RestApi.Controllers.V3
 
             return Json(response);
         }
+
+
+        [HasRights(Rights.PolicyRenew)]
+        [HttpPost]
+        [Route("selfrenewal")]
+        public IActionResult SelfRenewal([FromBody] SelfRenewal renewal)
+        {
+            DataMessage response;
+            try
+            {
+                 response = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().SelfRenewal(renewal);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new BusinessException(ex.Message);
+            }
+        }
     }
 }

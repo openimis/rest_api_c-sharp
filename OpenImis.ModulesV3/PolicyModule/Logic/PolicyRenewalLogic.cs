@@ -57,5 +57,11 @@ namespace OpenImis.ModulesV3.PolicyModule.Logic
 
             return response;
         }
+
+        public DataMessage SelfRenewal(SelfRenewal renewal)
+        {
+            DataMessage response = policyRenewalRepository.SelfRenewal(renewal);
+            return response;
+        }
     }
 }

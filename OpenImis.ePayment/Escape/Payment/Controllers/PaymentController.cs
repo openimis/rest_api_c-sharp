@@ -64,7 +64,7 @@ namespace OpenImis.ePayment.Controllers
             intent.enrolment_officer_code = intent.OfficerCode;
             intent.SmsRequired = true;
 
-            if (intent.enrolment_officer_code == null)
+            if (String.IsNullOrEmpty(intent.enrolment_officer_code))
                 intent.EnrolmentType = EnrolmentType.Renewal + 1;
 
             intent.SetDetails();
