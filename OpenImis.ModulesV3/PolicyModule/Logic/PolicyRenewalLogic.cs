@@ -4,6 +4,7 @@ using OpenImis.ModulesV3.PolicyModule.Models;
 using OpenImis.ModulesV3.PolicyModule.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.PolicyModule.Logic
 {
@@ -58,9 +59,9 @@ namespace OpenImis.ModulesV3.PolicyModule.Logic
             return response;
         }
 
-        public DataMessage SelfRenewal(SelfRenewal renewal)
+        public async Task<DataMessage> SelfRenewal(SelfRenewal renewal)
         {
-            DataMessage response = policyRenewalRepository.SelfRenewal(renewal);
+            DataMessage response = await policyRenewalRepository.SelfRenewal(renewal);
             return response;
         }
     }

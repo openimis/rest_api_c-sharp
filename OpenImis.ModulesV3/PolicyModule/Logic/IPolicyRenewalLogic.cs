@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.PolicyModule.Logic
 {
@@ -11,6 +12,6 @@ namespace OpenImis.ModulesV3.PolicyModule.Logic
         int Post(PolicyRenewalModel policy);
         int Delete(Guid uuid);
         DataMessage GetCommissions(GetCommissionInputs model);
-        DataMessage SelfRenewal(SelfRenewal renewal);
+        Task<DataMessage> SelfRenewal(SelfRenewal renewal);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -109,12 +110,12 @@ namespace OpenImis.RestApi.Controllers.V3
         [HasRights(Rights.PolicyRenew)]
         [HttpPost]
         [Route("selfrenewal")]
-        public IActionResult SelfRenewal([FromBody] SelfRenewal renewal)
+        public async Task<IActionResult> SelfRenewal([FromBody] SelfRenewal renewal)
         {
             DataMessage response;
             try
             {
-                 response = _imisModules.GetPolicyModule().GetPolicyRenewalLogic().SelfRenewal(renewal);
+                 response = await _imisModules.GetPolicyModule().GetPolicyRenewalLogic().SelfRenewal(renewal);
                 return Ok(response);
             }
             catch (Exception ex)

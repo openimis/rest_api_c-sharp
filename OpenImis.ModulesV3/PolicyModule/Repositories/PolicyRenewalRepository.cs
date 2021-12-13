@@ -16,6 +16,7 @@ using System.Diagnostics;
 using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
 using OpenImis.ePayment.Logic;
+using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.PolicyModule.Repositories
 {
@@ -320,10 +321,10 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
 
         }
 
-        public DataMessage SelfRenewal(SelfRenewal renewal)
+        public async Task<DataMessage> SelfRenewal(SelfRenewal renewal)
         {
             var helper = new SelfRenewalHelper(_configuration, _hostingEnvironment);
-            var response = helper.CreateSelfRenewal(renewal);
+            var response = await helper.CreateSelfRenewal(renewal);
             
             return response;
         }

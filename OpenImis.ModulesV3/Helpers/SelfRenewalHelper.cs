@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
 using OpenImis.DB.SqlServer.DataHelper;
+using OpenImis.ePayment.Controllers;
+using OpenImis.ePayment.Escape.Payment.Models;
+using OpenImis.ePayment.Models.Payment.Response;
 using OpenImis.ModulesV3.PolicyModule.Models;
 using System;
 using System.Collections.Generic;
@@ -10,6 +14,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.Helpers
 {
@@ -24,7 +29,7 @@ namespace OpenImis.ModulesV3.Helpers
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
         }
-        public DataMessage CreateSelfRenewal(SelfRenewal renewal)
+        public async Task<DataMessage> CreateSelfRenewal(SelfRenewal renewal)
         {
             var context = new ImisDB();
             var dataMessage = Validate(renewal);
@@ -96,11 +101,54 @@ namespace OpenImis.ModulesV3.Helpers
 
             policy.TblInsureePolicy = insureePolicy;
 
-            context.TblPolicy.Add(policy);
-            context.SaveChanges();
+            var controlNumberResponse = new GetControlNumberResp();
+            // Begin transaction
 
-            dataMessage.Data = context.TblPolicy.Where(p => p.PolicyId == policy.PolicyId).Select(p => new{ p.PolicyId, p.EnrollDate}).FirstOrDefault();
+            using (var dbContextTransaction = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    context.TblPolicy.Add(policy);
+                    context.SaveChanges();
 
+                    // Request Control Number from the Pool, if we fail to get the control number delete the newly created entry
+
+                    var officer = context.TblOfficer.Where(o => o.OfficerId == policy.OfficerId).FirstOrDefault();
+                    var intent = new IntentOfSinglePay
+                    {
+                        Msisdn = renewal.PhoneNumber,
+                        request_date = DateTime.Now.Date.ToString(),
+                        OfficerCode = officer.Code,
+                        InsureeNumber = renewal.InsuranceNumber,
+                        ProductCode = renewal.ProductCode,
+                        EnrolmentType = ePayment.Models.EnrolmentType.Renewal,
+                        language = "en"
+                    };
+
+                    controlNumberResponse = await GetControlNumber(intent);
+
+                    if (!String.IsNullOrEmpty(controlNumberResponse.control_number))
+                    {
+                        dbContextTransaction.Commit();
+                        dataMessage.Data = context.TblPolicy.Where(p => p.PolicyId == policy.PolicyId).Select(p => new { p.PolicyId, p.EnrollDate, ControlNumber = controlNumberResponse.control_number }).FirstOrDefault();
+
+                    }
+                    else
+                    {
+                        dbContextTransaction.Rollback();
+                        dataMessage.Data = controlNumberResponse.error_message;
+                    }
+                        
+
+                }
+                catch (Exception)
+                {
+                    dbContextTransaction.Rollback();
+                    throw;
+                }
+            }
+
+          
             return dataMessage;
         }
 
@@ -160,6 +208,15 @@ namespace OpenImis.ModulesV3.Helpers
             return dh.GetDataTable(sSQL, sqlParameters, CommandType.StoredProcedure);
 
             
+        }
+
+        private async Task<GetControlNumberResp> GetControlNumber(IntentOfSinglePay intent)
+        {
+            var result = await new PaymentController(_configuration, _hostingEnvironment).CHFRequestControlNumberForSimplePolicy(intent);
+            var result1 = (OkObjectResult)result;
+            var value = (GetControlNumberResp)result1.Value;
+            
+            return value;
         }
     }
 }
