@@ -1,8 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using OpenImis.DB.SqlServer;
+using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ModulesV3.PolicyModule.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
@@ -11,16 +16,89 @@ namespace OpenImis.ModulesV3.Helpers
 
     class SelfRenewalHelper
     {
+        private readonly IConfiguration _configuration;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
+        public SelfRenewalHelper(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        {
+            _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
+        }
         public DataMessage CreateSelfRenewal(SelfRenewal renewal)
         {
+            var context = new ImisDB();
             var dataMessage = Validate(renewal);
 
             if (dataMessage.Code != 0)
                 return dataMessage;
 
             // All checks passed, continue creating a new policy in tblPolicy
+            
+            var insuree = context.TblInsuree
+                                .Where(i => i.Chfid == renewal.InsuranceNumber && i.ValidityTo == null)
+                                .Include(i => i.Family).ThenInclude(f => f.TblPolicy).ThenInclude(p => p.Prod).ThenInclude(pr => pr.ConversionProd)
+                                .FirstOrDefault();
 
+            var insurees = context.TblInsuree
+                            .Where(i => i.FamilyId == insuree.FamilyId && i.ValidityTo == null).ToList();
+
+            var product = context.TblProduct.Where(prod => prod.ProductCode == renewal.ProductCode && prod.ValidityTo == null).FirstOrDefault();
+
+            var dtPolicyPeriod = GetPolicyPeriod(product.ProdId, DateTime.Now.Date);
+
+            var prevPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode == renewal.ProductCode && p.ValidityTo == null).FirstOrDefault();
+            var convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode == renewal.ProductCode && p.ValidityTo == null).FirstOrDefault();
+
+            int officerId = 0;
+            if (prevPolicy != null)
+                officerId = (int)prevPolicy.OfficerId;
+            else
+                officerId = (int)convPolicy.OfficerId;
+
+
+            // Prepare policy
+            var policy = new TblPolicy
+            {
+                FamilyId = insuree.FamilyId,
+                EnrollDate = DateTime.Now,
+                StartDate = (DateTime)dtPolicyPeriod.Rows[0]["StartDate"],
+                ExpiryDate = (DateTime?)dtPolicyPeriod.Rows[0]["ExpiryDate"],
+                PolicyStatus = 1,
+                PolicyValue = product.LumpSum, // for now we are taking lumnpsum but in future we might have to consider other paramters like Grace period, discount preiod etc...
+                ProdId = product.ProdId,
+                OfficerId = officerId,
+                ValidityFrom = DateTime.Now,
+                AuditUserId = -1,
+                IsOffline = false,
+                PolicyStage = "R"
+            };
+
+            // Prepare InsureePolicy
+            var insureePolicy = new List<TblInsureePolicy>();
+            foreach (var ins in insurees)
+            {
+                var insPol = new TblInsureePolicy
+                {
+                    InsureeId = ins.InsureeId,
+                    PolicyId = policy.PolicyId,
+                    EnrollmentDate = policy.EnrollDate,
+                    StartDate = policy.StartDate,
+                    EffectiveDate = policy.EffectiveDate,
+                    ExpiryDate = policy.ExpiryDate,
+                    ValidityFrom = DateTime.Now,
+                    AuditUserId = -1,
+                    IsOffline = false
+                };
+
+                insureePolicy.Add(insPol);
+            }
+
+            policy.TblInsureePolicy = insureePolicy;
+
+            context.TblPolicy.Add(policy);
+            context.SaveChanges();
+
+            dataMessage.Data = context.TblPolicy.Where(p => p.PolicyId == policy.PolicyId).Select(p => new{ p.PolicyId, p.EnrollDate}).FirstOrDefault();
 
             return dataMessage;
         }
@@ -65,6 +143,22 @@ namespace OpenImis.ModulesV3.Helpers
             }
 
             return dataMessage;
+        }
+
+        private DataTable GetPolicyPeriod(int productId, DateTime enrolDate)
+        {
+            var sSQL = "uspGetPolicyPeriod";
+            var dh = new DataHelper(_configuration);
+
+            SqlParameter[] sqlParameters = {
+                new SqlParameter("@ProdId", productId),
+                new SqlParameter("@EnrolDate", enrolDate),
+                new SqlParameter("@PolicyStage", "R")
+                };
+
+            return dh.GetDataTable(sSQL, sqlParameters, CommandType.StoredProcedure);
+
+            
         }
     }
 }

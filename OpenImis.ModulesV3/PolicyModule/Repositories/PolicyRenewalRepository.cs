@@ -322,7 +322,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
 
         public DataMessage SelfRenewal(SelfRenewal renewal)
         {
-            var helper = new SelfRenewalHelper();
+            var helper = new SelfRenewalHelper(_configuration, _hostingEnvironment);
             var response = helper.CreateSelfRenewal(renewal);
             
             return response;
