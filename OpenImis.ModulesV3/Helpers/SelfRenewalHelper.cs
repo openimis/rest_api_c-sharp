@@ -70,7 +70,8 @@ namespace OpenImis.ModulesV3.Helpers
                 ValidityFrom = DateTime.Now,
                 AuditUserId = -1,
                 IsOffline = false,
-                PolicyStage = "R"
+                PolicyStage = "R",
+                SelfRenewed = true
             };
 
             // Prepare InsureePolicy
