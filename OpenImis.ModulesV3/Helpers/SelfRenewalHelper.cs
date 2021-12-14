@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using OpenImis.DB.SqlServer;
 using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ePayment.Controllers;
@@ -12,8 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.Helpers
@@ -23,7 +24,7 @@ namespace OpenImis.ModulesV3.Helpers
     {
         private readonly IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
-
+        
         public SelfRenewalHelper(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _configuration = configuration;
@@ -31,6 +32,9 @@ namespace OpenImis.ModulesV3.Helpers
         }
         public async Task<DataMessage> CreateSelfRenewal(SelfRenewal renewal)
         {
+            // Log the request for future reference
+            GenerateRquestFile(renewal);
+
             var context = new ImisDB();
             var dataMessage = Validate(renewal);
 
@@ -217,6 +221,24 @@ namespace OpenImis.ModulesV3.Helpers
             var value = (GetControlNumberResp)result1.Value;
             
             return value;
+        }
+
+        private void GenerateRquestFile(SelfRenewal renewal)
+        {
+            var currentDate = DateTime.Now.ToString("yyyy/M/d/");
+            var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
+            string targetPath = System.IO.Path.Combine(_hostingEnvironment.WebRootPath, "SelfRenewals", currentDate);
+            
+            //if no Directory with current date - then create folder
+            if (!Directory.Exists(targetPath))
+            {
+                System.IO.Directory.CreateDirectory(targetPath);
+            }
+            //we have target folder for current date - then we can save file
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, renewal.Msisdn + "_" + currentDateTime + ".txt")))
+            {
+                outputFile.WriteLine(JsonConvert.SerializeObject(renewal));
+            }
         }
     }
 }
