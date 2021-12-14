@@ -107,7 +107,6 @@ namespace OpenImis.RestApi.Controllers.V3
         }
 
 
-        [HasRights(Rights.PolicyRenew)]
         [HttpPost]
         [Route("selfrenewal")]
         public async Task<IActionResult> SelfRenewal([FromBody] SelfRenewal renewal)

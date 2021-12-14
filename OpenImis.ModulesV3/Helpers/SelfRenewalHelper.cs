@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenImis.DB.SqlServer;
-using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ePayment.Controllers;
+using OpenImis.ePayment.Data;
 using OpenImis.ePayment.Escape.Payment.Models;
+using OpenImis.ePayment.Logic;
 using OpenImis.ePayment.Models.Payment.Response;
 using OpenImis.ModulesV3.PolicyModule.Models;
 using System;
@@ -37,6 +38,19 @@ namespace OpenImis.ModulesV3.Helpers
 
             var context = new ImisDB();
             var dataMessage = Validate(renewal);
+
+            // Send SMS for the previously created request
+            if (dataMessage.Code == (int)Errors.Renewal.RenewalAlreadyRequested)
+            {
+                var payment = new ImisPayment(_configuration, _hostingEnvironment);
+                
+                var paymentId = GetPaymentId(renewal);
+                if (paymentId > 0)
+                {
+                    payment.GetPaymentInfo(Convert.ToInt32(paymentId));
+                    SendSMS(payment);
+                }
+            }
 
             if (dataMessage.Code != 0)
                 return dataMessage;
@@ -240,5 +254,41 @@ namespace OpenImis.ModulesV3.Helpers
                 outputFile.WriteLine(JsonConvert.SerializeObject(renewal));
             }
         }
+
+        private long GetPaymentId(SelfRenewal renewal)
+        {
+            var sSQL = @"SELECT TOP 1 P.PaymentID 
+                        FROM tblPaymentDetails PD 
+                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
+                        WHERE PD.ValidityTo IS NULL
+                        AND P.ValidityTo IS NULL
+                        AND InsuranceNumber = @InsuranceNumber
+                        AND ProductCode = @ProductCode
+                        AND P.PaymentStatus = 3
+                        ORDER BY P.PaymentID DESC;";
+
+            var dh = new DataHelper(_configuration);
+            SqlParameter[] parameters =
+            {
+                new SqlParameter("@InsuranceNumber", renewal.InsuranceNumber),
+                new SqlParameter("@ProductCode", renewal.ProductCode)
+            };
+
+            var dt = dh.GetDataTable(sSQL, parameters, CommandType.Text);
+
+            if (dt != null && dt.Rows.Count > 0)
+                return (long)dt.Rows[0]["PaymentId"];
+
+            return 0;
+
+        }
+        
+        private void SendSMS(ImisPayment payment)
+        {
+            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+            paymentLogic.ControlNumberAssignedSms(payment);
+        }
+
+
     }
 }
