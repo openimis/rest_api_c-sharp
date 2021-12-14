@@ -116,7 +116,7 @@ namespace OpenImis.ModulesV3.Helpers
                     var officer = context.TblOfficer.Where(o => o.OfficerId == policy.OfficerId).FirstOrDefault();
                     var intent = new IntentOfSinglePay
                     {
-                        Msisdn = renewal.PhoneNumber,
+                        Msisdn = renewal.Msisdn,
                         request_date = DateTime.Now.Date.ToString(),
                         OfficerCode = officer.Code,
                         InsureeNumber = renewal.InsuranceNumber,

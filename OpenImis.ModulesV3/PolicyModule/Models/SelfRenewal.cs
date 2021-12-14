@@ -8,7 +8,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Models
     public class SelfRenewal
     {
         [Required]
-        public string PhoneNumber { get; set; }
+        public string Msisdn { get; set; }
 
         [Required]
         public string InsuranceNumber { get; set; }
