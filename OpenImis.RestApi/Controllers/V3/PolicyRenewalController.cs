@@ -109,6 +109,7 @@ namespace OpenImis.RestApi.Controllers.V3
 
         [HttpPost]
         [Route("selfrenewal")]
+        [AllowAnonymous]
         public async Task<IActionResult> SelfRenewal([FromBody] SelfRenewal renewal)
         {
             DataMessage response;
