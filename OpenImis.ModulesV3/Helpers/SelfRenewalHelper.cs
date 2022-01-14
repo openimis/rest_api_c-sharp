@@ -70,7 +70,13 @@ namespace OpenImis.ModulesV3.Helpers
             var dtPolicyPeriod = GetPolicyPeriod(product.ProdId, DateTime.Now.Date);
 
             var prevPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode == renewal.ProductCode && p.ValidityTo == null).FirstOrDefault();
-            var convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode == renewal.ProductCode && p.ValidityTo == null).FirstOrDefault();
+
+            var conProd = insuree.Family.TblPolicy.Any(p => p.Prod.ConversionProd != null);
+
+            TblPolicy convPolicy = null;
+            if (conProd == true)
+
+                convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode == renewal.ProductCode && p.ValidityTo == null).FirstOrDefault();
 
             int officerId = 0;
             if (prevPolicy != null)
@@ -200,7 +206,12 @@ namespace OpenImis.ModulesV3.Helpers
 
             //NoPreviousPolicyFoundToRenew = 3009,
             var prevPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode == renewal.ProductCode  && p.ValidityTo == null).FirstOrDefault();
-            var convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode == renewal.ProductCode  && p.ValidityTo == null).FirstOrDefault();
+            var conProd = insuree.Family.TblPolicy.Any(p => p.Prod.ConversionProd != null);
+
+            TblPolicy convPolicy = null;
+            if (conProd == true)
+                convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode == renewal.ProductCode  && p.ValidityTo == null).FirstOrDefault();
+            
             if (prevPolicy == null && convPolicy == null)
             {
                 dataMessage.Code = (int)Errors.Renewal.NoPreviousPolicyFoundToRenew;
