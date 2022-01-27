@@ -68,18 +68,18 @@ namespace OpenImis.ModulesV3.Helpers
             var insurees = context.TblInsuree
                             .Where(i => i.FamilyId == insuree.FamilyId && i.ValidityTo == null).ToList();
 
-            var product = context.TblProduct.Where(prod => prod.ProductCode == renewal.ProductCode && prod.ValidityTo == null).FirstOrDefault();
+            var product = context.TblProduct.Where(prod => prod.ProductCode.ToUpper() == renewal.ProductCode.ToUpper() && prod.ValidityTo == null).FirstOrDefault();
 
             var dtPolicyPeriod = GetPolicyPeriod(product.ProdId, DateTime.Now.Date);
 
-            var prevPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode == renewal.ProductCode && p.ValidityTo == null).FirstOrDefault();
+            var prevPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode.ToUpper() == renewal.ProductCode.ToUpper() && p.ValidityTo == null).FirstOrDefault();
 
             var conProd = insuree.Family.TblPolicy.Any(p => p.Prod.ConversionProd != null);
 
             TblPolicy convPolicy = null;
             if (conProd == true)
 
-                convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode == renewal.ProductCode && p.ValidityTo == null).FirstOrDefault();
+                convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode.ToUpper() == renewal.ProductCode.ToUpper() && p.ValidityTo == null).FirstOrDefault();
 
             int officerId = 0;
             if (prevPolicy != null)
@@ -199,7 +199,7 @@ namespace OpenImis.ModulesV3.Helpers
             }
 
             //RenewalAlreadyRequested = 3008,
-            if (insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode == renewal.ProductCode && p.PolicyStatus == 1 && p.ValidityTo == null).FirstOrDefault() != null)
+            if (insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode.ToUpper() == renewal.ProductCode.ToUpper() && p.PolicyStatus == 1 && p.ValidityTo == null).FirstOrDefault() != null)
             {
                 dataMessage.Code = (int)Errors.Renewal.RenewalAlreadyRequested;
                 dataMessage.MessageValue = "Renewal already created";
@@ -208,12 +208,12 @@ namespace OpenImis.ModulesV3.Helpers
             }
 
             //NoPreviousPolicyFoundToRenew = 3009,
-            var prevPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode == renewal.ProductCode  && p.ValidityTo == null).FirstOrDefault();
+            var prevPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ProductCode.ToUpper() == renewal.ProductCode.ToUpper() && p.ValidityTo == null).FirstOrDefault();
             var conProd = insuree.Family.TblPolicy.Any(p => p.Prod.ConversionProd != null);
 
             TblPolicy convPolicy = null;
             if (conProd == true)
-                convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode == renewal.ProductCode  && p.ValidityTo == null).FirstOrDefault();
+                convPolicy = insuree.Family.TblPolicy.Where(p => p.Prod.ConversionProd.ProductCode.ToUpper() == renewal.ProductCode.ToUpper() && p.ValidityTo == null).FirstOrDefault();
             
             if (prevPolicy == null && convPolicy == null)
             {
