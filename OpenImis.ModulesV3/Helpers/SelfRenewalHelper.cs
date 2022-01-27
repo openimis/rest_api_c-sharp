@@ -48,6 +48,9 @@ namespace OpenImis.ModulesV3.Helpers
                 if (paymentId > 0)
                 {
                     payment.GetPaymentInfo(Convert.ToInt32(paymentId));
+
+                    // Replace the phone number by the current recipient 
+                    payment.PhoneNumber = renewal.Msisdn;
                     SendSMS(payment);
                 }
             }
