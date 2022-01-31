@@ -18,7 +18,9 @@
 			"GepgPayCertStorePath": "",
 			"CertPass": "",
 			"GepgCertPass": ""
-		}
+		},
+		"CreatePremiumOnPaymentReceived": true,
+		"MaxControlNumberForEO": 50
 	},
 	"SmsGateWay": {
 		"GateUrl": "",
@@ -33,6 +35,6 @@
 	},
 	"Language": {
 		"Primary": "english,en,primary,0,1",
-		"Languages": [ "en", "sw" ]
+		"Languages": [ "en-tz", "sw" ]
 	}
 }
