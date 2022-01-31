@@ -34,6 +34,9 @@ namespace OpenImis.ModulesV3
             DuplicateReceiptFound = 3004,
             GracePeriodExpired = 3005,
             CouldNotUpdateControlNumber = 3006,
+            InsuranceNumberNotFound = 3007,
+            RenewalAlreadyRequested = 3008,
+            NoPreviousPolicyFoundToRenew = 3009,
             UnexpectedException = 3999
 
         }

@@ -90,7 +90,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 var response = await _payment.SaveIntent(intent);
 
-                
+
                 AssignedControlNumber data = (AssignedControlNumber)response.Data;
 
                 return Ok(new GetControlNumberResp() { error_occured = response.ErrorOccured, error_message = response.MessageValue, internal_identifier = data.internal_identifier, control_number = data.control_number });
@@ -107,7 +107,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(GetControlNumberResp), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual async Task<IActionResult> RequestBulkControlNumbers([FromBody]RequestBulkControlNumbersModel model)
+        public virtual async Task<IActionResult> RequestBulkControlNumbers([FromBody] RequestBulkControlNumbersModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -126,7 +126,7 @@ namespace OpenImis.ePayment.Controllers
             // var officer = _payment.GetOfficerInfo(model.OfficerId);
 
             var result = await _payment.RequestBulkControlNumbers(model);
-            
+
             return Ok(result);
         }
 
@@ -316,7 +316,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(BulkControlNumbersForEO), 200)]
         [ProducesResponseType(typeof(ErrorResponseV2), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        public virtual IActionResult GetControlNumbersForEO([FromBody]GetControlNumbersForEOModel model)
+        public virtual async Task<IActionResult> GetControlNumbersForEO([FromBody] GetControlNumbersForEOModel model)
         {
             List<BulkControlNumbersForEO> response = null;
             try
@@ -330,7 +330,7 @@ namespace OpenImis.ePayment.Controllers
                 // Check if the product requested has enough CNs left
                 try
                 {
-                    var count = _payment.ControlNumbersToBeRequested(model.ProductCode);
+                    var count = await _payment.ControlNumbersToBeRequested(model.ProductCode);
                     if (count > 0)
                     {
                         // The following method is Async, but we do not await it since we don't want to wait for the result
@@ -340,7 +340,7 @@ namespace OpenImis.ePayment.Controllers
                 catch (Exception)
                 {
 
-                    
+
                 }
 
 
@@ -352,6 +352,13 @@ namespace OpenImis.ePayment.Controllers
             }
 
             return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("api/GetControlNumber/Single")]
+        public async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody] IntentOfSinglePay intent)
+        {
+            return null;
         }
     }
 }

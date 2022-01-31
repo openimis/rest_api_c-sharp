@@ -70,6 +70,7 @@
     <Folder Include="Extensions\" />
     <Folder Include="Globals\" />
     <Folder Include="wwwroot\FromPhone\Enrollment\Debug\" />
+    <Folder Include="wwwroot\SelfRenewals\" />
   </ItemGroup>
 
   <ItemGroup>

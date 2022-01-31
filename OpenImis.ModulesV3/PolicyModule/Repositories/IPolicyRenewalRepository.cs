@@ -1,6 +1,7 @@
 ﻿using OpenImis.ModulesV3.PolicyModule.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.PolicyModule.Repositories
 {
@@ -10,5 +11,6 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
         int Post(PolicyRenewalModel policy);
         int Delete(Guid uuid);
         DataMessage GetCommissions(GetCommissionInputs model);
+        Task<DataMessage> SelfRenewal(SelfRenewal renewal);
     }
 }

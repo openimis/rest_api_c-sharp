@@ -64,7 +64,7 @@ namespace OpenImis.ePayment.Controllers
             intent.enrolment_officer_code = intent.OfficerCode;
             intent.SmsRequired = true;
 
-            if (intent.enrolment_officer_code == null)
+            if (String.IsNullOrEmpty(intent.enrolment_officer_code))
                 intent.EnrolmentType = EnrolmentType.Renewal + 1;
 
             intent.SetDetails();
@@ -74,7 +74,7 @@ namespace OpenImis.ePayment.Controllers
             // Check if the product requested has enough CNs left
             try
             {
-                var count = _payment.ControlNumbersToBeRequested(intent.ProductCode);
+                var count = await _payment.ControlNumbersToBeRequested(intent.ProductCode);
                 if (count > 0)
                 {
                     // The following method is Async, but we do not await it since we don't want to wait for the result

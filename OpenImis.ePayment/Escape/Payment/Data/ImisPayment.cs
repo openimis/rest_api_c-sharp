@@ -530,7 +530,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public int ControlNumbersToBeRequested(string productCode)
+        public async Task<int> ControlNumbersToBeRequested(string productCode)
         {
             var sSQL = @";WITH TotalProductUsage
                         AS
