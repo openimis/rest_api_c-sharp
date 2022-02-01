@@ -582,7 +582,10 @@ namespace OpenImis.ePayment.Logic
 
                 };
 
+                var controlNumebrs = new List<ControlNumbersForEO>();
+
                 response.Header = header;
+                response.ControlNumbers = controlNumebrs;
 
                 return response;
 
