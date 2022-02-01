@@ -1006,7 +1006,7 @@ namespace OpenImis.ePayment.Data
             return new BulkControlNumbersForEO();
         }
 
-        public int ControlNumbersToBeRequested(string productCode)
+        public async Task<int> ControlNumbersToBeRequested(string productCode)
         {
             return 0;
         }

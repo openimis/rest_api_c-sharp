@@ -31,6 +31,7 @@ namespace OpenImis.DB.SqlServer
         public byte[] RowId { get; set; }
         public bool? IsOffline { get; set; }
         public Guid PolicyUUID { get; set; }
+        public bool SelfRenewed { get; set; }
 
         public TblFamilies Family { get; set; }
         public TblOfficer Officer { get; set; }

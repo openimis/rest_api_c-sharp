@@ -283,4 +283,5 @@ __pycache__/
 **/wwwroot/SendMessages/
 /OpenImis.RestApi/wwwroot/SentMessages
 **/Published/
-/OpenImis.RestApi/wwwroot/SelfRenewals
+/OpenImis.RestApi/wwwroot/SelfRenewals/
+

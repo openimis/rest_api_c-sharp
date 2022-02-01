@@ -594,10 +594,10 @@ namespace OpenImis.ePayment.Logic
             return imisPayment.GetControlNumbersForEO(officerCode, productCode, requiredCNs);
         }
 
-        public int ControlNumbersToBeRequested(string productCode)
+        public async Task<int> ControlNumbersToBeRequested(string productCode)
         {
             var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
-            return imisPayment.ControlNumbersToBeRequested(productCode);
+            return await imisPayment.ControlNumbersToBeRequested(productCode);
         }
 
         public int CreatePremium(int paymentId)
