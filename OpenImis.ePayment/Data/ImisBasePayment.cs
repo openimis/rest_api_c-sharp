@@ -1001,9 +1001,9 @@ namespace OpenImis.ePayment.Data
             });
         }
 
-        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        public BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int available)
         {
-            return new List<BulkControlNumbersForEO>();
+            return new BulkControlNumbersForEO();
         }
 
         public int ControlNumbersToBeRequested(string productCode)
