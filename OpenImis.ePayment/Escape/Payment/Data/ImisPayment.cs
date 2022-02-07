@@ -452,11 +452,14 @@ namespace OpenImis.ePayment.Data
         }
 
 
-        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        public BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int count)
         {
-            var bulkControlNumbers = new List<BulkControlNumbersForEO>();
+            var bulkControlNumbers = new BulkControlNumbersForEO();
+            var header = new ControlNumbersForEOHeader();
+            var controlNumbers = new List<ControlNumbersForEO>();
 
-            var sSQL = @"SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+            var sSQL = $@"
+                        SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
 
                         BEGIN TRANSACTION;
 	                        DECLARE @dt TABLE
@@ -471,7 +474,7 @@ namespace OpenImis.ePayment.Data
 	                        )
 	                        INSERT INTO @dt(ControlNumberId, BillId, ProductCode, OfficerCode, PhoneNumber, ControlNumber, Amount)
 
-	                        SELECT TOP 100 CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, O.Phone PhoneNumber, CN.[ControlNumber], PD.ExpectedAmount Amount
+	                        SELECT TOP {count} CN.ControlNumberID, CN.[PaymentID] BillId, PD.ProductCode, @OfficerCode OfficerCode, O.Phone PhoneNumber, CN.[ControlNumber], PD.ExpectedAmount Amount
 	                        FROM tblControlNumber CN
 	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
 	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
@@ -502,6 +505,8 @@ namespace OpenImis.ePayment.Data
 
                         COMMIT TRANSACTION;";
 
+
+
             var dh = new DataHelper(config);
             SqlParameter[] parameters = {
                 new SqlParameter("@OfficerCode", officerCode),
@@ -512,7 +517,7 @@ namespace OpenImis.ePayment.Data
 
             foreach (DataRow dr in dt.Rows)
             {
-                var controlNumber = new BulkControlNumbersForEO
+                var controlNumber = new ControlNumbersForEO
                 {
                     ControlNumberId = Convert.ToInt32(dr["ControlNumberID"]),
                     BillId = Convert.ToInt32(dr["BillId"]),
@@ -523,8 +528,23 @@ namespace OpenImis.ePayment.Data
                     Amount = (decimal)dr["Amount"],
                 };
 
-                bulkControlNumbers.Add(controlNumber);
+                controlNumbers.Add(controlNumber);
             }
+
+            // Prepare the header based on the result
+            if (dt.Rows.Count == 0)
+            {
+                header.Error = (int)Errors.ControlNumbers.NoControlNumberAvailable;
+                header.ErrorMessage = Errors.ControlNumbers.NoControlNumberAvailable.ToString();
+            }
+            else
+            {
+                header.Error = (int)Errors.ControlNumbers.Success;
+                header.ErrorMessage = Errors.ControlNumbers.Success.ToString();
+            }
+
+            bulkControlNumbers.Header = header;
+            bulkControlNumbers.ControlNumbers = controlNumbers;
 
             return bulkControlNumbers;
 

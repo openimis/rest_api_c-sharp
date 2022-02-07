@@ -318,14 +318,14 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public virtual async Task<IActionResult> GetControlNumbersForEO([FromBody] GetControlNumbersForEOModel model)
         {
-            List<BulkControlNumbersForEO> response = null;
+            BulkControlNumbersForEO response = null;
             try
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
                 var officerId = new ValidationBase().GetOfficerIdByUserUUID(userUUID, _configuration);
                 var officerDetails = _payment.GetOfficerInfo(officerId);
 
-                response = _payment.GetControlNumbersForEO(officerDetails.Code, model.ProductCode);
+                response = _payment.GetControlNumbersForEO(officerDetails.Code, model.ProductCode, model.AvailableControlNumbers);
 
                 // Check if the product requested has enough CNs left
                 try

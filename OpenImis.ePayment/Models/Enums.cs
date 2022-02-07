@@ -27,4 +27,15 @@ namespace OpenImis.ePayment.Models
         ClaimAdd = 111002,
 
     }
+
+    public static class Errors
+    {
+        public enum ControlNumbers
+        {
+            Success = 4001,
+            NoControlNumberAvailable = 4002,
+            ThresholdReached = 4003,
+            UnexpectedException = 4999
+        }
+    }
 }

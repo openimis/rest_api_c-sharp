@@ -564,10 +564,34 @@ namespace OpenImis.ePayment.Logic
 
         }
 
-        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        public BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int available)
         {
             var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
-            return imisPayment.GetControlNumbersForEO(officerCode, productCode);
+
+            var  threshold = Convert.ToInt32( _configuration["PaymentGateWay:MaxControlNumberForEO"]);
+
+            var requiredCNs =  threshold - available;
+
+            if (requiredCNs <= 0)
+            {
+                var response = new BulkControlNumbersForEO();
+                var header = new ControlNumbersForEOHeader
+                {
+                    Error = (int)Errors.ControlNumbers.ThresholdReached,
+                    ErrorMessage = Errors.ControlNumbers.ThresholdReached.ToString()
+
+                };
+
+                var controlNumebrs = new List<ControlNumbersForEO>();
+
+                response.Header = header;
+                response.ControlNumbers = controlNumebrs;
+
+                return response;
+
+            }
+
+            return imisPayment.GetControlNumbersForEO(officerCode, productCode, requiredCNs);
         }
 
         public async Task<int> ControlNumbersToBeRequested(string productCode)

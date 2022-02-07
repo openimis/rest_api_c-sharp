@@ -7,5 +7,6 @@ namespace OpenImis.ePayment.Escape.Payment.Models
     public class GetControlNumbersForEOModel
     {
         public string ProductCode { get; set; }
+        public int AvailableControlNumbers { get; set; }
     }
 }
