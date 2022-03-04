@@ -240,8 +240,15 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             int year = Convert.ToInt32(model.year);
             int month = Convert.ToInt32(model.month);
 
-            DateTime minDate = new DateTime(year, month, 1);
-            DateTime maxDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
+            // fix - when no month is choosen - get data for every month in given year
+            DateTime minDate = new DateTime(year, 1, 1);
+            DateTime maxDate = new DateTime(year, 12, DateTime.DaysInMonth(year, 12));
+
+            if (month > 0)
+            {
+                minDate = new DateTime(year, month, 1);
+                maxDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
+            }
 
             DataMessage message;
 
