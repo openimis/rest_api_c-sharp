@@ -56,7 +56,7 @@ namespace OpenImis.RestApi.Controllers.V3
 
         [HasRights(Rights.FamilyAdd)]
         [HttpPost]
-        public IActionResult Create([FromBody] EnrollFamilyModel model)
+        public IActionResult Create([FromBody] EnrolFamilyModel model)
         {
             NewFamilyResponse response;
 

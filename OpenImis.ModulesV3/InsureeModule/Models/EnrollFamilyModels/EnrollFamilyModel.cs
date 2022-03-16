@@ -5,15 +5,15 @@ using System.Text;
 
 namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
 {
-    public class EnrollFamilyModel
+    public class EnrolFamilyModel
     {
         public List<Family> Family { get; set; }
 
         public Enrolment GetEnrolmentFromModel()
         {
 
-            var enrollment = new Enrolment();
-            enrollment.FileInfo = new FileInfo();
+            var enrolment = new Enrolment();
+            enrolment.FileInfo = new FileInfo();
 
             foreach (Family f in Family) {
                 // add the Family
@@ -37,34 +37,34 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
                         LanguageOfSMS = f.FamilySMS.LanguageOfSMS
                     } : null
                 };
-                enrollment.Families.Add(family);
+                enrolment.Families.Add(family);
                 // add the Insurees
                 foreach (var i in f.Insurees)
                 {
-                    enrollment.Insurees.Add(i);
+                    enrolment.Insurees.Add(i);
                 }
                 // add the Policies
                 foreach (var p in f.Policies)
                 {
                     var pol = p;
-                    enrollment.Policies.Add(p);
+                    enrolment.Policies.Add(p);
                     if (p.Premium != null)
                     {
                         foreach (var pr in p.Premium)
                         {
-                            enrollment.Premiums.Add(pr);
+                            enrolment.Premiums.Add(pr);
                         }
                     }
                 }
                 // add PolicyInsuree
                 foreach (var ip in f.InsureePolicy)
                 {
-                    enrollment.InsureePolicies.Add(ip);
+                    enrolment.InsureePolicies.Add(ip);
                 }
 
             }
 
-            return enrollment;
+            return enrolment;
         }
     }
 }

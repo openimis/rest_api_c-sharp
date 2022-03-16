@@ -40,7 +40,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
             return response;
         }
 
-        public NewFamilyResponse Create(EnrollFamilyModel model, int userId, int officerId)
+        public NewFamilyResponse Create(EnrolFamilyModel model, int userId, int officerId)
         {
             
             return familyRepository.Create(model, userId, officerId);
