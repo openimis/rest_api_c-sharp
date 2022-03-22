@@ -92,7 +92,7 @@ namespace OpenImis.ePayment.Escape.Payment.Data
                     dataMessage.Code = 4;
                     dataMessage.MessageValue = new Responses.Messages.Language().GetMessage((int)UserLanguage, "IncompatibleEO_PC");
                 }
-                // Check if the family has existing product to renew (if the Enrollment Type is renewal(1))
+                // Check if the family has existing product to renew (if the Enrolment Type is renewal(1))
                 else if (policy.IsRenewal() == 1 & (from prods in context.TblProduct
                                                     join pol in context.TblPolicy on prods.ProdId equals pol.ProdId
                                                     join i in context.TblInsuree on pol.FamilyId equals i.FamilyId

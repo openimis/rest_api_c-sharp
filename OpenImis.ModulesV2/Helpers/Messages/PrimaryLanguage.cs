@@ -42,8 +42,8 @@ namespace OpenImis.ModulesV2.Helpers.Messages
         public static string MissingLastName = "Missing last name.";
         public static string MissingOtherName = "Missing other name.";
         public static string DuplicatedMemberIN = "Insurance number of member duplicated.";
-        public static string WrongOrMissingEnrolDate = "Wrong or missing enrollment date.";
-        public static string WrongOrMissingEOcode = "Wrong or missing enrollment officer code (not existing or not applicable to the family/group).";
+        public static string WrongOrMissingEnrolDate = "Wrong or missing enrolment date.";
+        public static string WrongOrMissingEOcode = "Wrong or missing enrolment officer code (not existing or not applicable to the family/group).";
         public static string NoMemberOfOrder = "No member of the specified order number in the family/group.";
         public static string PayIdDoesntExist = "1. The payment identifier does not exist.";
         public static string WrongOrMissingRenDate = "Wrong or missing renewal date.";
@@ -52,11 +52,11 @@ namespace OpenImis.ModulesV2.Helpers.Messages
         public static string CantPostReq = "1. Request for control number cannot be posted in the external payment gateway.";
         public static string WrongFormatInsureeNo = "1. Wrong format of insurance number.";
         public static string InValidINmissingPC = "2. Not valid insurance or missing product code.";
-        public static string InValidEOC = "3. Not valid enrollment officer code.";
-        public static string IncompatibleEO_PC = "4. Enrollment officer code and insurance product code are not compatible.";
+        public static string InValidEOC = "3. Not valid enrolment officer code.";
+        public static string IncompatibleEO_PC = "4. Enrolment officer code and insurance product code are not compatible.";
         public static string NoRenewalProduct = "5. Beneficiary has no policy of specified insurance product for renewal.";
         public static string InsureeNoMissing = "6. Missing insurance number.";
-        public static string InsureeNotEnrolled = "7. Insuree not enrolled while prior enrollment mandatory.";
+        public static string InsureeNotEnrolled = "7. Insuree not enrolled while prior enrolment mandatory.";
         public static string DuplicateCNAssigned = "8. Duplicated control number assigned.";
         public static string CantAssignCn2 = "9. Control number cannot be assigned.";
         public static string UnknownPaymentType = "10. Unknown type of payment.";
@@ -65,7 +65,7 @@ namespace OpenImis.ModulesV2.Helpers.Messages
         public static string WrongControlNumber = "3. Wrong control number.";
         public static string WrongAmount = "4. Wrong amount.";
         public static string DuplicatePayAmount = "5. Duplicate Payment Amount.";
-        public static string DoesntExistEO = "6. Enrollment Officer Code does not exist.";
+        public static string DoesntExistEO = "6. Enrolment Officer Code does not exist.";
         public static string DoesntExistPC = "7. Product Code Does not Exist.";
         public static string NoPolicyForRenewal = "8. Beneficiary has no policy of specified insurance product for renewal.";
         public static string UnknownTypeOfPay = "9. Unknown type of payment.";
