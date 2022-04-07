@@ -27,7 +27,7 @@ namespace OpenImis.DB.SqlServer
         public DateTime DateTo { get; set; }
         public int? ConversionProdId { get; set; }
         public decimal LumpSum { get; set; }
-        public short MemberCount { get; set; }
+        public int MemberCount { get; set; }
         public decimal? PremiumAdult { get; set; }
         public decimal? PremiumChild { get; set; }
         public decimal? DedInsuree { get; set; }
