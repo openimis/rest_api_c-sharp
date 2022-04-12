@@ -340,15 +340,11 @@ namespace OpenImis.ePayment.Controllers
                 catch (Exception)
                 {
 
-
                 }
-
-
             }
             catch (Exception ex)
             {
-
-                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+                return BadRequest(new { error_occured = true, error_message = ex.Message });
             }
 
             return Ok(response);
@@ -356,7 +352,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetControlNumber/Single")]
-        public async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody] IntentOfSinglePay intent)
+        public virtual async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody] IntentOfSinglePay intent)
         {
             return null;
         }
