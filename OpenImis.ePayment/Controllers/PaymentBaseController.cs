@@ -356,7 +356,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetControlNumber/Single")]
-        public async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody] IntentOfSinglePay intent)
+        public virtual async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody] IntentOfSinglePay intent)
         {
             return null;
         }
