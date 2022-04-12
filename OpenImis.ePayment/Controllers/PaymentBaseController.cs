@@ -340,15 +340,11 @@ namespace OpenImis.ePayment.Controllers
                 catch (Exception)
                 {
 
-
                 }
-
-
             }
             catch (Exception ex)
             {
-
-                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+                return BadRequest(new { error_occured = true, error_message = ex.Message });
             }
 
             return Ok(response);
