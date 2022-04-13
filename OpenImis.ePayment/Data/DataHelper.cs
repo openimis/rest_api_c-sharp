@@ -54,7 +54,8 @@ namespace OpenImis.ePayment.Data
         {
             DataTable dt = new DataTable();
             var sqlConnection = new SqlConnection(ConnectionString);
-            var command = new SqlCommand(SQL, sqlConnection)
+
+           var command = new SqlCommand(SQL, sqlConnection)
             {
                 CommandType = commandType
             };

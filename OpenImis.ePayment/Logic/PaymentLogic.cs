@@ -606,6 +606,24 @@ namespace OpenImis.ePayment.Logic
             return imisPayment.CreatePremium(paymentId);
         }
 
+        public async Task<bool> HandleControlNumbersToBeRequested(string productCode)
+        {
+            try
+            {
+                var count = await ControlNumbersToBeRequested(productCode);
+                if (count > 0)
+                {
+                    // The following method is Async, but we do not await it since we don't want to wait for the result
+                    _ = RequestBulkControlNumbers(new RequestBulkControlNumbersModel { ControlNumberCount = count, ProductCode = productCode });
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return true;
+        }
 
     }
 }

@@ -468,7 +468,7 @@ namespace OpenImis.ePayment.Data
 		                        BillId INT,
 		                        ProductCode NVARCHAR(50),
 		                        OfficerCode NVARCHAR(50),
-                                PhoneNumber NVARCHAR(15),
+                                PhoneNumber NVARCHAR(50),
 		                        ControlNumber NVARCHAR(15),
 		                        Amount DECIMAL(18, 2)
 	                        )
@@ -487,27 +487,20 @@ namespace OpenImis.ePayment.Data
 	                        AND P.ValidityTo IS NULL
                             AND O.ValidityTo IS NULL;
 
-	                        UPDATE P SET OfficerCode = @OfficerCode, PhoneNumber = O.Phone
-	                        FROM @dt dt
-	                        INNER JOIN tblControlNumber CN ON dt.ControlNumberId = CN.ControlNumberID
-	                        INNER JOIN tblPaymentDetails PD ON CN.PaymentID = PD.PaymentID
-	                        INNER JOIN tblPayment P ON PD.PaymentID = P.PaymentID
-                            LEFT OUTER JOIN tblOfficer O ON Code = @OfficerCode
-	                        WHERE CN.ControlNumber IS NOT NULL
-	                        AND PD.ProductCode = @ProductCode
-	                        AND P.OfficerCode IS NULL
-	                        AND CN.ValidityTo IS NULL
-	                        AND PD.ValidityTo IS NULL
-	                        AND P.ValidityTo IS NULL
-                            AND O.ValidityTo IS NULL;
+                            UPDATE P SET OfficerCode = @OfficerCode, PhoneNumber = dt.PhoneNumber
+
+                            FROM @dt dt
+                            INNER JOIN tblPayment P ON P.PaymentId = dt.BillId;	                       
 
 	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, PhoneNumber, ControlNumber, Amount FROM @dt;
 
                         COMMIT TRANSACTION;";
 
+            //
 
 
             var dh = new DataHelper(config);
+         
             SqlParameter[] parameters = {
                 new SqlParameter("@OfficerCode", officerCode),
                 new SqlParameter("@ProductCode", productCode)
