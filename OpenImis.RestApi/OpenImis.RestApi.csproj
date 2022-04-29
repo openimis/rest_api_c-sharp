@@ -137,10 +137,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Escape\Sms\StringsSecondaryLanguage\PaymentConfirmationSMS.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Escape\Sms\Strings\PaymentConfirmationSMS.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="log4net.configure">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
