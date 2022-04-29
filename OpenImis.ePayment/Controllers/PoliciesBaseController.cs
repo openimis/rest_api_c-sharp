@@ -39,7 +39,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 policies.UserId = Convert.ToInt32(iden.Value);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 policies.UserId = -1;
             }
@@ -66,7 +66,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 policies.UserId = Convert.ToInt32(iden.Value);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 policies.UserId = -1;
             }
@@ -94,7 +94,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 policies.UserId = Convert.ToInt32(iden.Value);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 policies.UserId = -1;
             }

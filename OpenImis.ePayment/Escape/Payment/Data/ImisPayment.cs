@@ -1,5 +1,4 @@
 ﻿using OpenImis.ePayment.Escape.Payment.Models;
-using OpenImis.ePayment.Data;
 using OpenImis.ePayment.Extensions;
 using OpenImis.ePayment.Models;
 using OpenImis.ePayment.Models.Payment;
@@ -13,7 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Data.SqlClient;
 using System.Data;
@@ -366,7 +364,7 @@ namespace OpenImis.ePayment.Data
             return rejectedReason;
         }
 
-        public async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
+        public override async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
         {
             var gepg = new GepgUtility(_hostingEnvironment, Configuration);
             var bills = await gepg.CreateBulkBills(Configuration, model);
@@ -452,7 +450,7 @@ namespace OpenImis.ePayment.Data
         }
 
 
-        public BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int count)
+        public override BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int count)
         {
             var bulkControlNumbers = new BulkControlNumbersForEO();
             var header = new ControlNumbersForEOHeader();
@@ -495,9 +493,6 @@ namespace OpenImis.ePayment.Data
 	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, PhoneNumber, ControlNumber, Amount FROM @dt;
 
                         COMMIT TRANSACTION;";
-
-            //
-
 
             var dh = new DataHelper(config);
          
@@ -543,7 +538,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public async Task<int> ControlNumbersToBeRequested(string productCode)
+        public override async Task<int> ControlNumbersToBeRequested(string productCode)
         {
             var sSQL = @";WITH TotalProductUsage
                         AS
@@ -582,10 +577,10 @@ namespace OpenImis.ePayment.Data
             if (dt.Rows.Count > 0)
                 needToRequest = (int)dt.Rows[0]["NeedToRequest"];
 
-            return needToRequest;
+            return await Task.FromResult(needToRequest);
         }
 
-        public int CreatePremium(int paymentId)
+        public override int CreatePremium(int paymentId)
         {
             var sSQL = @"IF EXISTS(SELECT 1 
 			            FROM tblInsuree I
@@ -684,13 +679,6 @@ namespace OpenImis.ePayment.Data
             return 0;
 
         }
-
-
-
-
 #endif
-        
     }
-
-
 }

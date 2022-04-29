@@ -40,7 +40,7 @@ namespace OpenImis.ePayment.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("api/Coverage/Get_Coverage")]
-        public async Task<IActionResult> GetChf([FromBody]ChfGetCoverageModel model)
+        public async Task<IActionResult> GetChf([FromBody] ChfGetCoverageModel model)
         {
             if (new ValidationBase().InsureeNumber(model.insureeNumber) != ValidationResult.Success)
             {
@@ -52,32 +52,30 @@ namespace OpenImis.ePayment.Controllers
 
             var response = new GetCoverageResponse(message.Code, message.ErrorOccured, model.language).Message;
 
-            if (!message.ErrorOccured) {
-
+            if (!message.ErrorOccured)
+            {
                 var coverage = new ChfCoverage();
                 try
                 {
                     var covstring = JsonConvert.SerializeObject(message.Data);
                     coverage = JsonConvert.DeserializeObject<ChfCoverage>(covstring);
-
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
-               
+
                 Language language = Language.Secondary;
 
-                if (model.language == 2) {
+                if (model.language == 2)
+                {
                     language = Language.Primary;
                 }
 
                 ImisSms sms = new ImisSms(_configuration, _hostingEnvironment, language);
-                
+
                 var txtmsgTemplate = sms.GetMessage("EnquireInformSms");
 
-                
                 var txtmsg = string.Format(txtmsgTemplate,
                          coverage.OtherNames,
                          coverage.LastNames,
@@ -89,7 +87,7 @@ namespace OpenImis.ePayment.Controllers
                          coverage.CoverageProducts.FirstOrDefault().ExpiryDate
                          );
 
-                for(int i = 1; i > coverage.CoverageProducts.Count; i++)
+                for (int i = 1; i > coverage.CoverageProducts.Count; i++)
                 {
                     var cov = coverage.CoverageProducts[i];
 
@@ -105,9 +103,7 @@ namespace OpenImis.ePayment.Controllers
                         );
 
                     txtmsg += ":-" + txtmsg.Split(":-")[1];
-
                 }
-
 
                 sms.QuickSms(txtmsg, model.msisdn);
 
@@ -117,7 +113,7 @@ namespace OpenImis.ePayment.Controllers
             {
                 return BadRequest(new { success = false, message = response.MessageValue });
             }
-           
+
         }
 #endif
     }

@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace OpenImis.ePayment.Escape.Sms
 {
-    public class ImisSms:ImisBaseSms
+    public class ImisSms : ImisBaseSms
     {
 
         IConfiguration config;
 
-        public ImisSms(IConfiguration config, IHostingEnvironment env,Language lang = Language.Primary) : base(config, env,lang)
+        public ImisSms(IConfiguration config, IHostingEnvironment env, Language lang = Language.Primary) : base(config, env, lang)
         {
             this.config = config;
         }
@@ -69,10 +69,10 @@ namespace OpenImis.ePayment.Escape.Sms
 
                 string todayDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                string body = "{\"message\":\"" + message + 
-                              "\",\"datetime\":\"" + todayDate + 
-                              "\",\"sender_id\":\"" + sender + 
-                              "\",\"mobile_service_id\":\"" + service + 
+                string body = "{\"message\":\"" + message +
+                              "\",\"datetime\":\"" + todayDate +
+                              "\",\"sender_id\":\"" + sender +
+                              "\",\"mobile_service_id\":\"" + service +
                               "\",\"recipients\":\"" + recipients + "\"}";
 
                 HttpClient client = new HttpClient();
@@ -100,14 +100,13 @@ namespace OpenImis.ePayment.Escape.Sms
 
                     var ret = await response.Content.ReadAsStringAsync();
                     response_message += ret;
-                    container.Response = ret+"____"+ response.StatusCode;
+                    container.Response = ret + "____" + response.StatusCode;
 
                 }
                 catch (Exception e)
                 {
-
                     response_message += e.ToString();
-                    container.Response = status + " "+e.ToString();
+                    container.Response = status + " " + e.ToString();
                 }
             }
 #else

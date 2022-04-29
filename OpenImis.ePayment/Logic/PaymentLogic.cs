@@ -101,7 +101,7 @@ namespace OpenImis.ePayment.Logic
 
             }
 
-            return response;
+            return await Task.FromResult(response);
         }
 
         public async Task<DataMessage> SaveAcknowledgementAsync(Acknowledgement model)
@@ -518,7 +518,7 @@ namespace OpenImis.ePayment.Logic
                 error_occurred = false
             };
 
-            return return_message;
+            return await Task.FromResult(return_message);
         }
 
         // Todo: make this method generic

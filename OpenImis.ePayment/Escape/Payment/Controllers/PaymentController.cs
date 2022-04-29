@@ -84,11 +84,8 @@ namespace OpenImis.ePayment.Controllers
             catch (Exception)
             {
 
-
             }
-
             return result;
-
         }
 
         [HttpPost]
