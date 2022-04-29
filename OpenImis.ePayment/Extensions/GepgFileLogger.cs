@@ -33,41 +33,69 @@ namespace OpenImis.ePayment.Extensions
 
         public static void Log(int paymentId, string finality, string content, IHostingEnvironment env)
         {
-            Log(paymentId + "_" + finality, content, env);
+            try
+            {
+                Log(paymentId + "_" + finality, content, env);
+            }
+            catch (Exception)
+            {
+
+
+            }
+
         }
 
         public static void Log(string finality, string content, IHostingEnvironment env)
         {
-            var currentDate = DateTime.Now.ToString("yyyy/M/d/");
-            var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
-            string targetPath = System.IO.Path.Combine(env.WebRootPath, "ePayment", currentDate);
-            //if no Directory with current date - then create folder
-            if (!Directory.Exists(targetPath))
+            try
             {
-                System.IO.Directory.CreateDirectory(targetPath);
+
+                var currentDate = DateTime.Now.ToString("yyyy/M/d/");
+                var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
+                string targetPath = System.IO.Path.Combine(env.WebRootPath, "ePayment", currentDate);
+                //if no Directory with current date - then create folder
+                if (!Directory.Exists(targetPath))
+                {
+                    System.IO.Directory.CreateDirectory(targetPath);
+                }
+                //we have target folder for current date - then we can save file
+                using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, finality + "_" + currentDateTime + ".json")))
+                {
+                    outputFile.WriteLine(content);
+                }
+
             }
-            //we have target folder for current date - then we can save file
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, finality + "_" + currentDateTime + ".json")))
+            catch (Exception)
             {
-                outputFile.WriteLine(content);
+
+
             }
         }
 
         public void putRequestBody()
         {
-            var currentDate = DateTime.Now.ToString("yyyy/M/d/");
-            var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
-            string targetPath = System.IO.Path.Combine(basePath, "ePayment", currentDate);
-            //if no Directory with current date - then create folder
-            if (!Directory.Exists(targetPath))
+            try
             {
-                System.IO.Directory.CreateDirectory(targetPath);
+                var currentDate = DateTime.Now.ToString("yyyy/M/d/");
+                var currentDateTime = DateTime.Now.ToString("yyyy-M-dTHH-mm-ss");
+                string targetPath = System.IO.Path.Combine(basePath, "ePayment", currentDate);
+                //if no Directory with current date - then create folder
+                if (!Directory.Exists(targetPath))
+                {
+                    System.IO.Directory.CreateDirectory(targetPath);
+                }
+                //we have target folder for current date - then we can save file
+                using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, finality + "_" + currentDateTime + ".xml")))
+                {
+                    outputFile.WriteLine(content);
+                }
+
             }
-            //we have target folder for current date - then we can save file
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(targetPath, finality + "_" + currentDateTime + ".xml")))
+            catch (Exception)
             {
-                outputFile.WriteLine(content);
+
             }
+
         }
     }
 }
