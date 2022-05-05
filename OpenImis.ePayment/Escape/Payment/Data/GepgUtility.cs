@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Data
 {
@@ -31,17 +32,18 @@ namespace OpenImis.ePayment.Data
         gepgBillSubReq newBill = null;
 
         private IConfiguration configuration;
+        private readonly ILogger _logger;
 
-        public GepgUtility(IHostingEnvironment hostingEnvironment, IConfiguration Configuration)
+        public GepgUtility(IHostingEnvironment hostingEnvironment, IConfiguration Configuration, ILoggerFactory loggerFactory)
         {
             configuration = Configuration;
+            _logger = loggerFactory.CreateLogger<GepgUtility>();
 
             PublicStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PublicStorePath"]);
             PrivateStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PrivateStorePath"]);
             GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
 
             CertPass = Configuration["PaymentGateWay:GePG:CertPass"];
-
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode, string PhoneNumber, int BillId, decimal ExpectedAmount, List<PaymentDetail> policies)
@@ -171,7 +173,7 @@ namespace OpenImis.ePayment.Data
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(ex, "Exception during XML serialization");
                 }
                 return sb.ToString();
             }
@@ -222,7 +224,7 @@ namespace OpenImis.ePayment.Data
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(ex, "Exception during XML serialization");
                 }
 
                 return sb.ToString();
@@ -249,7 +251,7 @@ namespace OpenImis.ePayment.Data
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(ex, "Exception during XML serialization");
                 }
                 return sb.ToString();
             }
@@ -274,7 +276,7 @@ namespace OpenImis.ePayment.Data
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(ex, "Exception during XML serialization");
                 }
                 return sb.ToString();
             }
@@ -299,7 +301,7 @@ namespace OpenImis.ePayment.Data
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(ex, "Exception during XML serialization");
                 }
 
                 return Encoding.UTF8.GetString(sb.ToArray());
@@ -333,7 +335,7 @@ namespace OpenImis.ePayment.Data
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(ex, "Exception during XML serialization");
                 }
 
                 return sb.ToString();
@@ -414,6 +416,7 @@ namespace OpenImis.ePayment.Data
             catch (Exception ex)
             {
                 // MessageBox.Show(ex.Message);
+                _logger.LogError(ex, "Exception during web request");
                 return ex.Message;
             }
 
@@ -542,7 +545,7 @@ namespace OpenImis.ePayment.Data
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    _logger.LogError(ex, "Exception during XML serialization");
                 }
 
                 return Encoding.UTF8.GetString(sb.ToArray());

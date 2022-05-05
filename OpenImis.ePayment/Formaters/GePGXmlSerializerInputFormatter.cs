@@ -88,7 +88,7 @@ namespace OpenImis.ePayment.Formaters
             //get the billId/paymentId from request body - from <BillId> node
             if (this.type.Name != "gepgSpReconcResp")
             {
-                string billId = StringExtensions.Between(body, "<BillId>", "</BillId>");
+                string billId = body.Between("<BillId>", "</BillId>");
                 if (!String.IsNullOrEmpty(billId))
                 {
                     GepgFileLogger.Log(billId + "_" + type.Name, body, hostingEnvironment);

@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenImis.ePayment.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Controllers
 {
@@ -30,14 +31,16 @@ namespace OpenImis.ePayment.Controllers
     public abstract class PaymentBaseController : Controller
     {
         public PaymentLogic _payment;
+        protected readonly ILoggerFactory _loggerFactory;
         public IConfiguration _configuration;
         public readonly IHostingEnvironment _hostingEnvironment;
 
-        public PaymentBaseController(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PaymentBaseController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
-            _payment = new PaymentLogic(configuration, hostingEnvironment);
+            _loggerFactory = loggerFactory;
+            _payment = new PaymentLogic(configuration, hostingEnvironment, _loggerFactory);
         }
 
 

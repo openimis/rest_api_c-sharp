@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OpenImis.DB.SqlServer;
 using OpenImis.ePayment.Controllers;
@@ -25,11 +26,13 @@ namespace OpenImis.ModulesV3.Helpers
     {
         private readonly IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
-        
-        public SelfRenewalHelper(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public SelfRenewalHelper(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
         }
         public async Task<DataMessage> CreateSelfRenewal(SelfRenewal renewal)
         {
@@ -42,7 +45,7 @@ namespace OpenImis.ModulesV3.Helpers
             // Send SMS for the previously created request
             if (dataMessage.Code == (int)Errors.Renewal.RenewalAlreadyRequested)
             {
-                var payment = new ImisPayment(_configuration, _hostingEnvironment);
+                var payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
                 
                 var paymentId = GetPaymentId(renewal);
                 if (paymentId > 0)
@@ -244,7 +247,7 @@ namespace OpenImis.ModulesV3.Helpers
 
         private async Task<GetControlNumberResp> GetControlNumber(IntentOfSinglePay intent)
         {
-            var result = await new PaymentController(_configuration, _hostingEnvironment).CHFRequestControlNumberForSimplePolicy(intent);
+            var result = await new PaymentController(_configuration, _hostingEnvironment, _loggerFactory).CHFRequestControlNumberForSimplePolicy(intent);
             var result1 = (OkObjectResult)result;
             var value = (GetControlNumberResp)result1.Value;
             
@@ -299,7 +302,7 @@ namespace OpenImis.ModulesV3.Helpers
         
         private void SendSMS(ImisPayment payment)
         {
-            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment, _loggerFactory);
             paymentLogic.ControlNumberAssignedSms(payment);
         }
 

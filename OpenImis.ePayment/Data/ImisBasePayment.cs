@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using OpenImis.DB.SqlServer;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Data
 {
@@ -43,12 +44,14 @@ namespace OpenImis.ePayment.Data
         protected IConfiguration Configuration;
         protected readonly IHostingEnvironment _hostingEnvironment;
         protected DataHelper dh;
+        protected ILoggerFactory _loggerFactory;
 
-        public ImisBasePayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public ImisBasePayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
             dh = new DataHelper(configuration);
+            _loggerFactory = loggerFactory;
         }
 
         public async Task<bool> SaveControlNumberRequest(int BillId, bool failed)

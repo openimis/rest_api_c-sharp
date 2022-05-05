@@ -51,7 +51,7 @@ namespace OpenImis.ePayment.Extensions
             }
         }
 
-        public static string Between(string text, string firstString, string lastString)
+        public static string Between(this string text, string firstString, string lastString)
         {
             string finalString;
 

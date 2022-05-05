@@ -21,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenImis.ePayment.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Controllers
 {
@@ -30,9 +31,9 @@ namespace OpenImis.ePayment.Controllers
         private ImisPayment imisPayment;
         private IHostingEnvironment env;
 
-        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment) : base(configuration, hostingEnvironment)
+        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory) : base(configuration, hostingEnvironment, loggerFactory)
         {
-            imisPayment = new ImisPayment(configuration, hostingEnvironment);
+            imisPayment = new ImisPayment(configuration, hostingEnvironment, loggerFactory);
             env = hostingEnvironment;
         }
 
@@ -175,7 +176,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CHFCancelOnePayment([FromBody] PaymentCancelModel model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             DataMessage dt = new DataMessage();
 
             if (model.payment_id !=0 || model.control_number != null)

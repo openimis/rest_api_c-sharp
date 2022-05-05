@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3.InsureeModule.Logic;
 
 namespace OpenImis.ModulesV3.InsureeModule
@@ -12,18 +13,20 @@ namespace OpenImis.ModulesV3.InsureeModule
         private IFamilyLogic _familyLogic;
         private IContributionLogic _contributionLogic;
         private IInsureeLogic _insureeLogic;
+        private ILoggerFactory _loggerFactory;
 
-        public InsureeModule(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public InsureeModule(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
         }
 
         public IFamilyLogic GetFamilyLogic()
         {
             if (_familyLogic == null)
             {
-                _familyLogic = new FamilyLogic(_configuration, _hostingEnvironment);
+                _familyLogic = new FamilyLogic(_configuration, _hostingEnvironment, _loggerFactory);
             }
             return _familyLogic;
         }

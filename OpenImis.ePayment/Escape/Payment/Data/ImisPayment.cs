@@ -16,6 +16,7 @@ using System.Xml.Serialization;
 using System.Data.SqlClient;
 using System.Data;
 using OpenImis.ePayment.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Data
 {
@@ -24,7 +25,7 @@ namespace OpenImis.ePayment.Data
         private IHostingEnvironment env;
         private IConfiguration config;
 
-        public ImisPayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment) : base(configuration, hostingEnvironment)
+        public ImisPayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory) : base(configuration, hostingEnvironment, loggerFactory)
         {
             env = hostingEnvironment;
             config = configuration;
@@ -35,7 +36,7 @@ namespace OpenImis.ePayment.Data
         {
             daysAgo = -1 * daysAgo;
 
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             ReconcRequest Reconciliation = new ReconcRequest();
 
@@ -94,7 +95,7 @@ namespace OpenImis.ePayment.Data
 
         public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false, string rejectedReason = "")
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             ExpectedAmount = Math.Round(ExpectedAmount, 2);
             //send request only when we have amount > 0
@@ -148,7 +149,7 @@ namespace OpenImis.ePayment.Data
 
         public string ControlNumberResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             gepgBillSubRespAck CnAck = new gepgBillSubRespAck();
             CnAck.TrxStsCode = code;
@@ -162,7 +163,7 @@ namespace OpenImis.ePayment.Data
 
         public async Task<Object> GePGPostCancelPayment(int PaymentId)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             try
             {
@@ -225,7 +226,7 @@ namespace OpenImis.ePayment.Data
 
         public string PaymentResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             gepgPmtSpInfoAck PayAck = new gepgPmtSpInfoAck();
             PayAck.TrxStsCode = code;
@@ -239,7 +240,7 @@ namespace OpenImis.ePayment.Data
 
         public string ReconciliationResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             gepgSpReconcRespAck ReconcAck = new gepgSpReconcRespAck();
             ReconcAck.ReconcStsCode = code;
@@ -366,7 +367,7 @@ namespace OpenImis.ePayment.Data
 
         public override async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
         {
-            var gepg = new GepgUtility(_hostingEnvironment, Configuration);
+            var gepg = new GepgUtility(_hostingEnvironment, Configuration, _loggerFactory);
             var bills = await gepg.CreateBulkBills(Configuration, model);
 
             var signature = gepg.GenerateSignature(bills);

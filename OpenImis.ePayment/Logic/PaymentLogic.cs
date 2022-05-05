@@ -17,6 +17,7 @@ using System.Xml.Serialization;
 using OpenImis.ePayment.Escape.Payment.Models;
 using OpenImis.DB.SqlServer;
 using OpenImis.ePayment.Escape.Payment.Data;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Logic
 {
@@ -25,16 +26,18 @@ namespace OpenImis.ePayment.Logic
 
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public PaymentLogic(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PaymentLogic(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
 
         }
         public async Task<DataMessage> SaveIntent(IntentOfPay intent, int? errorNumber = 0, string errorMessage = null)
         {
-            var payment = new ImisPayment(_configuration, _hostingEnvironment);
+            var payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             var cnHandler = new SingleControlNumberHandler(_configuration, _hostingEnvironment);
             var return_message = cnHandler.GetControlNumber(intent);
             var data = new AssignedControlNumber();
@@ -73,7 +76,7 @@ namespace OpenImis.ePayment.Logic
 
         public async Task<DataMessage> MatchPayment(MatchModel model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             var response = payment.MatchPayment(model);
 
             if (model.internal_identifier == 0)
@@ -106,7 +109,7 @@ namespace OpenImis.ePayment.Logic
 
         public async Task<DataMessage> SaveAcknowledgementAsync(Acknowledgement model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment) { PaymentId = model.internal_identifier };
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory) { PaymentId = model.internal_identifier };
             var response = await payment.SaveControlNumberAknAsync(model.error_occured, model.error_message);
 
             return response;
@@ -115,7 +118,7 @@ namespace OpenImis.ePayment.Logic
         public async Task<DataMessage> SavePayment(PaymentData model)
         {
 
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             //var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
 
             if (model.control_number != null)
@@ -192,7 +195,7 @@ namespace OpenImis.ePayment.Logic
         public async Task<DataMessage> SaveControlNumberAsync(ControlNumberResp model)
         {
 
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             var controlNumberExists = payment.CheckControlNumber(model.internal_identifier, model.control_number);
             var response = await payment.SaveControlNumberAsync(model, controlNumberExists);
 
@@ -265,7 +268,7 @@ namespace OpenImis.ePayment.Logic
 
         public async Task<DataMessage> GetControlNumbers(PaymentRequest requests)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             var PaymentIds = requests.requests.Select(x => x.internal_identifier).ToArray();
 
             var PaymentIds_string = string.Join(",", PaymentIds);
@@ -442,7 +445,7 @@ namespace OpenImis.ePayment.Logic
                     var txtmsgTemplate = string.Empty;
                     string othersCount = string.Empty;
 
-                    ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment);
+                    ImisPayment _pay = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
                     _pay.GetPaymentInfo(m.PaymentId);
 
                     //Language lang = _pay.Language.ToLower() == "en" || _pay.Language.ToLower() == "english" || _pay.Language.ToLower() == "primary" ? Language.Primary : Language.Secondary;
@@ -508,7 +511,7 @@ namespace OpenImis.ePayment.Logic
 
         public async Task<ReconciliationMessage> ProvideReconciliationData(ReconciliationRequest model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
 
             var response = payment.ProvideReconciliationData(model);
 
@@ -525,7 +528,7 @@ namespace OpenImis.ePayment.Logic
         public async Task<DataMessage> CancelPayment(int payment_id)
         {
 
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             DataMessage dt = new DataMessage();
 
             if (payment_id > 0)
@@ -553,20 +556,20 @@ namespace OpenImis.ePayment.Logic
 
         public TblOfficer GetOfficerInfo(int officerId)
         {
-            var imisPayment = new ImisBasePayment(_configuration, _hostingEnvironment);
+            var imisPayment = new ImisBasePayment(_configuration, _hostingEnvironment, _loggerFactory);
             return imisPayment.GetOfficerInfo(officerId);
         }
 
         public async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
         {
-            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             return await imisPayment.RequestBulkControlNumbers(model);
 
         }
 
         public BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int available)
         {
-            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
 
             var  threshold = Convert.ToInt32( _configuration["PaymentGateWay:MaxControlNumberForEO"]);
 
@@ -596,13 +599,13 @@ namespace OpenImis.ePayment.Logic
 
         public async Task<int> ControlNumbersToBeRequested(string productCode)
         {
-            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             return await imisPayment.ControlNumbersToBeRequested(productCode);
         }
 
         public int CreatePremium(int paymentId)
         {
-            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment);
+            var imisPayment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             return imisPayment.CreatePremium(paymentId);
         }
 
