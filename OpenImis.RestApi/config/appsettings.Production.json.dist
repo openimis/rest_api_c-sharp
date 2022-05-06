@@ -1,0 +1,34 @@
+﻿{
+	"ConnectionStrings": {
+		"IMISDatabase": "Server=Server;Database=IMIS;User ID=User;Password=Password"
+	},
+	
+	"Log4NetCore": {
+		"PropertyOverrides": [
+			{
+				"XPath": "/log4net/root/level",
+				"Attributes": {
+					"Value": "DEBUG"
+				}
+			},
+			{
+				"XPath": "/log4net/appender[@name='RollingLogFileAppender']/file",
+				"Attributes": {
+					"Value": "log/server_log.log"
+				}
+			},
+			{
+				"XPath": "/log4net/appender[@name='RollingLogFileAppender']/maximumFileSize",
+				"Attributes": {
+					"Value": "5MB"
+				}
+			},
+			{
+				"XPath": "/log4net/appender[@name='RollingLogFileAppender']/maxSizeRollBackups",
+				"Attributes": {
+					"Value": "5"
+				}
+			}
+		]
+	}
+}
