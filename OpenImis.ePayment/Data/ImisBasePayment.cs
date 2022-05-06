@@ -45,6 +45,7 @@ namespace OpenImis.ePayment.Data
         protected readonly IHostingEnvironment _hostingEnvironment;
         protected DataHelper dh;
         protected ILoggerFactory _loggerFactory;
+        protected ILogger _logger;
 
         public ImisBasePayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
@@ -52,6 +53,7 @@ namespace OpenImis.ePayment.Data
             _hostingEnvironment = hostingEnvironment;
             dh = new DataHelper(configuration);
             _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<ImisBasePayment>();
         }
 
         public async Task<bool> SaveControlNumberRequest(int BillId, bool failed)

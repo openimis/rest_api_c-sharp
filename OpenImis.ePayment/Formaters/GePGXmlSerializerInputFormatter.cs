@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Formaters
 {
@@ -21,11 +22,15 @@ namespace OpenImis.ePayment.Formaters
         private Type type;
         private IConfiguration configuration;
         private IHostingEnvironment hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly GepgFileRequestLogger _gepgFileLogger;
 
-        public GePGXmlSerializerInputFormatter(IHostingEnvironment hostingEnvironment, IConfiguration configuration)
+        public GePGXmlSerializerInputFormatter(IHostingEnvironment hostingEnvironment, IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             this.configuration = configuration;
             this.hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
+            _gepgFileLogger = new GepgFileRequestLogger(hostingEnvironment, loggerFactory);
 
             SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse("application/xml"));
 
@@ -91,17 +96,16 @@ namespace OpenImis.ePayment.Formaters
                 string billId = body.Between("<BillId>", "</BillId>");
                 if (!String.IsNullOrEmpty(billId))
                 {
-                    GepgFileLogger.Log(billId + "_" + type.Name, body, hostingEnvironment);
+                    _gepgFileLogger.Log(billId + "_" + type.Name, body);
                 }
                 else
                 {
-                    var gepgFile = new GepgFileLogger(type.Name, body, Path.Combine(System.Environment.CurrentDirectory, "wwwroot"));
-                    gepgFile.putRequestBody();
+                    _gepgFileLogger.LogRequestBody(type.Name, body);
                 }
             }
             else
             {
-                GepgFileLogger.Log(type.Name, body, hostingEnvironment);
+                _gepgFileLogger.Log(type.Name, body);
             }
 
             TextReader writer = new StringReader(content);

@@ -24,11 +24,14 @@ namespace OpenImis.ePayment.Data
     {
         private IHostingEnvironment env;
         private IConfiguration config;
+        private readonly GepgFileRequestLogger _gepgFileLogger;
 
         public ImisPayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory) : base(configuration, hostingEnvironment, loggerFactory)
         {
             env = hostingEnvironment;
             config = configuration;
+            _gepgFileLogger = new GepgFileRequestLogger(hostingEnvironment, loggerFactory);
+            _logger = loggerFactory.CreateLogger<ImisPayment>();
         }
 
 #if CHF
@@ -54,7 +57,7 @@ namespace OpenImis.ePayment.Data
             var result = await gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode, "default.sp.in");
 
             var content = signedRequest + "********************" + result;
-            GepgFileLogger.Log(productSPCode + "_GepGReconRequest", content, env);
+            _gepgFileLogger.Log(productSPCode + "_GepGReconRequest", content);
 
             return new { reconcId = request.SpReconcReqId, resp = result };
 
@@ -113,7 +116,7 @@ namespace OpenImis.ePayment.Data
                     string billAckRequest = JsonConvert.SerializeObject(billAck);
                     string sentbill = JsonConvert.SerializeObject(bill);
 
-                    GepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + billAckRequest, env);
+                    _gepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + billAckRequest);
 
                     //check if timeout in GePG server
                     if (billAck == "The operation has timed out.")
@@ -174,7 +177,7 @@ namespace OpenImis.ePayment.Data
                 var response = await gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
 
                 var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
-                GepgFileLogger.Log(PaymentId, "CancelPayment", content, env);
+                _gepgFileLogger.Log(PaymentId, "CancelPayment", content);
 
                 //check if timeout in GePG server
                 if (response == "The operation has timed out.")
@@ -200,6 +203,7 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GePGPostCancelPayment");
                 return new DataMessage
                 {
                     Code = -1,
@@ -217,8 +221,9 @@ namespace OpenImis.ePayment.Data
                 var serializer = new XmlSerializer(type);
                 return Convert.ChangeType(serializer.Deserialize(reader), type);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GetGePGObjectFromString");
                 return null;
             }
 
@@ -278,7 +283,7 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e, "Error in GetProductsSPCode");
                 throw e;
             }
         }
@@ -320,7 +325,9 @@ namespace OpenImis.ePayment.Data
                 }
             }
             catch (Exception e)
-            { }
+            {
+                _logger.LogError(e, "Error in GetPaymentToReconciliate");
+            }
 
             return result;
         }
@@ -378,7 +385,7 @@ namespace OpenImis.ePayment.Data
             var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, accountCode, "default.sp.in");
 
             string sentbill = JsonConvert.SerializeObject(bills);
-            GepgFileLogger.Log("Bulk_CN_Request", sentbill + "********************" + billAck, env);
+            _gepgFileLogger.Log("Bulk_CN_Request", sentbill + "********************" + billAck);
 
             // if the response is not 7101(SUCCESS) then delete all the entries from DB
             if (!billAck.Contains("7101"))
@@ -442,8 +449,9 @@ namespace OpenImis.ePayment.Data
 
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e, "Error in DeleteFailedControlNumberRequests");
                 return false;
             }
 
