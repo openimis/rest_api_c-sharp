@@ -39,20 +39,23 @@ namespace OpenImis.RestApi
                 .UseContentRoot(appRootPath)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
+                    // var parentDir = hostingContext.HostingEnvironment.ContentRootPath;
+                    var path = string.Concat(hostingContext.HostingEnvironment.ContentRootPath, Path.DirectorySeparatorChar, "config", Path.DirectorySeparatorChar);
+                    Console.WriteLine("PATH : ", path);
                     //var secretsMode = GetSecretsMode(hostingContext.HostingEnvironment);
                     //config.AddOpenImisConfig(secretsMode, "REGISTRY_CONFIG_FILE");
-					//config.AddOpenImisConfig(SecretsMode.LocalFile, $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
-					config.AddJsonFile($"appsettings.json", optional: false, reloadOnChange: true);
+                    //config.AddOpenImisConfig(SecretsMode.LocalFile, $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
+                    config.AddJsonFile($"{path}appsettings.json", optional: false, reloadOnChange: true);
 #if DEBUG
-                    config.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"{path}appsettings.Development.json", optional: false, reloadOnChange: true);
 #else
-                    config.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"{path}appsettings.Production.json", optional: false, reloadOnChange: true);
 #endif
 #if CHF
-                    config.AddJsonFile("appsettings.CHF.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"{path}appsettings.CHF.json", optional: false, reloadOnChange: true);
 #endif
-                    config.AddJsonFile("openImisModules.json", optional: true, reloadOnChange: true);
-				})
+                    config.AddJsonFile($"{path}openImisModules.json", optional: true, reloadOnChange: true);
+                })
                 .UseStartup<Startup>();
 
             return webHostBuilder;
