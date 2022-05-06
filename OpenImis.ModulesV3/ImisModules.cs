@@ -39,6 +39,7 @@ namespace OpenImis.ModulesV3
 
         private readonly IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
 
@@ -46,6 +47,7 @@ namespace OpenImis.ModulesV3
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger("LoggerCategory");
             _serviceProvider = serviceProvider;
         }
@@ -96,7 +98,7 @@ namespace OpenImis.ModulesV3
         {
             if (insureeModule == null)
             {
-                insureeModule = new InsureeModule.InsureeModule(_configuration, _hostingEnvironment);
+                insureeModule = new InsureeModule.InsureeModule(_configuration, _hostingEnvironment, _loggerFactory);
 
                 Type familyLogicType = CreateTypeFromConfiguration("InsureeModule", "FamilyLogic", "OpenImis.ModulesV3.InsureeModule.Logic.FamilyLogic");
                 insureeModule.SetFamilyLogic((InsureeModule.Logic.IFamilyLogic)ActivatorUtilities.CreateInstance(_serviceProvider, familyLogicType));
@@ -210,7 +212,7 @@ namespace OpenImis.ModulesV3
         {
             if (policyModule == null)
             {
-                policyModule = new PolicyModule.PolicyModule(_configuration, _hostingEnvironment);
+                policyModule = new PolicyModule.PolicyModule(_configuration, _hostingEnvironment, _loggerFactory);
 
                 Type policyLogicType = CreateTypeFromConfiguration("PolicyModule", "PolicyRenewalLogic", "OpenImis.ModulesV3.PolicyModule.Logic.PolicyRenewalLogic");
                 policyModule.SetPolicyLogic((IPolicyRenewalLogic)ActivatorUtilities.CreateInstance(_serviceProvider, policyLogicType));

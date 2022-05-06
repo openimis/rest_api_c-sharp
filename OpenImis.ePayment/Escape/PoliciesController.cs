@@ -61,7 +61,6 @@ namespace OpenImis.ePayment.Controllers
 
             if (!response.ErrorOccured)
             {
-
                 return Ok(new { success = true, message = response.MessageValue });
             }
             else
@@ -98,7 +97,6 @@ namespace OpenImis.ePayment.Controllers
             var commissionString = JsonConvert.SerializeObject(message.Data);
             var commissionAmount = JsonConvert.DeserializeObject<List<CommissionAmount>>(commissionString).FirstOrDefault();
 
-
             var response = new GetCommissionResponse(message.Code, false, 0).Message;
 
             Language language = Language.Secondary;
@@ -124,7 +122,6 @@ namespace OpenImis.ePayment.Controllers
 
             if (!response.ErrorOccured)
             {
-
                 return Ok(new { success = true, message = response.MessageValue });
             }
             else
@@ -140,6 +137,5 @@ namespace OpenImis.ePayment.Controllers
             return base.Renew_Policy(model);
         }
 #endif
-
     }
 }

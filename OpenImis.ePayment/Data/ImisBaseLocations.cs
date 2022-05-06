@@ -32,8 +32,6 @@ namespace OpenImis.ePayment.Data
                 new SqlParameter("@EnrollmentOfficerCode", officerCode)
             };
 
-
-
             DataMessage message;
 
             try

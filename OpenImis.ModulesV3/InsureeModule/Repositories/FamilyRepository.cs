@@ -22,6 +22,7 @@ using OpenImis.ePayment.Logic;
 using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
 using OpenImis.ModulesV3.InsureeModule.Logic;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
 {
@@ -29,11 +30,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
     {
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public FamilyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public FamilyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
         }
 
         public FamilyModel GetByCHFID(string chfid, Guid userUUID)
@@ -364,8 +367,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
         public void CreatePremium(EnrolFamilyModel model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            PaymentLogic paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
+            PaymentLogic paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment, _loggerFactory);
 
             if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
             {

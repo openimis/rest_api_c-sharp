@@ -31,18 +31,16 @@ namespace OpenImis.ePayment.Data
                 new SqlParameter("@EnrollmentOfficerCode", model.EnrollmentOfficerCode)
             };
 
-            
             DataMessage message;
 
             try
             {
                 var response = helper.Procedure("uspAPIEnterPolicy", sqlParameters);
-                 message = new EnterPolicyResponse(response.Code, false, response.Data, 0).Message;
+                message = new EnterPolicyResponse(response.Code, false, response.Data, 0).Message;
 
             }
             catch (Exception e)
             {
-
                 message = new EditFamilyResponse(e).Message;
             }
 
@@ -67,12 +65,11 @@ namespace OpenImis.ePayment.Data
             try
             {
                 var response = helper.Procedure("uspAPIRenewPolicy", sqlParameters);
-                message = new RenewPolicyResponse(response.Code,false,0).Message;
+                message = new RenewPolicyResponse(response.Code, false, 0).Message;
 
             }
             catch (Exception e)
             {
-
                 message = new EditFamilyResponse(e).Message;
             }
 
@@ -104,8 +101,8 @@ namespace OpenImis.ePayment.Data
                 throw;
             }
 
-            DateTime minDate = new DateTime(year,month,1);
-            DateTime maxDate = new DateTime(year,month, DateTime.DaysInMonth(year,month));
+            DateTime minDate = new DateTime(year, month, 1);
+            DateTime maxDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
             DataHelper helper = new DataHelper(Configuration);
 
@@ -118,19 +115,15 @@ namespace OpenImis.ePayment.Data
                 new SqlParameter("@ProductCode", (model.insurance_product_code != null)? model.insurance_product_code:(object)DBNull.Value)
             };
 
-           
-
             DataMessage message;
 
             try
             {
                 var response = helper.GetDataTable(sSQL, sqlParameters, System.Data.CommandType.Text);
-                message = new GetCommissionResponse(0, false,response, 0).Message;
-
+                message = new GetCommissionResponse(0, false, response, 0).Message;
             }
             catch (Exception e)
             {
-
                 message = new GetCommissionResponse(e).Message;
             }
 

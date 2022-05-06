@@ -17,11 +17,13 @@ namespace OpenImis.ePayment.Scheduler
     {
         private readonly IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public MatchPaymentJob(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public MatchPaymentJob(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
         }
 
         public Task Execute(IJobExecutionContext context)
@@ -35,7 +37,7 @@ namespace OpenImis.ePayment.Scheduler
 
             try
             {
-                var payment = new PaymentLogic(_configuration, _hostingEnvironment);
+                var payment = new PaymentLogic(_configuration, _hostingEnvironment, _loggerFactory);
                 var response = payment.MatchPayment(model);
 
             }

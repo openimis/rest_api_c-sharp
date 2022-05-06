@@ -25,25 +25,8 @@ namespace OpenImis.ePayment.Data
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@InsureeNumber", insureeNumber),
             };
-            DataTable response = new DataTable();
-
-            try
-            {
-                
-                response = helper.GetDataTable("uspAPIGetCoverage", sqlParameters, CommandType.StoredProcedure);
-
-            }
-            catch (SqlException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-
-                throw new Exception();
-            }
             
-            return response;
+            return helper.GetDataTable("uspAPIGetCoverage", sqlParameters, CommandType.StoredProcedure);
         }
     }
 }

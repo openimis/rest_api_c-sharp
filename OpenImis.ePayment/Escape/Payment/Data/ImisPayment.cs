@@ -1,5 +1,4 @@
 ﻿using OpenImis.ePayment.Escape.Payment.Models;
-using OpenImis.ePayment.Data;
 using OpenImis.ePayment.Extensions;
 using OpenImis.ePayment.Models;
 using OpenImis.ePayment.Models.Payment;
@@ -13,11 +12,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Data.SqlClient;
 using System.Data;
 using OpenImis.ePayment.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Data
 {
@@ -25,11 +24,14 @@ namespace OpenImis.ePayment.Data
     {
         private IHostingEnvironment env;
         private IConfiguration config;
+        private readonly GepgFileRequestLogger _gepgFileLogger;
 
-        public ImisPayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment) : base(configuration, hostingEnvironment)
+        public ImisPayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory) : base(configuration, hostingEnvironment, loggerFactory)
         {
             env = hostingEnvironment;
             config = configuration;
+            _gepgFileLogger = new GepgFileRequestLogger(hostingEnvironment, loggerFactory);
+            _logger = loggerFactory.CreateLogger<ImisPayment>();
         }
 
 #if CHF
@@ -37,7 +39,7 @@ namespace OpenImis.ePayment.Data
         {
             daysAgo = -1 * daysAgo;
 
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             ReconcRequest Reconciliation = new ReconcRequest();
 
@@ -55,7 +57,7 @@ namespace OpenImis.ePayment.Data
             var result = await gepg.SendHttpRequest("/api/reconciliations/sig_sp_qrequest", signedRequest, productSPCode, "default.sp.in");
 
             var content = signedRequest + "********************" + result;
-            GepgFileLogger.Log(productSPCode + "_GepGReconRequest", content, env);
+            _gepgFileLogger.Log(productSPCode + "_GepGReconRequest", content);
 
             return new { reconcId = request.SpReconcReqId, resp = result };
 
@@ -96,7 +98,7 @@ namespace OpenImis.ePayment.Data
 
         public override async Task<PostReqCNResponse> PostReqControlNumberAsync(string OfficerCode, int PaymentId, string PhoneNumber, decimal ExpectedAmount, List<PaymentDetail> products, string controlNumber = null, bool acknowledge = false, bool error = false, string rejectedReason = "")
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             ExpectedAmount = Math.Round(ExpectedAmount, 2);
             //send request only when we have amount > 0
@@ -114,7 +116,7 @@ namespace OpenImis.ePayment.Data
                     string billAckRequest = JsonConvert.SerializeObject(billAck);
                     string sentbill = JsonConvert.SerializeObject(bill);
 
-                    GepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + billAckRequest, env);
+                    _gepgFileLogger.Log(PaymentId, "CN_Request", sentbill + "********************" + billAckRequest);
 
                     //check if timeout in GePG server
                     if (billAck == "The operation has timed out.")
@@ -150,7 +152,7 @@ namespace OpenImis.ePayment.Data
 
         public string ControlNumberResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             gepgBillSubRespAck CnAck = new gepgBillSubRespAck();
             CnAck.TrxStsCode = code;
@@ -164,7 +166,7 @@ namespace OpenImis.ePayment.Data
 
         public async Task<Object> GePGPostCancelPayment(int PaymentId)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             try
             {
@@ -175,7 +177,7 @@ namespace OpenImis.ePayment.Data
                 var response = await gepg.SendHttpRequest("/api/bill/sigcancel_request", GePGCancelPaymentRequest, SPCode, "changebill.sp.in");
 
                 var content = JsonConvert.SerializeObject(GePGCancelPaymentRequest) + "\n********************\n" + JsonConvert.SerializeObject(response);
-                GepgFileLogger.Log(PaymentId, "CancelPayment", content, env);
+                _gepgFileLogger.Log(PaymentId, "CancelPayment", content);
 
                 //check if timeout in GePG server
                 if (response == "The operation has timed out.")
@@ -201,6 +203,7 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GePGPostCancelPayment");
                 return new DataMessage
                 {
                     Code = -1,
@@ -218,8 +221,9 @@ namespace OpenImis.ePayment.Data
                 var serializer = new XmlSerializer(type);
                 return Convert.ChangeType(serializer.Deserialize(reader), type);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GetGePGObjectFromString");
                 return null;
             }
 
@@ -227,7 +231,7 @@ namespace OpenImis.ePayment.Data
 
         public string PaymentResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             gepgPmtSpInfoAck PayAck = new gepgPmtSpInfoAck();
             PayAck.TrxStsCode = code;
@@ -241,7 +245,7 @@ namespace OpenImis.ePayment.Data
 
         public string ReconciliationResp(int code)
         {
-            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config);
+            GepgUtility gepg = new GepgUtility(_hostingEnvironment, config, _loggerFactory);
 
             gepgSpReconcRespAck ReconcAck = new gepgSpReconcRespAck();
             ReconcAck.ReconcStsCode = code;
@@ -279,7 +283,7 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e, "Error in GetProductsSPCode");
                 throw e;
             }
         }
@@ -321,7 +325,9 @@ namespace OpenImis.ePayment.Data
                 }
             }
             catch (Exception e)
-            { }
+            {
+                _logger.LogError(e, "Error in GetPaymentToReconciliate");
+            }
 
             return result;
         }
@@ -366,9 +372,9 @@ namespace OpenImis.ePayment.Data
             return rejectedReason;
         }
 
-        public async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
+        public override async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
         {
-            var gepg = new GepgUtility(_hostingEnvironment, Configuration);
+            var gepg = new GepgUtility(_hostingEnvironment, Configuration, _loggerFactory);
             var bills = await gepg.CreateBulkBills(Configuration, model);
 
             var signature = gepg.GenerateSignature(bills);
@@ -379,7 +385,7 @@ namespace OpenImis.ePayment.Data
             var billAck = await gepg.SendHttpRequest("/api/bill/sigqrequest", signedMesg, accountCode, "default.sp.in");
 
             string sentbill = JsonConvert.SerializeObject(bills);
-            GepgFileLogger.Log("Bulk_CN_Request", sentbill + "********************" + billAck, env);
+            _gepgFileLogger.Log("Bulk_CN_Request", sentbill + "********************" + billAck);
 
             // if the response is not 7101(SUCCESS) then delete all the entries from DB
             if (!billAck.Contains("7101"))
@@ -443,8 +449,9 @@ namespace OpenImis.ePayment.Data
 
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e, "Error in DeleteFailedControlNumberRequests");
                 return false;
             }
 
@@ -452,7 +459,7 @@ namespace OpenImis.ePayment.Data
         }
 
 
-        public BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int count)
+        public override BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int count)
         {
             var bulkControlNumbers = new BulkControlNumbersForEO();
             var header = new ControlNumbersForEOHeader();
@@ -495,9 +502,6 @@ namespace OpenImis.ePayment.Data
 	                        SELECT ControlNumberId, BillId, ProductCode, OfficerCode, PhoneNumber, ControlNumber, Amount FROM @dt;
 
                         COMMIT TRANSACTION;";
-
-            //
-
 
             var dh = new DataHelper(config);
          
@@ -543,7 +547,7 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public async Task<int> ControlNumbersToBeRequested(string productCode)
+        public override async Task<int> ControlNumbersToBeRequested(string productCode)
         {
             var sSQL = @";WITH TotalProductUsage
                         AS
@@ -582,10 +586,10 @@ namespace OpenImis.ePayment.Data
             if (dt.Rows.Count > 0)
                 needToRequest = (int)dt.Rows[0]["NeedToRequest"];
 
-            return needToRequest;
+            return await Task.FromResult(needToRequest);
         }
 
-        public int CreatePremium(int paymentId)
+        public override int CreatePremium(int paymentId)
         {
             var sSQL = @"IF EXISTS(SELECT 1 
 			            FROM tblInsuree I
@@ -684,13 +688,6 @@ namespace OpenImis.ePayment.Data
             return 0;
 
         }
-
-
-
-
 #endif
-        
     }
-
-
 }
