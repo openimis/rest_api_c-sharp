@@ -58,10 +58,5 @@ namespace OpenImis.ePayment.Extensions
         {
             Log(finality, content, Path.Combine(Environment.CurrentDirectory, "wwwroot"), "xml");
         }
-
-
-
-
-
     }
 }
