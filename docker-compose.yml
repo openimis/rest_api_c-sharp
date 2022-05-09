@@ -1,0 +1,14 @@
+version: '2.4'
+services:
+  restapi:
+    build: 
+      context: ./
+      args:
+        BUILD-FLAVOUR: ${BUILD-FLAVOUR:-Release}
+    ports:
+      - 8080:80
+    volumes:
+      - ./OpenImis.RestApi/config:/app/config
+      - ./OpenImis.RestApi/logs:/app/log
+      - ./OpenImis.RestApi/Certificates:/app/wwwRoot/Certificates
+    restart: always

@@ -21,8 +21,8 @@ jobs:
       run: dotnet restore
     - name: Build
       run: |
-        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.CHF.json
-        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/appsettings.Development.json
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.CHF.json
+        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json
         dotnet publish --no-restore --configuration Debug --verbosity quiet
     - name: Publish artifact
