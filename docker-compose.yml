@@ -3,6 +3,8 @@ services:
   restapi:
     build: 
       context: ./
+      args:
+        BUILD-FLAVOUR: ${BUILD-FLAVOUR:-Release}
     ports:
       - 8080:80
     volumes:
