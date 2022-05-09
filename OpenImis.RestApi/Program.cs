@@ -35,7 +35,11 @@ namespace OpenImis.RestApi
         public static IWebHostBuilder GetWebHostBuilder(string appRootPath, string[] args)
         {
             var webHostBuilder = new WebHostBuilder()
-                .UseKestrel()
+                .UseKestrel(options =>
+                {
+                    options.Limits.MinRequestBodyDataRate =
+                    new Microsoft.AspNetCore.Server.Kestrel.Core.MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(15));
+                })
                 .UseContentRoot(appRootPath)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
@@ -54,7 +58,7 @@ namespace OpenImis.RestApi
 #if CHF
                     config.AddJsonFile($"{path}appsettings.CHF.json", optional: false, reloadOnChange: true);
 #endif
-                    config.AddJsonFile($"{path}openImisModules.json", optional: true, reloadOnChange: true);
+                    config.AddJsonFile($"openImisModules.json", optional: true, reloadOnChange: true);
                 })
                 .UseStartup<Startup>();
 
