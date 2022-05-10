@@ -92,20 +92,20 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
         {
             try
             {
-                var enrollFamily = model.GetEnrolmentFromModel();
+                var enrolFamily = model.GetEnrolmentFromModel();
 
-                enrollFamily.FileInfo.UserId = userId;
-                enrollFamily.FileInfo.OfficerId = officerId;
+                enrolFamily.FileInfo.UserId = userId;
+                enrolFamily.FileInfo.OfficerId = officerId;
 
-                var XML = enrollFamily.XMLSerialize();
-                var JSON = JsonConvert.SerializeObject(enrollFamily);
+                var XML = enrolFamily.XMLSerialize();
+                var JSON = JsonConvert.SerializeObject(enrolFamily);
 
-                var EnrollmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
+                var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
                 var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar;
                 var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
                 var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
 
-                var hof = enrollFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
+                var hof = enrolFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
                 var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
                 var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss"));
@@ -115,9 +115,9 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
 
                 try
                 {
-                    if (!Directory.Exists(EnrollmentDir)) Directory.CreateDirectory(EnrollmentDir);
+                    if (!Directory.Exists(EnrolmentDir)) Directory.CreateDirectory(EnrolmentDir);
 
-                    xmldoc.Save(EnrollmentDir + FileName);
+                    xmldoc.Save(EnrolmentDir + FileName);
 
                     if (!Directory.Exists(JsonDebugFolder)) Directory.CreateDirectory(JsonDebugFolder);
 

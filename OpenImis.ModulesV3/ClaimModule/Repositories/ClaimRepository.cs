@@ -74,7 +74,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                         var returnParameter = new SqlParameter("@RV", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         var claimRejectedParameter = new SqlParameter("@ClaimRejected", SqlDbType.Bit) { Direction = ParameterDirection.Output };
 
-                        var sql = "exec @RV = uspUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
+                        var sql = "exec @RV = uspRestApiUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
 
                         DbConnection connection = imisContext.Database.GetDbConnection();
 

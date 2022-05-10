@@ -22,226 +22,186 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public DataSet FillDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            DataSet ds = new DataSet();
-            var sqlConnection = new SqlConnection(ConnectionString);
-
-            SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
-            returnParameter.Direction = ParameterDirection.ReturnValue;
-
-            var command = new SqlCommand(SQL, sqlConnection)
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var adapter = new SqlDataAdapter(command))
             {
-                CommandType = commandType
-            };
+                DataSet ds = new DataSet();
 
-            command.Parameters.Add(returnParameter);
+                SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
 
-            var adapter = new SqlDataAdapter(command);
-            using (command)
-            {
+                command.Parameters.Add(returnParameter);
+
                 if (parameters.Length > 0)
+                {
                     command.Parameters.AddRange(parameters);
+                }
+
                 adapter.Fill(ds);
+
+                ReturnValue = int.Parse(returnParameter.Value.ToString());
+
+                return ds;
             }
-
-            ReturnValue = int.Parse(returnParameter.Value.ToString());
-
-            return ds;
         }
 
         public DataTable GetDataTable(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            DataTable dt = new DataTable();
-            var sqlConnection = new SqlConnection(ConnectionString);
-            var command = new SqlCommand(SQL, sqlConnection)
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var adapter = new SqlDataAdapter(command))
             {
-                CommandType = commandType
-            };
+                DataTable dt = new DataTable();
 
-            var adapter = new SqlDataAdapter(command);
-
-            using (command)
-            {
                 if (parameters.Length > 0)
+                {
                     command.Parameters.AddRange(parameters);
-                adapter.Fill(dt);
-            }
+                }
 
-            return dt;
+                adapter.Fill(dt);
+
+                return dt;
+            }
+        }
+
+        public DataSet GetDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
+        {
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var adapter = new SqlDataAdapter(command))
+            {
+                DataSet ds = new DataSet();
+
+                if (parameters.Length > 0)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
+                adapter.Fill(ds);
+
+                return ds;
+            }
         }
 
         public void Execute(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            var sqlConnection = new SqlConnection(ConnectionString);
-
-            //if(SqlCommand.C)
-            // sqlConnection.Open
-            var command = new SqlCommand(SQL, sqlConnection)
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
             {
-                CommandType = commandType
-            };
+                sqlConnection.Open();
 
-            using (command)
+                if (parameters.Length > 0)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public async Task ExecuteAsync(string SQL, SqlParameter[] parameters, CommandType commandType)
+        {
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
             {
                 if (command.Connection.State == 0)
                 {
                     command.Connection.Open();
 
                     if (parameters.Length > 0)
+                    {
                         command.Parameters.AddRange(parameters);
+                    }
 
-                    command.ExecuteNonQuery();
-
-                    command.Connection.Close();
+                    await command.ExecuteNonQueryAsync();
                 }
             }
         }
 
         public ProcedureOutPut Procedure(string StoredProcedure, SqlParameter[] parameters, int tableIndex = 0)
         {
-            DataSet dt = new DataSet();
-
-            SqlConnection sqlConnection = new SqlConnection(ConnectionString);
-            SqlCommand command = new SqlCommand();
-            //SqlDataReader reader;
-
-            SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
-            returnParameter.Direction = ParameterDirection.ReturnValue;
-
-            command.CommandText = StoredProcedure;
-            command.CommandType = CommandType.StoredProcedure;
-            command.Connection = sqlConnection;
-            command.Parameters.Add(returnParameter);
-
-            if (parameters.Length > 0)
-                command.Parameters.AddRange(parameters);
-
-            var adapter = new SqlDataAdapter(command);
-
-            using (command)
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure })
+            using (var adapter = new SqlDataAdapter(command))
             {
+                DataSet dt = new DataSet();
+                SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
+
+                command.Parameters.Add(returnParameter);
+
+                if (parameters.Length > 0)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
                 adapter.Fill(dt);
+
+                int rv = int.Parse(returnParameter.Value.ToString());
+
+                DataTable dat = new DataTable();
+
+                if (rv == 0 && dt.Tables.Count > tableIndex)
+                {
+                    dat = dt.Tables[tableIndex];
+                }
+
+                var output = new ProcedureOutPut { Code = rv, Data = dat };
+
+                return output;
             }
-
-            int rv = int.Parse(returnParameter.Value.ToString());
-            DataTable dat = new DataTable();
-
-            if (rv == 0)
-            {
-                dat = dt.Tables[tableIndex];
-            }
-
-            var output = new ProcedureOutPut
-            {
-                Code = rv,
-                Data = dat
-            };
-
-            return output;
         }
 
         public IList<SqlParameter> ExecProcedure(string StoredProcedure, SqlParameter[] parameters)
         {
-            SqlConnection sqlConnection = new SqlConnection(ConnectionString);
-            SqlCommand command = new SqlCommand();
-
-            SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
-            returnParameter.Direction = ParameterDirection.ReturnValue;
-
-            command.CommandText = StoredProcedure;
-            command.CommandType = CommandType.StoredProcedure;
-            command.Connection = sqlConnection;
-            command.Parameters.Add(returnParameter);
-
-            if (parameters.Length > 0)
-                command.Parameters.AddRange(parameters);
-
-            sqlConnection.Open();
-
-            command.ExecuteNonQuery();
-
-            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output) || x.Direction.Equals(ParameterDirection.ReturnValue)).ToList();
-            rv.Add(returnParameter);
-
-            sqlConnection.Close();
-
-            return rv;
-        }
-
-        public DataSet GetDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
-        {
-            DataSet ds = new DataSet();
-            var sqlConnection = new SqlConnection(ConnectionString);
-            var command = new SqlCommand(SQL, sqlConnection)
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure })
             {
-                CommandType = commandType
-            };
+                SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
 
-            var adapter = new SqlDataAdapter(command);
+                command.Parameters.Add(returnParameter);
 
-            using (command)
-            {
                 if (parameters.Length > 0)
-                    command.Parameters.AddRange(parameters);
-                adapter.Fill(ds);
-            }
-
-            return ds;
-        }
-
-        public async Task ExecuteAsync(string SQL, SqlParameter[] parameters, CommandType commandType)
-        {
-            var sqlConnection = new SqlConnection(ConnectionString);
-
-            //if(SqlCommand.C)
-            // sqlConnection.Open
-            var command = new SqlCommand(SQL, sqlConnection)
-            {
-                CommandType = commandType
-            };
-
-            using (command)
-            {
-                if (command.Connection.State == 0)
                 {
-                    command.Connection.Open();
-
-                    if (parameters.Length > 0)
-                        command.Parameters.AddRange(parameters);
-
-                    await command.ExecuteNonQueryAsync();
-
-                    command.Connection.Close();
+                    command.Parameters.AddRange(parameters);
                 }
 
+                sqlConnection.Open();
+
+                command.ExecuteNonQuery();
+
+                var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output) || x.Direction.Equals(ParameterDirection.ReturnValue)).ToList();
+                rv.Add(returnParameter);
+
+                return rv;
             }
         }
 
         public async Task<IList<SqlParameter>> ExecProcedureAsync(string StoredProcedure, SqlParameter[] parameters)
         {
-            SqlConnection sqlConnection = new SqlConnection(ConnectionString);
-            SqlCommand command = new SqlCommand();
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure })
+            {
+                SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
+                returnParameter.Direction = ParameterDirection.ReturnValue;
+                command.Parameters.Add(returnParameter);
 
-            SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
-            returnParameter.Direction = ParameterDirection.ReturnValue;
+                if (parameters.Length > 0)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
 
-            command.CommandText = StoredProcedure;
-            command.CommandType = CommandType.StoredProcedure;
-            command.Connection = sqlConnection;
-            command.Parameters.Add(returnParameter);
+                sqlConnection.Open();
 
-            if (parameters.Length > 0)
-                command.Parameters.AddRange(parameters);
+                await command.ExecuteNonQueryAsync();
 
-            sqlConnection.Open();
+                var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output) || x.Direction.Equals(ParameterDirection.ReturnValue)).ToList();
+                rv.Add(returnParameter);
 
-            await command.ExecuteNonQueryAsync();
-
-            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output) || x.Direction.Equals(ParameterDirection.ReturnValue)).ToList();
-            rv.Add(returnParameter);
-
-            sqlConnection.Close();
-
-            return rv;
+                return rv;
+            }
         }
     }
 

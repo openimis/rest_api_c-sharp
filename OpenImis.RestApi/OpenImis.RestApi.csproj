@@ -70,6 +70,7 @@
     <Folder Include="Extensions\" />
     <Folder Include="Globals\" />
     <Folder Include="wwwroot\FromPhone\Enrollment\Debug\" />
+    <Folder Include="wwwroot\SelfRenewals\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -90,14 +91,14 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <None Include="appsettings.CHF.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <ProjectReference Include="..\OpenImis.ePayment\OpenImis.ePayment.csproj" />
@@ -108,7 +109,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="appsettings.Development.json">
+    <!-- <Content Update="appsettings.Development.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.json">
@@ -119,7 +120,7 @@
     </Content>
     <Content Update="appsettings.Test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Content> -->
     <Content Update="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -136,10 +137,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Escape\Sms\StringsSecondaryLanguage\PaymentConfirmationSMS.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Escape\Sms\Strings\PaymentConfirmationSMS.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="log4net.configure">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

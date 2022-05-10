@@ -22,6 +22,7 @@ using OpenImis.ePayment.Logic;
 using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
 using OpenImis.ModulesV3.InsureeModule.Logic;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ModulesV3.InsureeModule.Repositories
 {
@@ -29,11 +30,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
     {
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public FamilyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public FamilyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
         }
 
         public FamilyModel GetByCHFID(string chfid, Guid userUUID)
@@ -77,7 +80,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             return response;
         }
 
-        public NewFamilyResponse CreateEnrollResponse(EnrollFamilyModel model)
+        public NewFamilyResponse CreateEnrolResponse(EnrolFamilyModel model)
         {
             var response = new NewFamilyResponse();
 
@@ -151,22 +154,22 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             return response;
         }
 
-        public NewFamilyResponse Create(EnrollFamilyModel model, int userId, int officerId)
+        public NewFamilyResponse Create(EnrolFamilyModel model, int userId, int officerId)
         {
-            var enrollFamily = model.GetEnrolmentFromModel();
+            var enrolFamily = model.GetEnrolmentFromModel();
 
-            enrollFamily.FileInfo.UserId = userId;
-            enrollFamily.FileInfo.OfficerId = officerId;
+            enrolFamily.FileInfo.UserId = userId;
+            enrolFamily.FileInfo.OfficerId = officerId;
 
-            var XML = enrollFamily.XMLSerialize();
-            var JSON = JsonConvert.SerializeObject(enrollFamily);
+            var XML = enrolFamily.XMLSerialize();
+            var JSON = JsonConvert.SerializeObject(enrolFamily);
 
-            var EnrollmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
+            var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
             var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar;
             var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
             var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
 
-            var hof = enrollFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
+            var hof = enrolFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
             var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
             var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
@@ -174,9 +177,9 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             var xmldoc = new XmlDocument();
             xmldoc.InnerXml = XML;
 
-            if (!Directory.Exists(EnrollmentDir)) Directory.CreateDirectory(EnrollmentDir);
+            if (!Directory.Exists(EnrolmentDir)) Directory.CreateDirectory(EnrolmentDir);
 
-            xmldoc.Save(EnrollmentDir + FileName);
+            xmldoc.Save(EnrolmentDir + FileName);
 
             if (!Directory.Exists(JsonDebugFolder)) Directory.CreateDirectory(JsonDebugFolder);
 
@@ -268,7 +271,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             newFamily.Response = RV;
             if (RV == 0)
             {
-                newFamily = CreateEnrollResponse(model);
+                newFamily = CreateEnrolResponse(model);
 
                 // Update the control number
                 newFamily.Response = UpdateControlNumber(model, newFamily);
@@ -318,7 +321,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             return response;
         }
 
-        public int UpdateControlNumber(EnrollFamilyModel familyModel, NewFamilyResponse serverResponse)
+        public int UpdateControlNumber(EnrolFamilyModel familyModel, NewFamilyResponse serverResponse)
         {
 
             foreach (var family in familyModel.Family)
@@ -362,10 +365,10 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             return 0;
         }
 
-        public void CreatePremium(EnrollFamilyModel model)
+        public void CreatePremium(EnrolFamilyModel model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            PaymentLogic paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
+            PaymentLogic paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment, _loggerFactory);
 
             if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
             {

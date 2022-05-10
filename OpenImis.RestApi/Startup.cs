@@ -27,14 +27,17 @@ namespace OpenImis.RestApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
             HostingEnvironment = hostingEnvironment;
+            LoggerFactory = loggerFactory;
         }
 
         private IConfiguration Configuration { get; }
         private IHostingEnvironment HostingEnvironment { get; }
+
+        private ILoggerFactory LoggerFactory { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -82,7 +85,7 @@ namespace OpenImis.RestApi
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
 #if CHF
-                options.InputFormatters.Add(new ePayment.Formaters.GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration));
+                options.InputFormatters.Add(new ePayment.Formaters.GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration, LoggerFactory));
 #else
                 options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
 #endif

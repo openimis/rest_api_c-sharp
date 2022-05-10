@@ -16,6 +16,8 @@ using System.Diagnostics;
 using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
 using OpenImis.ePayment.Logic;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ModulesV3.PolicyModule.Repositories
 {
@@ -23,11 +25,13 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
     {
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private ILoggerFactory _loggerFactory;
 
-        public PolicyRenewalRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PolicyRenewalRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
         }
 
         // TODO: Receiving RenewalUUID directly from SP
@@ -239,8 +243,15 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             int year = Convert.ToInt32(model.year);
             int month = Convert.ToInt32(model.month);
 
-            DateTime minDate = new DateTime(year, month, 1);
-            DateTime maxDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
+            // fix - when no month is choosen - get data for every month in given year
+            DateTime minDate = new DateTime(year, 1, 1);
+            DateTime maxDate = new DateTime(year, 12, DateTime.DaysInMonth(year, 12));
+
+            if (month > 0)
+            {
+                minDate = new DateTime(year, month, 1);
+                maxDate = new DateTime(year, month, DateTime.DaysInMonth(year, month));
+            }
 
             DataMessage message;
 
@@ -309,8 +320,8 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
 
         public void CreatePremium(PolicyRenewalModel renewal)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
+            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment, _loggerFactory);
 
             if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
             {
@@ -318,6 +329,14 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                 _ = paymentLogic.CreatePremium(paymentId);
             }
 
+        }
+
+        public async Task<DataMessage> SelfRenewal(SelfRenewal renewal)
+        {
+            var helper = new SelfRenewalHelper(_configuration, _hostingEnvironment, _loggerFactory);
+            var response = await helper.CreateSelfRenewal(renewal);
+            
+            return response;
         }
     }
 }

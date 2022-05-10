@@ -30,14 +30,12 @@ namespace OpenImis.ePayment.Data
 
         public virtual async Task<string> SendSMS(List<SmsContainer> containers,string filename)
         {
-            string response_message = string.Empty;
-
-
             HttpClient client = new HttpClient();
 
             var param = new { data = containers, datetime = DateTime.Now.ToString() };
             var content = new StringContent(JsonConvert.SerializeObject(param), Encoding.ASCII, "application/json");
 
+            string response_message;
             try
             {
                 var response = await client.PostAsync("url", content);
@@ -76,8 +74,6 @@ namespace OpenImis.ePayment.Data
 
         public virtual async void QuickSms(string txtmsg, string phoneNumber, Language language = Language.Primary)
         {
-
-
             var txtmsgTemplate = string.Empty;
             string othersCount = string.Empty;
 

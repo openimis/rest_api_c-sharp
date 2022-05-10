@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using OpenImis.DB.SqlServer;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Data
 {
@@ -43,12 +44,16 @@ namespace OpenImis.ePayment.Data
         protected IConfiguration Configuration;
         protected readonly IHostingEnvironment _hostingEnvironment;
         protected DataHelper dh;
+        protected ILoggerFactory _loggerFactory;
+        protected ILogger _logger;
 
-        public ImisBasePayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public ImisBasePayment(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
             dh = new DataHelper(configuration);
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<ImisBasePayment>();
         }
 
         public async Task<bool> SaveControlNumberRequest(int BillId, bool failed)
@@ -113,7 +118,7 @@ namespace OpenImis.ePayment.Data
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -241,7 +246,6 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception e)
             {
-
                 message = new SaveIntentResponse(e).Message;
             }
 
@@ -260,19 +264,16 @@ namespace OpenImis.ePayment.Data
 
             try
             {
-
                 var data = await dh.ExecProcedureAsync("uspReceiveControlNumber", sqlParameters);
                 message = new CtrlNumberResponse(int.Parse(data[0].Value.ToString()), false, (int)Language).Message;
                 GetPaymentInfo(PaymentId);
             }
             catch (Exception e)
             {
-
                 message = new CtrlNumberResponse(e).Message;
             }
 
             return message;
-
         }
 
         public async Task<DataMessage> SaveControlNumberAsync(ControlNumberResp model, bool failed)
@@ -319,7 +320,7 @@ namespace OpenImis.ePayment.Data
                 }
                 //GetPaymentInfo(PaymentID);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -377,12 +378,10 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception e)
             {
-
                 message = new SaveAckResponse(e).Message;
             }
 
             return message;
-
         }
 
 
@@ -438,7 +437,6 @@ namespace OpenImis.ePayment.Data
             }
 
             return message;
-
         }
 
         public DataMessage MatchPayment(MatchModel model)
@@ -537,7 +535,6 @@ namespace OpenImis.ePayment.Data
                         invalid.Rows.Add(rw);
                     }
 
-
                     dt = new RequestedCNResponse(2, true, invalid, (int)Language).Message;
                 }
 
@@ -547,7 +544,7 @@ namespace OpenImis.ePayment.Data
                 throw e;
             }
 
-            return dt;
+            return await Task.FromResult(dt);
         }
 
         public void GetPaymentInfo(int Id)
@@ -745,7 +742,6 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception e)
             {
-
                 throw e;
             }
         }
@@ -766,7 +762,6 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -836,8 +831,10 @@ namespace OpenImis.ePayment.Data
                     }
                 }
             }
-            catch (Exception e)
-            { }
+            catch (Exception)
+            {
+                throw;
+            }
 
             return result;
         }
@@ -858,7 +855,6 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -880,8 +876,7 @@ namespace OpenImis.ePayment.Data
                 await dh.ExecuteAsync(sSQL, parameters, CommandType.Text);
             }
             catch (Exception)
-            {
-
+            { 
                 throw;
             }
         }
@@ -929,7 +924,7 @@ namespace OpenImis.ePayment.Data
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -956,7 +951,7 @@ namespace OpenImis.ePayment.Data
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -981,7 +976,6 @@ namespace OpenImis.ePayment.Data
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -993,26 +987,23 @@ namespace OpenImis.ePayment.Data
 
         }
 
-        public async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
+        public virtual async Task<string> RequestBulkControlNumbers(RequestBulkControlNumbersModel model)
         {
-            return await Task.Run(() =>
-            {
-                return "";
-            });
+            return await Task.FromResult("");
         }
 
-        public List<BulkControlNumbersForEO> GetControlNumbersForEO(string officerCode, string productCode)
+        public virtual BulkControlNumbersForEO GetControlNumbersForEO(string officerCode, string productCode, int available)
         {
-            return new List<BulkControlNumbersForEO>();
+            return new BulkControlNumbersForEO();
         }
 
-        public int ControlNumbersToBeRequested(string productCode)
+        public virtual async Task<int> ControlNumbersToBeRequested(string productCode)
         {
-            return 0;
+            return await Task.FromResult(0);
         }
 
 
-        public int CreatePremium(int paymentId)
+        public virtual int CreatePremium(int paymentId)
         {
             return 0;
         }
