@@ -218,7 +218,7 @@ namespace OpenImis.ePayment.Data
 
                     using (var xw2 = XmlWriter.Create(sb, settings))
                     {
-                        xs.Serialize(xw, gepgBillCanclReq, ns);
+                        xs.Serialize(xw, GePGPaymentCancelRequest, ns);
                         xw.Flush();
                     }
                 }
@@ -534,8 +534,8 @@ namespace OpenImis.ePayment.Data
             var ns = new XmlSerializerNamespaces();
             ns.Add("", "");
             var settings = new XmlWriterSettings() { OmitXmlDeclaration = true };
+            var sb = new StringBuilder();
 
-            using (var sb = new MemoryStream())
             using (var xw = XmlWriter.Create(sb, settings))
             {
                 try
@@ -548,7 +548,7 @@ namespace OpenImis.ePayment.Data
                     _logger.LogError(ex, "Exception during XML serialization");
                 }
 
-                return Encoding.UTF8.GetString(sb.ToArray());
+                return sb.ToString();
             }
         }
     }
