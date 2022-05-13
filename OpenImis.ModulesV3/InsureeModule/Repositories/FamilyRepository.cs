@@ -328,7 +328,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             {
                 foreach (var policy in family.Policies)
                 {
-                    if (policy.ControlNumber.Length == 0)
+                    if (String.IsNullOrEmpty(policy.ControlNumber))
                         continue;
 
                     var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
