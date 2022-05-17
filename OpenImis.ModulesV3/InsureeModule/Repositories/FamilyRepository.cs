@@ -164,15 +164,18 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             var XML = enrolFamily.XMLSerialize();
             var JSON = JsonConvert.SerializeObject(enrolFamily);
 
-            var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
-            var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar;
+            var dateFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Day.ToString() + Path.DirectorySeparatorChar;
+
+            var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar + dateFolder;
+            
             var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
             var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
+
 
             var hof = enrolFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
             var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
-            var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
+            
 
             var xmldoc = new XmlDocument();
             xmldoc.InnerXml = XML;
@@ -181,9 +184,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
             xmldoc.Save(EnrolmentDir + FileName);
 
-            if (!Directory.Exists(JsonDebugFolder)) Directory.CreateDirectory(JsonDebugFolder);
-
-            File.WriteAllText(JsonDebugFolder + JsonFileName, JSON);
+            
 
             int RV = -99;
             int InsureeUpd;
