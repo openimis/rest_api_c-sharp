@@ -164,10 +164,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             var XML = enrolFamily.XMLSerialize();
             var JSON = JsonConvert.SerializeObject(enrolFamily);
 
-            var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
-            var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar;
+            var dateFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Day.ToString() + Path.DirectorySeparatorChar;
+
+            var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar + dateFolder;
+            var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar + dateFolder;
             var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
             var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
+
 
             var hof = enrolFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
