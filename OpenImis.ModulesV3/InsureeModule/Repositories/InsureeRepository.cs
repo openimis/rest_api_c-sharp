@@ -60,6 +60,9 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                     response.PhotoPath = reader["PhotoPath"].ToString();
                                     response.DOB = reader["DOB"].ToString().ToNullableDatetime();
                                     response.Gender = reader["Gender"].ToString();
+                                    response.OtherNames = reader["OtherNames"].ToString();
+                                    response.LastName = reader["LastName"].ToString();
+
                                 }
 
                                 details.Add(new DetailModel

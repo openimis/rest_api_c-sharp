@@ -15,5 +15,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public DateTime? DOB { get; set; }
         public string Gender { get; set; }
         public string PhotoBase64 { get; set; }
+        public string OtherNames { get; set; }
+        public string LastName { get; set; }
+
     }
 }
