@@ -17,6 +17,7 @@ using OpenImis.ePayment.Data;
 using OpenImis.ModulesV3.Utils;
 using OpenImis.ePayment.Logic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ModulesV3.PolicyModule.Repositories
 {
@@ -24,11 +25,13 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
     {
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private ILoggerFactory _loggerFactory;
 
-        public PolicyRenewalRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PolicyRenewalRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
         }
 
         // TODO: Receiving RenewalUUID directly from SP
@@ -152,7 +155,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                     int tempRV = (int)returnParameter.Value;
                     bool moveToRejected = false;
 
-                    switch (tempRV) 
+                    switch (tempRV)
                     {
                         case 0:
                             RV = (int)Errors.Renewal.Accepted;
@@ -178,12 +181,17 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                             break;
                     }
 
-                    if(moveToRejected)
+                    if (moveToRejected)
                     {
+                        // Check if the file already exists in the rejected folder
+                        // If yes then delete it otherwise it will throw and exception
+                        if (File.Exists(fromPhoneRenewalRejectedDir + fileName))
+                            File.Delete(fromPhoneRenewalRejectedDir + fileName);
+
+
                         if (File.Exists(fromPhoneRenewalDir + fileName))
-                        {
                             File.Move(fromPhoneRenewalDir + fileName, fromPhoneRenewalRejectedDir + fileName);
-                        }
+
                     }
                 }
             }
@@ -317,8 +325,8 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
 
         public void CreatePremium(PolicyRenewalModel renewal)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
-            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
+            var paymentLogic = new PaymentLogic(_configuration, _hostingEnvironment, _loggerFactory);
 
             if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
             {
@@ -330,9 +338,9 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
 
         public async Task<DataMessage> SelfRenewal(SelfRenewal renewal)
         {
-            var helper = new SelfRenewalHelper(_configuration, _hostingEnvironment);
+            var helper = new SelfRenewalHelper(_configuration, _hostingEnvironment, _loggerFactory);
             var response = await helper.CreateSelfRenewal(renewal);
-            
+
             return response;
         }
     }

@@ -1,5 +1,4 @@
 ﻿using OpenImis.ePayment.Escape.Payment.Models;
-using OpenImis.ePayment.Data;
 using OpenImis.ePayment.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,11 +15,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using OpenImis.ePayment.Models.Payment;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Data
 {
-    
+
     public class GepgUtility
     {
         string PublicStorePath = string.Empty;
@@ -31,19 +30,20 @@ namespace OpenImis.ePayment.Data
 
         RSA rsaCrypto = null;
         gepgBillSubReq newBill = null;
-        
-        private IConfiguration configuration;
 
-        public GepgUtility(IHostingEnvironment hostingEnvironment, IConfiguration Configuration)
+        private IConfiguration configuration;
+        private readonly ILogger _logger;
+
+        public GepgUtility(IHostingEnvironment hostingEnvironment, IConfiguration Configuration, ILoggerFactory loggerFactory)
         {
             configuration = Configuration;
+            _logger = loggerFactory.CreateLogger<GepgUtility>();
 
             PublicStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PublicStorePath"]);
             PrivateStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:PrivateStorePath"]);
             GepgPayCertStorePath = Path.Combine(hostingEnvironment.ContentRootPath + Configuration["PaymentGateWay:GePG:GepgPayCertStorePath"]);
 
             CertPass = Configuration["PaymentGateWay:GePG:CertPass"];
-
         }
 
         public String CreateBill(IConfiguration Configuration, string OfficerCode, string PhoneNumber, int BillId, decimal ExpectedAmount, List<PaymentDetail> policies)
@@ -147,7 +147,7 @@ namespace OpenImis.ePayment.Data
 
             string accountCode = GetAccountCodeByProductCode(policies.FirstOrDefault().insurance_product_code);
 
-            var billTrxInfs = new List<BillTrxInf> { 
+            var billTrxInfs = new List<BillTrxInf> {
                 billTrxInf
             };
 
@@ -158,42 +158,25 @@ namespace OpenImis.ePayment.Data
                 BillTrxInf = billTrxInfs
             };
 
-            XmlSerializer xs = null;
-            XmlSerializerNamespaces ns = null;
-            XmlWriterSettings settings = null;
-            String outString = String.Empty;
+            var settings = new XmlWriterSettings() { OmitXmlDeclaration = true };
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            var sb = new StringBuilder();
+            var xs = new XmlSerializer(typeof(gepgBillSubReq));
 
-            XmlWriter xw = null;
-
-            try
+            using (var xw = XmlWriter.Create(sb, settings))
             {
-                settings = new XmlWriterSettings();
-                settings.OmitXmlDeclaration = true;
-                //settings.Indent = true;
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-
-                StringBuilder sb = new StringBuilder();
-                xs = new XmlSerializer(typeof(gepgBillSubReq));
-
-                xw = XmlWriter.Create(sb, settings);
-
-                xs.Serialize(xw, newBill, ns);
-                xw.Flush();
-                outString = sb.ToString();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (xw != null)
+                try
                 {
-                    xw.Close();
+                    xs.Serialize(xw, newBill, ns);
+                    xw.Flush();
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during XML serialization");
+                }
+                return sb.ToString();
             }
-            return outString;
         }
 
         public String CreateGePGCancelPaymentRequest(IConfiguration Configuration, int PaymentId)
@@ -206,245 +189,157 @@ namespace OpenImis.ePayment.Data
                 SpSysId = Configuration["PaymentGateWay:GePG:SystemId"],
             };
 
-            XmlSerializer xs = null;
-            XmlSerializerNamespaces ns = null;
-            XmlWriterSettings settings = null;
-            String outString = String.Empty;
+            var xs = new XmlSerializer(typeof(gepgBillCanclReq));
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            var settings = new XmlWriterSettings() { OmitXmlDeclaration = true };
+            var sb = new StringBuilder();
 
-            XmlWriter xw = null;
-
-            try
+            using (var xw = XmlWriter.Create(sb, settings))
             {
-                settings = new XmlWriterSettings()
+                try
                 {
-                    OmitXmlDeclaration = true
-                };
+                    xs.Serialize(xw, gepgBillCanclReq, ns);
+                    xw.Flush();
 
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
+                    var outString = sb.ToString();
 
-                StringBuilder sb = new StringBuilder();
-                xs = new XmlSerializer(typeof(gepgBillCanclReq));
+                    var signature = this.GenerateSignature(outString);
 
-                xw = XmlWriter.Create(sb, settings);
+                    GePGPaymentCancelRequest GePGPaymentCancelRequest = new GePGPaymentCancelRequest()
+                    {
+                        gepgBillCanclReq = gepgBillCanclReq,
+                        gepgSignature = signature
+                    };
 
-                xs.Serialize(xw, gepgBillCanclReq, ns);
-                xw.Flush();
+                    xs = new XmlSerializer(typeof(GePGPaymentCancelRequest));
+                    settings = new XmlWriterSettings();
+                    sb = new StringBuilder();
 
-                outString = sb.ToString();
-
-                var signature = this.GenerateSignature(outString);
-
-                GePGPaymentCancelRequest GePGPaymentCancelRequest = new GePGPaymentCancelRequest()
-                {
-                    gepgBillCanclReq = gepgBillCanclReq,
-                    gepgSignature = signature
-                };
-
-                settings = new XmlWriterSettings();
-                sb = new StringBuilder();
-                xs = new XmlSerializer(typeof(GePGPaymentCancelRequest));
-                xw = XmlWriter.Create(sb, settings);
-
-                xs.Serialize(xw, GePGPaymentCancelRequest, ns);
-                xw.Flush();
-                outString = sb.ToString();
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (xw != null)
-                {
-                    xw.Close();
+                    using (var xw2 = XmlWriter.Create(sb, settings))
+                    {
+                        xs.Serialize(xw, GePGPaymentCancelRequest, ns);
+                        xw.Flush();
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during XML serialization");
+                }
+
+                return sb.ToString();
             }
-            return outString;
         }
 
         public string FinaliseSignedMsg(string sign)
         {
-
             object gepgData = null;
             gepgData = new GepgBillMessage() { gepgBillSubReq = newBill, gepgSignature = sign };
 
+            var xs = new XmlSerializer(typeof(GepgBillMessage));
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            var settings = new XmlWriterSettings();
+            var sb = new StringBuilder();
 
-            XmlSerializer xs = null;
-            XmlSerializerNamespaces ns = null;
-            XmlWriterSettings settings = null;
-            XmlWriter xw = null;
-            String outString = String.Empty;
-
-            try
+            using (var xw = XmlWriter.Create(sb, settings))
             {
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                settings = new XmlWriterSettings();
-                //settings.Indent = true;
-                StringBuilder sb = new StringBuilder();
-                xs = new XmlSerializer(typeof(GepgBillMessage));
-
-                xw = XmlWriter.Create(sb, settings);
-
-                xs.Serialize(xw, gepgData, ns);
-                xw.Flush();
-                outString = sb.ToString();
-
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (xw != null)
+                try
                 {
-                    xw.Close();
+                    xs.Serialize(xw, gepgData, ns);
+                    xw.Flush();
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during XML serialization");
+                }
+                return sb.ToString();
             }
-
-            return outString;
         }
 
         public string FinaliseSignedMsg(object content, Type type)
         {
             //Gepg gepgBill = new Gepg() { Content = content, gepgSignature = sign };
 
-            XmlSerializer xs = null;
-            XmlSerializerNamespaces ns = null;
-            XmlWriterSettings settings = null;
-            XmlWriter xw = null;
-            String outString = String.Empty;
+            var xs = new XmlSerializer(type);
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            var settings = new XmlWriterSettings();
+            var sb = new StringBuilder();
 
-            try
+            using (var xw = XmlWriter.Create(sb, settings))
             {
-
-
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                settings = new XmlWriterSettings();
-
-                //settings.Indent = true;
-                StringBuilder sb = new StringBuilder();
-                xs = new XmlSerializer(type);
-                xw = XmlWriter.Create(sb, settings);
-
-                xs.Serialize(xw, content, ns);
-                xw.Flush();
-                outString = sb.ToString();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (xw != null)
+                try
                 {
-                    xw.Close();
+                    xs.Serialize(xw, content, ns);
+                    xw.Flush();
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during XML serialization");
+                }
+                return sb.ToString();
             }
-
-            return outString;
         }
 
         public string FinaliseSignedAcks(object content, Type type)
         {
             //Gepg gepgBill = new Gepg() { Content = content, gepgSignature = sign };
 
-            XmlSerializer xs = null;
-            XmlSerializerNamespaces ns = null;
-            XmlWriterSettings settings = null;
-            XmlWriter xw = null;
-            String outString = String.Empty;
+            var xs = new XmlSerializer(type);
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            var settings = new XmlWriterSettings() { Encoding = Encoding.UTF8 };
 
-            try
+            using (var sb = new MemoryStream())
+            using (var xw = XmlWriter.Create(sb, settings))
             {
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                settings = new XmlWriterSettings();
-                settings.Encoding = System.Text.Encoding.UTF8;
-
-                //settings.Indent = true;
-                MemoryStream sb = new MemoryStream();
-                xs = new XmlSerializer(type);
-                xw = XmlWriter.Create(sb, settings);
-
-                xs.Serialize(xw, content, ns);
-                xw.Flush();
-                outString = Encoding.UTF8.GetString(sb.ToArray());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (xw != null)
+                try
                 {
-                    xw.Close();
+                    xs.Serialize(xw, content, ns);
+                    xw.Flush();
                 }
-            }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during XML serialization");
+                }
 
-            return outString;
+                return Encoding.UTF8.GetString(sb.ToArray());
+            }
         }
 
         public string SerializeClean(object bill, Type type)
         {
-            XmlSerializer xs = null;
-            //These are the objects that will free us from extraneous markup.
-            XmlWriterSettings settings = null;
-            XmlSerializerNamespaces ns = null;
+            var xs = new XmlSerializer(type);
+            var sb = new StringBuilder();
 
-            //We use a XmlWriter instead of a StringWriter.
-            XmlWriter xw = null;
+            //To get rid of the default namespaces we create a new
+            //set of namespaces with one empty entry.
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
 
-            String outString = String.Empty;
+            //To get rid of the xml declaration we create an 
+            //XmlWriterSettings object and tell it to OmitXmlDeclaration.
+            var settings = new XmlWriterSettings() { OmitXmlDeclaration = true };
 
-            try
+            //We create a new XmlWriter with the previously created settings 
+            //(to OmitXmlDeclaration).
+            using (var xw = XmlWriter.Create(sb, settings))
             {
-                //To get rid of the xml declaration we create an 
-                //XmlWriterSettings object and tell it to OmitXmlDeclaration.
-                settings = new XmlWriterSettings();
-                settings.OmitXmlDeclaration = true;
-
-                //To get rid of the default namespaces we create a new
-                //set of namespaces with one empty entry.
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-
-                StringBuilder sb = new StringBuilder();
-
-                xs = new XmlSerializer(type);
-
-                //We create a new XmlWriter with the previously created settings 
-                //(to OmitXmlDeclaration).
-                xw = XmlWriter.Create(sb, settings);
-
-                //We call xs.Serialize and pass in our custom 
-                //XmlSerializerNamespaces object.
-                xs.Serialize(xw, bill, ns);
-
-                xw.Flush();
-
-                outString = sb.ToString();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (xw != null)
+                try
                 {
-                    xw.Close();
+                    //We call xs.Serialize and pass in our custom 
+                    //XmlSerializerNamespaces object.
+                    xs.Serialize(xw, bill, ns);
+                    xw.Flush();
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during XML serialization");
+                }
+
+                return sb.ToString();
             }
-            return outString;
         }
 
         public string GenerateSignature(string strUnsignedContent)
@@ -457,11 +352,7 @@ namespace OpenImis.ePayment.Data
 
                 rsaCrypto = (RSA)certificate.PrivateKey;
 
-                if (rsaCrypto == null)
-                {
-
-                }
-                else
+                if (rsaCrypto != null)
                 {
                     SHA1Managed sha1 = new SHA1Managed();
                     byte[] hash;
@@ -483,17 +374,16 @@ namespace OpenImis.ePayment.Data
 
         public async Task<string> SendHttpRequest(string FunctionURL, string Content, string SPCode, string GepgCom)
         {
-
             try
             {
                 var url = configuration["PaymentGateWay:GePG:Url"];
 
-                // Create a request using a URL that can receive a post.   
+                // Create POST data and convert it to a byte array.  
+                byte[] byteArray = Encoding.UTF8.GetBytes(Content);
+                
                 WebRequest request = WebRequest.Create(url + FunctionURL);
                 // Set the Method property of the request to POST.  
                 request.Method = "POST";
-                // Create POST data and convert it to a byte array.  
-                byte[] byteArray = Encoding.UTF8.GetBytes(Content);
                 // Set the ContentType property of the WebRequest.  
                 request.ContentType = "application/xml";
                 // Set the ContentLength property of the WebRequest. 
@@ -502,11 +392,11 @@ namespace OpenImis.ePayment.Data
                 request.Headers.Add("Gepg-Code", SPCode);
                 request.Headers.Add("Gepg-Com", GepgCom);
                 // Get the request stream.  
-                Stream dataStream = request.GetRequestStream();
-                // Write the data to the request stream.  
-                dataStream.Write(byteArray, 0, byteArray.Length);
-                // Close the Stream object.  
-                dataStream.Close();
+                using (Stream dataStream = request.GetRequestStream())
+                {
+                    // Write the data to the request stream.  
+                    dataStream.Write(byteArray, 0, byteArray.Length);
+                }
 
 
                 // Get the response.  
@@ -514,22 +404,19 @@ namespace OpenImis.ePayment.Data
                 // Display the status.  
                 Console.WriteLine(((HttpWebResponse)response).StatusDescription);
                 // Get the stream containing content returned by the server.  
-                dataStream = response.GetResponseStream();
-                // Open the stream using a StreamReader for easy access.  
-                StreamReader reader = new StreamReader(dataStream);
-                // Read the content.  
-                string responseFromServer = reader.ReadToEnd();
-                // Display the content.  
-                Console.WriteLine(responseFromServer);
-                // Clean up the streams.  
-                reader.Close();
-                dataStream.Close();
-                response.Close();
-                return responseFromServer;
+                using (var dataStream = response.GetResponseStream())
+                using(var reader = new StreamReader(dataStream))
+                {
+                    string responseFromServer = reader.ReadToEnd();
+                    Console.WriteLine(responseFromServer);
+
+                    return responseFromServer;
+                }   
             }
             catch (Exception ex)
             {
                 // MessageBox.Show(ex.Message);
+                _logger.LogError(ex, "Exception during web request");
                 return ex.Message;
             }
 
@@ -580,8 +467,6 @@ namespace OpenImis.ePayment.Data
 
         public async Task<string> CreateBulkBills(IConfiguration configuration, RequestBulkControlNumbersModel model)
         {
-
-
             var billTrxRefs = new List<BillTrxInf>();
             var rand = new Random();
 
@@ -596,7 +481,7 @@ namespace OpenImis.ePayment.Data
 
             DataTable dt = dh.GetDataTable(sSQL, parameters, CommandType.StoredProcedure);
 
-            foreach(DataRow dr in dt.Rows)
+            foreach (DataRow dr in dt.Rows)
             {
                 var billItems = new List<BillItem>();
                 BillItem item = new BillItem()
@@ -610,7 +495,7 @@ namespace OpenImis.ePayment.Data
                 };
                 billItems.Add(item);
 
-                
+
                 BillTrxInf billTrxInf = new BillTrxInf()
                 {
                     BillId = (int)dr["BillId"],
@@ -632,13 +517,12 @@ namespace OpenImis.ePayment.Data
 
                 billTrxInf.PyrId = dr["BillId"].ToString();
                 billTrxInf.PyrName = "CHF IMIS";
-                billTrxInf.PyrEmail = "info@imis.co.tz";  
+                billTrxInf.PyrEmail = "info@imis.co.tz";
                 billTrxInf.PyrCellNum = "";
 
                 billTrxRefs.Add(billTrxInf);
 
             }
-
 
             string accountCode = GetAccountCodeByProductCode(model.ProductCode);
 
@@ -646,43 +530,26 @@ namespace OpenImis.ePayment.Data
             newBill.BillHdr = new BillHdr() { SpCode = accountCode, RtrRespFlg = true };
             newBill.BillTrxInf = billTrxRefs;
 
+            var xs = new XmlSerializer(typeof(gepgBillSubReq));
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            var settings = new XmlWriterSettings() { OmitXmlDeclaration = true };
+            var sb = new StringBuilder();
 
-            XmlSerializer xs = null;
-            XmlSerializerNamespaces ns = null;
-            XmlWriterSettings settings = null;
-            String outString = String.Empty;
-
-            XmlWriter xw = null;
-
-            try
+            using (var xw = XmlWriter.Create(sb, settings))
             {
-                settings = new XmlWriterSettings();
-                settings.OmitXmlDeclaration = true;
-                //settings.Indent = true;
-                ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-
-                StringBuilder sb = new StringBuilder();
-                xs = new XmlSerializer(typeof(gepgBillSubReq));
-
-                xw = XmlWriter.Create(sb, settings);
-
-                xs.Serialize(xw, newBill, ns);
-                xw.Flush();
-                outString = sb.ToString();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                if (xw != null)
+                try
                 {
-                    xw.Close();
+                    xs.Serialize(xw, newBill, ns);
+                    xw.Flush();
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during XML serialization");
+                }
+
+                return sb.ToString();
             }
-            return outString;
         }
     }
 }

@@ -47,6 +47,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (Exception e)
             {
+                _logger.LogError("Error while uploading claims", e);
                 return BadRequest(new SubmitClaimResponse
                 {
                     ClaimCode = "",

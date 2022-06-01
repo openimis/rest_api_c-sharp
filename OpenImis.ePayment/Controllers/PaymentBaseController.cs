@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenImis.ePayment.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Controllers
 {
@@ -30,14 +31,16 @@ namespace OpenImis.ePayment.Controllers
     public abstract class PaymentBaseController : Controller
     {
         public PaymentLogic _payment;
+        protected readonly ILoggerFactory _loggerFactory;
         public IConfiguration _configuration;
         public readonly IHostingEnvironment _hostingEnvironment;
 
-        public PaymentBaseController(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public PaymentBaseController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
-            _payment = new PaymentLogic(configuration, hostingEnvironment);
+            _loggerFactory = loggerFactory;
+            _payment = new PaymentLogic(configuration, hostingEnvironment, _loggerFactory);
         }
 
 
@@ -323,32 +326,20 @@ namespace OpenImis.ePayment.Controllers
             {
                 Guid userUUID = Guid.Parse(HttpContext.User.Claims.Where(w => w.Type == "UserUUID").Select(x => x.Value).FirstOrDefault());
                 var officerId = new ValidationBase().GetOfficerIdByUserUUID(userUUID, _configuration);
+
+                if (officerId == 0)
+                    return BadRequest(new { error_occured = true, error_message = "Officer not found" });
+
                 var officerDetails = _payment.GetOfficerInfo(officerId);
 
                 response = _payment.GetControlNumbersForEO(officerDetails.Code, model.ProductCode, model.AvailableControlNumbers);
 
                 // Check if the product requested has enough CNs left
-                try
-                {
-                    var count = await _payment.ControlNumbersToBeRequested(model.ProductCode);
-                    if (count > 0)
-                    {
-                        // The following method is Async, but we do not await it since we don't want to wait for the result
-                        _ = RequestBulkControlNumbers(new RequestBulkControlNumbersModel { ControlNumberCount = count, ProductCode = model.ProductCode });
-                    }
-                }
-                catch (Exception)
-                {
-
-
-                }
-
-
+                _ = _payment.HandleControlNumbersToBeRequested(model.ProductCode);
             }
             catch (Exception ex)
             {
-
-                return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
+                return BadRequest(new { error_occured = true, error_message = ex.Message });
             }
 
             return Ok(response);
@@ -356,9 +347,9 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetControlNumber/Single")]
-        public async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody] IntentOfSinglePay intent)
+        public virtual async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody] IntentOfSinglePay intent)
         {
-            return null;
+            return await Task.FromResult<IActionResult>(null);
         }
     }
 }

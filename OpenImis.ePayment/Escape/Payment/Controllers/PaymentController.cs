@@ -21,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenImis.ePayment.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace OpenImis.ePayment.Controllers
 {
@@ -29,11 +30,15 @@ namespace OpenImis.ePayment.Controllers
     {
         private ImisPayment imisPayment;
         private IHostingEnvironment env;
+        private readonly GepgFileRequestLogger _gepgFileLogger;
+        private readonly ILogger _logger;
 
-        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment) : base(configuration, hostingEnvironment)
+        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory) : base(configuration, hostingEnvironment, loggerFactory)
         {
-            imisPayment = new ImisPayment(configuration, hostingEnvironment);
             env = hostingEnvironment;
+            imisPayment = new ImisPayment(configuration, hostingEnvironment, loggerFactory);
+            _gepgFileLogger = new GepgFileRequestLogger(hostingEnvironment, loggerFactory);
+            _logger = loggerFactory.CreateLogger<PaymentController>();
         }
 
 #if CHF
@@ -52,7 +57,7 @@ namespace OpenImis.ePayment.Controllers
 
         [HttpPost]
         [Route("api/GetControlNumber/Single")]
-        public async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody]IntentOfSinglePay intent)
+        public override async Task<IActionResult> CHFRequestControlNumberForSimplePolicy([FromBody]IntentOfSinglePay intent)
         {
             if (!ModelState.IsValid)
             {
@@ -81,26 +86,23 @@ namespace OpenImis.ePayment.Controllers
                      _ = RequestBulkControlNumbers(new RequestBulkControlNumbersModel { ControlNumberCount = count, ProductCode = intent.ProductCode });
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-
+                _logger.LogError(e, "Error in CHFRequestControlNumberForSimplePolicy");
             }
-
             return result;
-
         }
 
         [HttpPost]
         [Route("api/GetReqControlNumber")]
         public async Task<IActionResult> GePGReceiveControlNumber([FromBody] gepgBillSubResp model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
+
             int billId;
             if (model.HasValidSignature)
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
-
                 ControlNumberResp ControlNumberResponse;
                 foreach (var bill in model.BillTrxInf)
                 {
@@ -115,7 +117,7 @@ namespace OpenImis.ePayment.Controllers
                     billId = bill.BillId;
 
                     string reconc = JsonConvert.SerializeObject(ControlNumberResponse);
-                    GepgFileLogger.Log(billId, "CN_Response", reconc, env);
+                    _gepgFileLogger.Log(billId, "CN_Response", reconc);
 
                     try
                     {
@@ -128,7 +130,8 @@ namespace OpenImis.ePayment.Controllers
                     }
                     catch (Exception e)
                     {
-                        throw e;
+                        _logger.LogError(e, "Error in GePGReceiveControlNumber");
+                        throw;
                     }
                 }
 
@@ -141,7 +144,7 @@ namespace OpenImis.ePayment.Controllers
                     billId = bill.BillId;
 
                     string reconc = JsonConvert.SerializeObject(model);
-                    GepgFileLogger.Log(billId, "CN_Response_InvalidSignature", reconc, env);
+                    _gepgFileLogger.Log(billId, "CN_Response_InvalidSignature", reconc);
                     imisPayment.setRejectedReason(billId, GepgCodeResponses.GepgResponseCodes["Invalid Signature"] + ":Invalid Signature");
                 }
                 
@@ -178,7 +181,7 @@ namespace OpenImis.ePayment.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CHFCancelOnePayment([FromBody] PaymentCancelModel model)
         {
-            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment);
+            ImisPayment payment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
             DataMessage dt = new DataMessage();
 
             if (model.payment_id !=0 || model.control_number != null)
@@ -277,7 +280,7 @@ namespace OpenImis.ePayment.Controllers
                     billId = payment.BillId;
 
                     string reconc = JsonConvert.SerializeObject(_response);
-                    GepgFileLogger.Log(billId, "Payment", reconc, env);
+                    _gepgFileLogger.Log(billId, "Payment", reconc);
                     
                     _response = await base.GetPaymentData(pay);
 
@@ -292,7 +295,7 @@ namespace OpenImis.ePayment.Controllers
                     billId = payment.BillId;
 
                     string reconc = JsonConvert.SerializeObject(model);
-                    GepgFileLogger.Log(billId, "PaymentInvalidSignature", reconc, env);
+                    _gepgFileLogger.Log(billId, "PaymentInvalidSignature", reconc);
                     imisPayment.setRejectedReason(billId, GepgCodeResponses.GepgResponseCodes["Invalid Signature"] + ":Invalid Signature");
 
                 }
@@ -345,7 +348,7 @@ namespace OpenImis.ePayment.Controllers
                     return BadRequest(imisPayment.ReconciliationResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
 
                 string reconc = JsonConvert.SerializeObject(model);
-                GepgFileLogger.Log("Reconc_Data", reconc, env);
+                _gepgFileLogger.Log("Reconc_Data", reconc);
                 
                 foreach (var recon in model.ReconcTrxInf)
                 {
@@ -383,7 +386,7 @@ namespace OpenImis.ePayment.Controllers
             else
             {
                 string reconc = JsonConvert.SerializeObject(model);
-                GepgFileLogger.Log("Reconc_DataInvalidSig", reconc, env);
+                _gepgFileLogger.Log("Reconc_DataInvalidSig", reconc);
 
                 foreach (var recon in model.ReconcTrxInf)
                 {
@@ -416,15 +419,14 @@ namespace OpenImis.ePayment.Controllers
                 var response = await base.MatchPayment(match);
                 return Ok(response);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e, "Error in WebMatchPayment");
                 return BadRequest(new { error_occured = true, error_message = "Unknown Error Occured" });
             }
 
         }
-        #endregion
-
-        
+        #endregion        
 #endif
     }
 }

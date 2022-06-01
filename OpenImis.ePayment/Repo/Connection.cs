@@ -20,27 +20,23 @@ namespace OpenImis.ePayment.Repo
 
         public IList<SqlParameter> Procedure(string StoredProcedure, SqlParameter[] parameters)
         {
-            SqlConnection sqlConnection = new SqlConnection(ConnectionString);
-            SqlCommand command = new SqlCommand();
+            using (var sqlConnection = new SqlConnection(ConnectionString))
+            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure })
+            {
 
+                if (parameters.Length > 0)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
 
-            command.CommandText = StoredProcedure;
-            command.CommandType = CommandType.StoredProcedure;
-            command.Connection = sqlConnection;
+                sqlConnection.Open();
 
+                command.ExecuteNonQuery();
 
-            if (parameters.Length > 0)
-                command.Parameters.AddRange(parameters);
+                var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output));
 
-            sqlConnection.Open();
-
-            command.ExecuteNonQuery();
-
-            var rv = parameters.Where(x => x.Direction.Equals(ParameterDirection.Output));
- 
-            sqlConnection.Close();
-
-            return rv.ToList();
+                return rv.ToList();
+            }
         }
     }
 }
