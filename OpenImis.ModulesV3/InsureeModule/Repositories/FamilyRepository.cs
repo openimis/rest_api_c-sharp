@@ -31,12 +31,14 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
 
         public FamilyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
             _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<FamilyRepository>();
         }
 
         public FamilyModel GetByCHFID(string chfid, Guid userUUID)
@@ -167,7 +169,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             var dateFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Day.ToString() + Path.DirectorySeparatorChar;
 
             var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar + dateFolder;
-            
+
             var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
             var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
 
@@ -175,7 +177,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             var hof = enrolFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
             var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
-            
+
 
             var xmldoc = new XmlDocument();
             xmldoc.InnerXml = XML;
@@ -184,7 +186,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
             xmldoc.Save(EnrolmentDir + FileName);
 
-            
+
 
             int RV = -99;
             int InsureeUpd;
@@ -279,8 +281,6 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                 // Create Premium
                 CreatePremium(model);
-
-
             }
 
             return newFamily;
@@ -327,14 +327,16 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
             foreach (var family in familyModel.Family)
             {
-                foreach (var policy in family.Policies)
+                if (family.Policies != null)
                 {
-                    if (String.IsNullOrEmpty(policy.ControlNumber))
-                        continue;
+                    foreach (var policy in family.Policies)
+                    {
+                        if (String.IsNullOrEmpty(policy.ControlNumber))
+                            continue;
 
-                    var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
+                        var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
 
-                    var sSQL = @"UPDATE PD SET InsuranceNumber = I.CHFID, PremiumID = PR.PremiumId, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
+                        var sSQL = @"UPDATE PD SET InsuranceNumber = I.CHFID, PremiumID = PR.PremiumId, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
                             FROM tblControlNumber CN
                             INNER JOIN tblPaymentDetails PD ON CN.PaymentId = PD.PaymentID
                             INNER JOIN tblInsuree I ON IsHead = 1 
@@ -344,23 +346,27 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                             AND I.ValidityTo IS NULL
                             AND CN.ControlNumber = @ControlNumber;";
 
-                    SqlParameter[] parameters =
-                    {
-                        new SqlParameter("@ControlNumber", policy.ControlNumber),
-                        new SqlParameter("@PolicyId", policyId),
-                    };
+                        SqlParameter[] parameters =
+                        {
+                            new SqlParameter("@ControlNumber", policy.ControlNumber),
+                            new SqlParameter("@PolicyId", policyId),
+                        };
 
-                    try
-                    {
-                        var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
-                        dh.Execute(sSQL, parameters, CommandType.Text);
+                        try
+                        {
+                            var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
+                            dh.Execute(sSQL, parameters, CommandType.Text);
+                        }
+                        catch (Exception)
+                        {
+                            return 1001;
+                        }
+
                     }
-                    catch (Exception)
-                    {
-
-                        return 1001;
-                    }
-
+                }
+                else
+                {
+                    _logger.LogWarning("Family policy null in UpdateControlNumber, family HOFCHFID: " + family.HOFCHFID);
                 }
             }
             return 0;

@@ -97,12 +97,12 @@ namespace OpenImis.ePayment.Controllers
         [Route("api/GetReqControlNumber")]
         public async Task<IActionResult> GePGReceiveControlNumber([FromBody] gepgBillSubResp model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
+
             int billId;
             if (model.HasValidSignature)
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(imisPayment.ControlNumberResp(GepgCodeResponses.GepgResponseCodes["Invalid Request Data"]));
-
                 ControlNumberResp ControlNumberResponse;
                 foreach (var bill in model.BillTrxInf)
                 {
