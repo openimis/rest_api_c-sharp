@@ -39,7 +39,7 @@ dotnet build
 ```
 
 Before running the application, you need to change the connection string to connect to the 
-database in the [appsettings.Development.json](./OpenImis.RestApi/appsettings.Development.json) file within [OpenImis.RestApi](./OpenImis.RestApi) folder.
+database in the [appsettings.Development.json.dist](./OpenImis.RestApi/config/appsettings.Development.json.dist) file within [OpenImis.RestApi.config](./OpenImis.RestApi/config) folder. File name should be changed to `appsettings.Development.json` (`.dist` extension removed).
 
 ```
 "ConnectionStrings":{"IMISDatabase":"Server=Server;Database=IMIS;User ID=User;Password=Password"}
