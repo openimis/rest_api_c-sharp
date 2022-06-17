@@ -195,6 +195,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             using (var imisContext = new ImisDB())
             {
                 var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                var source = new SqlParameter("@Source", model.Source) { DbType = DbType.String, Size = 50 };
+                var sourceVersion = new SqlParameter("@SourceVersion", model.SourceVersion) { DbType = DbType.String, Size = 15 };
                 var returnParameter = OutputParameter.CreateOutputParameter("@RV", SqlDbType.Int);
                 var familySentParameter = OutputParameter.CreateOutputParameter("@FamilySent", SqlDbType.Int);
                 var familyImportedParameter = OutputParameter.CreateOutputParameter("@FamilyImported", SqlDbType.Int);
@@ -211,7 +213,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 var premiumImportedParameter = OutputParameter.CreateOutputParameter("@PremiumImported", SqlDbType.Int);
                 var premiumRejectedParameter = OutputParameter.CreateOutputParameter("@PremiumRejected", SqlDbType.Int);
 
-                var sql = "exec @RV = uspConsumeEnrollments @XML, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
+                var sql = "exec @RV = uspConsumeEnrollments @XML, @Source, @SourceVersion, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
                     "@InsureeSent OUT, @InsureeUpd OUT, @InsureeImported OUT, " +
                     "@PolicySent OUT, @PolicyImported OUT, @PolicyRejected OUT, @PolicyChanged OUT," +
                     "@PremiumSent OUT, @PremiumImported OUT, @PremiumRejected OUT";
@@ -223,7 +225,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                     cmd.CommandText = sql;
 
-                    cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
+                    cmd.Parameters.AddRange(new[] { xmlParameter, source, sourceVersion, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
                                             familyRejectedParameter, insureeSentParameter, insureeUpdParameter, insureeImportedParameter, policySentParameter,
                                             policyImportedParameter, policyRejectedParameter, policyChangedParameter, premiumSentParameter, premiumImportedParameter,
                                             premiumRejectedParameter });
