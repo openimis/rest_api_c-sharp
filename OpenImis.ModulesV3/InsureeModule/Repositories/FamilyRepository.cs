@@ -386,7 +386,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     foreach (var policy in family.Policies)
                     {
                         int paymentId = payment.GetPaymentId(policy.ControlNumber);
-                        _ = paymentLogic.CreatePremium(paymentId);
+                        _ = paymentLogic.CreatePremium(paymentId, "GePG", model.SourceVersion);
                     }
                 }
             }

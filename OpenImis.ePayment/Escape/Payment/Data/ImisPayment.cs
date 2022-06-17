@@ -589,7 +589,7 @@ namespace OpenImis.ePayment.Data
             return await Task.FromResult(needToRequest);
         }
 
-        public override int CreatePremium(int paymentId)
+        public override int CreatePremium(int paymentId, string source = "unknown", string sourceVersion = "1")
         {
             var sSQL = @"IF EXISTS(SELECT 1 
 			            FROM tblInsuree I
@@ -603,9 +603,9 @@ namespace OpenImis.ePayment.Data
                         BEGIN
                             DECLARE @tblPremiums TABLE(PremiumId INT, PolicyId INT, PayDate DATETIME)
 
-                            INSERT INTO tblPremium(PolicyID, PayerID, Amount, Receipt, PayDate, PayType, ValidityFrom, AuditUserID, isOffline, isPhotoFee)
+                            INSERT INTO tblPremium(PolicyID, PayerID, Amount, Receipt, PayDate, PayType, ValidityFrom, AuditUserID, isOffline, isPhotoFee, Source, SourceVersion)
                             OUTPUT inserted.PremiumID, inserted.PolicyID, inserted.PayDate INTO @tblPremiums(PremiumId, PolicyId, PayDate)
-                            SELECT PL.PolicyID, NULL PayerId, P.ReceivedAmount Amount, P.ReceiptNo Receipt, P.PaymentDate PayDate, N'M' PayType, GETDATE() ValidityFrom, -1 AuditUserId, 0 IsOffline, 0 IsPhotoFee
+                            SELECT PL.PolicyID, NULL PayerId, P.ReceivedAmount Amount, P.ReceiptNo Receipt, P.PaymentDate PayDate, N'M' PayType, GETDATE() ValidityFrom, -1 AuditUserId, 0 IsOffline, 0 IsPhotoFee, @Source, @SourceVersion
                             FROM tblControlNumber CN
                             INNER JOIN tblPayment P ON CN.PaymentID = P.PaymentID
                             INNER JOIN tblPaymentDetails PD ON P.PaymentID  = PD.PaymentID
@@ -677,7 +677,9 @@ namespace OpenImis.ePayment.Data
             var dh = new DataHelper(config);
 
             SqlParameter[] parameters = {
-                new SqlParameter("@PaymentId", paymentId)
+                new SqlParameter("@PaymentId", paymentId),
+                new SqlParameter("@Source", source){DbType = DbType.String, Size =50},
+                new SqlParameter("@SourceVersion", sourceVersion){DbType = DbType.String, Size =15}
             };
 
             var dt = dh.GetDataTable(sSQL, parameters, CommandType.Text);

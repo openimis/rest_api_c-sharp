@@ -163,7 +163,7 @@ namespace OpenImis.ePayment.Logic
             {
 
                 if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived") & response.Code == 0)
-                    CreatePremium(payment.PaymentId);
+                    CreatePremium(payment.PaymentId, "GePG", "1");
 
                 SendPaymentConfirmationSms(model, payment);
             }
@@ -603,10 +603,10 @@ namespace OpenImis.ePayment.Logic
             return await imisPayment.ControlNumbersToBeRequested(productCode);
         }
 
-        public int CreatePremium(int paymentId)
+        public int CreatePremium(int paymentId, string source, string sourceVersion)
         {
             var imisPayment = new ImisPayment(_configuration, _hostingEnvironment, _loggerFactory);
-            return imisPayment.CreatePremium(paymentId);
+            return imisPayment.CreatePremium(paymentId, source, sourceVersion);
         }
 
         public async Task<bool> HandleControlNumbersToBeRequested(string productCode)
