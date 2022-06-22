@@ -57,7 +57,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                                     response.InsureeName = string.Join(' ', reader["OtherNames"].ToString()) + ' ' + reader["LastName"].ToString();
                                     response.CHFID = reader["CHFID"].ToString();
-                                    response.PhotoPath = reader["PhotoPath"].ToString();
+                                    response.PhotoPath = System.IO.Path.Combine(reader["PhotoPath"].ToString()
+                                        .Split(new[] { "\\" }, StringSplitOptions.None));
                                     response.DOB = reader["DOB"].ToString().ToNullableDatetime();
                                     response.Gender = reader["Gender"].ToString();
                                 }
@@ -119,7 +120,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                 DOB = I.Dob,
                                 Gender = G.Gender,
                                 InsureeName = I.LastName + " " + I.OtherNames,
-                                PhotoPath = P.PhotoFolder + P.PhotoFileName
+                                PhotoPath = System.IO.Path.Combine(P.PhotoFolder, P.PhotoFileName) 
                             }).FirstOrDefault();
             }
 
