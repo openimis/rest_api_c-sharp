@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenImis.ePayment.Responses;
 using Microsoft.Extensions.Logging;
+using OpenImis.ePayment.QueueSystem;
 
 namespace OpenImis.ePayment.Controllers
 {
@@ -30,12 +31,14 @@ namespace OpenImis.ePayment.Controllers
     {
         private ImisPayment imisPayment;
         private IHostingEnvironment env;
+        private readonly BackgroundWorkerQueue _backgroundWorkerQueue;
         private readonly GepgFileRequestLogger _gepgFileLogger;
         private readonly ILogger _logger;
 
-        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory) : base(configuration, hostingEnvironment, loggerFactory)
+        public PaymentController(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, BackgroundWorkerQueue backgroundWorkerQueue) : base(configuration, hostingEnvironment, loggerFactory)
         {
             env = hostingEnvironment;
+            _backgroundWorkerQueue = backgroundWorkerQueue;
             imisPayment = new ImisPayment(configuration, hostingEnvironment, loggerFactory);
             _gepgFileLogger = new GepgFileRequestLogger(hostingEnvironment, loggerFactory);
             _logger = loggerFactory.CreateLogger<PaymentController>();
@@ -281,8 +284,13 @@ namespace OpenImis.ePayment.Controllers
 
                     string reconc = JsonConvert.SerializeObject(_response);
                     _gepgFileLogger.Log(billId, "Payment", reconc);
-                    
-                    _response = await base.GetPaymentData(pay);
+
+
+                    _backgroundWorkerQueue.QueueBackgroundWorkerItem(async token =>
+                    {
+                        await base.GetPaymentData(pay);
+                    });
+                    // _response = await base.GetPaymentData(pay);
 
                 }               
 
