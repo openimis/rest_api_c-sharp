@@ -331,7 +331,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
             {
                 int paymentId = payment.GetPaymentId(renewal.ControlNumber);
-                _ = paymentLogic.CreatePremium(paymentId);
+                _ = paymentLogic.CreatePremium(paymentId, "GePG", "1");
             }
 
         }

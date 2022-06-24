@@ -1003,7 +1003,7 @@ namespace OpenImis.ePayment.Data
         }
 
 
-        public virtual int CreatePremium(int paymentId)
+        public virtual int CreatePremium(int paymentId, string source, string sourceVersion)
         {
             return 0;
         }
