@@ -30,7 +30,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
             foreach (var claim in claims)
             {
                 result = claimRepository.Create(claim);
-
+                
                 Errors.Claim errorCode;
                 string message;
                 switch (result)
@@ -81,12 +81,18 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
                         break;
                 }
 
+                var rejectedItems = claimRepository.GetRejectedItems(claim.Details.HFCode, claim.Details.ClaimCode);
+                var rejectedServices = claimRepository.GetRejectedServices(claim.Details.HFCode, claim.Details.ClaimCode);
+
+
                 claimResponse.Add(
                     new SubmitClaimResponse
                     {
                         ClaimCode = claim.Details.ClaimCode,
                         Response = (int)errorCode,
-                        Message = message
+                        Message = message,
+                        RejectedItems = rejectedItems,
+                        RejectedServices = rejectedServices
                     });
 
             }

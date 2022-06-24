@@ -104,7 +104,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
 
                         if ((RV == 0) && (isClaimRejected == false || isClaimRejected == null))
                         {
-                             RV = 0;
+                            RV = 0;
                         }
                         else if (RV == 0 && (isClaimRejected == true))
                         {
@@ -113,7 +113,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                                 File.Move(fromPhoneClaimDir + fileName, fromPhoneClaimRejectedDir + fileName);
                             }
 
-                             RV = (int)Errors.Claim.Rejected;
+                            RV = (int)Errors.Claim.Rejected;
                         }
                         else
                         {
@@ -136,6 +136,85 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
             catch (Exception e)
             {
                 throw e;
+            }
+        }
+
+        // Get Rejected Items
+        public List<RejectedItem> GetRejectedItems(string hfCode, string claimCode)
+        {
+            var rejectedItems = new List<RejectedItem>();
+
+            using (var imisContext = new ImisDB())
+            {
+                var query = from c in imisContext.TblClaim
+                            join hf in imisContext.TblHf on c.Hfid equals hf.HfId
+                            join ci in imisContext.TblClaimItems on c.ClaimId equals ci.ClaimId
+                            join i in imisContext.TblItems on ci.ItemId equals i.ItemId
+                            where c.ClaimCode == claimCode && c.ValidityTo == null && hf.Hfcode == hfCode && ci.ValidityTo == null && ci.ClaimItemStatus == 2
+                            select new RejectedItem() { Code = i.ItemCode, Error = ci.RejectionReason};
+
+                rejectedItems = query.ToList();
+            }
+
+            foreach (var item in rejectedItems)
+            {
+                item.Reason = GetRejectionReason(item.Error);
+            }
+
+            return rejectedItems;
+
+        }
+
+        // Get Rejected Services
+        public List<RejectedService> GetRejectedServices(string hfCode, string claimCode)
+        {
+            var rejectedServices = new List<RejectedService>();
+
+            using (var imisContext = new ImisDB())
+            {
+                var query = from c in imisContext.TblClaim
+                            join hf in imisContext.TblHf on c.Hfid equals hf.HfId
+                            join cs in imisContext.TblClaimServices on c.ClaimId equals cs.ClaimId
+                            join s in imisContext.TblServices on cs.ServiceId equals s.ServiceId
+                            where c.ClaimCode == claimCode && c.ValidityTo == null && hf.Hfcode == hfCode && cs.ValidityTo == null && cs.ClaimServiceStatus == 2
+                            select new RejectedService() { Code = s.ServCode, Error = cs.RejectionReason};
+
+                rejectedServices = query.ToList();
+            }
+
+            foreach (var service in rejectedServices)
+            {
+                service.Reason = GetRejectionReason(service.Error);
+            }
+
+            return rejectedServices;
+
+        }
+
+        public string GetRejectionReason(short? code)
+        {
+            switch (code)
+            {
+                case 1: return "Not in Registers";
+                case 2: return "Not in HF Pricelist";
+                case 3: return "Not in Covering Product/policy";
+                case 4: return "Limitation Failed";
+                case 5: return "Frequency Failed";
+                case 6: return "Duplicated";
+                case 7: return "CHFID Not valid/Family Not Valid";
+                case 8: return "ICD Code not in current ICD list";
+                case 9: return "Target date provision invalid";
+                case 10: return "Care type not consistant with Facility";
+                case 11: return "Maximum Hospital admissions";
+                case 12: return "Maximim visits(OP)";
+                case 13: return "Maximum consulations";
+                case 14: return "Maximum Surgeries";
+                case 15: return "Maximum Deliveries";
+                case 16: return "Maximum provision";
+                case 17: return "Waiting period violation";
+                case 19: return "Maximum Antenatal";
+                default:
+                    return "";
             }
         }
 
