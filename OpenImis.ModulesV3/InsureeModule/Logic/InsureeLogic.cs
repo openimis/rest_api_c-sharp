@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3.InsureeModule.Models;
 using OpenImis.ModulesV3.InsureeModule.Repositories;
 using OpenImis.ModulesV3.Utils;
@@ -11,10 +12,12 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
     {
         private IConfiguration _configuration;
         protected IInsureeRepository insureeRepository;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public InsureeLogic(IConfiguration configuration)
+        public InsureeLogic(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
+            _loggerFactory = loggerFactory;
 
             insureeRepository = new InsureeRepository(_configuration);
         }
@@ -27,7 +30,11 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
 
             if (response != null)
             {
-                response.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(_configuration.GetValue<string>("AppSettings:UpdatedFolder"), response.PhotoPath);
+                response.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(
+                    _configuration.GetValue<string>("AppSettings:UpdatedFolder"), 
+                    response.PhotoPath,
+                    _loggerFactory.CreateLogger<InsureeLogic>()
+                    );
             }
 
             return response;

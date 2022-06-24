@@ -99,7 +99,10 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
 
             if (tblInsuree.Photo != null)
             {
-                insuree.PhotoPath = tblInsuree.Photo.PhotoFileName;
+                insuree.PhotoPath = System.IO.Path.Combine(
+                    tblInsuree.Photo.PhotoFolder != null ? tblInsuree.Photo.PhotoFolder : "",
+                    tblInsuree.Photo.PhotoFileName
+                );
             }
 
             return insuree;

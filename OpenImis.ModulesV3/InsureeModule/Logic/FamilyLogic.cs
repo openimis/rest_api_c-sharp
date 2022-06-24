@@ -35,7 +35,11 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
             {
                 foreach (var insure in response.Insurees)
                 {
-                    insure.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(_configuration.GetValue<string>("AppSettings:UpdatedFolder"), insure.PhotoPath);
+                    insure.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(
+                        _configuration.GetValue<string>("AppSettings:UpdatedFolder"), 
+                        insure.PhotoPath,
+                        _loggerFactory.CreateLogger<FamilyLogic>()
+                        );
                 }
             }
 
