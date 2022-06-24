@@ -21,6 +21,7 @@ using System;
 using OpenImis.ePayment.Scheduler;
 using OpenImis.RestApi.Scheduler;
 using OpenImis.RestApi.Util.ErrorHandling;
+using OpenImis.ePayment.QueueSystem;
 // using OpenImis.ePayment.Formaters;
 
 namespace OpenImis.RestApi
@@ -130,6 +131,10 @@ namespace OpenImis.RestApi
 
             services.AddSingleton(new JobMetaData(Guid.NewGuid(), typeof(MatchPaymentJob), jobName , cronExpression));
             services.AddHostedService<CustomQuartzHostedService>();
+
+            // Queue system
+            services.AddHostedService<LongRunningServices>();
+            services.AddSingleton<BackgroundWorkerQueue>();
 
         }
 

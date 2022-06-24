@@ -247,7 +247,7 @@ namespace OpenImis.ModulesV3.Helpers
 
         private async Task<GetControlNumberResp> GetControlNumber(IntentOfSinglePay intent)
         {
-            var result = await new PaymentController(_configuration, _hostingEnvironment, _loggerFactory).CHFRequestControlNumberForSimplePolicy(intent);
+            var result = await new PaymentController(_configuration, _hostingEnvironment, _loggerFactory, null).CHFRequestControlNumberForSimplePolicy(intent);
             var result1 = (OkObjectResult)result;
             var value = (GetControlNumberResp)result1.Value;
             
