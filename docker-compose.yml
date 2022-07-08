@@ -5,6 +5,7 @@ services:
       context: ./
       args:
         BUILD-FLAVOUR: ${BUILD-FLAVOUR:-Release}
+      network: host
     ports:
       - 8080:80
     volumes:
