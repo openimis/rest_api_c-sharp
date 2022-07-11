@@ -15,7 +15,9 @@ namespace OpenImis.ModulesV3.Utils
             {
                 var startIndex = imageName.LastIndexOf("\\") == -1 ? 0 : imageName.LastIndexOf("\\");
                 var fileName = imageName.Substring(startIndex);
-                var fileFullPath =System.IO.Path.Combine(photoPath, imageName);
+                var fileFullPath = Path.Join(photoPath, fileName);
+
+                var stare = Path.Combine(photoPath, imageName);
 
                 if (File.Exists(fileFullPath))
                 {
