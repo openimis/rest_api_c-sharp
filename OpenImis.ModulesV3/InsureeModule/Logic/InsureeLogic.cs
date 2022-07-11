@@ -28,13 +28,12 @@ namespace OpenImis.ModulesV3.InsureeModule.Logic
 
             response = insureeRepository.GetEnquire(chfid);
 
-            if (response != null)
+            if (response != null && !string.IsNullOrEmpty(response.PhotoPath))
             {
                 response.PhotoBase64 = PhotoUtils.CreateBase64ImageFromFilepath(
                     _configuration.GetValue<string>("AppSettings:UpdatedFolder"), 
                     response.PhotoPath,
-                    _loggerFactory.CreateLogger<InsureeLogic>()
-                    );
+                    _loggerFactory.CreateLogger<InsureeLogic>());
             }
 
             return response;
