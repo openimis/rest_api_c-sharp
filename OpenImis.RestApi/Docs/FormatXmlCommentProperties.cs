@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 namespace OpenImis.RestApi.Docs
 {
@@ -17,7 +19,7 @@ namespace OpenImis.RestApi.Docs
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="context"></param>
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             operation.Description = Formatted(operation.Description);
             operation.Summary = Formatted(operation.Summary);

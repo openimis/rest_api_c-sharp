@@ -4,21 +4,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 namespace OpenImis.RestApi.Docs
 {
     public class AddRequiredHeaderParameter : IOperationFilter
     {
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             if (operation.Parameters == null)
-                operation.Parameters = new List<IParameter>();
+                operation.Parameters = new List<OpenApiParameter>();
 
-            operation.Parameters.Add(new NonBodyParameter
+            operation.Parameters.Add(new OpenApiParameter
             {
                 Name = "api-version",
-                In = "header",
-                Type = "int",
+                In = ParameterLocation.Header,
+                Schema =  { Type = "int" },
                 Required = false,
                 Description = "API version"
             });

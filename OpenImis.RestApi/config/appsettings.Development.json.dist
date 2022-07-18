@@ -10,6 +10,10 @@
 			"Microsoft": "Information"
 		}
 	},
+	"MatchPaymentSchedule": {
+		"CronExpression": "0 5 7 * * ?",
+		"JobName": "ExampleName"
+	},
 	"Log4NetCore": {
 		"PropertyOverrides": [
 			{

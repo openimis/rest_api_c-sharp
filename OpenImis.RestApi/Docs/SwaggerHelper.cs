@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -11,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 namespace OpenImis.RestApi.Docs
 {
@@ -23,15 +24,15 @@ namespace OpenImis.RestApi.Docs
             ApplyDocInclusions(swaggerGenOptions);
 
             var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
-            foreach (var xmlFile in xmlFiles)
-                swaggerGenOptions.IncludeXmlComments(xmlFile);
+            //foreach (var xmlFile in xmlFiles)
+            //    swaggerGenOptions.IncludeXmlComments(xmlFile);
 
-            swaggerGenOptions.DescribeAllEnumsAsStrings();
-            swaggerGenOptions.OperationFilter<FormatXmlCommentProperties>();
-            swaggerGenOptions.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
-            swaggerGenOptions.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
+            //swaggerGenOptions.DescribeAllEnumsAsStrings();
+            //swaggerGenOptions.OperationFilter<FormatXmlCommentProperties>();
+            //swaggerGenOptions.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
+            //swaggerGenOptions.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
 
-            swaggerGenOptions.OperationFilter<AddRequiredHeaderParameter>();
+            //swaggerGenOptions.OperationFilter<AddRequiredHeaderParameter>();
         }
 
         private static void AddSwaggerDocPerVersion(SwaggerGenOptions swaggerGenOptions, Assembly webApiAssembly)
@@ -44,32 +45,32 @@ namespace OpenImis.RestApi.Docs
             var apiVersions = GetApiVersions(webApiAssembly);
             foreach (var apiVersion in apiVersions)
             {
-                swaggerGenOptions.SwaggerDoc($"v{apiVersion}",
-                    new Info
+/*                swaggerGenOptions.SwaggerDoc($"v{apiVersion}",
+                    new OpenApiInfo
                     {
                         Title = "openIMIS REST API",
                         Version = $"v{apiVersion}",
                         Description = apiVersionDescriptions.GetDescription(apiVersion),
 
-                        Contact = new Contact()
+                        Contact = new OpenApiContact()
                         {
                             Name = "openIMIS",
-                            Url = "http://openimis.org"
+                            Url =  new Uri("http://openimis.org")
                         }
-                    });
+                    });*/
             }
         }
 
         private static void ApplyDocInclusions(SwaggerGenOptions swaggerGenOptions)
         {
-            swaggerGenOptions.DocInclusionPredicate((docName, apiDesc) =>
+/*            swaggerGenOptions.DocInclusionPredicate((docName, apiDesc) =>
             {
                 var versions = apiDesc.ControllerAttributes()
                     .OfType<ApiVersionAttribute>()
                     .SelectMany(attr => attr.Versions);
 
                 return versions.Any(v => $"v{v.ToString()}" == docName);
-            });
+            });*/
         }
 
         private static IEnumerable<string> GetApiVersions(Assembly webApiAssembly)
@@ -86,7 +87,7 @@ namespace OpenImis.RestApi.Docs
 
         public static void ConfigureSwagger(SwaggerOptions swaggerOptions)
         {
-            swaggerOptions.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
+           // swaggerOptions.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
             swaggerOptions.RouteTemplate = "api-docs/{documentName}/swagger.json";
 
         }

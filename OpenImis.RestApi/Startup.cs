@@ -3,17 +3,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OpenImis.Security.Security;
 using OpenImis.RestApi.Docs;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using OpenImis.ModulesV1.Helpers;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Quartz.Impl;
 using Quartz.Spi;
 using Quartz;
@@ -28,15 +26,16 @@ namespace OpenImis.RestApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
+        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
-            HostingEnvironment = hostingEnvironment;
+            HostEnvironment = hostEnvironment;
             LoggerFactory = loggerFactory;
         }
 
         private IConfiguration Configuration { get; }
-        private IHostingEnvironment HostingEnvironment { get; }
+
+        private IHostEnvironment HostEnvironment { get; }
 
         private ILoggerFactory LoggerFactory { get; }
 
@@ -83,6 +82,7 @@ namespace OpenImis.RestApi
             services.AddMvc(options =>
             {
                 options.AllowCombiningAuthorizeFilters = false;
+                options.EnableEndpointRouting = false;
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
 #if CHF
@@ -136,9 +136,10 @@ namespace OpenImis.RestApi
             services.AddHostedService<LongRunningServices>();
             services.AddSingleton<BackgroundWorkerQueue>();
 
+            services.AddRazorPages();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             var loggingOptions = Configuration.GetSection("Log4NetCore").Get<Log4NetProviderOptions>();
             loggerFactory.AddLog4Net(loggingOptions);
@@ -147,8 +148,11 @@ namespace OpenImis.RestApi
 
             if (env.IsDevelopment())
             {
-                loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-                loggerFactory.AddDebug();
+                ILogger Logger = loggerFactory.CreateLogger("DebugLogger");
+                Logger.LogDebug("Error while processing request from Address");
+                
+                //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+                //loggerFactory.AddDebug();
             }
             if (!env.EnvironmentName.Equals("Test"))
             {
@@ -157,8 +161,14 @@ namespace OpenImis.RestApi
                 app.UseSwaggerUI(SwaggerHelper.ConfigureSwaggerUI);
             }
 
-            app.UseAuthentication();
-            app.UseMvc();
+            //app.UseAuthentication();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints=>
+            {
+                endpoints.MapRazorPages();
+            }
+            );
 
             app.UseCors("AllowSpecificOrigin");
 

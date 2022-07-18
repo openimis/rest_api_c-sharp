@@ -46,9 +46,9 @@ namespace OpenImis.RestApi.Scheduler
         private ITrigger CreateTrigger(JobMetaData jobMetaData)
         {
             return TriggerBuilder.Create()
-                .WithIdentity(_jobMetaData.JobId.ToString())
-                .WithCronSchedule(_jobMetaData.CronExpression)
-                .WithDescription($"{_jobMetaData.JobName}")
+                .WithIdentity(jobMetaData.JobId.ToString())
+                .WithCronSchedule(jobMetaData.CronExpression)
+                .WithDescription($"{jobMetaData.JobName}")
                 .Build();
         }
 
