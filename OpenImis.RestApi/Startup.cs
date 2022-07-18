@@ -20,6 +20,10 @@ using OpenImis.ePayment.Scheduler;
 using OpenImis.RestApi.Scheduler;
 using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.ePayment.QueueSystem;
+using WebApiContrib.Core.Formatter.Csv;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using System.Linq;
 // using OpenImis.ePayment.Formaters;
 
 namespace OpenImis.RestApi
@@ -81,18 +85,16 @@ namespace OpenImis.RestApi
 
             services.AddMvc(options =>
             {
-                options.AllowCombiningAuthorizeFilters = false;
+                // options.AllowCombiningAuthorizeFilters = false;
                 options.EnableEndpointRouting = false;
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
 #if CHF
                 options.InputFormatters.Add(new ePayment.Formaters.GePGXmlSerializerInputFormatter(HostingEnvironment, Configuration, LoggerFactory));
 #else
-                options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
+                options.OutputFormatters.Add(new CsvOutputFormatter(new CsvFormatterOptions()));
 #endif
-                options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            }).AddXmlSerializerFormatters()
             .AddControllersAsServices();
 
             services.AddApiVersioning(o =>
@@ -103,13 +105,18 @@ namespace OpenImis.RestApi
                 o.ApiVersionReader = ApiVersionReader.Combine(new QueryStringApiVersionReader(), new HeaderApiVersionReader("api-version"));
             });
 
-
+            services.AddSwaggerGen(c => {
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.IgnoreObsoleteActions();
+                c.IgnoreObsoleteProperties();
+                c.CustomSchemaIds(type => type.FullName);
+            });
             services.AddSwaggerGen(SwaggerHelper.ConfigureSwaggerGen);
 
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
 
             services.Configure<ApiBehaviorOptions>(options =>

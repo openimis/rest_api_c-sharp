@@ -17,5 +17,6 @@ namespace OpenImis.ModulesV1
         IInsureeModule GetInsureeModule();
 
         ICoverageModule GetCoverageModule();
+
     }
 }

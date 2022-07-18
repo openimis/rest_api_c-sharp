@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 
 namespace OpenImis.ModulesV1.Helpers
@@ -13,6 +12,13 @@ namespace OpenImis.ModulesV1.Helpers
         public CoverageModule CoverageModule { get; set; }
         public InsureeModule InsureeModule { get; set; }
         public PaymentModule PaymentModule { get; set; }
+
+        public FeedbackModule FeedbackModule { get; set; }
+        public PremiumModule PremiumModule { get; set; }
+        public SystemModule SystemModule { get; set; }
+        public MasterDataModule MasterDataModule { get; set; }
+        public PolicyModule PolicyModule { get; set; }
+        public ReportModule ReportModule { get; set; }
     }
 
     public class LoginModule
@@ -33,12 +39,42 @@ namespace OpenImis.ModulesV1.Helpers
     public class InsureeModule
     {
         public string FamilyLogic { get; set; }
-        public string PolicyLogic { get; set; }
         public string ContributionLogic { get; set; }
+        public string InsureeLogic { get; set; }
     }
 
     public class PaymentModule
     {
         public string PaymentLogic { get; set; }
+    }
+
+    public class FeedbackModule
+    {
+        public string FeedbackLogic { get; set; }
+    }
+
+    public class PremiumModule
+    {
+        public string PremiumLogic { get; set; }
+    }
+
+    public class SystemModule
+    {
+        public string SystemLogic { get; set; }
+    }
+
+    public class MasterDataModule
+    {
+        public string MasterDataLogic { get; set; }
+    }
+
+    public class PolicyModule
+    {
+        public string PolicyRenewalLogic { get; set; }
+    }
+
+    public class ReportModule
+    {
+        public string ReportLogic { get; set; }
     }
 }

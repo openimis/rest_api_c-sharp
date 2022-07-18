@@ -28,7 +28,9 @@ namespace OpenImis.RestApi
         public static IWebHost BuildWebHost(string appRootPath, string[] args)
         {
             var webHostBuilder = GetWebHostBuilder(appRootPath, args);
-            return webHostBuilder.Build();
+            var app =  webHostBuilder.Build();
+            
+            return app;
         }
 
 
