@@ -2,6 +2,9 @@
 	"ConnectionStrings": {
 		"IMISDatabase": "Server=Server;Database=IMIS;User ID=User;Password=Password"
 	},
+	"ConnectionSettings": {
+		"CommandTimeout": 30
+	},
 	"Logging": {
 		"IncludeScopes": false,
 		"LogLevel": {

@@ -76,15 +76,13 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
 
                         var sql = "exec @RV = uspRestApiUpdateClaimFromPhone @XML, 0, @ClaimRejected OUTPUT";
 
-                        DbConnection connection = imisContext.Database.GetDbConnection();
-
-                        using (DbCommand cmd = connection.CreateCommand())
+                        using (DbCommand cmd = imisContext.CreateCommand())
                         {
                             cmd.CommandText = sql;
 
                             cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, claimRejectedParameter });
 
-                            if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                            imisContext.CheckConnection();
 
                             using (var reader = cmd.ExecuteReader())
                             {
