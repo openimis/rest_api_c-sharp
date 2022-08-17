@@ -218,9 +218,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     "@PolicySent OUT, @PolicyImported OUT, @PolicyRejected OUT, @PolicyChanged OUT," +
                     "@PremiumSent OUT, @PremiumImported OUT, @PremiumRejected OUT";
 
-                DbConnection connection = imisContext.Database.GetDbConnection();
-
-                using (DbCommand cmd = connection.CreateCommand())
+                using (DbCommand cmd = imisContext.CreateCommand())
                 {
 
                     cmd.CommandText = sql;
@@ -230,7 +228,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                             policyImportedParameter, policyRejectedParameter, policyChangedParameter, premiumSentParameter, premiumImportedParameter,
                                             premiumRejectedParameter });
 
-                    if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                    imisContext.CheckConnection();
 
                     using (var reader = cmd.ExecuteReader())
                     {

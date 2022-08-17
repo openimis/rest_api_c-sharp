@@ -96,15 +96,13 @@ namespace OpenImis.ModulesV3.FeedbackModule.Repositories
 
                     var sql = "exec @RV = uspInsertFeedback @XML";
 
-                    DbConnection connection = imisContext.Database.GetDbConnection();
-
-                    using (DbCommand cmd = connection.CreateCommand())
+                    using (DbCommand cmd = imisContext.CreateCommand())
                     {
                         cmd.CommandText = sql;
 
                         cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter });
 
-                        if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                        imisContext.CheckConnection();
 
                         using (var reader = cmd.ExecuteReader())
                         {

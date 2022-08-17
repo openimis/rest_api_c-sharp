@@ -33,16 +33,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                 var sql = "exec uspAPIGetCoverage @CHFID";
 
-                DbConnection connection = imisContext.Database.GetDbConnection();
-
-                using (DbCommand cmd = connection.CreateCommand())
+                using (DbCommand cmd = imisContext.CreateCommand())
                 {
-
                     cmd.CommandText = sql;
 
                     cmd.Parameters.AddRange(new[] { chfidParameter });
 
-                    if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                    imisContext.CheckConnection();
 
                     using (var reader = cmd.ExecuteReader())
                     {

@@ -130,15 +130,13 @@ namespace OpenImis.ModulesV3.ReportModule.Repositories
 
                 var sql = "SELECT Active, Expired, Idle, Suspended FROM udfGetSnapshotIndicators(@SnapshotDate,@OfficerId)";
 
-                DbConnection connection = imisContext.Database.GetDbConnection();
-
-                using (DbCommand cmd = connection.CreateCommand())
+                using (DbCommand cmd = imisContext.CreateCommand())
                 {
                     cmd.CommandText = sql;
 
                     cmd.Parameters.AddRange(new[] { snapshotDateParameter, officerIdParameter });
 
-                    if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                    imisContext.CheckConnection();
 
                     using (var reader = cmd.ExecuteReader())
                     {
