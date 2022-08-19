@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
@@ -13,15 +14,14 @@ namespace OpenImis.ModulesV3.Utils
             var base64 = "";
             if (!string.IsNullOrEmpty(imageName))
             {
-                var startIndex = imageName.LastIndexOf("\\") == -1 ? 0 : imageName.LastIndexOf("\\");
-                var fileName = imageName.Substring(startIndex);
-                var fileFullPath = Path.Join(photoPath, fileName);
-
-                var stare = Path.Combine(photoPath, imageName);
-
-                if (File.Exists(fileFullPath))
+                var fileName = imageName.Replace('\\', '/').Split('/').Last();
+                if (!string.IsNullOrEmpty(fileName)) 
                 {
-                    base64 = Convert.ToBase64String(File.ReadAllBytes(fileFullPath));
+                    var fileFullPath = Path.Join(photoPath, fileName);
+                    if (File.Exists(fileFullPath))
+                    {
+                        base64 = Convert.ToBase64String(File.ReadAllBytes(fileFullPath));
+                    }
                 }
             }
             return base64;
