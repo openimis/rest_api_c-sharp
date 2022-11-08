@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json;
-using OpenImis.ModulesV3.Helpers.Validators;
-using OpenImis.ModulesV3.Utils;
+﻿using Newtonsoft.Json;  
+using OpenImis.ModulesV3.Helpers;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.ClaimModule.Models
 {
@@ -14,17 +10,13 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
         [Required]
         public string claim_administrator_code { get; set; }
         public ClaimStatus status_claim { get; set; }
-        [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer), "Invalid visit_date_from")]
         public DateTime? visit_date_from { get; set; }
-        [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer), "Invalid visit_date_to")]
         public DateTime? visit_date_to { get; set; }
-        [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer), "Invalid processed_date_from")]
         public DateTime? processed_date_from { get; set; }
-        [ValidDate(ErrorMessage = "4:Wrong or missing enrolment date")]
-        [JsonConverter(typeof(IsoDateSerializer))]
+        [JsonConverter(typeof(IsoDateSerializer), "Invalid processed_date_to")]
         public DateTime? processed_date_to { get; set; }
     }
 

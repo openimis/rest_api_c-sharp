@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.FeedbackModule.Models;
+using OpenImis.ModulesV3.Helpers;
 using OpenImis.ModulesV3.Utils;
-using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V3
