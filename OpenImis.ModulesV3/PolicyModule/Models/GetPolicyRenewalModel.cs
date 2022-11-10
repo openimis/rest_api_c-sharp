@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
-using OpenImis.ModulesV3.Utils;
+using OpenImis.ModulesV3.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OpenImis.ModulesV3.PolicyModule.Models
 {

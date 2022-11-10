@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 using OpenImis.DB.SqlServer;
+using OpenImis.ModulesV3.Helpers;
 using OpenImis.ModulesV3.Utils;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace OpenImis.ModulesV3.InsureeModule.Models
 {

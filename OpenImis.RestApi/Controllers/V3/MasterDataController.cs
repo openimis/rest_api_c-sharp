@@ -1,12 +1,10 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.MasterDataModule.Models;
-using OpenImis.Security.Security;
 
 namespace OpenImis.RestApi.Controllers.V3
 {
@@ -48,7 +46,6 @@ namespace OpenImis.RestApi.Controllers.V3
         public IActionResult GetMasterData()
         {
             MasterDataModel masterData = _imisModules.GetMasterDataModule().GetMasterDataLogic().GetMasterData();
-
             return Ok(masterData);
         }
     }
