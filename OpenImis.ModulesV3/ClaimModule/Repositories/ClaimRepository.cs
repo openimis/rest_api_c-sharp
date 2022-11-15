@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenImis.DB.SqlServer;
 using OpenImis.DB.SqlServer.DataHelper;
 using OpenImis.ModulesV3.ClaimModule.Models;
@@ -22,11 +21,15 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
     {
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
 
-        public ClaimRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public ClaimRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<ClaimRepository>();
         }
 
         // TODO Change the RV assignment codes. It should be on the list for better understanding
@@ -63,6 +66,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                 }
                 catch (Exception e)
                 {
+                    _logger.LogError("Error while saving claim file", e);
                     return (int)Errors.Claim.UnexpectedException;
                 }
 
@@ -91,7 +95,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                                 {
                                     while (reader.Read())
                                     {
-                                        Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                        _logger.LogDebug($"SP OUTPUT: {reader.GetValue(0)}");
                                     }
                                 } while (reader.NextResult());
                             }
@@ -115,6 +119,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                         }
                         else
                         {
+                            _logger.LogWarning($"Saving claim failed, RV: {RV}");
                             if (File.Exists(fromPhoneClaimDir + fileName))
                             {
                                 File.Delete(fromPhoneClaimDir + fileName);
@@ -127,12 +132,9 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
 
                 return RV;
             }
-            catch (SqlException e)
-            {
-                throw e;
-            }
             catch (Exception e)
             {
+                _logger.LogError("Error while saving a claim", e);
                 throw e;
             }
         }
