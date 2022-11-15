@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenImis.DB.SqlServer;
 using OpenImis.ModulesV3.ClaimModule.Models;
 using OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim;
@@ -12,14 +13,16 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
     {
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILoggerFactory _loggerFactory;
         protected ClaimRepository claimRepository;
 
-        public ClaimLogic(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public ClaimLogic(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _loggerFactory = loggerFactory;
 
-            claimRepository = new ClaimRepository(_configuration, _hostingEnvironment);
+            claimRepository = new ClaimRepository(_configuration, _hostingEnvironment, _loggerFactory);
         }
 
         public List<SubmitClaimResponse> Create(List<Claim> claims)
@@ -30,7 +33,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
             foreach (var claim in claims)
             {
                 result = claimRepository.Create(claim);
-
+                
                 Errors.Claim errorCode;
                 string message;
                 switch (result)
@@ -77,16 +80,22 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
                         break;
                     default:
                         errorCode = Errors.Claim.UnexpectedException;
-                        message = "Unhandled exception occured. Please contact the system administrator";
+                        message = $"Unhandled exception occured ({result}). Please contact the system administrator";
                         break;
                 }
+
+                var rejectedItems = claimRepository.GetRejectedItems(claim.Details.HFCode, claim.Details.ClaimCode);
+                var rejectedServices = claimRepository.GetRejectedServices(claim.Details.HFCode, claim.Details.ClaimCode);
+
 
                 claimResponse.Add(
                     new SubmitClaimResponse
                     {
                         ClaimCode = claim.Details.ClaimCode,
                         Response = (int)errorCode,
-                        Message = message
+                        Message = message,
+                        RejectedItems = rejectedItems,
+                        RejectedServices = rejectedServices
                     });
 
             }

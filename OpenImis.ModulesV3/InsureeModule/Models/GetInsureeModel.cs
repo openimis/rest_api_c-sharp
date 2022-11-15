@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using OpenImis.ModulesV3.Utils;
+using OpenImis.ModulesV3.Helpers;
 
 namespace OpenImis.ModulesV3.InsureeModule.Models
 {
@@ -15,5 +13,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public DateTime? DOB { get; set; }
         public string Gender { get; set; }
         public string PhotoBase64 { get; set; }
+        public string OtherNames { get; set; }
+        public string LastName { get; set; }
     }
 }

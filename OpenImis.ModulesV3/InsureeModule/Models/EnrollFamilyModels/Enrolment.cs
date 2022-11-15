@@ -22,5 +22,6 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public List<Policy> Policies { get; set; }
         public List<Premium> Premiums { get; set; }
         public List<InsureePolicy> InsureePolicies { get; set; }
+       
     }
 }

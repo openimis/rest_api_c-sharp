@@ -1,9 +1,7 @@
 ﻿using OpenImis.DB.SqlServer;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 
 namespace OpenImis.ModulesV3.Utils
 {

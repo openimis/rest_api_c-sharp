@@ -80,7 +80,7 @@ namespace OpenImis.ModulesV3
         {
             if (claimModule == null)
             {
-                claimModule = new ClaimModule.ClaimModule(_configuration, _hostingEnvironment);
+                claimModule = new ClaimModule.ClaimModule(_configuration, _hostingEnvironment, _loggerFactory);
 
                 Type claimLogicType = CreateTypeFromConfiguration("ClaimModule", "ClaimLogic", "OpenImis.ModulesV3.ClaimModule.Logic.ClaimLogic");
                 claimModule.SetClaimLogic((ClaimModule.Logic.ClaimLogic)ActivatorUtilities.CreateInstance(_serviceProvider, claimLogicType));

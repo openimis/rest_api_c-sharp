@@ -2,7 +2,9 @@
 	"ConnectionStrings": {
 		"IMISDatabase": "Server=Server;Database=IMIS;User ID=User;Password=Password"
 	},
-	
+	"ConnectionSettings": {
+		"CommandTimeout": 30
+	},
 	"Log4NetCore": {
 		"PropertyOverrides": [
 			{

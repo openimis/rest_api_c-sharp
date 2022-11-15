@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using OpenImis.ModulesV3.Utils;
+using OpenImis.ModulesV3.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OpenImis.ModulesV3.ClaimModule.Models
 {

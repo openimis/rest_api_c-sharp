@@ -130,7 +130,7 @@ namespace OpenImis.ModulesV2.InsureeModule.Repositories
                                     DOB = I.Dob.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
                                     Gender = G.Gender,
                                     InsureeName = I.LastName + " " + I.OtherNames,
-                                    PhotoPath = P.PhotoFolder + P.PhotoFileName
+                                    PhotoPath = System.IO.Path.Combine(P.PhotoFolder, P.PhotoFileName)
                                 })
                              .FirstOrDefault();
                 }
