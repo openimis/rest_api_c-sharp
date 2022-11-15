@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
@@ -9,9 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OpenImis.ModulesV3;
+using OpenImis.ModulesV3.Helpers;
 using OpenImis.ModulesV3.InsureeModule.Models;
 using OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels;
-using OpenImis.ModulesV3.Utils;
 using OpenImis.RestApi.Util.ErrorHandling;
 using OpenImis.Security.Security;
 
