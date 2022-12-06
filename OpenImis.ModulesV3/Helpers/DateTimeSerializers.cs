@@ -55,6 +55,17 @@ namespace OpenImis.ModulesV3.Helpers
         }
     }
 
+    public class IsoDateTimeSerializer : CustomFormatDatetimeSerializer
+    {
+        public IsoDateTimeSerializer() : base(DateTimeFormats.IsoDateTimeFormat)
+        {
+        }
+
+        public IsoDateTimeSerializer(string errorMessage) : base(DateTimeFormats.IsoDateTimeFormat, errorMessage)
+        {
+        }
+    }
+
     public class ImisSPXmlWriter : XmlTextWriter
     {
         public ImisSPXmlWriter(TextWriter writer) : base(writer)
