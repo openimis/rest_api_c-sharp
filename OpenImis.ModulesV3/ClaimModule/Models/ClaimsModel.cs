@@ -9,9 +9,8 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
     {
         [Required]
         public string claim_administrator_code { get; set; }
-        public ClaimStatus? status_claim { get; set; }
+        public ClaimStatus status_claim { get; set; }
         [JsonConverter(typeof(IsoDateSerializer), "Invalid visit_date_from")]
-        public string insuree_number { get; set; }
         public DateTime? visit_date_from { get; set; }
         [JsonConverter(typeof(IsoDateSerializer), "Invalid visit_date_to")]
         public DateTime? visit_date_to { get; set; }
@@ -19,8 +18,6 @@ namespace OpenImis.ModulesV3.ClaimModule.Models
         public DateTime? processed_date_from { get; set; }
         [JsonConverter(typeof(IsoDateSerializer), "Invalid processed_date_to")]
         public DateTime? processed_date_to { get; set; }
-        [JsonConverter(typeof(IsoDateTimeSerializer), "Invalid last_update_date")]
-        public DateTime? last_update_date { get; set; }
     }
 
     public enum ClaimStatus

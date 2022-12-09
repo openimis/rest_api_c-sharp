@@ -151,7 +151,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                             join ci in imisContext.TblClaimItems on c.ClaimId equals ci.ClaimId
                             join i in imisContext.TblItems on ci.ItemId equals i.ItemId
                             where c.ClaimCode == claimCode && c.ValidityTo == null && hf.Hfcode == hfCode && ci.ValidityTo == null && ci.ClaimItemStatus == 2
-                            select new RejectedItem() { Code = i.ItemCode, Error = ci.RejectionReason };
+                            select new RejectedItem() { Code = i.ItemCode, Error = ci.RejectionReason};
 
                 rejectedItems = query.ToList();
             }
@@ -177,7 +177,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                             join cs in imisContext.TblClaimServices on c.ClaimId equals cs.ClaimId
                             join s in imisContext.TblServices on cs.ServiceId equals s.ServiceId
                             where c.ClaimCode == claimCode && c.ValidityTo == null && hf.Hfcode == hfCode && cs.ValidityTo == null && cs.ClaimServiceStatus == 2
-                            select new RejectedService() { Code = s.ServCode, Error = cs.RejectionReason };
+                            select new RejectedService() { Code = s.ServCode, Error = cs.RejectionReason};
 
                 rejectedServices = query.ToList();
             }
@@ -384,11 +384,13 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
 
         public List<ClaimOutput> GetClaims(ClaimsModel model)
         {
-            string sSQL = @"uspAPIGetClaims";
+            string sSQL = @"exec uspAPIGetClaims @ClaimAdminCode,@StartDate,@EndDate,@DateProcessedFrom,@DateProcessedTo,@ClaimStatus";
 
             DataHelper helper = new DataHelper(_configuration);
+            int? claimStatus = null;
 
-            int? claimStatus = model.status_claim != null ? (int?)model.status_claim : (int?)null;
+            if (model.status_claim != 0)
+                claimStatus = (int)model.status_claim;
 
             SqlParameter[] sqlParameters = {
                 new SqlParameter("@ClaimAdminCode", model.claim_administrator_code),
@@ -397,11 +399,9 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                 new SqlParameter("@DateProcessedFrom",SqlDbType.DateTime){ Value = (model.processed_date_from != null)?model.processed_date_from:(object)DBNull.Value},
                 new SqlParameter("@DateProcessedTo", SqlDbType.DateTime){ Value = (model.processed_date_to != null)?model.processed_date_to:(object)DBNull.Value},
                 new SqlParameter("@ClaimStatus", SqlDbType.Int){ Value = (claimStatus != null)?claimStatus:(object)DBNull.Value},
-                new SqlParameter("@InsureeNumber", SqlDbType.NVarChar, 50){ Value = (model.insuree_number != null)?model.insuree_number:(object)DBNull.Value},
-                new SqlParameter("@LastUpdateDate", SqlDbType.DateTime){ Value = (model.last_update_date != null)?model.last_update_date:(object)DBNull.Value},
             };
 
-            var response = helper.GetDataSet(sSQL, sqlParameters, CommandType.StoredProcedure);
+            var response = helper.GetDataSet(sSQL, sqlParameters, CommandType.Text);
 
             DataTable responseItems = response.Tables[0];
             DataTable responseServices = response.Tables[1];
