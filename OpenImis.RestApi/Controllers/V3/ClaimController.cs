@@ -7,9 +7,9 @@ using OpenImis.ModulesV3.ClaimModule.Models;
 using OpenImis.ModulesV3;
 using OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim;
 using Microsoft.Extensions.Logging;
-using OpenImis.RestApi.Util.ErrorHandling;
 using System.Net;
 using System.Collections.Generic;
+using OpenImis.ModulesV3.Helpers;
 
 namespace OpenImis.RestApi.Controllers.V3
 {
@@ -47,6 +47,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
             catch (Exception e)
             {
+                _logger.LogError("Error while uploading claims", e);
                 return BadRequest(new SubmitClaimResponse
                 {
                     ClaimCode = "",

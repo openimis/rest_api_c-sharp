@@ -11,19 +11,21 @@ namespace OpenImis.DB.SqlServer.DataHelper
 {
     public class DataHelper
     {
-        private readonly string ConnectionString;
+        private readonly string _connectionString;
+        private readonly int _commandTimeout = 30;
 
         public int ReturnValue { get; set; }
 
         public DataHelper(IConfiguration configuration)
         {
-            ConnectionString = configuration["ConnectionStrings:IMISDatabase"];
+            _connectionString = configuration["ConnectionStrings:IMISDatabase"];
+            if (configuration["ConnectionSettings:CommandTimeout"] != null) _commandTimeout = Int32.Parse(configuration["ConnectionSettings:CommandTimeout"]);
         }
 
         public DataSet FillDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType, CommandTimeout = _commandTimeout })
             using (var adapter = new SqlDataAdapter(command))
             {
                 DataSet ds = new DataSet();
@@ -48,8 +50,8 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public DataTable GetDataTable(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType, CommandTimeout = _commandTimeout })
             using (var adapter = new SqlDataAdapter(command))
             {
                 DataTable dt = new DataTable();
@@ -67,8 +69,8 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public DataSet GetDataSet(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType, CommandTimeout = _commandTimeout })
             using (var adapter = new SqlDataAdapter(command))
             {
                 DataSet ds = new DataSet();
@@ -86,8 +88,8 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public void Execute(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType, CommandTimeout = _commandTimeout })
             {
                 sqlConnection.Open();
 
@@ -102,8 +104,8 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public async Task ExecuteAsync(string SQL, SqlParameter[] parameters, CommandType commandType)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(SQL, sqlConnection) { CommandType = commandType, CommandTimeout = _commandTimeout })
             {
                 if (command.Connection.State == 0)
                 {
@@ -121,8 +123,8 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public ProcedureOutPut Procedure(string StoredProcedure, SqlParameter[] parameters, int tableIndex = 0)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure, CommandTimeout = _commandTimeout })
             using (var adapter = new SqlDataAdapter(command))
             {
                 DataSet dt = new DataSet();
@@ -155,8 +157,8 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public IList<SqlParameter> ExecProcedure(string StoredProcedure, SqlParameter[] parameters)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure, CommandTimeout = _commandTimeout })
             {
                 SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
                 returnParameter.Direction = ParameterDirection.ReturnValue;
@@ -181,8 +183,8 @@ namespace OpenImis.DB.SqlServer.DataHelper
 
         public async Task<IList<SqlParameter>> ExecProcedureAsync(string StoredProcedure, SqlParameter[] parameters)
         {
-            using (var sqlConnection = new SqlConnection(ConnectionString))
-            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure })
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(StoredProcedure, sqlConnection) { CommandType = CommandType.StoredProcedure, CommandTimeout = _commandTimeout })
             {
                 SqlParameter returnParameter = new SqlParameter("@RV", SqlDbType.Int);
                 returnParameter.Direction = ParameterDirection.ReturnValue;

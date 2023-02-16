@@ -16,6 +16,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
                 DOB = DOB,
                 Gender = Gender,
                 InsureeName = InsureeName,
+                OtherNames = OtherNames,
+                LastName = LastName,
                 PhotoPath = PhotoPath,
                 PhotoBase64 = PhotoBase64
             };

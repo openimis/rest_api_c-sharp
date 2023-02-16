@@ -8,13 +8,15 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
     public class EnrolFamilyModel
     {
         public List<Family> Family { get; set; }
+        public string Source { get; set; } = "unknown";
+        public string SourceVersion { get; set; } = "";
 
         public Enrolment GetEnrolmentFromModel()
         {
 
             var enrolment = new Enrolment();
             enrolment.FileInfo = new FileInfo();
-
+            
             foreach (Family f in Family) {
                 // add the Family
                 Family family = new Family()

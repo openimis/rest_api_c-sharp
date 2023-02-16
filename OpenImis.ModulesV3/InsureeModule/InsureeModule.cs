@@ -44,7 +44,7 @@ namespace OpenImis.ModulesV3.InsureeModule
         {
             if (_insureeLogic == null)
             {
-                _insureeLogic = new InsureeLogic(_configuration);
+                _insureeLogic = new InsureeLogic(_configuration, _loggerFactory);
             }
             return _insureeLogic;
         }

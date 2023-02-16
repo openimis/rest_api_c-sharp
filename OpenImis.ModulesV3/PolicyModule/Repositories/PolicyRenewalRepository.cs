@@ -155,7 +155,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                     int tempRV = (int)returnParameter.Value;
                     bool moveToRejected = false;
 
-                    switch (tempRV) 
+                    switch (tempRV)
                     {
                         case 0:
                             RV = (int)Errors.Renewal.Accepted;
@@ -181,12 +181,17 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
                             break;
                     }
 
-                    if(moveToRejected)
+                    if (moveToRejected)
                     {
+                        // Check if the file already exists in the rejected folder
+                        // If yes then delete it otherwise it will throw and exception
+                        if (File.Exists(fromPhoneRenewalRejectedDir + fileName))
+                            File.Delete(fromPhoneRenewalRejectedDir + fileName);
+
+
                         if (File.Exists(fromPhoneRenewalDir + fileName))
-                        {
                             File.Move(fromPhoneRenewalDir + fileName, fromPhoneRenewalRejectedDir + fileName);
-                        }
+
                     }
                 }
             }
@@ -326,7 +331,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
             if (_configuration.GetValue<bool>("PaymentGateWay:CreatePremiumOnPaymentReceived"))
             {
                 int paymentId = payment.GetPaymentId(renewal.ControlNumber);
-                _ = paymentLogic.CreatePremium(paymentId);
+                _ = paymentLogic.CreatePremium(paymentId, "GePG", "1");
             }
 
         }
@@ -335,7 +340,7 @@ namespace OpenImis.ModulesV3.PolicyModule.Repositories
         {
             var helper = new SelfRenewalHelper(_configuration, _hostingEnvironment, _loggerFactory);
             var response = await helper.CreateSelfRenewal(renewal);
-            
+
             return response;
         }
     }

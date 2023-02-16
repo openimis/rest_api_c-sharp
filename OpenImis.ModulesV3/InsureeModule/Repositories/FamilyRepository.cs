@@ -31,12 +31,14 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
         private IConfiguration _configuration;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
 
         public FamilyRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
             _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<FamilyRepository>();
         }
 
         public FamilyModel GetByCHFID(string chfid, Guid userUUID)
@@ -47,22 +49,22 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             {
                 var locationIds = (from UD in imisContext.TblUsersDistricts
                                    join U in imisContext.TblUsers on UD.UserId equals U.UserId
-                                   where U.UserUUID == userUUID && UD.ValidityTo == null
+                                   where U.UserUUID == userUUID && U.ValidityTo == null && UD.ValidityTo == null
                                    select UD.LocationId)
                                    .ToList();
 
                 var familyId = (from I in imisContext.TblInsuree
                                 join F in imisContext.TblFamilies on I.FamilyId equals F.FamilyId
-                                join V in imisContext.TblVillages on F.LocationId equals V.VillageId
-                                join W in imisContext.TblWards on V.WardId equals W.WardId
-                                join D in imisContext.TblDistricts on W.DistrictId equals D.DistrictId
+                                join LV in imisContext.TblLocations on F.LocationId equals LV.LocationId
+                                join LW in imisContext.TblLocations on LV.ParentLocationId equals LW.LocationId
+                                join LD in imisContext.TblLocations on LW.ParentLocationId equals LD.LocationId
                                 where (I.Chfid == chfid
-                                    && locationIds.Contains(D.DistrictId)
-                                    && F.ValidityTo == null
                                     && I.ValidityTo == null
-                                    && V.ValidityTo == null
-                                    && W.ValidityTo == null
-                                    && D.ValidityTo == null)
+                                    && F.ValidityTo == null
+                                    && LV.ValidityTo == null
+                                    && LW.ValidityTo == null
+                                    && LD.ValidityTo == null
+                                    && locationIds.Contains(LD.LocationId))
                                 select F.FamilyId)
                                .FirstOrDefault();
 
@@ -164,15 +166,18 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             var XML = enrolFamily.XMLSerialize();
             var JSON = JsonConvert.SerializeObject(enrolFamily);
 
-            var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar;
-            var JsonDebugFolder = _configuration["AppSettings:JsonDebugFolder"] + Path.DirectorySeparatorChar;
+            var dateFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Day.ToString() + Path.DirectorySeparatorChar;
+
+            var EnrolmentDir = _configuration["AppSettings:Enrollment_Phone"] + Path.DirectorySeparatorChar + dateFolder;
+
             var UpdatedFolder = _configuration["AppSettings:UpdatedFolder"] + Path.DirectorySeparatorChar;
             var SubmittedFolder = _configuration["AppSettings:SubmittedFolder"] + Path.DirectorySeparatorChar;
+
 
             var hof = enrolFamily.Families.Select(x => x.HOFCHFID).FirstOrDefault();
 
             var FileName = string.Format("{0}_{1}_{2}.xml", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
-            var JsonFileName = string.Format("{0}_{1}_{2}.json", hof, officerId.ToString(), DateTime.Now.ToString(DateTimeFormats.FileNameDateTimeFormat));
+
 
             var xmldoc = new XmlDocument();
             xmldoc.InnerXml = XML;
@@ -181,9 +186,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
             xmldoc.Save(EnrolmentDir + FileName);
 
-            if (!Directory.Exists(JsonDebugFolder)) Directory.CreateDirectory(JsonDebugFolder);
 
-            File.WriteAllText(JsonDebugFolder + JsonFileName, JSON);
 
             int RV = -99;
             int InsureeUpd;
@@ -192,6 +195,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             using (var imisContext = new ImisDB())
             {
                 var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                var source = new SqlParameter("@Source", model.Source) { DbType = DbType.String, Size = 50 };
+                var sourceVersion = new SqlParameter("@SourceVersion", model.SourceVersion) { DbType = DbType.String, Size = 15 };
                 var returnParameter = OutputParameter.CreateOutputParameter("@RV", SqlDbType.Int);
                 var familySentParameter = OutputParameter.CreateOutputParameter("@FamilySent", SqlDbType.Int);
                 var familyImportedParameter = OutputParameter.CreateOutputParameter("@FamilyImported", SqlDbType.Int);
@@ -208,24 +213,22 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 var premiumImportedParameter = OutputParameter.CreateOutputParameter("@PremiumImported", SqlDbType.Int);
                 var premiumRejectedParameter = OutputParameter.CreateOutputParameter("@PremiumRejected", SqlDbType.Int);
 
-                var sql = "exec @RV = uspConsumeEnrollments @XML, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
+                var sql = "exec @RV = uspConsumeEnrollments @XML, @Source, @SourceVersion, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
                     "@InsureeSent OUT, @InsureeUpd OUT, @InsureeImported OUT, " +
                     "@PolicySent OUT, @PolicyImported OUT, @PolicyRejected OUT, @PolicyChanged OUT," +
                     "@PremiumSent OUT, @PremiumImported OUT, @PremiumRejected OUT";
 
-                DbConnection connection = imisContext.Database.GetDbConnection();
-
-                using (DbCommand cmd = connection.CreateCommand())
+                using (DbCommand cmd = imisContext.CreateCommand())
                 {
 
                     cmd.CommandText = sql;
 
-                    cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
+                    cmd.Parameters.AddRange(new[] { xmlParameter, source, sourceVersion, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
                                             familyRejectedParameter, insureeSentParameter, insureeUpdParameter, insureeImportedParameter, policySentParameter,
                                             policyImportedParameter, policyRejectedParameter, policyChangedParameter, premiumSentParameter, premiumImportedParameter,
                                             premiumRejectedParameter });
 
-                    if (connection.State.Equals(ConnectionState.Closed)) connection.Open();
+                    imisContext.CheckConnection();
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -278,8 +281,6 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                 // Create Premium
                 CreatePremium(model);
-
-
             }
 
             return newFamily;
@@ -326,14 +327,16 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
             foreach (var family in familyModel.Family)
             {
-                foreach (var policy in family.Policies)
+                if (family.Policies != null)
                 {
-                    if (policy.ControlNumber.Length == 0)
-                        continue;
+                    foreach (var policy in family.Policies)
+                    {
+                        if (String.IsNullOrEmpty(policy.ControlNumber))
+                            continue;
 
-                    var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
+                        var policyId = serverResponse.Family.Where(f => f.FamilyId == family.FamilyId).FirstOrDefault().Policies.Where(p => p.PolicyId == policy.PolicyId).Select(p => p.PolicyDBId).FirstOrDefault();
 
-                    var sSQL = @"UPDATE PD SET InsuranceNumber = I.CHFID, PremiumID = PR.PremiumId, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
+                        var sSQL = @"UPDATE PD SET InsuranceNumber = I.CHFID, PremiumID = PR.PremiumId, PolicyStage = Pol.PolicyStage, enrollmentDate = Pol.EnrollDate, ValidityFrom = GETDATE()
                             FROM tblControlNumber CN
                             INNER JOIN tblPaymentDetails PD ON CN.PaymentId = PD.PaymentID
                             INNER JOIN tblInsuree I ON IsHead = 1 
@@ -343,23 +346,27 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                             AND I.ValidityTo IS NULL
                             AND CN.ControlNumber = @ControlNumber;";
 
-                    SqlParameter[] parameters =
-                    {
-                        new SqlParameter("@ControlNumber", policy.ControlNumber),
-                        new SqlParameter("@PolicyId", policyId),
-                    };
+                        SqlParameter[] parameters =
+                        {
+                            new SqlParameter("@ControlNumber", policy.ControlNumber),
+                            new SqlParameter("@PolicyId", policyId),
+                        };
 
-                    try
-                    {
-                        var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
-                        dh.Execute(sSQL, parameters, CommandType.Text);
+                        try
+                        {
+                            var dh = new DB.SqlServer.DataHelper.DataHelper(_configuration);
+                            dh.Execute(sSQL, parameters, CommandType.Text);
+                        }
+                        catch (Exception)
+                        {
+                            return 1001;
+                        }
+
                     }
-                    catch (Exception)
-                    {
-
-                        return 1001;
-                    }
-
+                }
+                else
+                {
+                    _logger.LogWarning("Family policy null in UpdateControlNumber, family HOFCHFID: " + family.HOFCHFID);
                 }
             }
             return 0;
@@ -377,7 +384,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                     foreach (var policy in family.Policies)
                     {
                         int paymentId = payment.GetPaymentId(policy.ControlNumber);
-                        _ = paymentLogic.CreatePremium(paymentId);
+                        _ = paymentLogic.CreatePremium(paymentId, "GePG", model.SourceVersion);
                     }
                 }
             }
