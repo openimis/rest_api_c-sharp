@@ -1,0 +1,28 @@
+name: create docker image
+on:
+  push:
+    branches:
+      - master
+      - develop
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag'     
+        required: true
+        default: 'manual'
+jobs:
+  publish-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build the openimis restapi  Docker image
+      run: |
+         [ ${{github.event_name == 'push'}} ] &&  LABEL=${GITHUB_REF##*/} || LABEL=${{ github.event_name == 'workflow_dispatch' &&  github.event.inputs.tag || 'manual' }}
+         docker build . --tag ghcr.io/openimis/openimis-rest_api:${LABEL}
+         docker push ghcr.io/openimis/openimis-rest_api:${LABEL}
