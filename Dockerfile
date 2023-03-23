@@ -3,7 +3,7 @@ WORKDIR /app
 
 COPY /OpenImis.RestApi/*.csproj ./
 RUN dotnet restore
-ARG BUILD-FLAVOUR=Releases
+ARG BUILD-FLAVOUR=Release
 COPY . ./
 RUN dotnet publish OpenImis.RestApi/OpenImis.RestApi.csproj -c $BUILD-FLAVOUR -o out
 

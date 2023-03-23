@@ -9,7 +9,7 @@ services:
       - DB_HOST=Server
       - DB_NAME=IMIS
       - DB_USER=IMISuser
-      - DB_PASSWORD=
+      - DB_PASSWORD=IMISuser@1234
     ports:
       - 8080:80
     volumes:
