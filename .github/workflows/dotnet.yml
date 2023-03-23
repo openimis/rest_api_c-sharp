@@ -23,8 +23,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-
-      Greeting: Hello
       run: |
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.CHF.json
         envsubst  '${DB_HOST},${DB_USER},${DB_PASSWORD},${DB_NAME}' < /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json.dist > /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json
