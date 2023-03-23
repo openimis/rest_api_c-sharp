@@ -8,9 +8,12 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      DB_HOST: Server
+      DB_NAME: IMIS
+      DB_USER: IMISuser
+      DB_PASSWORD: IMISuser@1234
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -20,9 +23,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
+
+      Greeting: Hello
       run: |
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.CHF.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.CHF.json
-        cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json
+        envsubst  '${DB_HOST},${DB_USER},${DB_PASSWORD},${DB_NAME}' < /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json.dist > /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi/config/appsettings.Development.json
         cp /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json.dist /home/runner/work/rest_api_c-sharp/rest_api_c-sharp/OpenImis.RestApi.IntegrationTests/appsettings.Test.json
         dotnet publish --no-restore --configuration Debug --verbosity quiet
     - name: Publish artifact

@@ -1,6 +1,6 @@
 ﻿{
 	"ConnectionStrings": {
-		"IMISDatabase": "Server=Server;Database=IMIS;User ID=User;Password=Password"
+		"IMISDatabase": "Server=${DB_HOST};Database=${DB_NAME};User ID=${DB_USER};Password=${DB_PASSWORD}"
 	},
 	"ConnectionSettings": {
 		"CommandTimeout": 30
