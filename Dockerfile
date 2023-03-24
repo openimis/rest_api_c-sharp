@@ -21,6 +21,7 @@ ENV DB_PASSWORD=IMISuser@1234
 COPY OpenImis.RestApi/config/appsettings.Production.json.dist /app/tpl/
 COPY OpenImis.RestApi/config/appsettings.json /app/config/
 COPY scripts/entrypoint.sh /app/entrypoint.sh
+RUN chmod a+x /app/entrypoint.sh
 
 
 ENTRYPOINT /app/entrypoint.sh
