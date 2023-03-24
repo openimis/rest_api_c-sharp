@@ -15,7 +15,7 @@ ENV DB_HOST=Server
 ENV DB_NAME=IMIS
 ENV DB_USER=IMISuser
 ENV DB_PASSWORD=IMISuser@1234
-
+RUN apt-get update && apt-get install gettext -y  && rm -rf /var/lib/apt/lists/*
 
 # copy appsettings templates
 COPY OpenImis.RestApi/config/appsettings.Production.json.dist /app/tpl/
