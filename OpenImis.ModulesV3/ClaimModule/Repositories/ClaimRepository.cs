@@ -95,7 +95,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                                 {
                                     while (reader.Read())
                                     {
-                                        _logger.LogDebug($"SP OUTPUT: {reader.GetValue(0)}");
+                                        _logger.LogWarning($"SP OUTPUT: {reader.GetValue(0)}");
                                     }
                                 } while (reader.NextResult());
                             }
@@ -122,7 +122,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                             _logger.LogWarning($"Saving claim failed, RV: {RV}");
                             if (File.Exists(fromPhoneClaimDir + fileName))
                             {
-                                File.Delete(fromPhoneClaimDir + fileName);
+                                //File.Delete(fromPhoneClaimDir + fileName);
                             }
 
                             // RV = 2;
