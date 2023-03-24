@@ -10,4 +10,17 @@ RUN dotnet publish OpenImis.RestApi/OpenImis.RestApi.csproj -c $BUILD-FLAVOUR -o
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.1
 WORKDIR /app
 COPY --from=build-env /app/OpenImis.RestApi/out .
-ENTRYPOINT ["dotnet", "OpenImis.RestApi.dll"]
+
+ENV DB_HOST=Server
+ENV DB_NAME=IMIS
+ENV DB_USER=IMISuser
+ENV DB_PASSWORD=IMISuser@1234
+
+
+# copy appsettings templates
+COPY OpenImis.RestApi/config/appsettings.Production.json.dist /app/tpl/
+COPY OpenImis.RestApi/config/appsettings.json /app/config/
+COPY scripts/entrypoint.sh /app/entrypoint.sh
+
+
+ENTRYPOINT /app/entrypoint.sh

@@ -5,10 +5,17 @@ services:
       context: ./
       args:
         BUILD-FLAVOUR: ${BUILD-FLAVOUR:-Release}
+    environements:
+      - DB_HOST=Server
+      - DB_NAME=IMIS
+      - DB_USER=IMISuser
+      - DB_PASSWORD=IMISuser@1234
     ports:
       - 8080:80
     volumes:
       - ./OpenImis.RestApi/config:/app/config
       - ./OpenImis.RestApi/logs:/app/log
       - ./OpenImis.RestApi/Certificates:/app/wwwRoot/Certificates
+      - ./photos:/app/photos
+      - ./Escape:/app/Escape
     restart: always
