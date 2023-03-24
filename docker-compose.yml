@@ -18,4 +18,5 @@ services:
       - ./OpenImis.RestApi/Certificates:/app/wwwRoot/Certificates
       - ./photos:/app/photos
       - ./Escape:/app/Escape
+      - ./FromPhone:/app/FromPhone
     restart: always
