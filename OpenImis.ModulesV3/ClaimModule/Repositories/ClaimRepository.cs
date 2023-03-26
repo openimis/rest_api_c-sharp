@@ -59,12 +59,12 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
 
                     if (!File.Exists(fromPhoneClaimDir + fileName))
                     {
-                        _logger.LogWarning($"file created  {filename}");
+                        _logger.LogWarning($"file created  {fileName}");
                         xmldoc.Save(fromPhoneClaimDir + fileName);
                     }
                     else
                     {
-                        _logger.LogWarning($"file already exist {filename}");
+                        _logger.LogWarning($"file already exist {fileName}");
                     }
 
                     ifSaved = true;
