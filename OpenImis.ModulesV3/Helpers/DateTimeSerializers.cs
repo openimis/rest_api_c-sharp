@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace OpenImis.ModulesV3.Helpers
 {
@@ -77,8 +78,10 @@ namespace OpenImis.ModulesV3.Helpers
         public override void WriteRaw(string data)
         {
             DateTime dt;
-
-            if (DateTime.TryParse(data, out dt))
+            string strRegex = @"([0-9]{4}\-[0-9]{2}\-[0-9]{2})";
+            Regex re = new Regex(strRegex);
+            
+            if (re.IsMatch(data) && DateTime.TryParse(data, out dt))
                 base.WriteRaw(dt.ToString(DateTimeFormats.IsoDateFormat, CultureInfo.InvariantCulture));
             else
                 base.WriteRaw(data);
