@@ -59,7 +59,12 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
 
                     if (!File.Exists(fromPhoneClaimDir + fileName))
                     {
+                        _logger.LogWarning($"file created  {filename}");
                         xmldoc.Save(fromPhoneClaimDir + fileName);
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"file already exist {filename}");
                     }
 
                     ifSaved = true;
@@ -74,7 +79,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                 {
                     using (var imisContext = new ImisDB())
                     {
-                        var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
+                        var xmlParameter = new SqlParameter("@XML", SqlDbType.Xml) { Value = XML.ToString()};
                         var returnParameter = new SqlParameter("@RV", SqlDbType.Int) { Direction = ParameterDirection.Output };
                         var claimRejectedParameter = new SqlParameter("@ClaimRejected", SqlDbType.Bit) { Direction = ParameterDirection.Output };
 
