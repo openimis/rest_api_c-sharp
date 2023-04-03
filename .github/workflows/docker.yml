@@ -4,12 +4,6 @@ on:
     branches:
       - master
       - develop
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'tag'     
-        required: true
-        default: 'manual'
 jobs:
   publish-docker-image:
     runs-on: ubuntu-latest
@@ -23,6 +17,5 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build the openimis restapi  Docker image
       run: |
-         [ ${{github.event_name == 'push'}} ] &&  LABEL=${GITHUB_REF##*/} || LABEL=${{ github.event_name == 'workflow_dispatch' &&  github.event.inputs.tag || 'manual' }}
-         docker build . --tag ghcr.io/openimis/openimis-rest_api:${LABEL}
-         docker push ghcr.io/openimis/openimis-rest_api:${LABEL}
+         docker build . --tag ghcr.io/openimis/openimis-rest_api:${GITHUB_REF##*/}
+         docker push ghcr.io/openimis/openimis-rest_api:${GITHUB_REF##*/}
