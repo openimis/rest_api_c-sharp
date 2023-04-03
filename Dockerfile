@@ -18,9 +18,9 @@ ENV DB_PASSWORD=IMISuser@1234
 RUN apt-get update && apt-get install gettext -y  && rm -rf /var/lib/apt/lists/*
 
 # copy appsettings templates
-COPY OpenImis.RestApi/config/appsettings.Production.json.dist /app/tpl/
-COPY OpenImis.RestApi/config/appsettings.json /app/config/
-COPY scripts/entrypoint.sh /app/entrypoint.sh
+COPY ./OpenImis.RestApi/config/appsettings.Production.json.dist /app/tpl/
+COPY ./OpenImis.RestApi/config/appsettings.json /app/config/
+COPY ./scripts/entrypoint.sh /app/entrypoint.sh
 RUN chmod a+x /app/entrypoint.sh
 
 
