@@ -22,7 +22,10 @@ COPY ./OpenImis.RestApi/config/appsettings.json /app/config/
 COPY ./scripts/entrypoint.sh /app/
 RUN chmod a+x /app/entrypoint.sh
 COPY --from=build-env /app/OpenImis.RestApi/out .
-RUN apt-get update && apt-get install gettext -y  && rm -rf /var/lib/apt/lists/*
-
+RUN echo 'deb http://archive.debian.org/debian/ stretch main' > /etc/apt/sources.list \
+    && echo 'deb http://archive.debian.org/debian-security/ stretch/updates main' >> /etc/apt/sources.list \
+    && apt-get -o Acquire::Check-Valid-Until=false update \
+    && apt-get install gettext -y \
+    && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT /app/entrypoint.sh
