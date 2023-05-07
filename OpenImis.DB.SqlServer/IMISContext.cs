@@ -33,6 +33,7 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblFeedbackPrompt> TblFeedbackPrompt { get; set; }
         public virtual DbSet<TblFromPhone> TblFromPhone { get; set; }
         public virtual DbSet<TblGender> TblGender { get; set; }
+        public virtual DbSet<TblMembershipGroup> TblMembershipGroup { get; set; }
         public virtual DbSet<TblHealthStatus> TblHealthStatus { get; set; }
         public virtual DbSet<TblHf> TblHf { get; set; }
         public virtual DbSet<TblHfcatchment> TblHfcatchment { get; set; }
@@ -817,6 +818,21 @@ namespace OpenImis.DB.SqlServer
                 entity.Property(e => e.AltLanguage).HasMaxLength(50);
 
                 entity.Property(e => e.Gender).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TblMembershipGroup>(entity =>
+            {
+                entity.HasKey(e => e.idMembershipGroup);
+
+                entity.ToTable("tblMembershipGroup");
+
+                entity.Property(e => e.idMembershipGroup)
+                    .HasMaxLength(2)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
             });
 
             modelBuilder.Entity<TblHealthStatus>(entity =>

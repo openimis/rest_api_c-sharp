@@ -22,6 +22,7 @@ namespace OpenImis.ModulesV3.MasterDataModule.Repositories
         List<RelationTypeModel> GetRelations();
         List<PhoneDefaultModel> GetPhoneDefaults();
         List<GenderTypeModel> GetGenders();
+        List<MembershipGroupModel> GetMembership();
 
     }
 }

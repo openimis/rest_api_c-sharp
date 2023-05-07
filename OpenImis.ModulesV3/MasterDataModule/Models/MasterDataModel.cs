@@ -21,5 +21,6 @@ namespace OpenImis.ModulesV3.MasterDataModule.Models
         public List<RelationTypeModel> Relations { get; set; }
         public List<PhoneDefaultModel> PhoneDefaults { get; set; }
         public List<GenderTypeModel> Genders { get; set; }
+        public List<MembershipGroupModel> MembershipGroup { get; set; }
     }
 }

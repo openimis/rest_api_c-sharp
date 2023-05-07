@@ -33,7 +33,8 @@ namespace OpenImis.ModulesV3.MasterDataModule.Logic
                 Professions = masterDataRepository.GetProfessions(),
                 Relations = masterDataRepository.GetRelations(),
                 PhoneDefaults = masterDataRepository.GetPhoneDefaults(),
-                Genders = masterDataRepository.GetGenders()
+                Genders = masterDataRepository.GetGenders(),
+                MembershipGroup = masterDataRepository.GetMembershipGroup()
             };
 
             return masterdata;

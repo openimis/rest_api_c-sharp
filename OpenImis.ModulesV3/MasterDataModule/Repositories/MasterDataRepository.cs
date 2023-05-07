@@ -354,5 +354,23 @@ namespace OpenImis.ModulesV3.MasterDataModule.Repositories
 
             return genders;
         }
+
+        public List<MembershipGroupModel> GetMembershipGroup()
+        {
+            List<MembershipGroupModel> membershipGroups;
+
+            using (var imisContext = new ImisDB())
+            {
+                membershipGroups = imisContext.TblMembershipGroup
+                    .Select(x => new MembershipGroupModel()
+                    {
+                        idMembershipGroup = x.idMembershipGroup,
+                        Name = x.Name
+                    })
+                    .ToList();
+            }
+
+            return membershipGroups;
+        }
     }
 }
