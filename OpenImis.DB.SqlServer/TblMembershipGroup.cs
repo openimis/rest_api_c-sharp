@@ -5,7 +5,7 @@ namespace OpenImis.DB.SqlServer
 {
     public partial class TblMembershipGroup
     {
-        public string idMembershipGroup { get; set; }
+        public int idMembershipGroup { get; set; }
         public string Name { get; set; }
     }
 }

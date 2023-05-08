@@ -4,7 +4,7 @@ namespace OpenImis.ModulesV3.MasterDataModule.Models
 {
 	public class MembershipGroupModel
 	{
-		public string idMembershipGroup { get; set; }
+		public int idMembershipGroup { get; set; }
 		public string Name { get; set; }
 	}
 }
