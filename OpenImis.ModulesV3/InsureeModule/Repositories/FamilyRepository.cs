@@ -95,6 +95,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                                     .Select(i => i.FamilyId)
                                     .FirstOrDefault();
 
+                    _logger.LogWarning("Family Id in CreateEnrolResponse - 98 - : " + familyId);
                     var family = imisContext.TblFamilies
                                 .Where(f => f.FamilyId == familyId && f.ValidityTo == null)
                                 .Include(f => f.TblInsuree)
