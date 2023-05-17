@@ -4,6 +4,9 @@ on:
     inputs:   
       tag:
         required: true
+      buildvariant:
+        required: true
+        default: "Release"
 
 jobs:
   publish-manual-docker-image:
@@ -18,5 +21,5 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build the openimis backend  Docker image
       run: |
-         docker build . --tag ghcr.io/openimis/openimis-rest_api:${{ github.event.inputs.tag }}
+         docker build . --build-arg BUILD-FLAVOUR=${{ github.event.inputs.buildvariant }} --tag ghcr.io/openimis/openimis-rest_api:${{ github.event.inputs.tag }}
          docker push ghcr.io/openimis/openimis-rest_api:${{ github.event.inputs.tag }}
