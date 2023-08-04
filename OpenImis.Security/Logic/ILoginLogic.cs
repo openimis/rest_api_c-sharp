@@ -7,5 +7,7 @@ namespace OpenImis.Security.Logic
     {
         UserData GetByUUID(Guid userUUID);
         UserData FindUser(string UserName, string Password);
+
+        UserModel GetUserDetails(Guid userUUID);
     }
 }

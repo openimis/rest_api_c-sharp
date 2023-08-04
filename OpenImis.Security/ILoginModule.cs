@@ -1,4 +1,6 @@
 ﻿using OpenImis.Security.Logic;
+using OpenImis.Security.Models;
+using System;
 
 namespace OpenImis.Security
 {

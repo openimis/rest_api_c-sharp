@@ -10,5 +10,9 @@ namespace OpenImis.Security.Repositories
     {
         UserData GetByUUID(Guid userUUID);
         List<UserData> FindUserByName(string UserName);
+
+        UserModel GetUserDetails(Guid userUUID);
+
+       
     }
 }

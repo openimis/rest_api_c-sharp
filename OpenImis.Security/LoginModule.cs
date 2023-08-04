@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using OpenImis.Security.Logic;
+using OpenImis.Security.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
