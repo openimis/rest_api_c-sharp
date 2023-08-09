@@ -81,5 +81,10 @@ namespace OpenImis.Security.Logic
 
             return stringBuilder.ToString();
         }
+
+        public UserModel GetUserDetails(Guid userUUID)
+        {
+            return loginRepository.GetUserDetails(userUUID);
+        }
     }
 }

@@ -144,7 +144,6 @@ namespace OpenImis.RestApi
             loggerFactory.AddLog4Net(loggingOptions);
 
             app.UseMiddleware<ErrorHandlerMiddleware>();
-
             if (env.IsDevelopment())
             {
                 loggerFactory.AddConsole(Configuration.GetSection("Logging"));

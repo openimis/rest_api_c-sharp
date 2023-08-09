@@ -79,6 +79,8 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblWards> TblWards { get; set; }
         public virtual DbSet<TblDistricts> TblDistricts { get; set; }
 
+        public virtual DbSet<TblRole> TblRole { get; set; }
+
         // Unable to generate entity type for table 'dbo.tblIMISDetaulsPhone'. Please see the warning messages.
         // Unable to generate entity type for table 'dbo.tblEmailSettings'. Please see the warning messages.
 
@@ -2679,12 +2681,14 @@ namespace OpenImis.DB.SqlServer
 
             modelBuilder.Entity<TblRoleRight>(entity =>
             {
-                entity.HasKey(e => e.RoleRightID);
+                entity.HasKey(e => new {e.RoleRightID, e.RoleID });
             });
 
             modelBuilder.Entity<TblUserRole>(entity =>
             {
-                entity.HasKey(e => e.UserRoleID);
+                entity.HasKey(e => new { e.UserID, e.RoleID });
+                
+                        
             });
 
             modelBuilder.Entity<TblIMISDefaultsPhone>(entity =>
