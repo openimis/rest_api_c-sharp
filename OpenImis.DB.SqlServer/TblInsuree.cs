@@ -22,6 +22,8 @@ namespace OpenImis.DB.SqlServer
         public string Chfid { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
+        public string ArabLastName { get; set; }
+        public string ArabOtherNames { get; set; }
         public DateTime Dob { get; set; }
         public string Gender { get; set; }
         public string Marital { get; set; }

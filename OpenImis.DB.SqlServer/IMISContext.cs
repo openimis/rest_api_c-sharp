@@ -1232,6 +1232,14 @@ namespace OpenImis.DB.SqlServer
                 entity.Property(e => e.OtherNames)
                     .IsRequired()
                     .HasMaxLength(100);
+                
+                entity.Property(e => e.ArabOtherNames)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.ArabLastName)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.Passport)
                     .HasColumnName("passport")
