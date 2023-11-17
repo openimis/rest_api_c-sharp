@@ -214,7 +214,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 var premiumImportedParameter = OutputParameter.CreateOutputParameter("@PremiumImported", SqlDbType.Int);
                 var premiumRejectedParameter = OutputParameter.CreateOutputParameter("@PremiumRejected", SqlDbType.Int);
 
-                var sql = "exec @RV = uspConsumeEnrollments @XML, @Source, @SourceVersion, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
+                var sql = "exec @RV = uspConsumeEnrollments @XML, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
                     "@InsureeSent OUT, @InsureeUpd OUT, @InsureeImported OUT, " +
                     "@PolicySent OUT, @PolicyImported OUT, @PolicyRejected OUT, @PolicyChanged OUT," +
                     "@PremiumSent OUT, @PremiumImported OUT, @PremiumRejected OUT";
@@ -224,7 +224,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                     cmd.CommandText = sql;
 
-                    cmd.Parameters.AddRange(new[] { xmlParameter, source, sourceVersion, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
+                    cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
                                             familyRejectedParameter, insureeSentParameter, insureeUpdParameter, insureeImportedParameter, policySentParameter,
                                             policyImportedParameter, policyRejectedParameter, policyChangedParameter, premiumSentParameter, premiumImportedParameter,
                                             premiumRejectedParameter });
@@ -239,6 +239,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                             while (reader.Read())
                             {
                                 Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                Console.WriteLine("Error/Warning: " + reader.GetValue(0));
                             }
                         } while (reader.NextResult());
                     }
@@ -247,6 +248,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 InsureeUpd = insureeUpdParameter.Value == DBNull.Value ? 0 : (int)insureeUpdParameter.Value;
                 InsureeImported = insureeImportedParameter.Value == DBNull.Value ? 0 : (int)insureeImportedParameter.Value;
                 RV = (int)returnParameter.Value;
+                Console.WriteLine("XML: " + XML);
 
                 if (RV == 0 && (InsureeImported > 0 || InsureeUpd > 0))
                 {
