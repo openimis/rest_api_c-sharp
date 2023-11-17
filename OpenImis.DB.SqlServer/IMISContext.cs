@@ -1251,9 +1251,9 @@ namespace OpenImis.DB.SqlServer
 
                 entity.Property(e => e.PhotoId).HasColumnName("PhotoID");
 
-                entity.Property(e => e.RowId)
-                    .HasColumnName("RowID")
-                    .IsRowVersion();
+                // entity.Property(e => e.RowId)
+                //     .HasColumnName("RowID")
+                //     .IsRowVersion();
 
                 entity.Property(e => e.TypeOfId).HasMaxLength(1);
 

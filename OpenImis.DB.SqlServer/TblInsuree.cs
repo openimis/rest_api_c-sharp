@@ -37,7 +37,7 @@ namespace OpenImis.DB.SqlServer
         public DateTime? ValidityTo { get; set; }
         public int? LegacyId { get; set; }
         public int AuditUserId { get; set; }
-        public byte[] RowId { get; set; }
+        // public byte[] RowId { get; set; }
         public short? Relationship { get; set; }
         public short? Profession { get; set; }
         public short? Education { get; set; }
