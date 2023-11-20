@@ -82,7 +82,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             return response;
         }
 
-        public NewFamilyResponse CreateEnrolResponse(EnrolFamilyModel model)
+        public NewFamilyResponse CreateEnrolResponse(EnrolFamilyModel model, String NewGeneretedChfID)
         {
             var response = new NewFamilyResponse();
 
@@ -91,7 +91,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 foreach (var fam in model.Family)
                 {
 
-                    var familyId = imisContext.TblInsuree.Where(i => i.Chfid == fam.HOFCHFID && i.IsHead == true && i.ValidityTo == null)
+                    var familyId = imisContext.TblInsuree.Where(i => i.Chfid == NewGeneretedChfID && i.IsHead == true && i.ValidityTo == null)
                                     .Select(i => i.FamilyId)
                                     .FirstOrDefault();
 
@@ -190,6 +190,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
 
             int RV = -99;
+            String GeneretedChfID = "0";
             int InsureeUpd;
             int InsureeImported;
 
@@ -240,6 +241,11 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                             {
                                 Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
                                 Console.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                if (reader.GetValue(0).ToString().Contains("GeneretedChfID")){
+                                    var lst = reader.GetValue(0).ToString().Split("GeneretedChfID");
+                                    Console.WriteLine("Nouvel CHFID Genere " + lst[1]);
+                                    GeneretedChfID = lst[1];
+                                }
                             }
                         } while (reader.NextResult());
                     }
@@ -277,7 +283,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             newFamily.Response = RV;
             if (RV == 0)
             {
-                newFamily = CreateEnrolResponse(model);
+                newFamily = CreateEnrolResponse(model, GeneretedChfID);
 
                 // Update the control number
                 newFamily.Response = UpdateControlNumber(model, newFamily);

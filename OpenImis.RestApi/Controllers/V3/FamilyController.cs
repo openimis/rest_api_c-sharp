@@ -69,7 +69,6 @@ namespace OpenImis.RestApi.Controllers.V3
             Guid userUUID;
             int officerId;
             Console.WriteLine("Hello World!");
-            Console.WriteLine("kevel");
 
             try
             {

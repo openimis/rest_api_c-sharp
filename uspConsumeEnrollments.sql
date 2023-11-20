@@ -103,7 +103,7 @@ ALTER PROCEDURE [dbo].[uspConsumeEnrollments](
         SET @parentlocation3 = (Select ParentLocationId from tblLocations where LocationId=@parentlocation2);
 
     	SET @RandomNumberId = @locationCode3 + @locationCode2 + @locationCode1 + @genderXml + CAST(@randomNumId AS VARCHAR(9))
-        INSERT into @tblResult values(@RandomNumberId)
+        INSERT into @tblResult values('GeneretedChfID' + @RandomNumberId)
         --SET @Query = (N'SELECT @XML = CAST(X as XML) FROM OPENROWSET(BULK  '''+ @File +''' ,SINGLE_BLOB) AS T(X)')
 
 		--EXECUTE SP_EXECUTESQL @Query,N'@XML XML OUTPUT',@XML OUTPUT
