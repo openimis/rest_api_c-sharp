@@ -14,6 +14,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
             Policies = new List<Policy>();
             Premiums = new List<Premium>();
             InsureePolicies = new List<InsureePolicy>();
+            InsureeAttachments = new List<InsureeAttachments>();
         }
 
         public FileInfo FileInfo { get; set; }
@@ -22,6 +23,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public List<Policy> Policies { get; set; }
         public List<Premium> Premiums { get; set; }
         public List<InsureePolicy> InsureePolicies { get; set; }
+        public List<InsureeAttachments> InsureeAttachments { get; set; }
        
     }
 }

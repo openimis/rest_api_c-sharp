@@ -12,6 +12,7 @@ namespace OpenImis.DB.SqlServer
             TblFamilies = new HashSet<TblFamilies>();
             TblHealthStatus = new HashSet<TblHealthStatus>();
             TblInsureePolicy = new HashSet<TblInsureePolicy>();
+            TblInsureeAttachments = new HashSet<TblInsureeAttachments>();
             TblPolicyRenewalDetails = new HashSet<TblPolicyRenewalDetails>();
             TblPolicyRenewals = new HashSet<TblPolicyRenewals>();
         }
@@ -63,6 +64,7 @@ namespace OpenImis.DB.SqlServer
         public ICollection<TblFamilies> TblFamilies { get; set; }
         public ICollection<TblHealthStatus> TblHealthStatus { get; set; }
         public ICollection<TblInsureePolicy> TblInsureePolicy { get; set; }
+        public ICollection<TblInsureeAttachments> TblInsureeAttachments { get; set; }
         public ICollection<TblPolicyRenewalDetails> TblPolicyRenewalDetails { get; set; }
         public ICollection<TblPolicyRenewals> TblPolicyRenewals { get; set; }
     }

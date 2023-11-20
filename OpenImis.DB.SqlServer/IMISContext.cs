@@ -43,6 +43,7 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblImisdefaults> TblImisdefaults { get; set; }
         public virtual DbSet<TblInsuree> TblInsuree { get; set; }
         public virtual DbSet<TblInsureePolicy> TblInsureePolicy { get; set; }
+        public virtual DbSet<TblInsureeAttachments> TblInsureeAttachments { get; set; }
         public virtual DbSet<TblItems> TblItems { get; set; }
         public virtual DbSet<TblLanguages> TblLanguages { get; set; }
         public virtual DbSet<TblLegalForms> TblLegalForms { get; set; }
@@ -1349,6 +1350,49 @@ namespace OpenImis.DB.SqlServer
                     .WithMany(p => p.TblInsureePolicy)
                     .HasForeignKey(d => d.PolicyId)
                     .HasConstraintName("FK_tblInsureePolicy_tblPolicy");
+            });
+
+            modelBuilder.Entity<TblInsureeAttachments>(entity =>
+            {
+                entity.HasKey(e => e.idAttachment);
+
+                entity.ToTable("tblattachment");
+
+                entity.Property(e => e.idAttachment).HasColumnName("idAttachment");
+
+                entity.Property(e => e.Folder)
+                    .HasColumnName("Folder")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.Filename)
+                    .HasColumnName("FileName")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.Title)
+                    .HasColumnName("Title")
+                    .HasMaxLength(250);
+
+                entity.HasIndex(e => e.InsureeId )
+                .HasName("NCI_tblInsureeAttachments_InsureeID");
+
+                entity.Property(e => e.InsureeId).HasColumnName("InsureeID");
+
+                entity.Property(e => e.Date)
+                    .HasColumnType("datetime")
+                    .HasColumnName("AttachmentDate")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Document).HasColumnType("ntext");
+
+                entity.Property(e => e.Mime)
+                    .HasColumnName("Mime")
+                    .HasMaxLength(250);
+
+                entity.HasOne(d => d.Insuree)
+                    .WithMany(p => p.TblInsureeAttachments)
+                    .HasForeignKey(d => d.InsureeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TblInsureeAttachmentstblInsuree-InsureeID");
             });
 
             modelBuilder.Entity<TblItems>(entity =>
