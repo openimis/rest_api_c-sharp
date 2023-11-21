@@ -17,7 +17,7 @@ namespace OpenImis.DB.SqlServer
         public string Filename { get; set; }
         public string Title { get; set; }
         public string Mime { get; set; }
-        public string Document { get; set; }
+        public string Content { get; set; }
 
         // public ICollection<TblInsuree> TblInsuree { get; set; }
         public TblInsuree Insuree { get; set; }

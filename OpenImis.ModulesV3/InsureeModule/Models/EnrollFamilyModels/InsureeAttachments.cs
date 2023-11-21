@@ -13,6 +13,6 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public string Filename { get; set; }
         public string Title { get; set; }
         public string Mime { get; set; }
-        public string Document { get; set; }
+        public string Content { get; set; }
     }
 }

@@ -1382,7 +1382,7 @@ namespace OpenImis.DB.SqlServer
                     .HasColumnName("AttachmentDate")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Document).HasColumnType("ntext");
+                entity.Property(e => e.Content).HasColumnType("ntext");
 
                 entity.Property(e => e.Mime)
                     .HasColumnName("Mime")
