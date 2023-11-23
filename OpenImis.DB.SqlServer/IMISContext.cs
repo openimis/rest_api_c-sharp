@@ -44,6 +44,8 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblInsuree> TblInsuree { get; set; }
         public virtual DbSet<TblInsureePolicy> TblInsureePolicy { get; set; }
         public virtual DbSet<TblInsureeAttachments> TblInsureeAttachments { get; set; }
+        public virtual DbSet<tblServiceContainedPackage> tblServiceContainedPackage { get; set; }
+        public virtual DbSet<tblProductContainedPackage> tblProductContainedPackage { get; set; }
         public virtual DbSet<TblItems> TblItems { get; set; }
         public virtual DbSet<TblLanguages> TblLanguages { get; set; }
         public virtual DbSet<TblLegalForms> TblLegalForms { get; set; }
@@ -1398,6 +1400,51 @@ namespace OpenImis.DB.SqlServer
                     .HasConstraintName("FK_TblInsureeAttachmentstblInsuree-InsureeID");
             });
 
+            modelBuilder.Entity<tblServiceContainedPackage>(entity =>
+            {
+                entity.HasKey(e => e.id);
+
+                entity.ToTable("tblServiceContainedPackage");
+
+                entity.Property(e => e.id).HasColumnName("idSCP");
+
+                entity.Property(e => e.ServiceId).HasColumnName("ServiceId");
+
+                entity.Property(e => e.servicelinkedService).HasColumnName("ServiceLinked");;
+
+                entity.Property(e => e.qty_provided).HasColumnName("qty");
+
+                entity.Property(e => e.scpDate).HasColumnName("created_date");
+
+                entity.Property(e => e.price_asked).HasColumnName("price");
+
+                entity.Property(e => e.status).HasColumnName("status");
+
+            });
+
+
+            modelBuilder.Entity<tblProductContainedPackage>(entity =>
+            {
+                entity.HasKey(e => e.id);
+
+                entity.ToTable("tblProductContainedPackage");
+
+                entity.Property(e => e.id).HasColumnName("idPCP");
+
+                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+
+                entity.Property(e => e.servicelinkedItem).HasColumnName("ServiceID");;
+
+                entity.Property(e => e.qty_provided).HasColumnName("qty");
+
+                entity.Property(e => e.pcpDate).HasColumnName("created_date");
+
+                entity.Property(e => e.price_asked).HasColumnName("price");
+
+                entity.Property(e => e.status).HasColumnName("status");
+
+            });
+
             modelBuilder.Entity<TblItems>(entity =>
             {
                 entity.HasKey(e => e.ItemId);
@@ -2617,6 +2664,9 @@ namespace OpenImis.DB.SqlServer
                 entity.Property(e => e.ServName)
                     .IsRequired()
                     .HasMaxLength(100);
+
+                entity.Property(e => e.ServPackageType)
+                    .HasMaxLength(1);
 
                 entity.Property(e => e.ServType)
                     .IsRequired()
