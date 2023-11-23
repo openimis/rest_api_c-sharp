@@ -234,6 +234,9 @@ namespace OpenImis.DB.SqlServer
                     .HasMaxLength(1)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PrescriberType)
+                    .IsUnicode(false);
+
                 entity.HasOne(d => d.AdjusterNavigation)
                     .WithMany(p => p.TblClaim)
                     .HasForeignKey(d => d.Adjuster)

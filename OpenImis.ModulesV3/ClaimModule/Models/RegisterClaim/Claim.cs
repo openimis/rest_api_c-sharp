@@ -32,6 +32,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
         public string ICDCode3 { get; set; }
         public string ICDCode4 { get; set; }
         public string VisitType { get; set; }
+        public string PrescriberType { get; set; }
     }
 
     public class Item
@@ -39,6 +40,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
         public string ItemCode { get; set; }
         public decimal ItemPrice { get; set; }
         public decimal ItemQuantity { get; set; }
+        public List<SubItems> SubItems { get; set; }
     }
 
     public class Service
@@ -46,5 +48,22 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
         public string ServiceCode { get; set; }
         public decimal ServicePrice { get; set; }
         public decimal ServiceQuantity { get; set; }
+        public List<SubServices> SubServices { get; set; }
+    }
+
+    public class SubServices
+    {
+        public string Code { get; set; }
+        public decimal Quantity { get; set; }
+        public decimal Price { get; set; }
+        public string Type { get; set; }
+    }
+
+    public class SubItems
+    {
+        public string Code { get; set; }
+        public decimal Quantity { get; set; }
+        public decimal Price { get; set; }
+        public string Type { get; set; }
     }
 }

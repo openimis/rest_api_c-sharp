@@ -54,6 +54,8 @@ ALTER PROCEDURE [dbo].[uspConsumeEnrollments](
     DECLARE @randomNumId DECIMAL(18,0)
     DECLARE @RandomNumberId VARCHAR(13)
 
+    DECLARE @tblAttachments TABLE(Folder NVARCHAR(255), FileName NVARCHAR(255), Title NVARCHAR(255), Mime NVARCHAR(255), Content NVARCHAR(Max))
+
 	BEGIN TRY
 
 		SET @randomNumId = RIGHT('0000' + CAST(CONVERT(INT, (RAND() * 99999)+1) AS VARCHAR(5)), 5)
@@ -162,6 +164,13 @@ ALTER PROCEDURE [dbo].[uspConsumeEnrollments](
 		T.I.value('(Vulnerability)[1]','BIT')
 		FROM @XML.nodes('Enrolment/Insurees/Insuree') AS T(I)
 
+        -- SET	@Folder = NULL
+        --         SET	@FileName= (SELECT T.[A].value('(Filename)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T([A]))
+        --         SET	@Title= (SELECT T.[A].value('(Title)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T([A]))
+        --         -- SET	@Mime= (SELECT T.A.value('(Mime)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
+        --         SET	@Mime = 'image/png'
+        --         SET	@Content= (SELECT T.[A].value('(Content)[1]','NVARCHAR(Max)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T([A]))
+
 		--Get total number of Insurees sent via XML
 		SELECT @InsureeSent = COUNT(*) FROM @tblInsuree
 
@@ -239,11 +248,11 @@ ALTER PROCEDURE [dbo].[uspConsumeEnrollments](
 			END
 
 			DECLARE @AuditUserId INT =-2,@AssociatedPhotoFolder NVARCHAR(255), @OfficerID INT
-            DECLARE @Folder NVARCHAR(255)
-            DECLARE @FileName NVARCHAR(255)
-            DECLARE @Title NVARCHAR(255)
-            DECLARE @Mime NVARCHAR(255)
-            DECLARE @Document NVARCHAR(Max)
+            -- DECLARE @Folder NVARCHAR(255)
+            -- DECLARE @FileName NVARCHAR(255)
+            -- DECLARE @Title NVARCHAR(255)
+            -- DECLARE @Mime NVARCHAR(255)
+            -- DECLARE @Content NVARCHAR(Max)
 
 			IF ( @XML.exist('(Enrolment/FileInfo)')=1 )
 				SET	@AuditUserId= (SELECT T.PR.value('(UserId)[1]','INT') FROM @XML.nodes('Enrolment/FileInfo') AS T(PR))
@@ -252,16 +261,18 @@ ALTER PROCEDURE [dbo].[uspConsumeEnrollments](
 				SET	@OfficerID= (SELECT T.PR.value('(OfficerId)[1]','INT') FROM @XML.nodes('Enrolment/FileInfo') AS T(PR))
 				SET @AssociatedPhotoFolder=(SELECT AssociatedPhotoFolder FROM tblIMISDefaults)
             IF ( @XML.exist('(Enrolment/InsureeAttachments/InsureeAttachments)')=1 )
-                SET	@Folder= (SELECT T.A.value('(Folder)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
-                SET	@FileName= (SELECT T.A.value('(Filename)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
-                SET	@Title= (SELECT T.A.value('(Title)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
-                SET	@Mime= (SELECT T.A.value('(Mime)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
-                SET	@Document= (SELECT T.A.value('(Document)[1]','NVARCHAR(Max)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
-        INSERT INTO @tblResult VALUES ('Folder: ' + @Folder)
-        INSERT INTO @tblResult VALUES ('Filename: ' + @FileName)
-        INSERT INTO @tblResult VALUES ('Title: ' + @Title)
-        INSERT INTO @tblResult VALUES ('Mime: ' + @Mime)
-        INSERT INTO @tblResult VALUES ('Document: ' + @Document)
+                -- SET	@Folder= (SELECT T.A.value('(Folder)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
+                -- SET	@Folder = NULL
+                -- SET	@FileName= (SELECT T.[A].value('(Filename)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T([A]))
+                -- SET	@Title= (SELECT T.[A].value('(Title)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T([A]))
+                -- -- SET	@Mime= (SELECT T.A.value('(Mime)[1]','NVARCHAR(255)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(A))
+                -- SET	@Mime = 'image/png'
+                -- SET	@Content= (SELECT T.[A].value('(Content)[1]','NVARCHAR(Max)') FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T([A]))
+        -- INSERT INTO @tblResult VALUES ('Folder: ' + @Folder)
+        -- INSERT INTO @tblResult VALUES ('Filename: ' + @FileName)
+        -- INSERT INTO @tblResult VALUES ('Title: ' + @Title)
+        -- INSERT INTO @tblResult VALUES ('Mime: ' + @Mime)
+        -- INSERT INTO @tblResult VALUES ('Content: ' + @Content)
 
 		/********************************************************************************************************
 										VALIDATING FILE				
@@ -885,8 +896,19 @@ ALTER PROCEDURE [dbo].[uspConsumeEnrollments](
 									END
 
 								-- Insertion des pieces jointes
+                                INSERT INTO @tblAttachments(Folder, [FileName], Title, Mime, Content)
+                                SELECT
+                                NULL,
+                                T.I.value('(Filename)[1]','NVARCHAR(100)'),
+                                T.I.value('(Title)[1]','NVARCHAR(100)'),
+                                'image/png',
+                                T.I.value('(Content)[1]','NVARCHAR(Max)')
+                                FROM @XML.nodes('Enrolment/InsureeAttachments/InsureeAttachments') AS T(I)
+
                                 INSERT INTO tblattachment(Title, [FileName], Folder, Mime, AttachmentDate, document, InsureeID)
-                                SELECT @Title, @FileName, @Folder, @Mime, GETDATE(), @Document, @NewInsureeId
+                                SELECT Title, FileName, Folder, Mime, GETDATE(), Content, @NewInsureeId
+                                FROM @tblAttachments
+                                
                                 --Now we will insert new insuree in the table tblInsureePolicy for only existing policies
 								IF EXISTS(SELECT 1 FROM tblPolicy P 
 								INNER JOIN tblFamilies F ON F.FamilyID = P.FamilyID

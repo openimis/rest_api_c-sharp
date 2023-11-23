@@ -78,6 +78,14 @@ namespace OpenImis.ModulesV3.ClaimModule.Logic
                         errorCode = Errors.Claim.Rejected;
                         message = $"Claim rejected";
                         break;
+                    case 2011:
+                        errorCode = Errors.Claim.InvalidService;
+                        message = "One or more Subservices are invalid";
+                        break;
+                    case 2012:
+                        errorCode = Errors.Claim.InvalidService;
+                        message = "One or more Subitems are invalid";
+                        break;
                     default:
                         errorCode = Errors.Claim.UnexpectedException;
                         message = $"Unhandled exception occured ({result}). Please contact the system administrator";
