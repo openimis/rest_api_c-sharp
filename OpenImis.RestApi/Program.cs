@@ -49,16 +49,16 @@ namespace OpenImis.RestApi
                     //var secretsMode = GetSecretsMode(hostingContext.HostingEnvironment);
                     //config.AddOpenImisConfig(secretsMode, "REGISTRY_CONFIG_FILE");
                     //config.AddOpenImisConfig(SecretsMode.LocalFile, $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json");
-                    config.AddJsonFile($"{path}appsettings.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"{path}appsettings.json", optional: false, reloadOnChange: false);
 #if DEBUG
-                    config.AddJsonFile($"{path}appsettings.Development.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"{path}appsettings.Development.json", optional: false, reloadOnChange: false);
 #else
-                    config.AddJsonFile($"{path}appsettings.Production.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"{path}appsettings.Production.json", optional: false, reloadOnChange: false);
 #endif
 #if CHF
-                    config.AddJsonFile($"{path}appsettings.CHF.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"{path}appsettings.CHF.json", optional: false, reloadOnChange: false);
 #endif
-                    config.AddJsonFile($"openImisModules.json", optional: true, reloadOnChange: true);
+                    config.AddJsonFile($"openImisModules.json", optional: true, reloadOnChange: false);
                 })
                 .UseStartup<Startup>();
 
