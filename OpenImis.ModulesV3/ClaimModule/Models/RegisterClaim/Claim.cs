@@ -40,7 +40,6 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
         public string ItemCode { get; set; }
         public decimal ItemPrice { get; set; }
         public decimal ItemQuantity { get; set; }
-        public List<SubItems> SubItems { get; set; }
     }
 
     public class Service
@@ -48,18 +47,10 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
         public string ServiceCode { get; set; }
         public decimal ServicePrice { get; set; }
         public decimal ServiceQuantity { get; set; }
-        public List<SubServices> SubServices { get; set; }
+        public List<SubServicesItems> SubServicesItems { get; set; }
     }
 
-    public class SubServices
-    {
-        public string Code { get; set; }
-        public decimal Quantity { get; set; }
-        public decimal Price { get; set; }
-        public string Type { get; set; }
-    }
-
-    public class SubItems
+    public class SubServicesItems
     {
         public string Code { get; set; }
         public decimal Quantity { get; set; }

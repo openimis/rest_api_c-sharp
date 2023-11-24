@@ -20,24 +20,22 @@ ALTER PROCEDURE [dbo].[uspRestAPIUpdateClaimFromPhone]
 6	--Claimed amount is 0
 7	--Invalid ItemCode
 8	--Invalid ServiceCode
-2010	--Invalid SubServiceCode
-2011	--Invalid SubItemCode
 9	--Invalid Claim Admin
 */
 
 AS
 BEGIN
-
 	SET XACT_ABORT ON
 
 	DECLARE @Query NVARCHAR(3000)
 
 	DECLARE @ClaimID INT
+	DECLARE @ClaimServiceID INT
 	DECLARE @ClaimDate DATE
 	DECLARE @HFCode NVARCHAR(8)
 	DECLARE @ClaimAdmin NVARCHAR(8)
-	DECLARE @ClaimCode NVARCHAR(8)
-	DECLARE @CHFID NVARCHAR(13)
+	DECLARE @ClaimCode NVARCHAR(50)
+	DECLARE @CHFID NVARCHAR(50)
 	DECLARE @StartDate DATE
 	DECLARE @EndDate DATE
 	DECLARE @ICDCode NVARCHAR(6)
@@ -78,6 +76,13 @@ BEGIN
 			IF NOT OBJECT_ID('tempdb..#tblService') IS NULL DROP TABLE #tblService
 			CREATE TABLE #tblService(ServiceCode NVARCHAR(6),ServicePrice DECIMAL(18,2), ServiceQuantity INT)
 
+			IF NOT OBJECT_ID('temptblServiceService') IS NULL DROP TABLE temptblServiceService
+			CREATE TABLE temptblServiceService(ServiceCode NVARCHAR(6),price DECIMAL(18,2), qty INT, ServiceLinked NVARCHAR(6))
+
+			IF NOT OBJECT_ID('temptblServiceItems') IS NULL DROP TABLE temptblServiceItems
+			CREATE TABLE temptblServiceItems(ItemCode NVARCHAR(6),ItemPrice DECIMAL(18,2), ItemQuantity INT, idService INT)
+
+
 			--SET @Query = (N'SELECT @XML = CAST(X as XML) FROM OPENROWSET(BULK '''+ @FileName +''',SINGLE_BLOB) AS T(X)')
 
 			--EXECUTE SP_EXECUTESQL @Query,N'@XML XML OUTPUT',@XML OUTPUT
@@ -86,8 +91,8 @@ BEGIN
 			@ClaimDate = Claim.value('(ClaimDate)[1]','DATE'),
 			@HFCode = Claim.value('(HFCode)[1]','NVARCHAR(8)'),
 			@ClaimAdmin = Claim.value('(ClaimAdmin)[1]','NVARCHAR(8)'),
-			@ClaimCode = Claim.value('(ClaimCode)[1]','NVARCHAR(8)'),
-			@CHFID = Claim.value('(CHFID)[1]','NVARCHAR(13)'),
+			@ClaimCode = Claim.value('(ClaimCode)[1]','NVARCHAR(50)'),
+			@CHFID = Claim.value('(CHFID)[1]','NVARCHAR(50)'),
 			@StartDate = Claim.value('(StartDate)[1]','DATE'),
 			@EndDate = Claim.value('(EndDate)[1]','DATE'),
 			@ICDCode = Claim.value('(ICDCode)[1]','NVARCHAR(6)'),
@@ -116,6 +121,22 @@ BEGIN
 			CONVERT(DECIMAL(18,2),T.[Services].value('(ServicePrice)[1]','DECIMAL(18,2)')),
 			CONVERT(DECIMAL(18,2),T.[Services].value('(ServiceQuantity)[1]','NVARCHAR(15)'))
 			FROM @XML.nodes('Claim/Services/Service') AS T([Services])
+
+            INSERT INTO temptblServiceService(ServiceCode, price, qty)
+			SELECT
+			T.[ServicesServices].value('(Code)[1]','NVARCHAR(6)'),
+			CONVERT(DECIMAL(18,2),T.[ServicesServices].value('(Price)[1]','DECIMAL(18,2)')),
+			CONVERT(DECIMAL(18,2),T.[ServicesServices].value('(Quantity)[1]','NVARCHAR(15)'))
+            FROM @XML.nodes('Claim/Services/Service/SubServicesItems/SubServicesItems') AS T([ServicesServices])
+            where T.[ServicesServices].value('(Type)[1]','NVARCHAR(1)') = 'S'
+
+            INSERT INTO temptblServiceItems(ItemCode,ItemPrice,ItemQuantity)
+			SELECT
+			T.[Services].value('(Code)[1]','NVARCHAR(6)'),
+			CONVERT(DECIMAL(18,2),T.[Services].value('(Price)[1]','DECIMAL(18,2)')),
+			CONVERT(DECIMAL(18,2),T.[Services].value('(Quantity)[1]','NVARCHAR(15)'))
+			FROM @XML.nodes('Claim/Services/Service/SubServicesItems/SubServicesItems') AS T([Services])
+            where T.[Services].value('(Type)[1]','NVARCHAR(1)') = 'I'
 
 			--isValid HFCode
 
@@ -179,50 +200,23 @@ BEGIN
 			WHERE I.ItemCode IS NULL AND I.ValidityTo IS NULL)
 				RETURN 7
 
+			--isValid ServiceItemCode
+			IF EXISTS (SELECT I.ItemCode
+			FROM tblItems I FULL OUTER JOIN temptblServiceItems TI ON I.ItemCode COLLATE DATABASE_DEFAULT = TI.ItemCode COLLATE DATABASE_DEFAULT
+			WHERE I.ItemCode IS NULL AND I.ValidityTo IS NULL)
+				RETURN 7
+
 			--isValid ServiceCode
 			IF EXISTS(SELECT S.ServCode
 			FROM tblServices S FULL OUTER JOIN #tblService TS ON S.ServCode COLLATE DATABASE_DEFAULT = TS.ServiceCode COLLATE DATABASE_DEFAULT
 			WHERE S.ServCode IS NULL AND S.ValidityTo IS NULL)
 				RETURN 8
 
-
-            DECLARE @tblCodesList TABLE(id INT IDENTITY(1,1), Code NVARCHAR(Max))
-            INSERT into @tblCodesList
-            SELECT
-			T.I.value('(Code)[1]','NVARCHAR(Max)')
-			FROM @XML.nodes('Claim/Services/Service/SubServices/*') AS T(I)
-            DECLARE @totalInDatabase INT
-            DECLARE @TotalSent INT
-            
-            SET @totalInDatabase = (SELECT Count(*) FROM tblServices WHERE ValidityTo is NULL AND ServCode IN (
-                SELECT Code FROM @tblCodesList
-            ))
-            SELECT @totalInDatabase
-            SET @TotalSent = (SELECT COUNT (DISTINCT Code) FROM @tblCodesList)
-            SELECT @TotalSent
-            -- Some subservices are not found in database
-            IF @TotalSent > @totalInDatabase
-                RETURN 2011
-
-
-            DECLARE @tblItemsCodesList TABLE(id INT IDENTITY(1,1), Code NVARCHAR(Max))
-            INSERT into @tblItemsCodesList
-            SELECT
-			T.I.value('(Code)[1]','NVARCHAR(Max)')
-			FROM @XML.nodes('Claim/Items/Item/SubItems/*') AS T(I)
-            DECLARE @totalItemsInDatabase INT
-            DECLARE @TotalItemsSent INT
-            
-            SET @totalItemsInDatabase = (SELECT Count(*) FROM tblItems WHERE ValidityTo is NULL AND ItemCode IN (
-                SELECT Code FROM @tblItemsCodesList
-            ))
-            SELECT @totalItemsInDatabase
-            SET @TotalItemsSent = (SELECT COUNT (DISTINCT Code) FROM @tblItemsCodesList)
-            SELECT @TotalItemsSent
-            -- Some subitems are not found in Database
-            IF @TotalItemsSent > @totalItemsInDatabase
-                RETURN 2012
-
+			--isValid ServiceServiceCode
+			IF EXISTS(SELECT S.ServCode
+			FROM tblServices S FULL OUTER JOIN temptblServiceService TS ON S.ServCode COLLATE DATABASE_DEFAULT = TS.ServiceCode COLLATE DATABASE_DEFAULT
+			WHERE S.ServCode IS NULL AND S.ValidityTo IS NULL)
+				RETURN 8
 
 			--isValid Claim Admin
 			IF @isClaimAdminRequired = 1
@@ -287,49 +281,19 @@ BEGIN
 
 						UPDATE tblClaim SET Claimed = ISNULL(@TotalItems,0) + ISNULL(@TotalServices,0)
 						WHERE ClaimID = @ClaimID
-            -- Get the recently inserted id, the one of the Claim_Service
-            DECLARE @ClaimServiceID INT
-            SELECT @ClaimServiceID = SCOPE_IDENTITY();
             
-            DECLARE @tblQuantityList TABLE(id INT IDENTITY(1,1), Qty INT)
-            INSERT into @tblQuantityList
-            SELECT
-            T.I.value('(Quantity)[1]','INT')
-			FROM @XML.nodes('Claim/Services/Service/SubServices/*') AS T(I)
 
-            DECLARE @tblPriceList TABLE(id INT IDENTITY(1,1), Price DECIMAL(18,2))
-            INSERT into @tblPriceList
-            SELECT
-            CONVERT(DECIMAL(18,2),T.I.value('(Price)[1]','DECIMAL(18,2)'))
-			FROM @XML.nodes('Claim/Services/Service/SubServices/*') AS T(I)
-   
+            SELECT @ClaimServiceID  = IDENT_CURRENT('tblClaimServices');
 
-            INSERT INTO tblClaimServicesService(claimlinkedService, qty_displayed, price, ServiceId, qty_provided, created_date)
-            SELECT TOP(6) @ClaimServiceID, GG.Qty, PL.Price, 
-            (SELECT TOP(1) ServiceID FROM tblServices WHERE ServCode = T.Code),
-            (SELECT TOP(1) qty FROM tblServiceContainedPackage WHERE ServiceId = (SELECT TOP(1) ServiceID FROM tblServices WHERE ServCode = T.Code)), 
-            GETDATE()
-            FROM @tblCodesList T INNER JOIN @tblQuantityList GG ON GG.id = T.id INNER JOIN @tblPriceList PL ON GG.id = PL.id
+            INSERT INTO tblClaimServicesService(ServiceID, qty_provided, qty_displayed, price, claimlinkedService,created_date)
+			SELECT ts.ServiceID,t.qty,t.qty,t.price,@ClaimServiceID, getdate()
+			FROM temptblServiceService T
+            LEFT OUTER JOIN tblServices ts on t.ServiceCode COLLATE DATABASE_DEFAULT = ts.ServCode
 
-            DECLARE @tblItemsQuantityList TABLE(id INT IDENTITY(1,1), Qty INT)
-            INSERT into @tblItemsQuantityList
-            SELECT
-            T.I.value('(Quantity)[1]','INT')
-			FROM @XML.nodes('Claim/Items/Item/SubItems/*') AS T(I)
-
-            DECLARE @tblListOfItemsPrices TABLE(id INT IDENTITY(1,1), Price DECIMAL(18,2))
-            INSERT into @tblListOfItemsPrices
-            SELECT
-            CONVERT(DECIMAL(18,2),T.I.value('(Price)[1]','DECIMAL(18,2)'))
-			FROM @XML.nodes('Claim/Items/Item/SubItems/*') AS T(I) 
-
-            SELECT @ClaimServiceID
-            INSERT INTO tblClaimServicesItems(ClaimServiceID, qty_displayed, price, ItemID, qty_provided, created_date)
-            SELECT TOP(6) @ClaimServiceID, QL.Qty, IL.Price,
-            (SELECT TOP(1) ItemID FROM tblItems WHERE ItemCode = T.Code),
-            (SELECT TOP(1) qty FROM tblProductContainedPackage WHERE ItemID = (SELECT TOP(1) ItemID FROM tblItems WHERE ItemCode = T.Code)), 
-            GETDATE()
-            FROM @tblItemsCodesList T INNER JOIN @tblItemsQuantityList QL ON QL.id = T.id INNER JOIN @tblListOfItemsPrices IL ON QL.id = IL.id
+            INSERT INTO tblClaimServicesItems(ItemID, qty_provided, qty_displayed, price, ClaimServiceID,created_date)
+			SELECT ti.ItemID,t.ItemQuantity,t.ItemQuantity,t.ItemPrice,@ClaimServiceID, getdate()
+			FROM temptblServiceItems t
+            LEFT OUTER JOIN tblItems ti on t.ItemCode COLLATE DATABASE_DEFAULT = ti.ItemCode
 
 		COMMIT TRAN CLAIM
 
@@ -352,8 +316,6 @@ BEGIN
 		RETURN -1
 	END CATCH
 
-	SELECT Result FROM @tblResult;
-    RETURN 0
+	RETURN 0
 END
-
 GO
