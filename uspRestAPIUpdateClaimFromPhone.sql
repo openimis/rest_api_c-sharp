@@ -260,30 +260,6 @@ BEGIN
 			INNER JOIN tblItems I  ON T.ItemCode COLLATE DATABASE_DEFAULT = I.ItemCode COLLATE DATABASE_DEFAULT AND I.ValidityTo IS NULL
 			LEFT OUTER JOIN PLID ON PLID.ItemID = I.ItemID
 
-            -- Get the recently inserted id, the one of the Claim_item
-            DECLARE @ClaimItemID INT
-            SELECT @ClaimItemID = SCOPE_IDENTITY();
-            
-            DECLARE @tblItemsQuantityList TABLE(id INT IDENTITY(1,1), Qty INT)
-            INSERT into @tblItemsQuantityList
-            SELECT
-            T.I.value('(Quantity)[1]','INT')
-			FROM @XML.nodes('Claim/Items/Item/SubItems/*') AS T(I)
-
-            DECLARE @tblListOfItemsPrices TABLE(id INT IDENTITY(1,1), Price DECIMAL(18,2))
-            INSERT into @tblListOfItemsPrices
-            SELECT
-            CONVERT(DECIMAL(18,2),T.I.value('(Price)[1]','DECIMAL(18,2)'))
-			FROM @XML.nodes('Claim/Items/Item/SubItems/*') AS T(I) 
-
-            INSERT INTO tblClaimServicesItems(ClaimServiceID, qty_displayed, price, ItemID, qty_provided, created_date)
-            SELECT TOP(6) @ClaimItemID, QL.Qty, IL.Price,
-            (SELECT TOP(1) ItemID FROM tblItems WHERE ItemCode = T.Code),
-            (SELECT TOP(1) qty FROM tblProductContainedPackage WHERE ItemID = (SELECT TOP(1) ItemID FROM tblItems WHERE ItemCode = T.Code)), 
-            GETDATE()
-            FROM @tblItemsCodesList T INNER JOIN @tblItemsQuantityList QL ON QL.id = T.id INNER JOIN @tblListOfItemsPrices IL ON QL.id = IL.id
-
-
 			SELECT @TotalItems = SUM(PriceAsked * QtyProvided) FROM tblClaimItems
 						WHERE ClaimID = @ClaimID
 						GROUP BY ClaimID
@@ -334,8 +310,26 @@ BEGIN
             (SELECT TOP(1) qty FROM tblServiceContainedPackage WHERE ServiceId = (SELECT TOP(1) ServiceID FROM tblServices WHERE ServCode = T.Code)), 
             GETDATE()
             FROM @tblCodesList T INNER JOIN @tblQuantityList GG ON GG.id = T.id INNER JOIN @tblPriceList PL ON GG.id = PL.id
-            
-            
+
+            DECLARE @tblItemsQuantityList TABLE(id INT IDENTITY(1,1), Qty INT)
+            INSERT into @tblItemsQuantityList
+            SELECT
+            T.I.value('(Quantity)[1]','INT')
+			FROM @XML.nodes('Claim/Items/Item/SubItems/*') AS T(I)
+
+            DECLARE @tblListOfItemsPrices TABLE(id INT IDENTITY(1,1), Price DECIMAL(18,2))
+            INSERT into @tblListOfItemsPrices
+            SELECT
+            CONVERT(DECIMAL(18,2),T.I.value('(Price)[1]','DECIMAL(18,2)'))
+			FROM @XML.nodes('Claim/Items/Item/SubItems/*') AS T(I) 
+
+            SELECT @ClaimServiceID
+            INSERT INTO tblClaimServicesItems(ClaimServiceID, qty_displayed, price, ItemID, qty_provided, created_date)
+            SELECT TOP(6) @ClaimServiceID, QL.Qty, IL.Price,
+            (SELECT TOP(1) ItemID FROM tblItems WHERE ItemCode = T.Code),
+            (SELECT TOP(1) qty FROM tblProductContainedPackage WHERE ItemID = (SELECT TOP(1) ItemID FROM tblItems WHERE ItemCode = T.Code)), 
+            GETDATE()
+            FROM @tblItemsCodesList T INNER JOIN @tblItemsQuantityList QL ON QL.id = T.id INNER JOIN @tblListOfItemsPrices IL ON QL.id = IL.id
 
 		COMMIT TRAN CLAIM
 
