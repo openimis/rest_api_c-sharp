@@ -37,7 +37,7 @@ BEGIN
 	DECLARE @HFCode NVARCHAR(8)
 	DECLARE @ClaimAdmin NVARCHAR(8)
 	DECLARE @ClaimCode NVARCHAR(8)
-	DECLARE @CHFID NVARCHAR(12)
+	DECLARE @CHFID NVARCHAR(13)
 	DECLARE @StartDate DATE
 	DECLARE @EndDate DATE
 	DECLARE @ICDCode NVARCHAR(6)
@@ -87,7 +87,7 @@ BEGIN
 			@HFCode = Claim.value('(HFCode)[1]','NVARCHAR(8)'),
 			@ClaimAdmin = Claim.value('(ClaimAdmin)[1]','NVARCHAR(8)'),
 			@ClaimCode = Claim.value('(ClaimCode)[1]','NVARCHAR(8)'),
-			@CHFID = Claim.value('(CHFID)[1]','NVARCHAR(12)'),
+			@CHFID = Claim.value('(CHFID)[1]','NVARCHAR(13)'),
 			@StartDate = Claim.value('(StartDate)[1]','DATE'),
 			@EndDate = Claim.value('(EndDate)[1]','DATE'),
 			@ICDCode = Claim.value('(ICDCode)[1]','NVARCHAR(6)'),
