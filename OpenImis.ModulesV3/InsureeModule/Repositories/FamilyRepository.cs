@@ -164,6 +164,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             enrolFamily.FileInfo.UserId = userId;
             enrolFamily.FileInfo.OfficerId = officerId;
 
+            Console.WriteLine("Debug enrolFamily " + enrolFamily);
             var XML = enrolFamily.XMLSerialize();
             var JSON = JsonConvert.SerializeObject(enrolFamily);
 
