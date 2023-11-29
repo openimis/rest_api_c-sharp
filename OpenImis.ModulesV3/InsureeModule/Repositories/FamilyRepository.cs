@@ -193,6 +193,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             String GeneretedChfID = "0";
             int InsureeUpd;
             int InsureeImported;
+            Console.WriteLine("Enrollment data XML " + XML);
 
             using (var imisContext = new ImisDB())
             {
