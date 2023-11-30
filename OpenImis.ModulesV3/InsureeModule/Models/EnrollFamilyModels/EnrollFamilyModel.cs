@@ -43,7 +43,6 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
                 // add the Insurees
                 foreach (var i in f.Insurees)
                 {
-                    Console.WriteLine("Insuree data " + i);
                     enrolment.Insurees.Add(i);
                 }
 
