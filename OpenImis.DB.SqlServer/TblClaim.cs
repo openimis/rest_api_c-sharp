@@ -10,7 +10,6 @@ namespace OpenImis.DB.SqlServer
             TblClaimItems = new HashSet<TblClaimItems>();
             TblClaimServices = new HashSet<TblClaimServices>();
             TblFeedback = new HashSet<TblFeedback>();
-            TblClaimAttachments = new HashSet<TblClaimAttachments>();
         }
 
         public int ClaimId { get; set; }
@@ -71,6 +70,5 @@ namespace OpenImis.DB.SqlServer
         public ICollection<TblClaimItems> TblClaimItems { get; set; }
         public ICollection<TblClaimServices> TblClaimServices { get; set; }
         public ICollection<TblFeedback> TblFeedback { get; set; }
-        public ICollection<TblClaimAttachments> TblClaimAttachments { get; set; }
     }
 }

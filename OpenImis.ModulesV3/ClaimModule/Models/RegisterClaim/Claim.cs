@@ -10,6 +10,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
         public ClaimDetails Details { get; set; }
         public List<Item> Items { get; set; }
         public List<Service> Services { get; set; }
+        public List<ClaimAttachments> ClaimAttachments { get; set; }
     }
 
     public class ClaimDetails
@@ -56,5 +57,16 @@ namespace OpenImis.ModulesV3.ClaimModule.Models.RegisterClaim
         public decimal Quantity { get; set; }
         public decimal Price { get; set; }
         public string Type { get; set; }
+    }
+
+    public class ClaimAttachments
+    {
+        public int? ClaimId { get; set; }
+        public DateTime Date { get; set; }
+        public string Name { get; set; }
+        public string Title { get; set; }
+        public string Type { get; set; }
+        public string File { get; set; }
+        public string Mime { get; set; }
     }
 }

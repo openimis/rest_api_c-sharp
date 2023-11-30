@@ -44,7 +44,6 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblInsuree> TblInsuree { get; set; }
         public virtual DbSet<TblInsureePolicy> TblInsureePolicy { get; set; }
         public virtual DbSet<TblInsureeAttachments> TblInsureeAttachments { get; set; }
-        public virtual DbSet<TblClaimAttachments> TblClaimAttachments { get; set; }
         public virtual DbSet<tblServiceContainedPackage> tblServiceContainedPackage { get; set; }
         public virtual DbSet<tblProductContainedPackage> tblProductContainedPackage { get; set; }
         public virtual DbSet<TblItems> TblItems { get; set; }
@@ -1399,45 +1398,6 @@ namespace OpenImis.DB.SqlServer
                     .HasForeignKey(d => d.InsureeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_TblInsureeAttachmentstblInsuree-InsureeID");
-            });
-
-            modelBuilder.Entity<TblClaimAttachments>(entity =>
-            {
-                entity.ToTable("claim_ClaimAttachment");
-
-                entity.Property(e => e.Name)
-                    .HasColumnName("Name")
-                    .HasMaxLength(250);
-
-                entity.Property(e => e.Title)
-                    .HasColumnName("Title")
-                    .HasMaxLength(250);
-
-                entity.Property(e => e.Type)
-                    .HasColumnName("Type")
-                    .HasMaxLength(250);
-
-                entity.HasIndex(e => e.ClaimId )
-                .HasName("NCI_tblclaim_ClaimAttachment_ClaimID");
-
-                entity.Property(e => e.ClaimId).HasColumnName("ClaimID");
-
-                entity.Property(e => e.Date)
-                    .HasColumnType("datetime")
-                    .HasColumnName("AttachmentDate")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.File).HasColumnType("ntext");
-
-                entity.Property(e => e.Mime)
-                    .HasColumnName("Mime")
-                    .HasMaxLength(250);
-
-                entity.HasOne(d => d.ClaimId)
-                    .WithMany(p => p.TblClaimAttachments)
-                    .HasForeignKey(d => d.ClaimId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_TblClaimAttachmentstblClaim-ClaimID");
             });
 
             modelBuilder.Entity<tblServiceContainedPackage>(entity =>
