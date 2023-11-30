@@ -68,6 +68,9 @@ BEGIN
 
     DECLARE @tblResult TABLE(Result NVARCHAR(Max))
 
+    DECLARE @tblClaim_Attachments TABLE(Title NVARCHAR(255), Name NVARCHAR(255), FileContent NVARCHAR(Max))
+    DECLARE @Maxid INT
+
 	BEGIN TRY
 
 			IF NOT OBJECT_ID('tempdb..#tblItem') IS NULL DROP TABLE #tblItem
@@ -236,6 +239,23 @@ BEGIN
 						VALUES(@InsureeID,@ClaimCode,@StartDate,@EndDate,@ICDID,2,@Total,@ClaimDate,@Comment,-1,@HFID,@ClaimAdminId,@ICDID1,@ICDID2,@ICDID3,@ICDID4,@VisitType,@PrescriberType,@GuaranteeId);
 
 			SELECT @ClaimID = SCOPE_IDENTITY();
+
+            SET @Maxid = (SELECT MAX(id)+1 FROM claim_ClaimAttachment)
+            IF @Maxid IS NULL
+                BEGIN
+                    SET @Maxid = 1
+                END
+            -- Insertion des pieces jointes
+            INSERT INTO @tblClaim_Attachments(Title, [FileContent], Name)
+            SELECT
+            T.CAtt.value('(Title)[1]','NVARCHAR(250)'),
+            T.CAtt.value('(File)[1]','NVARCHAR(Max)'),
+            T.CAtt.value('(Name)[1]','NVARCHAR(250)')
+            FROM @XML.nodes('Claim/ClaimAttachments/ClaimAttachments') AS T(CAtt)
+
+            INSERT INTO claim_ClaimAttachment (id, ValidityFrom, Title, [FileName], [date], document, claim_id)
+            SELECT @Maxid, GETDATE(), Title, Name, GETDATE(), FileContent, @ClaimID
+            FROM @tblClaim_Attachments
 
 			;WITH PLID AS
 			(
