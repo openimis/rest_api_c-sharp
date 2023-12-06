@@ -33,6 +33,7 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblFeedbackPrompt> TblFeedbackPrompt { get; set; }
         public virtual DbSet<TblFromPhone> TblFromPhone { get; set; }
         public virtual DbSet<TblGender> TblGender { get; set; }
+        public virtual DbSet<TblMembershipGroup> TblMembershipGroup { get; set; }
         public virtual DbSet<TblHealthStatus> TblHealthStatus { get; set; }
         public virtual DbSet<TblHf> TblHf { get; set; }
         public virtual DbSet<TblHfcatchment> TblHfcatchment { get; set; }
@@ -42,6 +43,9 @@ namespace OpenImis.DB.SqlServer
         public virtual DbSet<TblImisdefaults> TblImisdefaults { get; set; }
         public virtual DbSet<TblInsuree> TblInsuree { get; set; }
         public virtual DbSet<TblInsureePolicy> TblInsureePolicy { get; set; }
+        public virtual DbSet<TblInsureeAttachments> TblInsureeAttachments { get; set; }
+        public virtual DbSet<tblServiceContainedPackage> tblServiceContainedPackage { get; set; }
+        public virtual DbSet<tblProductContainedPackage> tblProductContainedPackage { get; set; }
         public virtual DbSet<TblItems> TblItems { get; set; }
         public virtual DbSet<TblLanguages> TblLanguages { get; set; }
         public virtual DbSet<TblLegalForms> TblLegalForms { get; set; }
@@ -232,6 +236,9 @@ namespace OpenImis.DB.SqlServer
 
                 entity.Property(e => e.VisitType)
                     .HasMaxLength(1)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PrescriberType)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.AdjusterNavigation)
@@ -821,6 +828,21 @@ namespace OpenImis.DB.SqlServer
                 entity.Property(e => e.Gender).HasMaxLength(50);
             });
 
+            modelBuilder.Entity<TblMembershipGroup>(entity =>
+            {
+                entity.HasKey(e => e.idMembershipGroup);
+
+                entity.ToTable("tblMembershipGroup");
+
+                entity.Property(e => e.idMembershipGroup)
+                    .HasMaxLength(2)
+                    .IsUnicode(false)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+            });
+
             modelBuilder.Entity<TblHealthStatus>(entity =>
             {
                 entity.HasKey(e => e.HealthStatusId);
@@ -1218,6 +1240,14 @@ namespace OpenImis.DB.SqlServer
                 entity.Property(e => e.OtherNames)
                     .IsRequired()
                     .HasMaxLength(100);
+                
+                entity.Property(e => e.ArabOtherNames)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.ArabLastName)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.Passport)
                     .HasColumnName("passport")
@@ -1229,9 +1259,9 @@ namespace OpenImis.DB.SqlServer
 
                 entity.Property(e => e.PhotoId).HasColumnName("PhotoID");
 
-                entity.Property(e => e.RowId)
-                    .HasColumnName("RowID")
-                    .IsRowVersion();
+                // entity.Property(e => e.RowId)
+                //     .HasColumnName("RowID")
+                //     .IsRowVersion();
 
                 entity.Property(e => e.TypeOfId).HasMaxLength(1);
 
@@ -1327,6 +1357,94 @@ namespace OpenImis.DB.SqlServer
                     .WithMany(p => p.TblInsureePolicy)
                     .HasForeignKey(d => d.PolicyId)
                     .HasConstraintName("FK_tblInsureePolicy_tblPolicy");
+            });
+
+            modelBuilder.Entity<TblInsureeAttachments>(entity =>
+            {
+                entity.HasKey(e => e.idAttachment);
+
+                entity.ToTable("tblattachment");
+
+                entity.Property(e => e.idAttachment).HasColumnName("idAttachment");
+
+                entity.Property(e => e.Folder)
+                    .HasColumnName("Folder")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.Filename)
+                    .HasColumnName("FileName")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.Title)
+                    .HasColumnName("Title")
+                    .HasMaxLength(250);
+
+                entity.HasIndex(e => e.InsureeId )
+                .HasName("NCI_tblInsureeAttachments_InsureeID");
+
+                entity.Property(e => e.InsureeId).HasColumnName("InsureeID");
+
+                entity.Property(e => e.Date)
+                    .HasColumnType("datetime")
+                    .HasColumnName("AttachmentDate")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Content).HasColumnType("ntext");
+
+                entity.Property(e => e.Mime)
+                    .HasColumnName("Mime")
+                    .HasMaxLength(250);
+
+                entity.HasOne(d => d.Insuree)
+                    .WithMany(p => p.TblInsureeAttachments)
+                    .HasForeignKey(d => d.InsureeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TblInsureeAttachmentstblInsuree-InsureeID");
+            });
+
+            modelBuilder.Entity<tblServiceContainedPackage>(entity =>
+            {
+                entity.HasKey(e => e.id);
+
+                entity.ToTable("tblServiceContainedPackage");
+
+                entity.Property(e => e.id).HasColumnName("idSCP");
+
+                entity.Property(e => e.ServiceId).HasColumnName("ServiceId");
+
+                entity.Property(e => e.servicelinkedService).HasColumnName("ServiceLinked");;
+
+                entity.Property(e => e.qty_provided).HasColumnName("qty");
+
+                entity.Property(e => e.scpDate).HasColumnName("created_date");
+
+                entity.Property(e => e.price_asked).HasColumnName("price");
+
+                entity.Property(e => e.status).HasColumnName("status");
+
+            });
+
+
+            modelBuilder.Entity<tblProductContainedPackage>(entity =>
+            {
+                entity.HasKey(e => e.id);
+
+                entity.ToTable("tblProductContainedPackage");
+
+                entity.Property(e => e.id).HasColumnName("idPCP");
+
+                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+
+                entity.Property(e => e.servicelinkedItem).HasColumnName("ServiceID");;
+
+                entity.Property(e => e.qty_provided).HasColumnName("qty");
+
+                entity.Property(e => e.pcpDate).HasColumnName("created_date");
+
+                entity.Property(e => e.price_asked).HasColumnName("price");
+
+                entity.Property(e => e.status).HasColumnName("status");
+
             });
 
             modelBuilder.Entity<TblItems>(entity =>
@@ -2548,6 +2666,9 @@ namespace OpenImis.DB.SqlServer
                 entity.Property(e => e.ServName)
                     .IsRequired()
                     .HasMaxLength(100);
+
+                entity.Property(e => e.ServPackageType)
+                    .HasMaxLength(1);
 
                 entity.Property(e => e.ServType)
                     .IsRequired()

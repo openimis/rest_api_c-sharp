@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenImis.DB.SqlServer.DataHelper;
 
 namespace OpenImis.ModulesV3.MasterDataModule.Repositories
 {
@@ -353,6 +354,125 @@ namespace OpenImis.ModulesV3.MasterDataModule.Repositories
             }
 
             return genders;
+        }
+
+        public List<MembershipGroupModel> GetMembershipGroup()
+        {
+            List<MembershipGroupModel> membershipGroups;
+
+            using (var imisContext = new ImisDB())
+            {
+                membershipGroups = imisContext.TblMembershipGroup
+                    .Select(x => new MembershipGroupModel()
+                    {
+                        idMembershipGroup = x.idMembershipGroup,
+                        Name = x.Name
+                    })
+                    .ToList();
+            }
+
+            return membershipGroups;
+        }
+
+        public List<ServiceModel> GetServices()
+        {
+            List<ServiceModel> services;
+
+            using (var imisContext = new ImisDB())
+            {
+                services = imisContext.TblServices
+                    .Select(x => new ServiceModel()
+                    {
+                        ServiceId = x.ServiceId,
+                        ServCode = x.ServCode,
+                        ServName = x.ServName,
+                        ServType = x.ServType,
+                        ServLevel = x.ServLevel,
+                        ServPrice = x.ServPrice,
+                        ServCareType = x.ServCareType,
+                        ServFrequency = x.ServFrequency,
+                        ServPatCat = x.ServPatCat,
+                        ValidityFrom = x.ValidityFrom,
+                        ValidityTo = x.ValidityTo,
+                        LegacyId = x.LegacyId,
+                        ServCategory = x.ServCategory,
+                        ServPackageType = x.ServPackageType
+                    })
+                    .ToList();
+            }
+            return services;
+        }
+
+        public List<ItemModel> GetItems()
+        {
+            List<ItemModel> items;
+
+            using (var imisContext = new ImisDB())
+            {
+                items = imisContext.TblItems
+                    .Select(x => new ItemModel()
+                    {
+                        ItemId = x.ItemId,
+                        ItemCode = x.ItemCode,
+                        ItemName = x.ItemName,
+                        ItemType = x.ItemType,
+                        ItemPackage = x.ItemPackage,
+                        ItemPrice = x.ItemPrice,
+                        ItemCareType = x.ItemCareType,
+                        ItemFrequency = x.ItemFrequency,
+                        ItemPatCat = x.ItemPatCat,
+                        ValidityFrom = x.ValidityFrom,
+                        ValidityTo = x.ValidityTo,
+                        LegacyId = x.LegacyId
+                    })
+                    .ToList();
+            }
+            return items;
+        }
+
+        public List<SubServiceModel> GetSubServices()
+        {
+            List<SubServiceModel> subservices;
+
+            using (var imisContext = new ImisDB())
+            {
+                subservices = imisContext.tblServiceContainedPackage
+                    .Select(x => new SubServiceModel()
+                    {
+                        id = x.id,
+                        ServiceId = x.ServiceId,
+                        servicelinkedService = x.servicelinkedService,
+                        qty_provided = x.qty_provided,
+                        scpDate = x.scpDate,
+                        price_asked = x.price_asked,
+                        status = x.status
+                    })
+                    .ToList();
+            }
+            return subservices;
+        }
+
+
+        public List<SubItemModel> GetSubItems()
+        {
+            List<SubItemModel> subitems;
+
+            using (var imisContext = new ImisDB())
+            {
+                subitems = imisContext.tblProductContainedPackage
+                    .Select(x => new SubItemModel()
+                    {
+                        id = x.id,
+                        ItemId = x.ItemId,
+                        servicelinkedItem = x.servicelinkedItem,
+                        qty_provided = x.qty_provided,
+                        pcpDate = x.pcpDate,
+                        price_asked = x.price_asked,
+                        status = x.status
+                    })
+                    .ToList();
+            }
+            return subitems;
         }
     }
 }

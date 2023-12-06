@@ -45,6 +45,13 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
                 {
                     enrolment.Insurees.Add(i);
                 }
+
+                // add the Attachments
+                foreach (var i in f.InsureeAttachments)
+                {
+                    enrolment.InsureeAttachments.Add(i);
+                }
+
                 // add the Policies
                 foreach (var p in f.Policies)
                 {

@@ -12,6 +12,8 @@ namespace OpenImis.Modules.InsureeManagementModule.Models
 		public string CHFID { get; set; }
 		public string LastName { get; set; }
 		public string OtherNames { get; set; }
+		public string ArabLastName { get; set; }
+		public string ArabOtherNames { get; set; }
 		public DateTime DOB { get; set; }
 		public string Gender { get; set; }
 		public string Marital { get; set; }
@@ -59,6 +61,8 @@ namespace OpenImis.Modules.InsureeManagementModule.Models
 				CHFID = tblInsuree.Chfid,
 				LastName = tblInsuree.LastName,
 				OtherNames = tblInsuree.OtherNames,
+				ArabLastName = tblInsuree.ArabLastName,
+				ArabOtherNames = tblInsuree.ArabOtherNames,
 				DOB = tblInsuree.Dob,
 				IsHead = tblInsuree.IsHead,
 				Phone = tblInsuree.Phone,
@@ -134,6 +138,8 @@ namespace OpenImis.Modules.InsureeManagementModule.Models
 				Chfid = this.CHFID,
 				LastName = this.LastName,
 				OtherNames = this.OtherNames,
+				ArabLastName = this.ArabLastName,
+				ArabOtherNames = this.ArabOtherNames,
 				Dob = this.DOB,
 				IsHead = this.IsHead,
 				Phone = this.Phone,

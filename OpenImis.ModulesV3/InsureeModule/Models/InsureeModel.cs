@@ -14,6 +14,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
         public string CHFID { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
+        public string ArabLastName { get; set; }
+        public string ArabOtherNames { get; set; }
         [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime DOB { get; set; }
         public string Gender { get; set; }
@@ -51,6 +53,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models
                 CHFID = tblInsuree.Chfid,
                 LastName = tblInsuree.LastName,
                 OtherNames = tblInsuree.OtherNames,
+                ArabLastName = tblInsuree.ArabLastName,
+                ArabOtherNames = tblInsuree.ArabOtherNames,
                 DOB = (DateTime)tblInsuree.Dob,
                 IsHead = tblInsuree.IsHead,
                 Phone = tblInsuree.Phone,

@@ -82,7 +82,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             return response;
         }
 
-        public NewFamilyResponse CreateEnrolResponse(EnrolFamilyModel model)
+        public NewFamilyResponse CreateEnrolResponse(EnrolFamilyModel model, String NewGeneretedChfID)
         {
             var response = new NewFamilyResponse();
 
@@ -91,10 +91,11 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 foreach (var fam in model.Family)
                 {
 
-                    var familyId = imisContext.TblInsuree.Where(i => i.Chfid == fam.HOFCHFID && i.IsHead == true && i.ValidityTo == null)
+                    var familyId = imisContext.TblInsuree.Where(i => i.Chfid == NewGeneretedChfID && i.IsHead == true && i.ValidityTo == null)
                                     .Select(i => i.FamilyId)
                                     .FirstOrDefault();
 
+                    _logger.LogWarning("Family Id in CreateEnrolResponse - 98 - : " + familyId);
                     var family = imisContext.TblFamilies
                                 .Where(f => f.FamilyId == familyId && f.ValidityTo == null)
                                 .Include(f => f.TblInsuree)
@@ -163,6 +164,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             enrolFamily.FileInfo.UserId = userId;
             enrolFamily.FileInfo.OfficerId = officerId;
 
+            Console.WriteLine("Debug enrolFamily " + enrolFamily);
             var XML = enrolFamily.XMLSerialize();
             var JSON = JsonConvert.SerializeObject(enrolFamily);
 
@@ -189,8 +191,10 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
 
             int RV = -99;
+            String GeneretedChfID = "0";
             int InsureeUpd;
             int InsureeImported;
+            Console.WriteLine("Enrollment data XML " + XML);
 
             using (var imisContext = new ImisDB())
             {
@@ -213,7 +217,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 var premiumImportedParameter = OutputParameter.CreateOutputParameter("@PremiumImported", SqlDbType.Int);
                 var premiumRejectedParameter = OutputParameter.CreateOutputParameter("@PremiumRejected", SqlDbType.Int);
 
-                var sql = "exec @RV = uspConsumeEnrollments @XML, @Source, @SourceVersion, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
+                var sql = "exec @RV = uspConsumeEnrollments @XML, @FamilySent OUT, @FamilyImported OUT, @FamiliesUpd OUT, @FamilyRejected OUT, " +
                     "@InsureeSent OUT, @InsureeUpd OUT, @InsureeImported OUT, " +
                     "@PolicySent OUT, @PolicyImported OUT, @PolicyRejected OUT, @PolicyChanged OUT," +
                     "@PremiumSent OUT, @PremiumImported OUT, @PremiumRejected OUT";
@@ -223,7 +227,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
 
                     cmd.CommandText = sql;
 
-                    cmd.Parameters.AddRange(new[] { xmlParameter, source, sourceVersion, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
+                    cmd.Parameters.AddRange(new[] { xmlParameter, returnParameter, familySentParameter, familyImportedParameter, familiesUpdParameter,
                                             familyRejectedParameter, insureeSentParameter, insureeUpdParameter, insureeImportedParameter, policySentParameter,
                                             policyImportedParameter, policyRejectedParameter, policyChangedParameter, premiumSentParameter, premiumImportedParameter,
                                             premiumRejectedParameter });
@@ -238,6 +242,12 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                             while (reader.Read())
                             {
                                 Debug.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                Console.WriteLine("Error/Warning: " + reader.GetValue(0));
+                                if (reader.GetValue(0).ToString().Contains("GeneretedChfID")){
+                                    var lst = reader.GetValue(0).ToString().Split("GeneretedChfID");
+                                    Console.WriteLine("Nouvel CHFID Genere " + lst[1]);
+                                    GeneretedChfID = lst[1];
+                                }
                             }
                         } while (reader.NextResult());
                     }
@@ -246,6 +256,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
                 InsureeUpd = insureeUpdParameter.Value == DBNull.Value ? 0 : (int)insureeUpdParameter.Value;
                 InsureeImported = insureeImportedParameter.Value == DBNull.Value ? 0 : (int)insureeImportedParameter.Value;
                 RV = (int)returnParameter.Value;
+                Console.WriteLine("XML: " + XML);
 
                 if (RV == 0 && (InsureeImported > 0 || InsureeUpd > 0))
                 {
@@ -274,7 +285,7 @@ namespace OpenImis.ModulesV3.InsureeModule.Repositories
             newFamily.Response = RV;
             if (RV == 0)
             {
-                newFamily = CreateEnrolResponse(model);
+                newFamily = CreateEnrolResponse(model, GeneretedChfID);
 
                 // Update the control number
                 newFamily.Response = UpdateControlNumber(model, newFamily);

@@ -33,7 +33,7 @@ namespace OpenImis.DB.SqlServer
             .AddJsonFile($"{path}appsettings.json")
             //.AddJsonFile(Environment.GetEnvironmentVariable("REGISTRY_CONFIG_FILE"))
             //.AddJsonFile("appsettings.json")
-            .AddJsonFile(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != null ? $"{path}appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json" : $"{path}appsettings.Production.json", optional: false, reloadOnChange: true)
+            .AddJsonFile(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != null ? $"{path}appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json" : $"{path}appsettings.Production.json", optional: false, reloadOnChange: false)
             .Build();
             if (configuration["ConnectionSettings:CommandTimeout"] != null) _commandTimeout = Int32.Parse(configuration["ConnectionSettings:CommandTimeout"]);
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("IMISDatabase"), options => options.CommandTimeout(_commandTimeout));

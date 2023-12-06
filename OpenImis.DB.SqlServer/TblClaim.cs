@@ -57,6 +57,7 @@ namespace OpenImis.DB.SqlServer
         public int? Icdid3 { get; set; }
         public int? Icdid4 { get; set; }
         public string VisitType { get; set; }
+        public string PrescriberType { get; set; }
         public string ClaimCategory { get; set; }
 
         public TblUsers AdjusterNavigation { get; set; }

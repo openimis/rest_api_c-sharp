@@ -12,6 +12,7 @@ namespace OpenImis.DB.SqlServer
             TblFamilies = new HashSet<TblFamilies>();
             TblHealthStatus = new HashSet<TblHealthStatus>();
             TblInsureePolicy = new HashSet<TblInsureePolicy>();
+            TblInsureeAttachments = new HashSet<TblInsureeAttachments>();
             TblPolicyRenewalDetails = new HashSet<TblPolicyRenewalDetails>();
             TblPolicyRenewals = new HashSet<TblPolicyRenewals>();
         }
@@ -22,6 +23,8 @@ namespace OpenImis.DB.SqlServer
         public string Chfid { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
+        public string ArabLastName { get; set; }
+        public string ArabOtherNames { get; set; }
         public DateTime Dob { get; set; }
         public string Gender { get; set; }
         public string Marital { get; set; }
@@ -35,7 +38,7 @@ namespace OpenImis.DB.SqlServer
         public DateTime? ValidityTo { get; set; }
         public int? LegacyId { get; set; }
         public int AuditUserId { get; set; }
-        public byte[] RowId { get; set; }
+        // public byte[] RowId { get; set; }
         public short? Relationship { get; set; }
         public short? Profession { get; set; }
         public short? Education { get; set; }
@@ -61,6 +64,7 @@ namespace OpenImis.DB.SqlServer
         public ICollection<TblFamilies> TblFamilies { get; set; }
         public ICollection<TblHealthStatus> TblHealthStatus { get; set; }
         public ICollection<TblInsureePolicy> TblInsureePolicy { get; set; }
+        public ICollection<TblInsureeAttachments> TblInsureeAttachments { get; set; }
         public ICollection<TblPolicyRenewalDetails> TblPolicyRenewalDetails { get; set; }
         public ICollection<TblPolicyRenewals> TblPolicyRenewals { get; set; }
     }

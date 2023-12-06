@@ -72,6 +72,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
 
                 if (ifSaved)
                 {
+                    Console.WriteLine("La data XML " + XML);
                     using (var imisContext = new ImisDB())
                     {
                         var xmlParameter = new SqlParameter("@XML", XML) { DbType = DbType.Xml };
@@ -96,6 +97,7 @@ namespace OpenImis.ModulesV3.ClaimModule.Repositories
                                     while (reader.Read())
                                     {
                                         _logger.LogDebug($"SP OUTPUT: {reader.GetValue(0)}");
+                                        Console.WriteLine("OUTPUT " + reader.GetValue(0));
                                     }
                                 } while (reader.NextResult());
                             }

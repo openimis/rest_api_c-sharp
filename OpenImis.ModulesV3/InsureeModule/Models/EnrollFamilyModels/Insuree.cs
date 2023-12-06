@@ -11,6 +11,8 @@ namespace OpenImis.ModulesV3.InsureeModule.Models.EnrollFamilyModels
         public string CHFID { get; set; }
         public string LastName { get; set; }
         public string OtherNames { get; set; }
+        public string ArabLastName { get; set; }
+        public string ArabOtherNames { get; set; }
 
         [JsonConverter(typeof(IsoDateSerializer))]
         public DateTime? DOB { get; set; }

@@ -68,6 +68,7 @@ namespace OpenImis.RestApi.Controllers.V3
             //  This will help us later to debug in case of any queries
             Guid userUUID;
             int officerId;
+            Console.WriteLine("Hello World!");
 
             try
             {
@@ -115,6 +116,7 @@ namespace OpenImis.RestApi.Controllers.V3
             }
 
             // If the response is 1001 then Family uploaded successfully but it failed to map control number entries
+            Console.WriteLine(response);
             return Ok(response);
         }
     }
